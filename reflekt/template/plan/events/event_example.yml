@@ -1,0 +1,19 @@
+# Example event spec. Use this as:
+#    - A template for you first event. Rename this file to
+#      <your_event_name>.yml and edit as needed.
+#    - A template for new events. Copy this file and place in
+#      <your-plan-name>/events/<new-event-name>.yml. Edit as needed.
+- version: 1
+  name: Test Event One
+  description: Some description of the event.
+  metadata:  # Metadata is optional
+    owner: product
+    priority: 1
+  properties:
+    - name: property_one
+      description: A string property.
+      type: string
+      required: true  # Optional. Default is false.
+    - name: property_two
+      description: A boolean property.
+      type: boolean

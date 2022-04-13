@@ -1,0 +1,12 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: reflekt
+Upstream-Contact: Gregory Clunies <greg@reflekt-ci.com>
+Source: https://github.com/reflekt-ci/reflekt
+
+Files: reflekt/template/*
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
+Files: reflekt/dbt/package/*
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
