@@ -138,4 +138,5 @@ dmypy.json
 .tmp/
 /tracking-plans/
 /dbt_packages/
+/avo/
 reflekt_project.yml
