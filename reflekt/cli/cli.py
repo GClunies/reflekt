@@ -91,15 +91,15 @@ def new(plan_name, plans_dir):
 def pull(plan_name, plans_dir, raw):
     """Generate tracking plan as code using the reflekt schema."""
     logger.configure(**logger_config)
-    cdp_name = ReflektConfig().cdp_name
+    plan_type = ReflektConfig().plan_type
 
-    logger.info(f"Fetching tracking plan `{plan_name}` from {titleize(cdp_name)}...")
+    logger.info(f"Fetching tracking plan `{plan_name}` from {titleize(plan_type)}...")
     api = ReflektApiHandler().api
     data = api.get(plan_name)
-    logger.info(f"Fetched tracking plan `{plan_name}` from {titleize(cdp_name)}")
+    logger.info(f"Fetched tracking plan `{plan_name}` from {titleize(plan_type)}")
 
     if raw:
-        logger.info(f"Raw tracking plan `{plan_name}` from {titleize(cdp_name)}...\n")
+        logger.info(f"Raw tracking plan `{plan_name}` from {titleize(plan_type)}...\n")
         click.echo(json.dumps(data, indent=2))
 
     else:
@@ -108,7 +108,7 @@ def pull(plan_name, plans_dir, raw):
 
         plan = SegmentPlan(data)
         logger.info(
-            f"Building {titleize(cdp_name)} tracking plan `{plan_name}` in " f"reflekt specification at {plan_dir}"
+            f"Building {titleize(plan_type)} tracking plan `{plan_name}` in " f"reflekt specification at {plan_dir}"
         )
         plan.build_reflekt(plan_dir)
         logger.info(f"SUCCESS - Tracking plan `{plan_name}` built in reflekt " f"specification at {str(plan_dir)}")
@@ -150,13 +150,13 @@ def push(plan_name, plans_dir, dry):
 
     if dry:
         payload = api.sync(plan_name, cdp_plan, dry=True)
-        logger.info(f"DRY RUN MODE. The following JSON would be sent to " f"{transformer.cdp_name}")
+        logger.info(f"DRY RUN MODE. The following JSON would be sent to " f"{transformer.plan_type}")
         click.echo(json.dumps(payload, indent=2))
 
     else:
-        logger.info(f"Syncing tracking plan {plan_name} to {transformer.cdp_name}.")
+        logger.info(f"Syncing tracking plan {plan_name} to {transformer.plan_type}.")
         api.sync(plan_name, cdp_plan)
-        logger.info(f"DONE. Synced tracking plan {plan_name} to " f"{transformer.cdp_name}.")
+        logger.info(f"DONE. Synced tracking plan {plan_name} to " f"{transformer.plan_type}.")
 
 
 @click.command()
@@ -510,7 +510,8 @@ cli.add_command(dbt)
 if __name__ == "__main__":
     # Call CLI command here with arguments as a list
     # pull(["--name", "tracking-plan-example"])
+    pull(["--name", "patty-bar-dev-avo"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
-    dbt(["--name", "my-plan"])
+    # dbt(["--name", "my-plan"])
     # init(["--project-dir", "/Users/gclunies/Repos/patty-bar-reflekt"])

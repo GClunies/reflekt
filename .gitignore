@@ -140,3 +140,4 @@ dmypy.json
 /dbt_packages/
 /avo/
 reflekt_project.yml
+reflekt_project_backup.yml

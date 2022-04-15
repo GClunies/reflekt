@@ -51,35 +51,40 @@ class ReflektTransformer(object):
     """
 
     def __init__(self, reflekt_plan, dbt_pkg_dir=None, pkg_version=None):
-        self._reflekt_plan = reflekt_plan
-        self._plan_name = str.lower(self._reflekt_plan.name)
-        self._reflekt_config = ReflektConfig()
-        self._cdp = self._reflekt_config.cdp
-        self._cdp_name = self._reflekt_config.cdp_name
-        self._warehouse = self._reflekt_config.warehouse
-        self._warehouse_type = self._reflekt_config.warehouse_type
+        self.reflekt_plan = reflekt_plan
+        self.plan_name = str.lower(self.reflekt_plan.name)
+        self.reflekt_config = ReflektConfig()
+        # self.cdp = self.reflekt_config.cdp
+        self.cdp_name = self.reflekt_config.cdp_name
+        self.plan_type = self.reflekt_config.plan_type
+        self.warehouse = self.reflekt_config.warehouse
+        self.warehouse_type = self.reflekt_config.warehouse_type
         if dbt_pkg_dir is not None:
-            self._reflekt_project = ReflektProject()
-            self._project_dir = self._reflekt_project.project_dir
-            self._dbt_package_name = f"reflekt_{underscore(self._plan_name)}"
-            self._tmp_pkg_dir = self._project_dir / ".reflekt" / "tmp" / self._dbt_package_name
-            self._dbt_pkg_path = dbt_pkg_dir / self._dbt_package_name
-            self._pkg_template = pkg_resources.resource_filename("reflekt", "dbt/package/")
-            self._pkg_version = pkg_version
-            self._db_engine = WarehouseConnection(self._reflekt_config)
-            self._schema_map = self._reflekt_project.schema_map
-            self._schema = self._get_plan_schema_from_map(self._plan_name)
-            self._src_prefix = self._reflekt_project.src_prefix
-            self._stg_prefix = self._reflekt_project.stg_prefix
-            self._incremental_logic = self._reflekt_project.incremental_logic
+            self.reflekt_project = ReflektProject()
+            self.project_dir = self.reflekt_project.project_dir
+            self.dbt_package_name = f"reflekt_{underscore(self.plan_name)}"
+            self.tmp_pkg_dir = self.project_dir / ".reflekt" / "tmp" / self.dbt_package_name
+            self.dbt_pkg_path = dbt_pkg_dir / self.dbt_package_name
+            self.pkg_template = pkg_resources.resource_filename("reflekt", "dbt/package/")
+            self.pkg_version = pkg_version
+            self.db_engine = WarehouseConnection(self.reflekt_config)
+            self.schema_map = self.reflekt_project.schema_map
+            self.schema = self._get_plan_schema_from_map(self.plan_name)
+            self.src_prefix = self.reflekt_project.src_prefix
+            self.stg_prefix = self.reflekt_project.stg_prefix
+            self.incremental_logic = self.reflekt_project.incremental_logic
 
-    @property
-    def cdp_name(self):
-        return self._cdp_name
+    # @property
+    # def plan_type(self):
+    #     return self.plan_type
+
+    # @property
+    # def cdp_name(self):
+    #     return self.cdp_name
 
     def _get_plan_schema_from_map(self, plan_name):
         try:
-            return self._schema_map[plan_name]
+            return self.schema_map[plan_name]
 
         except KeyError:
             logger.error(
@@ -90,11 +95,13 @@ class ReflektTransformer(object):
             )
             sys.exit(1)
 
-    def _plan_avo(self, reflekt_plan):
-        pass
+    # TODO - Avo and Iteratively only support `reflekt pull`. The whole point
+    # of them existing is to use there UI for planning. We should not interfere here!
+    # def _plan_avo(self, reflekt_plan):
+    #     pass
 
-    def _plan_iteratively(self, reflekt_plan):
-        pass
+    # def _plan_iteratively(self, reflekt_plan):
+    #     pass
 
     def _plan_rudderstack(self, reflekt_plan):
         pass
@@ -102,9 +109,9 @@ class ReflektTransformer(object):
     def _plan_segment(self, reflekt_plan):
         segment_payload = copy.deepcopy(segment_payload_schema)
         segment_plan = copy.deepcopy(segment_plan_schema)
-        segment_plan["display_name"] = self._plan_name
+        segment_plan["display_name"] = self.plan_name
 
-        logger.info(f"Converting {self._plan_name} to {titleize(self._cdp_name)} " f"format")
+        logger.info(f"Converting {self.plan_name} to {titleize(self.plan_type)} " f"format")
 
         if reflekt_plan.events != []:
             for reflekt_event in reflekt_plan.events:
@@ -176,7 +183,7 @@ class ReflektTransformer(object):
 
     def _build_segment_event(self, reflekt_event):
         logger.info(
-            f"Building {reflekt_event.name} (version {reflekt_event.version}) " f"in {titleize(self._cdp_name)} format"
+            f"Building {reflekt_event.name} (version {reflekt_event.version}) " f"in {titleize(self.plan_type)} format"
         )
         segment_event = copy.deepcopy(segment_event_schema)
         segment_event["name"] = reflekt_event.name
@@ -260,31 +267,32 @@ class ReflektTransformer(object):
         pass
 
     def build_cdp_plan(self):
-        if self._cdp_name == "avo":
-            return self._plan_avo(self._reflekt_plan)
+        if self.plan_type == "rudderstack":
+            return self._plan_rudderstack(self.reflekt_plan)
 
-        elif self._cdp_name == "iteratively":
-            return self._plan_iteratively(self._reflekt_plan)
+        elif self.plan_type == "segment":
+            return self._plan_segment(self.reflekt_plan)
 
-        elif self._cdp_name == "rudderstack":
-            return self._plan_rudderstack(self._reflekt_plan)
+        elif self.plan_type == "snowplow":
+            return self._plan_snowplow(self.reflekt_plan)
 
-        elif self._cdp_name == "segment":
-            return self._plan_segment(self._reflekt_plan)
+        # TODO - will never push a plan to Analytics governance tool. Only `reflekt pull`
+        # elif self.plan_type == "avo":
+        #     return self.plan_avo(self.reflekt_plan)
 
-        elif self._cdp_name == "snowplow":
-            return self._plan_snowplow(self._reflekt_plan)
+        # elif self.plan_type == "iteratively":
+        #     return self.plan_iteratively(self.reflekt_plan)
 
     def _dbt_segment(self, reflekt_plan):
         logger.info(
             f"Building reflekt dbt package:\n"
-            f"\n        Warehouse: {self._warehouse_type}"
-            f"\n        CDP: {self._cdp_name}"
-            f"\n        Tracking plan: {self._plan_name}"
-            f"\n        dbt pkg path: {self._dbt_pkg_path}\n"
+            f"\n        Warehouse: {self.warehouse_type}"
+            f"\n        CDP: {self.cdp_name}"
+            f"\n        Tracking plan: {self.plan_name}"
+            f"\n        dbt pkg path: {self.dbt_pkg_path}\n"
         )
 
-        logger.info(f"Building dbt package at temporary path {self._tmp_pkg_dir}")
+        logger.info(f"Building dbt package at temporary path {self.tmp_pkg_dir}")
 
         self.db_errors = []
 
@@ -300,7 +308,7 @@ class ReflektTransformer(object):
         self._dbt_segment_event(reflekt_plan, dbt_src)  # Builds ALL events
 
         logger.info(f"Writing completed {reflekt_plan.name} dbt source to dbt " f"package")
-        dbt_src_path = self._tmp_pkg_dir / "models" / f"{self._src_prefix}{underscore(self._plan_name)}.yml"
+        dbt_src_path = self.tmp_pkg_dir / "models" / f"{self.src_prefix}{underscore(self.plan_name)}.yml"
 
         with open(dbt_src_path, "w") as f:
             yaml.dump(
@@ -317,13 +325,13 @@ class ReflektTransformer(object):
 
         logger.info(f"Added {reflekt_plan.name} dbt source to dbt package")
 
-        logger.info(f"Copying dbt package from temporary path " f"{self._tmp_pkg_dir} to {self._dbt_pkg_path}")
+        logger.info(f"Copying dbt package from temporary path " f"{self.tmp_pkg_dir} to {self.dbt_pkg_path}")
         # If dbt package already exists, remove it to start fresh
-        if self._dbt_pkg_path.exists():
-            shutil.rmtree(self._dbt_pkg_path)
-        shutil.copytree(self._tmp_pkg_dir, self._dbt_pkg_path)
+        if self.dbt_pkg_path.exists():
+            shutil.rmtree(self.dbt_pkg_path)
+        shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_path)
 
-        logger.info(f"Completed building dbt package at {self._dbt_pkg_path}")
+        logger.info(f"Completed building dbt package at {self.dbt_pkg_path}")
 
         if self.db_errors:
             logger.warning(
@@ -332,10 +340,10 @@ class ReflektTransformer(object):
             )
 
     def _dbt_segment_source(self, reflekt_plan, dbt_src):
-        dbt_src["sources"][0]["name"] = self._schema
+        dbt_src["sources"][0]["name"] = self.schema
         dbt_src["sources"][0]["description"] = (
-            f"Schema in {titleize(self._warehouse_type)} where data for the "
-            f"{reflekt_plan.name} {titleize(self._cdp_name)} source is stored."
+            f"Schema in {titleize(self.warehouse_type)} where data for the "
+            f"{reflekt_plan.name} {titleize(self.cdp_name)} source is stored."
         )
 
     def _dbt_segment_identifies(self, reflekt_plan, dbt_src):
@@ -355,10 +363,10 @@ class ReflektTransformer(object):
 
             # Setup the staging model SQL (very hacky, but gets spacing right)
             idf_sql = "{{\n" "  config(\n" "    materialized = 'incremental',\n" "    unique_key = 'identify_id',\n"
-            if self._warehouse_type == "redshift":
+            if self.warehouse_type == "redshift":
                 idf_sql += "    sort = 'tstamp',\n" "    dist = 'identify_id'\n"
 
-            elif self._warehouse_type == "snowflake":
+            elif self.warehouse_type == "snowflake":
                 idf_sql += "    cluster_by = 'tstamp'\n"
 
             idf_sql += (
@@ -367,8 +375,8 @@ class ReflektTransformer(object):
                 "with\n\n"
                 "source as (\n\n"
                 f"    select *\n\n"
-                f"    from source {{{{ source('{underscore(self._schema)}', 'identifies') }}}}\n\n"  # noqa: E501
-                f"{self._incremental_logic}\n"
+                f"    from source {{{{ source('{underscore(self.schema)}', 'identifies') }}}}\n\n"  # noqa: E501
+                f"{self.incremental_logic}\n"
                 "),\n\n"
                 "renamed as (\n\n"
                 "    select"
@@ -376,7 +384,7 @@ class ReflektTransformer(object):
 
             # Setup the staging model yml for docs
             idf_stg = copy.deepcopy(dbt_model_schema)
-            idf_stg["name"] = f"{self._stg_prefix}{underscore(self._plan_name)}" f"__identifies"
+            idf_stg["name"] = f"{self.stg_prefix}{underscore(self.plan_name)}" f"__identifies"
             idf_stg["description"] = (
                 f"A staging model with identify() calls for "
                 f"{reflekt_plan.name}. Each row is a single identify "
@@ -384,7 +392,7 @@ class ReflektTransformer(object):
             )
 
             # Get columns from table in warehouse
-            db_columns, error_msg = self._db_engine.get_columns(self._schema, "identifies")
+            db_columns, error_msg = self.db_engine.get_columns(self.schema, "identifies")
 
             if error_msg is not None:
                 logger.warning(f"Database error: {error_msg}. Skipping...")
@@ -408,9 +416,9 @@ class ReflektTransformer(object):
                                 idf_stg["columns"].append(idf_col)
                                 sql = (
                                     mapped_column["sql"]
-                                    .replace("__SCHEMA_NAME__", self._schema)
+                                    .replace("__SCHEMA_NAME__", self.schema)
                                     .replace("__TABLE_NAME__", "identifies")
-                                    .replace("__PLAN_NAME__", self._plan_name)
+                                    .replace("__PLAN_NAME__", self.plan_name)
                                 )
                                 idf_sql += "\n        " + sql + ","
 
@@ -437,19 +445,19 @@ class ReflektTransformer(object):
                 dbt_stg["models"].append(idf_stg)
 
                 idf_sql_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__identifies.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__identifies.sql"  # noqa: E501
                 )
 
                 with open(idf_sql_path, "w") as f:
                     f.write(idf_sql)
 
                 idf_stg_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__identifies.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__identifies.yml"  # noqa: E501
                 )
 
                 with open(idf_stg_path, "w") as f:
@@ -489,7 +497,7 @@ class ReflektTransformer(object):
                 "}}\n\n"
                 "with\n\n"
                 "source as (\n\n"
-                f"    select * from source {{{{ source('{underscore(self._schema)}', 'users') }}}}\n\n"  # noqa: E501
+                f"    select * from source {{{{ source('{underscore(self.schema)}', 'users') }}}}\n\n"  # noqa: E501
                 "),\n\n"
                 "renamed as (\n\n"
                 "    select"
@@ -497,14 +505,14 @@ class ReflektTransformer(object):
 
             # Setup the staging model yml for docs
             users_stg = copy.deepcopy(dbt_model_schema)
-            users_stg["name"] = f"{self._stg_prefix}{underscore(self._plan_name)}" f"__users"
+            users_stg["name"] = f"{self.stg_prefix}{underscore(self.plan_name)}" f"__users"
             users_stg["description"] = (
                 f"A staging model with the latest traits for users "
                 f"identified on {reflekt_plan.name}. Each row is user."
             )
 
             # Get columns from table in warehouse
-            db_columns, error_msg = self._db_engine.get_columns(self._schema, "users")
+            db_columns, error_msg = self.db_engine.get_columns(self.schema, "users")
 
             if error_msg is not None:
                 logger.warning(f"Database error: {error_msg}. Skipping...")
@@ -528,9 +536,9 @@ class ReflektTransformer(object):
                                 users_stg["columns"].append(users_col)
                                 sql = (
                                     mapped_column["sql"]
-                                    .replace("__SCHEMA_NAME__", self._schema)
+                                    .replace("__SCHEMA_NAME__", self.schema)
                                     .replace("__TABLE_NAME__", "identifies")
-                                    .replace("__PLAN_NAME__", self._plan_name)
+                                    .replace("__PLAN_NAME__", self.plan_name)
                                 )
                                 users_sql += "\n        " + sql + ","
 
@@ -557,19 +565,19 @@ class ReflektTransformer(object):
                 dbt_stg["models"].append(users_stg)
 
                 users_sql_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__users.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__users.sql"  # noqa: E501
                 )
 
                 with open(users_sql_path, "w") as f:
                     f.write(users_sql)
 
                 users_stg_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__users.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__users.yml"  # noqa: E501
                 )
 
                 with open(users_stg_path, "w") as f:
@@ -602,10 +610,10 @@ class ReflektTransformer(object):
 
             # Setup the staging model SQL (hacky, but gets the spacing right)
             groups_sql = "{{\n" "  config(\n" "    materialized = 'incremental',\n" "    unique_key = 'group_id',\n"
-            if self._warehouse_type == "redshift":
+            if self.warehouse_type == "redshift":
                 groups_sql += "    sort = 'tstamp',\n" "    dist = 'group_id'\n"
 
-            elif self._warehouse_type == "snowflake":
+            elif self.warehouse_type == "snowflake":
                 groups_sql += "    cluster_by = 'tstamp'\n"
 
             groups_sql += (
@@ -613,7 +621,7 @@ class ReflektTransformer(object):
                 "}}\n\n"
                 "with\n\n"
                 "source as (\n\n"
-                f"    select * from source {{{{ source('{underscore(self._schema)}', 'groups') }}}}\n\n"  # noqa: E501
+                f"    select * from source {{{{ source('{underscore(self.schema)}', 'groups') }}}}\n\n"  # noqa: E501
                 "),\n\n"
                 "renamed as (\n\n"
                 "    select"
@@ -621,7 +629,7 @@ class ReflektTransformer(object):
 
             # Setup the staging model yml for docs
             groups_stg = copy.deepcopy(dbt_model_schema)
-            groups_stg["name"] = f"{self._stg_prefix}{underscore(self._plan_name)}" f"__groups"
+            groups_stg["name"] = f"{self.stg_prefix}{underscore(self.plan_name)}" f"__groups"
             groups_stg["description"] = (
                 f"A staging model with group() calls for "
                 f"{reflekt_plan.name}. Each row is a single group() "
@@ -629,7 +637,7 @@ class ReflektTransformer(object):
             )
 
             # Get columns from table in warehouse
-            db_columns, error_msg = self._db_engine.get_columns(self._schema, "groups")
+            db_columns, error_msg = self.db_engine.get_columns(self.schema, "groups")
 
             if error_msg is not None:
                 logger.warning(f"Database error: {error_msg}. Skipping...")
@@ -653,9 +661,9 @@ class ReflektTransformer(object):
                                 groups_stg["columns"].append(groups_col)
                                 sql = (
                                     mapped_column["sql"]
-                                    .replace("__SCHEMA_NAME__", self._schema)
+                                    .replace("__SCHEMA_NAME__", self.schema)
                                     .replace("__TABLE_NAME__", "identifies")
-                                    .replace("__PLAN_NAME__", self._plan_name)
+                                    .replace("__PLAN_NAME__", self.plan_name)
                                 )
                                 groups_sql += "\n        " + sql + ","
 
@@ -682,19 +690,19 @@ class ReflektTransformer(object):
                 dbt_stg["models"].append(groups_stg)
 
                 groups_stg_sql_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__groups.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__groups.sql"  # noqa: E501
                 )
 
                 with open(groups_stg_sql_path, "w") as f:
                     f.write(groups_sql)
 
                 groups_stg_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__groups.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__groups.yml"  # noqa: E501
                 )
 
                 with open(groups_stg_path, "w") as f:
@@ -735,10 +743,10 @@ class ReflektTransformer(object):
 
             # Setup the staging model SQL (hacky, but gets the spacing right)
             pages_sql = "{{\n" "  config(\n" "    materialized = 'incremental',\n" "    unique_key = 'page_id',\n"
-            if self._warehouse_type == "redshift":
+            if self.warehouse_type == "redshift":
                 pages_sql += "    sort = 'tstamp',\n" "    dist = 'page_id'\n"
 
-            elif self._warehouse_type == "snowflake":
+            elif self.warehouse_type == "snowflake":
                 pages_sql += "    cluster_by = 'tstamp'\n"
 
             pages_sql += (
@@ -747,8 +755,8 @@ class ReflektTransformer(object):
                 "with\n\n"
                 "source as (\n\n"
                 f"    select *\n\n"
-                f"    from source {{{{ source('{underscore(self._schema)}', 'pages') }}}}\n\n"  # noqa: E501
-                f"{self._incremental_logic}\n"
+                f"    from source {{{{ source('{underscore(self.schema)}', 'pages') }}}}\n\n"  # noqa: E501
+                f"{self.incremental_logic}\n"
                 "),\n\n"
                 "renamed as (\n\n"
                 "    select"
@@ -756,7 +764,7 @@ class ReflektTransformer(object):
 
             # Setup the staging model yml for docs
             pages_stg = copy.deepcopy(dbt_model_schema)
-            pages_stg["name"] = f"{self._stg_prefix}{underscore(self._plan_name)}" f"__pages"
+            pages_stg["name"] = f"{self.stg_prefix}{underscore(self.plan_name)}" f"__pages"
             pages_stg["description"] = (
                 f"A staging model with page() calls for "
                 f"{reflekt_plan.name}. Each row is a single page "
@@ -764,7 +772,7 @@ class ReflektTransformer(object):
             )
 
             # Get columns from table in warehouse
-            db_columns, error_msg = self._db_engine.get_columns(self._schema, "pages")
+            db_columns, error_msg = self.db_engine.get_columns(self.schema, "pages")
 
             if error_msg is not None:
                 logger.warning(f"Database error: {error_msg}. Skipping...")
@@ -788,9 +796,9 @@ class ReflektTransformer(object):
                                 pages_stg["columns"].append(pages_col)
                                 sql = (
                                     mapped_column["sql"]
-                                    .replace("__SCHEMA_NAME__", self._schema)
+                                    .replace("__SCHEMA_NAME__", self.schema)
                                     .replace("__TABLE_NAME__", "pages")
-                                    .replace("__PLAN_NAME__", self._plan_name)
+                                    .replace("__PLAN_NAME__", self.plan_name)
                                 )
                                 pages_sql += "\n        " + sql + ","
 
@@ -817,19 +825,19 @@ class ReflektTransformer(object):
                 dbt_stg["models"].append(pages_stg)
 
                 pages_sql_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__pages.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__pages.sql"  # noqa: E501
                 )
 
                 with open(pages_sql_path, "w") as f:
                     f.write(pages_sql)
 
                 pages_stg_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__pages.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__pages.yml"  # noqa: E501
                 )
 
                 with open(pages_stg_path, "w") as f:
@@ -872,10 +880,10 @@ class ReflektTransformer(object):
 
             # Setup the staging model SQL (hacky, but gets the spacing right)
             screens_sql = "{{\n" "  config(\n" "    materialized = 'incremental',\n" "    unique_key = 'screen_id',\n"
-            if self._warehouse_type == "redshift":
+            if self.warehouse_type == "redshift":
                 screens_sql += "    sort = 'tstamp',\n" "    dist = 'screen_id'\n"
 
-            elif self._warehouse_type == "snowflake":
+            elif self.warehouse_type == "snowflake":
                 screens_sql += "    cluster_by = 'tstamp'\n"
 
             screens_sql += (
@@ -884,8 +892,8 @@ class ReflektTransformer(object):
                 "with\n\n"
                 "source as (\n\n"
                 f"    select *\n\n"
-                f"    from source {{{{ source('{underscore(self._schema)}', 'screens') }}}}\n\n"  # noqa: E501
-                f"{self._incremental_logic}\n"
+                f"    from source {{{{ source('{underscore(self.schema)}', 'screens') }}}}\n\n"  # noqa: E501
+                f"{self.incremental_logic}\n"
                 "),\n\n"
                 "renamed as (\n\n"
                 "    select"
@@ -893,7 +901,7 @@ class ReflektTransformer(object):
 
             # Setup the staging model yml for docs
             screens_stg = copy.deepcopy(dbt_model_schema)
-            screens_stg["name"] = f"{self._stg_prefix}{underscore(self._plan_name)}" f"__screens"
+            screens_stg["name"] = f"{self.stg_prefix}{underscore(self.plan_name)}" f"__screens"
             screens_stg["description"] = (
                 f"A staging model with screen() calls for "
                 f"{reflekt_plan.name}. Each row is a single screen "
@@ -901,7 +909,7 @@ class ReflektTransformer(object):
             )
 
             # Get columns from table in warehouse
-            db_columns, error_msg = self._db_engine.get_columns(self._schema, "screens")
+            db_columns, error_msg = self.db_engine.get_columns(self.schema, "screens")
 
             if error_msg is not None:
                 logger.warning(f"Database error: {error_msg}. Skipping...")
@@ -925,9 +933,9 @@ class ReflektTransformer(object):
                                 screens_stg["columns"].append(screens_col)
                                 sql = (
                                     mapped_column["sql"]
-                                    .replace("__SCHEMA_NAME__", self._schema)
+                                    .replace("__SCHEMA_NAME__", self.schema)
                                     .replace("__TABLE_NAME__", "screens")
-                                    .replace("__PLAN_NAME__", self._plan_name)
+                                    .replace("__PLAN_NAME__", self.plan_name)
                                 )
                                 screens_sql += "\n        " + sql + ","
 
@@ -954,19 +962,19 @@ class ReflektTransformer(object):
                 dbt_stg["models"].append(screens_stg)
 
                 screens_sql_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__screens.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__screens.sql"  # noqa: E501
                 )
 
                 with open(screens_sql_path, "w") as f:
                     f.write(screens_sql)
 
                 screens_stg_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__screens.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__screens.yml"  # noqa: E501
                 )
 
                 with open(screens_stg_path, "w") as f:
@@ -1003,10 +1011,10 @@ class ReflektTransformer(object):
 
             # Setup the staging model SQL (hacky, but gets the spacing right)
             tracks_sql = "{{\n" "  config(\n" "    materialized = 'incremental',\n" "    unique_key = 'event_id',\n"
-            if self._warehouse_type == "redshift":
+            if self.warehouse_type == "redshift":
                 tracks_sql += "    sort = 'tstamp',\n" "    dist = 'event_id'\n"
 
-            elif self._warehouse_type == "snowflake":
+            elif self.warehouse_type == "snowflake":
                 tracks_sql += "    cluster_by = 'tstamp'\n"
 
             tracks_sql += (
@@ -1015,8 +1023,8 @@ class ReflektTransformer(object):
                 "with\n\n"
                 "source as (\n\n"
                 f"    select *\n\n"
-                f"    from source {{{{ source('{underscore(self._schema)}', 'tracks') }}}}\n\n"  # noqa: E501
-                f"{self._incremental_logic}\n"
+                f"    from source {{{{ source('{underscore(self.schema)}', 'tracks') }}}}\n\n"  # noqa: E501
+                f"{self.incremental_logic}\n"
                 "),\n\n"
                 "renamed as (\n\n"
                 "    select"
@@ -1024,7 +1032,7 @@ class ReflektTransformer(object):
 
             # Setup the staging model yml for docs
             tracks_stg = copy.deepcopy(dbt_model_schema)
-            tracks_stg["name"] = f"{self._stg_prefix}{underscore(self._plan_name)}" f"__tracks"
+            tracks_stg["name"] = f"{self.stg_prefix}{underscore(self.plan_name)}" f"__tracks"
             tracks_stg["description"] = (
                 f"A staging model summarizing all track() calls (events) fired"
                 f" on {reflekt_plan.name}. Each row is a single event."
@@ -1035,7 +1043,7 @@ class ReflektTransformer(object):
             )
 
             # Get columns from table in warehouse
-            db_columns, error_msg = self._db_engine.get_columns(self._schema, "tracks")
+            db_columns, error_msg = self.db_engine.get_columns(self.schema, "tracks")
 
             if error_msg is not None:
                 logger.warning(f"Database error: {error_msg}. Skipping...")
@@ -1059,9 +1067,9 @@ class ReflektTransformer(object):
                                 tracks_stg["columns"].append(tracks_col)
                                 sql = (
                                     mapped_column["sql"]
-                                    .replace("__SCHEMA_NAME__", self._schema)
+                                    .replace("__SCHEMA_NAME__", self.schema)
                                     .replace("__TABLE_NAME__", "tracks")
-                                    .replace("__PLAN_NAME__", self._plan_name)
+                                    .replace("__PLAN_NAME__", self.plan_name)
                                 )
                                 tracks_sql += "\n        " + sql + ","
 
@@ -1080,19 +1088,19 @@ class ReflektTransformer(object):
                 dbt_stg["models"].append(tracks_stg)
 
                 tracks_sql_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__tracks.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__tracks.sql"  # noqa: E501
                 )
 
                 with open(tracks_sql_path, "w") as f:
                     f.write(tracks_sql)
 
                 tracks_stg_path = (
-                    self._tmp_pkg_dir
+                    self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self._stg_prefix}{underscore(self._plan_name)}__tracks.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__tracks.yml"  # noqa: E501
                 )
 
                 with open(tracks_stg_path, "w") as f:
@@ -1137,10 +1145,10 @@ class ReflektTransformer(object):
                         event_sql = (
                             "{{\n" "  config(\n" "    materialized = 'incremental',\n" "    unique_key = 'event_id',\n"
                         )
-                        if self._warehouse_type == "redshift":
+                        if self.warehouse_type == "redshift":
                             event_sql += "    sort = 'tstamp',\n" "    dist = 'event_id'\n"
 
-                        elif self._warehouse_type == "snowflake":
+                        elif self.warehouse_type == "snowflake":
                             event_sql += "    cluster_by = 'tstamp'\n"
 
                         event_sql += (
@@ -1149,8 +1157,8 @@ class ReflektTransformer(object):
                             "with\n\n"
                             "source as (\n\n"
                             f"    select *\n\n"
-                            f"    from source {{{{ source('{underscore(self._schema)}', '{segment_2_snake(event.name)}') }}}}\n\n"  # noqa: E501
-                            f"{self._incremental_logic:<4}\n"
+                            f"    from source {{{{ source('{underscore(self.schema)}', '{segment_2_snake(event.name)}') }}}}\n\n"  # noqa: E501
+                            f"{self.incremental_logic:<4}\n"
                             "),\n\n"
                             "renamed as (\n\n"
                             "    select"
@@ -1159,13 +1167,13 @@ class ReflektTransformer(object):
                         # Setup the staging model yml for docs
                         event_stg = copy.deepcopy(dbt_model_schema)
                         event_stg["name"] = (
-                            f"{self._stg_prefix}{underscore(self._plan_name)}" f"__{segment_2_snake(event.name)}"
+                            f"{self.stg_prefix}{underscore(self.plan_name)}" f"__{segment_2_snake(event.name)}"
                         )
                         event_stg["description"] = event.description
 
                         # Get columns from table in warehouse
-                        db_columns, error_msg = self._db_engine.get_columns(
-                            self._schema,
+                        db_columns, error_msg = self.db_engine.get_columns(
+                            self.schema,
                             segment_2_snake(event.name),
                         )
 
@@ -1196,7 +1204,7 @@ class ReflektTransformer(object):
                                                 mapped_column["sql"]
                                                 .replace(
                                                     "__SCHEMA_NAME__",
-                                                    self._schema,
+                                                    self.schema,
                                                 )
                                                 .replace(
                                                     "__TABLE_NAME__",
@@ -1204,7 +1212,7 @@ class ReflektTransformer(object):
                                                 )
                                                 .replace(
                                                     "__PLAN_NAME__",
-                                                    self._plan_name,
+                                                    self.plan_name,
                                                 )
                                             )
                                             event_sql += "\n        " + sql + ","
@@ -1232,19 +1240,19 @@ class ReflektTransformer(object):
                             dbt_stg["models"].append(event_stg)
 
                             event_sql_path = (
-                                self._tmp_pkg_dir
+                                self.tmp_pkg_dir
                                 / "models"
-                                / f"{self._stg_prefix}{underscore(self._plan_name)}__{segment_2_snake(event.name)}.sql"  # noqa: E501
+                                / f"{self.stg_prefix}{underscore(self.plan_name)}__{segment_2_snake(event.name)}.sql"  # noqa: E501
                             )
 
                             with open(event_sql_path, "w") as f:
                                 f.write(event_sql)
 
                             event_stg_path = (
-                                self._tmp_pkg_dir
+                                self.tmp_pkg_dir
                                 / "models"
                                 / "docs"
-                                / f"{self._stg_prefix}{underscore(self._plan_name)}__{segment_2_snake(event.name)}.yml"  # noqa: E501
+                                / f"{self.stg_prefix}{underscore(self.plan_name)}__{segment_2_snake(event.name)}.yml"  # noqa: E501
                             )
 
                             with open(event_stg_path, "w") as f:
@@ -1263,39 +1271,38 @@ class ReflektTransformer(object):
     def build_dbt_package(self):
         """Build dbt package that models product analytics data."""
         # Initialize a temp directory to write dbt package in, if exists, replace it
-        if self._tmp_pkg_dir.exists():
-            shutil.rmtree(str(self._tmp_pkg_dir))
-        shutil.copytree(self._pkg_template, str(self._tmp_pkg_dir))
+        if self.tmp_pkg_dir.exists():
+            shutil.rmtree(str(self.tmp_pkg_dir))
+        shutil.copytree(self.pkg_template, str(self.tmp_pkg_dir))
 
         # Set project name and config profile in reflekt_project.yml
-        with open(self._tmp_pkg_dir / "dbt_project.yml", "r") as f:
+        with open(self.tmp_pkg_dir / "dbt_project.yml", "r") as f:
             dbt_project_yml_str = f.read()
-        dbt_project_yml_str = dbt_project_yml_str.replace("0.1.0", str(self._pkg_version)).replace(
-            "reflekt_package_name", self._dbt_package_name
+        dbt_project_yml_str = dbt_project_yml_str.replace("0.1.0", str(self.pkg_version)).replace(
+            "reflekt_package_name", self.dbt_package_name
         )
-        with open(self._tmp_pkg_dir / "dbt_project.yml", "w") as f:
+        with open(self.tmp_pkg_dir / "dbt_project.yml", "w") as f:
             f.write(dbt_project_yml_str)
 
         # Set dbt_pkg_name and plan_name in README.md
-        with open(self._tmp_pkg_dir / "README.md", "r") as f:
+        with open(self.tmp_pkg_dir / "README.md", "r") as f:
             readme_str = f.read()
-        readme_str = readme_str.replace("_DBT_PKG_NAME_", self._dbt_package_name).replace(
-            "_PLAN_NAME_", self._plan_name
-        )
-        with open(self._tmp_pkg_dir / "README.md", "w") as f:
+        readme_str = readme_str.replace("_DBT_PKG_NAME_", self.dbt_package_name).replace("_PLAN_NAME_", self.plan_name)
+        with open(self.tmp_pkg_dir / "README.md", "w") as f:
             f.write(readme_str)
 
-        if self.cdp_name == "avo":
-            return self._dbt_avo(self._reflekt_plan)
-
-        elif self.cdp_name == "iteratively":
-            return self._dbt_iteratively(self._reflekt_plan, self._dbt_pkg_path)
-
-        elif self.cdp_name == "rudderstack":
-            return self._dbt_rudderstack(self._reflekt_plan)
+        if self.cdp_name == "rudderstack":
+            return self._dbt_rudderstack(self.reflekt_plan)
 
         elif self.cdp_name == "segment":
-            return self._dbt_segment(self._reflekt_plan)
+            return self._dbt_segment(self.reflekt_plan)
 
         elif self.cdp_name == "snowplow":
-            return self._dbt_snowplow(self._reflekt_plan)
+            return self._dbt_snowplow(self.reflekt_plan)
+
+        # TODO - will never build a dbt pkg based on Analytics governance tool. This is determined by the CDP used.
+        # elif self.cdp_name == "avo":
+        #     return self.dbt_avo(self.reflekt_plan)
+
+        # elif self.cdp_name == "iteratively":
+        #     return self.dbt_iteratively(self.reflekt_plan, self.dbt_pkg_path)

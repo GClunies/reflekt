@@ -20,8 +20,6 @@ class WarehouseConnection:
 
     def __init__(self, reflekt_config):
         self._reflekt_config = ReflektConfig()
-        self._cdp = self._reflekt_config.cdp
-        self._cdp_name = self._reflekt_config.cdp_name
         self._warehouse = self._reflekt_config.warehouse
         self._warehouse_type = self._reflekt_config.warehouse_type
 
@@ -45,30 +43,19 @@ class WarehouseConnection:
                     password=self._warehouse.get("snowflake").get("password"),
                     role=self._warehouse.get("snowflake").get("role"),
                     database=self._warehouse.get("snowflake").get("database"),
-                    warehouse=self._warehouse.get("snowflake").get(
-                        "warehouse"
-                    ),
+                    warehouse=self._warehouse.get("snowflake").get("warehouse"),
                     schema=self._warehouse.get("snowflake").get("schema"),
                 )
             )
 
         else:
-            logger.error(
-                "Unknown warehouse type specified in config at "
-                " reflekt_config.yml"
-            )
+            logger.error("Unknown warehouse type specified in config at " " reflekt_config.yml")
 
     def get_columns(self, schema, table_name):
         with self.engine.connect() as conn:
             try:
                 conn.detach()
-                columns = (
-                    conn.execute(
-                        f"select * from {schema}.{table_name} limit 0"
-                    )
-                    .keys()
-                    ._keys
-                )
+                columns = conn.execute(f"select * from {schema}.{table_name} limit 0").keys()._keys
                 # Connection is fully closed since we used "with:"
                 error_msg = None
                 return columns, error_msg
