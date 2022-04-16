@@ -12,4 +12,3 @@ class AmplitudeApi:
     Amplitude docs: https://developers.amplitude.com/docs/taxonomy-api#update-an-event-property
     """
     # fmt: on
-    pass

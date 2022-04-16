@@ -4,11 +4,13 @@
 
 import json
 import shutil
-from loguru import logger
-from reflekt.logger import logger_config
+
 import yaml
 from inflection import dasherize, underscore
+from loguru import logger
+
 from reflekt.avo.parser import parse_avo_event
+from reflekt.logger import logger_config
 from reflekt.reflekt.dumper import ReflektYamlDumper
 
 

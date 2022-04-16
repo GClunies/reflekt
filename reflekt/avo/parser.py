@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from loguru import logger
+
 from reflekt.logger import logger_config
 
 logger.configure(**logger_config)

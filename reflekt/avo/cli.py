@@ -2,14 +2,16 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import subprocess
-import shutil
 import json
+import shutil
+import subprocess
+
 from loguru import logger
-from reflekt.logger import logger_config
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.config import ReflektConfig
+
 from reflekt.avo.errors import AvoCliError
+from reflekt.logger import logger_config
+from reflekt.reflekt.config import ReflektConfig
+from reflekt.reflekt.project import ReflektProject
 
 
 class AvoCli:

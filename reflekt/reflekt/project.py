@@ -2,9 +2,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import yaml
 from pathlib import Path
-from git import Repo, InvalidGitRepositoryError
+
+import yaml
+from git import InvalidGitRepositoryError, Repo
+
 from reflekt.reflekt.errors import ReflektProjectError
 
 

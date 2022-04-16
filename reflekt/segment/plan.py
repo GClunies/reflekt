@@ -7,19 +7,16 @@
 import json
 import os
 import shutil
-
-from loguru import logger
-from reflekt.logger import logger_config
-
-import yaml
-import funcy
 from pathlib import Path
+
+import funcy
+import yaml
 from inflection import dasherize, underscore
-from reflekt.segment.parser import (
-    parse_segment_event,
-    parse_segment_property,
-)
+from loguru import logger
+
+from reflekt.logger import logger_config
 from reflekt.reflekt.dumper import ReflektYamlDumper
+from reflekt.segment.parser import parse_segment_event, parse_segment_property
 
 
 # The class SegmentPlan is a derivative work based on the class

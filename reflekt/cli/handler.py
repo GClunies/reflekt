@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from reflekt.avo.cli import AvoCli
-from reflekt.segment.api import SegmentApi
 from reflekt.reflekt.config import ReflektConfig
+from reflekt.segment.api import SegmentApi
 
 
 class ReflektApiHandler:

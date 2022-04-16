@@ -2,43 +2,45 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import sys
-import pkg_resources
-import yaml
 import copy
 import shutil
-from inflection import underscore, titleize
+import sys
+
+import pkg_resources
+import yaml
+from inflection import titleize, underscore
 from loguru import logger
-from reflekt.logger import logger_config
-from reflekt.reflekt.dumper import ReflektYamlDumper
-from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.warehouse import WarehouseConnection
-from reflekt.reflekt.utils import segment_2_snake
-from reflekt.segment.schema import (
-    segment_payload_schema,
-    segment_plan_schema,
-    segment_event_schema,
-    segment_property_schema,
-    segment_items_schema,
-)
-from reflekt.dbt.docs import (
-    dbt_src_schema,
-    dbt_table_schema,
-    dbt_stg_schema,
-    dbt_model_schema,
-    dbt_column_schema,
-)
+
+from reflekt.dbt.columns.reflekt import reflekt_columns
 from reflekt.dbt.columns.segment import (
     seg_event_cols,
-    seg_tracks_cols,
+    seg_groups_cols,
+    seg_identify_cols,
     seg_pages_cols,
     seg_screens_cols,
-    seg_identify_cols,
+    seg_tracks_cols,
     seg_users_cols,
-    seg_groups_cols,
 )
-from reflekt.dbt.columns.reflekt import reflekt_columns
+from reflekt.dbt.docs import (
+    dbt_column_schema,
+    dbt_model_schema,
+    dbt_src_schema,
+    dbt_stg_schema,
+    dbt_table_schema,
+)
+from reflekt.logger import logger_config
+from reflekt.reflekt.config import ReflektConfig
+from reflekt.reflekt.dumper import ReflektYamlDumper
+from reflekt.reflekt.project import ReflektProject
+from reflekt.reflekt.utils import segment_2_snake
+from reflekt.reflekt.warehouse import WarehouseConnection
+from reflekt.segment.schema import (
+    segment_event_schema,
+    segment_items_schema,
+    segment_payload_schema,
+    segment_plan_schema,
+    segment_property_schema,
+)
 
 # Setup logger
 logger.configure(**logger_config)
@@ -785,7 +787,6 @@ class ReflektTransformer(object):
             if error_msg is not None:
                 logger.warning(f"Database error: {error_msg}. Skipping...")
                 self.db_errors.append(error_msg)
-                pass
             else:
                 for column, mapped_columns in seg_pages_cols.items():
                     if column in db_columns or column in reflekt_columns:
@@ -922,7 +923,6 @@ class ReflektTransformer(object):
             if error_msg is not None:
                 logger.warning(f"Database error: {error_msg}. Skipping...")
                 self.db_errors.append(error_msg)
-                pass
             else:
                 for column, mapped_columns in seg_screens_cols.items():
                     if column in db_columns or column in reflekt_columns:
@@ -1053,7 +1053,6 @@ class ReflektTransformer(object):
             if error_msg is not None:
                 logger.warning(f"Database error: {error_msg}. Skipping...")
                 self.db_errors.append(error_msg)
-                pass
             else:
                 for column, mapped_columns in seg_tracks_cols.items():
                     if column in db_columns or column in reflekt_columns:
@@ -1182,7 +1181,6 @@ class ReflektTransformer(object):
                         if error_msg is not None:
                             logger.warning(f"Database error: {error_msg}. Skipping...")
                             self.db_errors.append(error_msg)
-                            pass
                         else:
                             for (
                                 column,

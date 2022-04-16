@@ -4,13 +4,15 @@
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
 
-import yaml
 from pathlib import Path
+
+import yaml
 from loguru import logger
+
 from reflekt.logger import logger_config
-from reflekt.reflekt.project import ReflektProject
 from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.plan import ReflektPlan
+from reflekt.reflekt.project import ReflektProject
 
 # Setup logger
 logger.configure(**logger_config)

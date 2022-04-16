@@ -2,35 +2,37 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import click
 import json
-import pkg_resources
 import shutil
-import yaml
 from pathlib import Path
-from packaging.version import InvalidVersion, parse as parse_version
-from loguru import logger
+
+import click
+import pkg_resources
+import yaml
 from inflection import titleize, underscore
+from loguru import logger
+from packaging.version import InvalidVersion
+from packaging.version import parse as parse_version
+
+from reflekt.avo.plan import AvoPlan
 from reflekt.cli.handler import ReflektApiHandler
+from reflekt.logger import logger_config
 from reflekt.reflekt._global import (
     CDP_INIT_STRING,
     CDP_MAP,
     WAREHOUSE_INIT_STRING,
     WAREHOUSE_MAP,
 )
-from reflekt.logger import logger_config
 from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.project import ReflektProject
 from reflekt.reflekt.loader import ReflektLoader
+from reflekt.reflekt.project import ReflektProject
 from reflekt.reflekt.transformer import ReflektTransformer
 from reflekt.segment.plan import SegmentPlan
-from reflekt.avo.plan import AvoPlan
 
 
 @click.group()
 def cli():
     logger.configure(**logger_config)
-    pass
 
 
 @click.command()
@@ -113,7 +115,8 @@ def pull(plan_name, plans_dir, raw):
 
     if raw:
         logger.info(
-            f"Fetched raw tracking plan `{plan_name}` from {titleize(config.plan_type)}\n"
+            f"Fetched raw tracking plan `{plan_name}` from "
+            f"{titleize(config.plan_type)}\n"
         )
         click.echo(json.dumps(plan_json, indent=2))
     else:

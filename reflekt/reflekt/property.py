@@ -5,22 +5,24 @@
 # SPDX-License-Identifier: MIT
 
 import re
+
 from cerberus import Validator
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.schema import (
-    reflekt_property_schema,
-    reflekt_item_schema,
-    reflekt_nested_property_schema,
-)
+
 from reflekt.reflekt.casing import (
-    TITLE_CASE_RE,
-    TITLE_CASE_NUMBERS_RE,
-    CAMEL_CASE_RE,
     CAMEL_CASE_NUMBERS_RE,
-    SNAKE_CASE_RE,
+    CAMEL_CASE_RE,
     SNAKE_CASE_NUMBERS_RE,
+    SNAKE_CASE_RE,
+    TITLE_CASE_NUMBERS_RE,
+    TITLE_CASE_RE,
 )
 from reflekt.reflekt.errors import ReflektValidationError
+from reflekt.reflekt.project import ReflektProject
+from reflekt.reflekt.schema import (
+    reflekt_item_schema,
+    reflekt_nested_property_schema,
+    reflekt_property_schema,
+)
 
 
 # The class ReflektProperty is a derivative work based on the class

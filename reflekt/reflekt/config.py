@@ -2,11 +2,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import yaml
 from pathlib import Path
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.errors import ReflektConfigError
+
+import yaml
+
 from reflekt.reflekt._global import WAREHOUSES
+from reflekt.reflekt.errors import ReflektConfigError
+from reflekt.reflekt.project import ReflektProject
 
 
 class ReflektConfig:

@@ -5,14 +5,15 @@
 # SPDX-License-Identifier: MIT
 
 from typing import Counter
+
 from cerberus import Validator
-from reflekt.reflekt.project import ReflektProject
+
 from reflekt.reflekt.errors import ReflektValidationError
-from reflekt.reflekt.property import ReflektProperty
 from reflekt.reflekt.event import ReflektEvent
-from reflekt.reflekt.schema import (
-    reflekt_plan_schema,
-)
+from reflekt.reflekt.project import ReflektProject
+from reflekt.reflekt.property import ReflektProperty
+from reflekt.reflekt.schema import reflekt_plan_schema
+
 
 # The class ReflektPlan is a derivative work based on the class
 # YamlTrackingPlan from project tracking-plan-kit licensed under MIT. All

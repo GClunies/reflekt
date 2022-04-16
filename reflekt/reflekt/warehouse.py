@@ -3,10 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import sys
+
 import sqlalchemy
-from sqlalchemy.engine.url import URL as redshift_url
-from snowflake.sqlalchemy import URL as snow_url
 from loguru import logger
+from snowflake.sqlalchemy import URL as snow_url
+from sqlalchemy.engine.url import URL as redshift_url
+
 from reflekt.logger import logger_config
 from reflekt.reflekt.config import ReflektConfig
 
