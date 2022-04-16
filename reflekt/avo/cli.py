@@ -28,16 +28,16 @@ class AvoCli:
                 f"Plan name {plan_name} does not match 'avo_json_source: {self.avo_json_source}' "
                 f"specified in {self.config_path}"
             )
-
         else:
             self._run_avo_pull()
             avo_json_file = self.avo_dir / f"{self.avo_json_source}.json"
             with open(avo_json_file) as f:
-                avo_json = json.load(f)
-
-            return avo_json
+                return json.load(f)
 
     def _run_avo_pull(self):
-        logger.info(f"Running `avo pull` to fetch {self.avo_json_source} from Avo account.\n")
+        logger.info(
+            f"Running `avo pull` to fetch {self.avo_json_source} from Avo account.\n"
+        )
         avo_executable = shutil.which("avo")
         subprocess.call([avo_executable, "pull", self.avo_json_source], cwd=self.avo_dir)
+        print("")
