@@ -5,7 +5,7 @@ To use the models in this package, reference the package in the `packages.yml` o
 
 ```yml
 # packages.yml
-- git: "https://github.com/GClunies/patty-bar-reflekt.git"  # git URL
+- git: "https://github.com/path/to/your/repo.git"  # git URL
     revision: 0.1.0  # tag, branch name, or 40-char commit hash
 ```
 
