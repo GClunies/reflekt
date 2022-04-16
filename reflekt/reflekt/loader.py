@@ -22,7 +22,7 @@ logger.configure(**logger_config)
 class ReflektLoader(object):
     def __init__(self, plan_dir, raise_validation_errors=True):
         self._validation_errors = []
-        if ReflektProject().exists:  # If no reflekt project exists, do nothing
+        if ReflektProject().exists:
             try:
                 self._load_plan_file(plan_dir / "plan.yml")
                 self._load_events(plan_dir / "events")
@@ -57,6 +57,7 @@ class ReflektLoader(object):
             logger.info(
                 f"  ...Parsing event file {file.name}",
             )
+
             with open(file, "r") as event_file:
                 yaml_event_obj = yaml.safe_load(event_file)
                 for event_version in yaml_event_obj:
@@ -65,6 +66,7 @@ class ReflektLoader(object):
     def _load_identify_traits(self, path):
         if not path.exists():
             return
+
         with open(path, "r") as identify_file:
             yaml_obj = yaml.safe_load(identify_file)
             for trait in yaml_obj.get("traits", []):
@@ -73,6 +75,7 @@ class ReflektLoader(object):
     def _load_group_traits(self, path):
         if not path.exists():
             return
+
         with open(path, "r") as group_file:
             yaml_obj = yaml.safe_load(group_file)
             for trait in yaml_obj.get("traits", []):

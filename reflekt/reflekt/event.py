@@ -31,9 +31,11 @@ from reflekt.reflekt.casing import (
 # changes are licensed under Apache-2.0.
 class ReflektEvent(object):
     def __init__(self, event_yaml):
-        if ReflektProject().exists:  # If no reflekt project exists, do nothing
+        if ReflektProject().exists:
             self._event_yaml = event_yaml
-            self._properties = [ReflektProperty(property) for property in event_yaml["properties"]]
+            self._properties = [
+                ReflektProperty(property) for property in event_yaml["properties"]
+            ]
             self.validate_event()
 
     @property
@@ -54,7 +56,6 @@ class ReflektEvent(object):
 
     @property
     def properties(self):
-        # return self._event_yaml.get("properties")
         return [ReflektProperty(property) for property in self._event_yaml["properties"]]
 
     def _check_event_metadata(self):
@@ -62,7 +63,10 @@ class ReflektEvent(object):
             validator = Validator(reflekt_metadata_schema)
             is_valid = validator.validate(self.metadata, reflekt_metadata_schema)
             if not is_valid:
-                message = f"for `metadata:` defined in event " f"`{self.name}` - {validator.errors}"
+                message = (
+                    f"for `metadata:` defined in event "
+                    f"`{self.name}` - {validator.errors}"
+                )
                 raise ReflektValidationError(message)
 
     def _check_event_name(self):
@@ -112,6 +116,7 @@ class ReflektEvent(object):
     def _check_duplicate_properties(self):
         if len(self.properties) == 0:
             return
+
         prop_names = [p.name for p in self.properties]
         counts = Counter(prop_names)
 
@@ -119,22 +124,27 @@ class ReflektEvent(object):
         if len(duplicates) > 0:
             duplicate_names = ", ".join(duplicates.keys())
             raise ReflektValidationError(
-                f"Duplicate properties found on event {self.name}. " f"Properties: {duplicate_names}"
+                f"Duplicate properties found on event {self.name}. "
+                f"Properties: {duplicate_names}"
             )
 
     def _check_reserved_property_names(self):
         if len(self.properties) == 0:
             return
+
         prop_names = [p.name for p in self.properties]
 
         for prop_name in prop_names:
             if prop_name in ReflektProject().properties_reserved:
-                raise ReflektValidationError(f"Property name '{prop_name}' is reserved and cannot be " f"used")
+                raise ReflektValidationError(
+                    f"Property name '{prop_name}' is reserved and cannot be " f"used"
+                )
 
     def validate_event(self):
         """Validate event against reflekt schema."""
         validator = Validator(reflekt_event_schema)
         is_valid = validator.validate(self._event_yaml, reflekt_event_schema)
+
         if not is_valid:
             message = f"for event `{self.name}` - {validator.errors}"
             raise ReflektValidationError(message)

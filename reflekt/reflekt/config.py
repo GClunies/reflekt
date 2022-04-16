@@ -6,14 +6,14 @@ import yaml
 from pathlib import Path
 from reflekt.reflekt.project import ReflektProject
 from reflekt.reflekt.errors import ReflektConfigError
-from reflekt.warehouse.warehouse import WAREHOUSES
+from reflekt.reflekt._global import WAREHOUSES
 
 
 class ReflektConfig:
     def __init__(self, raise_config_errors=True):
-        if ReflektProject().exists:  # If no reflekt project exists, do nothing
+        if ReflektProject().exists:
             try:
-                self._config_errors = []
+                self.config_errors = []
                 self.project = ReflektProject()
                 self.config_profile = self.project.config_profile
 
@@ -35,14 +35,13 @@ class ReflektConfig:
                 if raise_config_errors:
                     raise error
                 else:
-                    self._config_errors.append(error)
+                    self.config_errors.append(error)
 
     def _get_config(self):
         try:
             with open(self.path) as f:
                 config_yml = yaml.safe_load(f)
             return config_yml[self.config_profile]
-
         except FileNotFoundError:
             raise ReflektConfigError(
                 f"\nNo config file found at: {self.path}\nPlease create one."

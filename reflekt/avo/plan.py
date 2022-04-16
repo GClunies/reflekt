@@ -3,23 +3,18 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import os
 import shutil
 from loguru import logger
 from reflekt.logger import logger_config
 import yaml
-import funcy
-from pathlib import Path
 from inflection import dasherize, underscore
-from reflekt.avo.parser import parse_avo_event, parse_avo_property
+from reflekt.avo.parser import parse_avo_event
 from reflekt.reflekt.dumper import ReflektYamlDumper
 
-logger.configure(**logger_config)
 
-
-# TODO - update all this to use avo JSON schema
 class AvoPlan(object):
     def __init__(self, plan_json):
+        logger.configure(**logger_config)
         self.plan_json = plan_json
 
     @classmethod
@@ -62,7 +57,13 @@ class AvoPlan(object):
     def _build_reflekt_event_file(self, events_dir, event_json):
         event_name = event_json.get("name")
         event_file_name = dasherize(
-            underscore(event_json["name"].replace(" ", "-").replace("/", ""))
+            underscore(
+                event_json["name"]
+                .replace("-", "")  # Remove *existing* hyphens in event name
+                .replace("  ", " ")  # double spaces --> single spaces
+                .replace(" ", "-")  # spaces --> hyphens
+                .replace("/", "")  # Remove slashes
+            )
         )
         event_file = events_dir / f"{event_file_name}.yml"
         logger.info(f"Building reflekt event `{event_name}` at {event_file}")

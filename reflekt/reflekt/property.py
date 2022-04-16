@@ -28,7 +28,7 @@ from reflekt.reflekt.errors import ReflektValidationError
 # changes are licensed under Apache-2.0.
 class ReflektProperty(object):
     def __init__(self, property_yaml):
-        if ReflektProject().exists:  # If no reflekt project exists, do nothing
+        if ReflektProject().exists:
             self._property_yaml = property_yaml
             self.validate()
 
@@ -109,8 +109,12 @@ class ReflektProperty(object):
             for array_item in self.array_item_schema:
                 validator = Validator(reflekt_item_schema)
                 is_valid = validator.validate(array_item, reflekt_item_schema)
+
                 if not is_valid:
-                    message = f"for {array_item['name']} defined in property " f"{self.name} - {validator.errors}"
+                    message = (
+                        f"for {array_item['name']} defined in property "
+                        f"{self.name} - {validator.errors}"
+                    )
                     raise ReflektValidationError(message)
 
         if self.type != "array" and self.array_item_schema:
@@ -127,7 +131,10 @@ class ReflektProperty(object):
         if self.object_properties:
             for object_property in self.object_properties:
                 validator = Validator(reflekt_nested_property_schema)
-                is_valid = validator.validate(object_property, reflekt_nested_property_schema)
+                is_valid = validator.validate(
+                    object_property, reflekt_nested_property_schema
+                )
+
                 if not is_valid:
                     message = (
                         f"object property "
@@ -137,8 +144,6 @@ class ReflektProperty(object):
                     raise ReflektValidationError(message)
 
         if self.type != "object" and self.object_properties:
-            if self.type is None:
-                print(self._property_yaml)
             message = (
                 f"Property {self.name} is of type {self.type}. Cannot specify "
                 f"object_properties for {self.type} data types. "
@@ -197,6 +202,7 @@ class ReflektProperty(object):
         """Validate event property against reflekt schema."""
         validator = Validator(reflekt_property_schema)
         is_valid = validator.validate(self._property_yaml, reflekt_property_schema)
+
         if not is_valid:
             message = f"for property `{self.name}` - {validator.errors}"
             raise ReflektValidationError(message)

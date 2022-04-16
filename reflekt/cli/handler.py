@@ -8,39 +8,24 @@ from reflekt.reflekt.config import ReflektConfig
 
 
 class ReflektApiHandler:
+    """A class that handles which CDP or Analytics Governance API to use when
+    pulling or pushing tracking plans using `reflekt pull` and `reflekt push`
+    """
+
     def __init__(self):
         self._config = ReflektConfig()
-        # self._cdp = self._config.cdp
-        self.plan_type = self._config.plan_type
-        self.cdp_name = self._config.cdp_name
-        self.access_token = self._config.access_token
-        self.workspace_name = self._config.workspace_name
 
-    @property
-    def api(self):
-        return self._get_api()
-
-    def _get_api(self):
-        if self.plan_type == "avo":
-            # This API class should be abel to `avo pull` to populate the Avo JSON schema
-            # It will have a dependency on the Avo cli which is a npm package (not great, but OK)
-            # Will need to include docs on hwo to setup this dependency
-            api = AvoCli()
+    def get_api(self):
+        if self._config.plan_type == "avo":
+            return AvoCli()  # Actually a CLI, use `api` for naming consistency
+        elif self._config.plan_type == "iteratively":
             pass
-
-        elif self.plan_type == "iteratively":
+        elif self._config.plan_type == "rudderstack":
             pass
-
-        elif self.plan_type == "rudderstack":
-            pass
-
-        elif self.plan_type == "segment":
-            api = SegmentApi(
-                workspace_name=self.workspace_name,
-                access_token=self.access_token,
+        elif self._config.plan_type == "segment":
+            return SegmentApi(
+                workspace_name=self._config.workspace_name,
+                access_token=self._config.access_token,
             )
-
-        elif self.plan_type == "snowplow":
+        elif self._config.plan_type == "snowplow":
             pass
-
-        return api

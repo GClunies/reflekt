@@ -3,26 +3,44 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # fmt: off
+PLANS = [
+    "avo",
+    "segment",
+    # "rudderstack",
+    # "snowplow",
+    # "iteratively",
+]
+
 CDPS = [
     "segment",
     # "rudderstack",
     # "snowplow",
-    # "avo",
-    # "iteratively",
 ]
 
 CDP_INIT_STRING = (
     "\n[1] Segment"
     # "\n[2] Rudderstack"
     # "\n[3] Snowplow"
-    # "\n[4] Avo"
-    # "\n[5] Iteratively"
 )
 
 CDP_MAP = {
     "1": "segment",
     # "2": "rudderstack",
     # "3": "snowplow",
-    # "4": "avo",
-    # "5": "iteratively",
 }
+
+WAREHOUSES = [
+    "snowflake",
+    "redshift",
+]
+
+WAREHOUSE_INIT_STRING = (
+    "\n[1] Snowflake"
+    "\n[2] Redshift"
+)
+
+WAREHOUSE_MAP = {
+    "1": "snowflake",
+    "2": "redshift",
+}
+# fmt: on

@@ -17,17 +17,20 @@ def parse_segment_property(name, property_json, required=[]):
     p_types = property_json.get("type")
     if not isinstance(p_types, (list,)):
         p_types = [p_types]  # If p_types is not list, make it one
+
     if not p_types[0]:
         p_types[0] = "any"
+
     p = {
         "name": name,
         "description": property_json.get("description"),
         "type": p_types[0],
     }
-
     allow_null = len(p_types) > 1 and p_types[1] == "null"
+
     if allow_null:
         p["allow_null"] = True
+
     if required is not None and name in required:
         p["required"] = True
 
@@ -54,13 +57,15 @@ def parse_segment_property(name, property_json, required=[]):
             array_props = []
             reqd_array_props = property_json.get("items").get("required")
 
-            for property_name, property_prop in property_json.get("items").get("properties").items():
-                item_p = parse_segment_property(property_name, property_prop, reqd_array_props)  # Using RECURSION
+            for property_name, property_prop in (
+                property_json.get("items").get("properties").items()
+            ):
+                item_p = parse_segment_property(
+                    property_name, property_prop, reqd_array_props
+                )  # Using RECURSION
                 array_props.append(item_p)
             p["array_item_schema"] = array_props
-
         return p
-
     elif p["type"] == "object":
         # If a schema is defined for the object property, get the schema.
         object_props = []
@@ -68,12 +73,12 @@ def parse_segment_property(name, property_json, required=[]):
 
         if "properties" in property_json.keys():
             for property_name, property_prop in property_json.get("properties").items():
-                obj_p = parse_segment_property(property_name, property_prop, reqd_object_props)  # Using RECURSION
+                obj_p = parse_segment_property(
+                    property_name, property_prop, reqd_object_props
+                )  # Using RECURSION
                 object_props.append(obj_p)
             p["object_properties"] = object_props
-
         return p
-
     else:
         return p
 
@@ -83,23 +88,22 @@ def parse_segment_property(name, property_json, required=[]):
 # All changes are licensed under Apache-2.0.
 def parse_segment_event(event_json):
     metadata = event_json.get("rules").get("labels")
-
     event_obj = {
         "name": event_json.get("name"),
         "description": event_json.get("description"),
         "version": event_json.get("version"),
         "metadata": metadata,
     }
-
-    properties = event_json.get("rules").get("properties").get("properties").get("properties")
-
-    required = event_json.get("rules").get("properties").get("properties").get("required", [])
-
+    properties = (
+        event_json.get("rules").get("properties").get("properties").get("properties")
+    )
+    required = (
+        event_json.get("rules").get("properties").get("properties").get("required", [])
+    )
     event_obj_properties = []
 
     if properties is None:
         pass
-
     else:
         for name, prop in sorted(properties.items()):
             # logger.info(f"Dumping property: {name}")

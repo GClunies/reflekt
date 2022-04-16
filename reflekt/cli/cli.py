@@ -11,20 +11,25 @@ from pathlib import Path
 from packaging.version import InvalidVersion, parse as parse_version
 from loguru import logger
 from inflection import titleize, underscore
+from reflekt.cli.handler import ReflektApiHandler
+from reflekt.reflekt._global import (
+    CDP_INIT_STRING,
+    CDP_MAP,
+    WAREHOUSE_INIT_STRING,
+    WAREHOUSE_MAP,
+)
 from reflekt.logger import logger_config
 from reflekt.reflekt.config import ReflektConfig
 from reflekt.reflekt.project import ReflektProject
 from reflekt.reflekt.loader import ReflektLoader
-from reflekt.cli.handler import ReflektApiHandler
 from reflekt.reflekt.transformer import ReflektTransformer
 from reflekt.segment.plan import SegmentPlan
 from reflekt.avo.plan import AvoPlan
-from reflekt.reflekt.cdp import CDP_INIT_STRING, CDP_MAP
-from reflekt.warehouse.warehouse import WAREHOUSE_INIT_STRING, WAREHOUSE_MAP
 
 
 @click.group()
 def cli():
+    logger.configure(**logger_config)
     pass
 
 
@@ -47,7 +52,6 @@ def cli():
 )
 def new(plan_name, plans_dir):
     """Create a new empty tracking plan using provided name."""
-    logger.configure(**logger_config)
     plan_template_dir = pkg_resources.resource_filename("reflekt", "template/plan/")
 
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
@@ -100,33 +104,40 @@ def new(plan_name, plans_dir):
 )
 def pull(plan_name, plans_dir, raw):
     """Generate tracking plan as code using the reflekt schema."""
-    logger.configure(**logger_config)
+    api = ReflektApiHandler().get_api()
     config = ReflektConfig()
-    plan_type = ReflektConfig().plan_type
     logger.info(
-        f"Fetching tracking plan `{plan_name}` from {titleize(config.plan_type)}..."
+        f"Fetching tracking plan `{plan_name}` from {titleize(config.plan_type)}"
     )
-    api = ReflektApiHandler().api
     plan_json = api.get(plan_name)
-    logger.info(f"Fetched tracking plan `{plan_name}` from {titleize(config.plan_type)}")
 
     if raw:
         logger.info(
-            f"Raw tracking plan `{plan_name}` from {titleize(config.plan_type)}...\n"
+            f"Fetched raw tracking plan `{plan_name}` from {titleize(config.plan_type)}\n"
         )
         click.echo(json.dumps(plan_json, indent=2))
     else:
+        logger.info(
+            f"Fetched tracking plan `{plan_name}` from {titleize(config.plan_type)}"
+        )
         if plans_dir != ReflektProject().project_dir / "tracking-plans":
             plan_dir = Path(plans_dir) / plan_name
 
-        if config.plan_type.lower() == "segment":
-            plan = SegmentPlan(plan_json)
-        elif config.plan_type.lower() == "avo":
+        if config.plan_type.lower() == "avo":
             plan = AvoPlan(plan_json)
+        elif config.plan_type.lower() == "segment":
+            plan = SegmentPlan(plan_json)
+        # TODO: Add support for other tracking plan types
+        # elif config.plan_type.lower() == "iteratively":
+        #     plan = IterativelyPlan(plan_json)
+        # elif config.plan_type.lower() == "rudderstack":
+        #     plan = RudderstackPlan(plan_json)
+        # elif config.plan_type.lower() == "snowplow":
+        #     plan = SnowplowPlan(plan_json)
 
         logger.info(
-            f"Building {titleize(plan_type)} tracking plan `{plan_name}` in reflekt "
-            f"specification at {plan_dir}"
+            f"Building {titleize(config.plan_type)} tracking plan "
+            f"`{plan_name}` in reflekt specification at {plan_dir}"
         )
         plan.build_reflekt(plan_dir)
         logger.info(
@@ -147,7 +158,10 @@ def pull(plan_name, plans_dir, raw):
     "plans_dir",
     required=False,
     default=ReflektProject().project_dir / "tracking-plans",
-    help="Path to the directory containing the tracking plan folder. Defaults to `/tracking-plans` directory in your reflekt project.",  # noqa: E501
+    help=(
+        "Path to the directory containing the tracking plan folder. Defaults "
+        "to `/tracking-plans` directory in your reflekt project."
+    ),
 )
 @click.option(
     "--dry",
@@ -156,7 +170,10 @@ def pull(plan_name, plans_dir, raw):
 )
 def push(plan_name, plans_dir, dry):
     """Sync tracking plan to CDP or Analytics Governance tool."""
-    logger.configure(**logger_config)
+    api = ReflektApiHandler().get_api()
+    if api.type.lower() in ["avo", "iteratively"]:
+        logger.error(f"`reflekt push` not supported for {titleize(api.type)}.")
+        raise click.Abort()
 
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
         plan_dir = Path(plans_dir) / plan_name
@@ -167,7 +184,6 @@ def push(plan_name, plans_dir, dry):
     logger.info(f"Loaded tracking plan {plan_name}\n")
     transformer = ReflektTransformer(reflekt_plan)
     cdp_plan = transformer.build_cdp_plan()
-    api = ReflektApiHandler().api
 
     if dry:
         payload = api.sync(plan_name, cdp_plan, dry=True)
@@ -176,7 +192,6 @@ def push(plan_name, plans_dir, dry):
             f"{transformer.plan_type}"
         )
         click.echo(json.dumps(payload, indent=2))
-
     else:
         logger.info(f"Syncing tracking plan {plan_name} to {transformer.plan_type}.")
         api.sync(plan_name, cdp_plan)
@@ -197,26 +212,26 @@ def push(plan_name, plans_dir, dry):
     "plans_dir",
     required=False,
     default=ReflektProject().project_dir / "tracking-plans",
-    help="Path to the directory containing the tracking plan folder. Defaults to `/tracking-plans` directory in your reflekt project.",  # noqa: E501
+    help=(
+        "Path to the directory containing the tracking plan folder. Defaults "
+        "to `/tracking-plans` directory in your reflekt project."
+    ),
 )
 def test(plan_name, plans_dir):
-    """Test tracking plan schema for naming, data types, and custom tests."""
-    logger.configure(**logger_config)
-
+    """Test tracking plan schema for naming, data types, and metadata."""
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
         plan_dir = Path(plans_dir) / plan_name
 
     logger.info(f"Testing tracking plan {plan_name} at {str(plan_dir)}")
+    loader = ReflektLoader(
+        plan_dir,
+        raise_validation_errors=False,  # Raise errors after tests have ran
+    )
 
-    # Don't raise validation errors until all tests have ran
-    loader = ReflektLoader(plan_dir, raise_validation_errors=False)
-
-    # If there are any validation errors, raise them now
     if loader.has_validation_errors:
         for error in loader.validation_errors:
             click.echo(error, err=True)
         raise click.Abort()
-
     else:
         logger.info(f"PASSED - no errors detected in tracking plan `{plan_name}`")
 
@@ -232,27 +247,36 @@ def test(plan_name, plans_dir):
     "plans_dir",
     required=False,
     default=ReflektProject().project_dir / "tracking-plans",
-    help="Path to the directory containing the tracking plan folder. Defaults to the `tracking-plans/` directory in your reflekt project.",  # noqa: E501
+    help=(
+        "Path to the directory containing the tracking plan folder. Defaults "
+        "to the `tracking-plans/` directory in your reflekt project."
+    ),
 )
 @click.option(
     "--dbt-dir",
     "dbt_dir",
     required=False,
     default=ReflektProject().project_dir / "dbt_packages",
-    help="Path to directory where dbt package will be built. Defaults to the `dbt_packages/` directory in your reflekt project.",  # noqa: E501
+    help=(
+        "Path to directory where dbt package will be built. Defaults to the "
+        "`dbt_packages/` directory in your reflekt project."
+    ),
 )
 @click.option(
     "--force-version",
     "force_version_str",
     required=False,
     default=None,
-    help="Force reflekt to build or overwrite the dbt package with a specific semantic version.",
+    help=(
+        "Force reflekt to build or overwrite the dbt package with a specific "
+        "semantic version."
+    ),
 )
 @click.command()
 def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
     """Build dbt package with sources, models, and docs based on tracking plan."""
+
     # TODO - figure out how to template dbt package from reflekt plans that were pulled from Avo
-    logger.configure(**logger_config)
 
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
         plan_dir = Path(plans_dir).resolve() / plan_name
@@ -264,7 +288,6 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
         try:
             version = parse_version(force_version_str)
             overwrite = True
-
         except InvalidVersion:
             logger.error(
                 f"[ERROR] Invalid semantic version provided: {force_version_str}"
@@ -272,22 +295,22 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
             raise click.Abort()
 
     else:
-        # Check if dbt package exists (if dbt_project.yml exists, then the package exists)
         dbt_project_yml_path = (
             dbt_pkg_dir / f"reflekt_{underscore(plan_name)}" / "dbt_project.yml"
         )
         if not dbt_project_yml_path.exists():
             version = parse_version("0.1.0")
-
         else:
             with dbt_project_yml_path.open() as f:
                 dbt_project_yml_path = yaml.safe_load(f)
 
             dbt_pkg_version = parse_version(dbt_project_yml_path["version"])
-            new_dbt_pkg_version = parse_version(
-                f"{dbt_pkg_version.major}.{dbt_pkg_version.minor + 1}.{dbt_pkg_version.micro}"
-            )  # noqa: E501
-
+            new_version_str = (
+                f"{dbt_pkg_version.major}."
+                f"{dbt_pkg_version.minor + 1}."
+                f"{dbt_pkg_version.micro}"
+            )
+            new_dbt_pkg_version = parse_version(new_version_str)
             bump = click.confirm(
                 f"[WARNING] dbt package `reflekt_{underscore(plan_name)}` already exists with version {dbt_pkg_version}.\n"  # noqa: E501
                 f"    Do you want to bump `reflekt_{underscore(plan_name)}` to version {new_dbt_pkg_version} and overwrite?",  # noqa: E501
@@ -296,7 +319,6 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
 
             if bump:
                 version = new_dbt_pkg_version
-
             else:
                 overwrite = click.confirm(
                     f"[WARNING] reflekt will overwrite dbt package `reflekt_{underscore(plan_name)}` with version {dbt_pkg_version}.\n"  # noqa: E501
@@ -304,14 +326,13 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
                     default=False,
                 )
                 if not overwrite:
-                    click.Abort()
+                    raise click.Abort()
                 version = dbt_pkg_version
 
     logger.info(f"Loading reflekt tracking plan {plan_name} at {str(plan_dir)}")
     loader = ReflektLoader(plan_dir)
     reflekt_plan = loader.plan
     logger.info(f"Loaded reflekt tracking plan {plan_name}\n")
-
     transformer = ReflektTransformer(reflekt_plan, dbt_pkg_dir, pkg_version=version)
     transformer.build_dbt_package()
 
@@ -320,18 +341,18 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
     "--project-dir",
     "project_dir_str",
     default=".",
-    help="Path to directory where reflekt project will be created.",  # noqa: E501
+    help="Path where reflekt project will be created. Defaults to current directory.",
 )
 @click.command()
 def init(project_dir_str):
     """Create a reflekt project at the provide directory."""
-    project_dir = Path(project_dir_str).resolve()
 
+    # TODO - update all this logic to match the format in ~/.reflekt/reflekt_config.yml
+
+    project_dir = Path(project_dir_str).resolve()
     project_name = click.prompt(
         "Enter your project name (letters, digits, underscore)", type=str
     )
-
-    # Check if the project already exists
     project_yml = project_dir / "reflekt_project.yml"
     if project_yml.exists():
         with open(project_yml, "r") as f:
@@ -342,74 +363,46 @@ def init(project_dir_str):
                 f"A reflekt project named {project_name} already exists in "
                 f"{Path.cwd()}"
             )
-            click.Abort()
+            raise click.Abort()
 
-    # Set path for reflekt_config.yml for use by reflekt project
-    reflekt_config_prompt = click.prompt(
+    reflekt_config_path = click.prompt(
         "Enter the absolute path where reflekt_config.yml will be created for "
         "use by this reflekt project",
         type=str,
         default=str(Path.home() / ".reflekt" / "reflekt_config.yml"),
     )
-    reflekt_config_path = Path(reflekt_config_prompt)
-
+    reflekt_config_path = Path(reflekt_config_path)
     collect_config = True  # Default to collect config from user
-
-    config_profile = click.prompt(
+    config_name = click.prompt(
         "Enter a config profile name for the reflekt_config.yml", type=str
     )
 
-    # If reflekt_config.yml does not exist, create object
     if not reflekt_config_path.exists():
-        # Set up an empty config dict
         reflekt_config_obj = {
-            config_profile: {
+            config_name: {
                 "cdp": {},
                 "warehouse": {},
             }
         }
-
-    # If reflekt_config.yml already exists, check for config_profile
     else:
         with open(reflekt_config_path, "r") as f:
             reflekt_config_obj = yaml.safe_load(f)
 
-        # Check if config_profile already exists
-        if config_profile in reflekt_config_obj:
-            existing_config_selection = click.prompt(
-                f"{reflekt_config_path} already contains a config profile "
-                f"'{config_profile}'. What would you like to do?"
-                f"\n[1] Use '{config_profile}' config profile"
-                f"\n[2] Provide a different config profile name to add to {reflekt_config_path}"  # noqa: E501
-                f"\nEnter a number",
-                type=int,
+        if config_name in reflekt_config_obj:
+            logger.error(
+                f"A reflekt config profile named {config_name} already exists in "
+                f"{reflekt_config_path}"
             )
-
-            if existing_config_selection == 1:
-                collect_config = False
-
-            else:
-                config_profile = click.prompt(
-                    f"Enter a different config profile name to be added to "
-                    f"{reflekt_config_path}",
-                    type=str,
-                )
-
-                if config_profile in reflekt_config_obj:
-                    logger.error(
-                        f"{reflekt_config_path} already contains config profile "
-                        f"'{config_profile}'. Aborting..."
-                    )
-                    click.Abort()
-
-                reflekt_config_obj.update(
-                    {
-                        config_profile: {
-                            "cdp": {},
-                            "warehouse": {},
-                        }
+            raise click.Abort()
+        else:
+            reflekt_config_obj.update(
+                {
+                    config_name: {
+                        "cdp": {},
+                        "warehouse": {},
                     }
-                )
+                }
+            )
 
     if collect_config:
         cdp_num = click.prompt(
@@ -422,19 +415,17 @@ def init(project_dir_str):
 
         if cdp == "segment":
             workspace_name = click.prompt(
-                "Enter your Segment workspace name. You can find this in your "
-                "Segment account URL (i.e. https://app.segment.com/your-workspace-name/)",  # noqa: E501
+                "Enter your Segment workspace name. You can find this in your Segment "
+                "account URL (i.e. https://app.segment.com/your-workspace-name/)",
                 type=str,
             )
-
             access_token = click.prompt(
                 "Enter your Segment Config API access token (To generate a "
                 "token, see Segment's documentation https://segment.com/docs/config-api/authentication/#create-an-access-token)",  # noqa: E501
                 type=str,
                 hide_input=True,
             )
-
-            reflekt_config_obj[config_profile]["cdp"].update(
+            reflekt_config_obj[config_name]["cdp"].update(
                 {
                     "segment": {
                         "workspace_name": workspace_name,
@@ -442,17 +433,13 @@ def init(project_dir_str):
                     }
                 }
             )
-
         # TODO - Enable support for other CDPs below as developed
         # elif cdp == "rudderstack":
         #     pass
-
         # elif cdp == "snowplow":
         #     pass
-
         # elif cdp == "avo":
         #     pass
-
         # elif cdp == "iteratively":
         #     pass
 
@@ -463,71 +450,75 @@ def init(project_dir_str):
             type=int,
         )
         warehouse = WAREHOUSE_MAP[str(warehouse_num)]
-        reflekt_config_obj[config_profile]["warehouse"].update({warehouse: {}})
+        reflekt_config_obj[config_name]["warehouse"].update({warehouse: {}})
 
         if warehouse == "snowflake":
             account = click.prompt("account", type=str)
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"account": account}
             )
             user = click.prompt("user", type=str)
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"user": user}
             )
             password = click.prompt("password", hide_input=True, type=str)
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"password": password}
             )
             role = click.prompt("role", type=str)
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"role": role}
             )
-            database = click.prompt("database", type=str)
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
+            database = click.prompt(
+                "database (where raw event data is stored)", type=str
+            )
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"database": database}
             )
             snowflake_warehouse = click.prompt("warehouse", type=str)
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"warehouse": snowflake_warehouse}
             )
-            schema = click.prompt("schema", type=str)
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
-                {"schema": schema}
-            )
+            # TODO - Allow user to set schema dbt pkg will materialize in
+            # schema = click.prompt("schema", type=str)
+            # reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+            #     {"schema": schema}
+            # )
 
         elif warehouse == "redshift":
             host_url = click.prompt(
                 "host_url (hostname.region.redshift.amazonaws.com)", type=str
             )
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"host_url": host_url}
             )
             port = click.prompt("port", default=5439, type=int)
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"port": port}
             )
             user = click.prompt("user", type=str)
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"user": user}
             )
             password = click.prompt("password", hide_input=True, type=str)
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"password": password}
             )
             db_name = click.prompt(
-                "db_name (database that reflekt dbt packages will build objects in)",  # noqa: E501
+                "db_name (database where raw event data is stored)",
                 type=str,
             )
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"db_name": db_name}
             )
-            schema = click.prompt(
-                "schema (schema that reflekt dbt packages will build objects in)",  # noqa: E501
-                type=str,
-            )
-            reflekt_config_obj[config_profile]["warehouse"][warehouse].update(
-                {"schema": schema}
-            )
+            # TODO - Allow user to set schema dbt pkg will materialize in
+            # schema = click.prompt(
+            #     "schema (schema that reflekt dbt packages will build objects in)",
+            #     type=str,
+            # )
+            # reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+            #     {"schema": schema}
+            # )
 
         # TODO - Enable support for other warehouses below as developed
         # elif warehouse == "bigquery":
@@ -537,23 +528,19 @@ def init(project_dir_str):
             yaml.dump(reflekt_config_obj, f, indent=2)
 
     click.echo(
-        f"Configured to use reflekt config profile '{config_profile}' at "
+        f"Configured to use reflekt config profile '{config_name}' at "
         f"{reflekt_config_path}."
     )
-
     project_template_dir = pkg_resources.resource_filename(
         "reflekt", "template/project/"
     )
-
-    # Copy the project template to the current directory
     shutil.copytree(project_template_dir, project_dir, dirs_exist_ok=True)
 
-    # Set project name and config profile in reflekt_project.yml
     with open(project_yml, "r") as f:
         project_yml_str = f.read()
 
     project_yml_str = project_yml_str.replace("default_project", project_name).replace(
-        "default_profile", config_profile
+        "default_profile", config_name
     )
 
     with open(project_yml, "w") as f:
@@ -587,8 +574,8 @@ cli.add_command(dbt)
 # Used for CLI debugging
 if __name__ == "__main__":
     # Call CLI command here with arguments as a list
-    # pull(["--name", "tracking-plan-example"])
-    pull(["--name", "patty-bar-dev-avo"])
+    pull(["--name", "tracking-plan-example"])
+    # pull(["--name", "patty-bar-dev-avo"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
     # dbt(["--name", "my-plan"])

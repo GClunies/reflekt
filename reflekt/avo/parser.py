@@ -24,11 +24,10 @@ def parse_avo_property(name, property_json, required=[]):
 
     if p_type == "array":
         # Unlike Segment, Avo takes a simplified approach to array types, user
-        # con oly specify the type of the array elements. No array items like
-        # Segment. Placeholder kept in case this changes in the future.
+        # can only specify the type of the array elements. No 'array items'
+        # like Segment. This placeholder is kept in case this changes.
         pass
     elif p["type"] == "object":
-        # If a schema is defined for the object property, get the schema.
         object_props = []
         reqd_object_props = property_json.get("required")
 
