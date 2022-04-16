@@ -251,6 +251,7 @@ def test(plan_name, plans_dir):
 @click.command()
 def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
     """Build dbt package with sources, models, and docs based on tracking plan."""
+    # TODO - figure out how to template dbt package from reflekt plans that were pulled from Avo
     logger.configure(**logger_config)
 
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
