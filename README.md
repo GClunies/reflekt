@@ -94,7 +94,6 @@ staged_models:
     # See this article for details on dbt incremental logic: https://discourse.getdbt.com/t/on-the-limits-of-incrementality/303
 ```
 </p></details>
-<br>
 
 reflekt defines tracking plans as YAML in the reflekt spec. An example spec for a `Product Added` event.
 
