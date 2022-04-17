@@ -5,24 +5,23 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # reflekt
-reflekt is a command-line interface (CLI) and continuous integration (CI) tool for your tracking plan. With reflekt, your tracking plan is `code`.
+reflekt is a command-line interface (CLI) and continuous integration (CI) tool for your tracking plan. With reflekt defines your tracking plan as `code`. This code is:
+- **Human readable** (i.e. not JSON schema). Technical *and* business users must be able read and understand the plan.
+- **Version controlled**. Create branches for your dev, staging, and production tracking plans. Submit PRs for review. Roll-back if something goes wrong.
+- **Testable**. Naming conventions, prohibited property names, expected metadata, etc. should be testable whenever a change is made. Think a *CI suite for your tracking plan*.
+- Able to support **Metadata**, customizable for unique use cases.
+- **Extensible**. Enabling integration with other tools in the data stack (e.g. Segment, Avo, dbt, Amplitude, etc.). Build custom data pipelines and products using reflekt's artifacts.
 
-reflekt tracking plan code is:
-- ***Human readable*** (i.e. not JSON schema). Technical and business users must be able read, understand, and contribute to the plan.
-- ***Version controlled***. Create branches for dev, staging, and production tracking plans. Submit PRs for review. Roll-back if something goes wrong.
-- ***Testable***. Naming conventions, prohibited property names, expected metadata, etc. should be testable whenever a change is made. Think a *CI suite for your tracking plan*.
-- Able to support ***Metadata*** to enable unique business use cases.
-- ***Extensible***, enabling integration with other tools in the data stack (e.g. Segment, dbt, Amplitude, etc.) and unexplored use cases.
-
-By defining tracking plans as code, reflekt can ***template dbt packages*** with sources, staging models, and docs for ***every event in your tracking plans***.
+This extensibility allows reflekt to template dbt packages modeling your product analytics data. The sources, staging models, and docs in the dbt package ***reflekt your tracking plan.***
 
 **DEMO GIF HERE**
 
-reflekt itself is ***Modular***. Prefer to manage your tracking plan in your CDP or Analytics Governance tool? No problem! reflekt can pull a copy of the plan and use it to build dbt packages like in the example above.
+See more details on reflekt's other commands and capabilities.
+
+reflekt is ***Modular***, meaning you can choose what features to use. Prefer to manage your tracking plan in Segment/Avo/etc? No problem! You can still use reflekt to pull a copy of your latest plan and build a dbt packages for use in your dbt project.
 
 ## Your tracking plan as `code`
-Each reflekt project has a `reflekt_porject.yml`, which sets project wide configurations.
-<br>
+Each reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
 <br>
 
 <details><summary><strong>reflekt_project.yml</strong> (click to expand example code)</summary><p>
@@ -96,11 +95,8 @@ staged_models:
 ```
 </p></details>
 <br>
-<br>
 
-reflekt defines tracking plans as code using the reflekt spec. Here's an example for a `Product Added` event.
-<br>
-<br>
+reflekt defines tracking plans as YAML in the reflekt spec. An example spec for a `Product Added` event.
 
 <details><summary><strong>product-added.yml</strong> (click to expand example code)</summary><p>
 
@@ -144,11 +140,10 @@ reflekt defines tracking plans as code using the reflekt spec. Here's an example
       required: true
 ```
 </p></details>
-<br>
 
 
 ## Install
-1. Install `reflekt`, preferably in a virtual Python environment.
+1. Install `reflekt` with `pip`. Recommend installing in a virtual Python environment.
    ```bash
    pip install reflekt
    ```
@@ -159,7 +154,7 @@ reflekt defines tracking plans as code using the reflekt spec. Here's an example
    cd my_reflekt_project                            # Navigate inside project
    ```
 
-You now have a git repo with a reflekt project, including an example tracking plan in the `tracking-plans/` folder.
+Your reflekt project includes an example tracking plan in the `tracking-plans/` folder.
 
 ## Commands
 Create a new tracking plan in the reflekt spec
@@ -168,7 +163,7 @@ $ reflekt new --name <plan-name>
 ```
 <br>
 
-Get a tracking plan from your CDP or Analytics Governance tool and convert it to reflekt spec
+Get a tracking plan from your CDP or Analytics Governance tool and convert it to YAML in reflekt spec
 ```zsh
 $ reflekt pull --name <plan-name>
 ```
@@ -185,54 +180,34 @@ Test a reflekt tracking plan for naming conventions, allowed data types, and exp
 $ reflekt test --name <plan-name>
 ```
 
-Build a dbt package with sources, models, and documentation. The package models & docs *reflekt* your tracking plan!
+Build a dbt package with sources, staging models, and documentation.
 ```zsh
 $ reflekt dbt --name <plan-name>
 ```
 
 ## Integrations
 ### CDPs
-**Supported**
-- Segment Protocols
-
-**Under Research**
-- Rudderstack
-
-**Not Evaluated**
-- Snowplow
+- **Supported**: Segment Protocols
+- **Under evaluation**: Rudderstack, Snowplow
 
 ### Analytics Governance
-**Supported**
-
-**Under Research**
-
-**Not Evaluated**
-- Avo (reflekt pull only)
-- Iteratively (reflekt pull only)
-- Amplitude Govern (reflekt push only)
+- **Supported**: Avo (reflekt pull, reflekt dbt only)
+- **Under evaluation**: Iteratively (reflekt pull, reflekt dbt only), Amplitude Govern (reflekt push only)
 
 ### Transform
-**Supported**
-- dbt
+**Supported**: dbt
 
 ### Cloud Warehouses
-**Supported**
-- Snowflake
-- Redshift
-
-**Under Research**
-
-**Not Evaluated**
-- BigQuery
-
+- **Supported**: Snowflake, Redshift
+- **Under evaluation**: BigQuery
 <br>
-
+<br>
 ## Contributing
 
 Contributions are welcome. Please feel free to raise issues and submit PRs.
 
 ### dev environment
-reflekt uses [poetry](https://python-poetry.org/) for packaging and dependency management. If you use poetry, this repo includes `poetry.lock` and `pyproject.toml` files to help create a dev environment. Simply navigate to the root of this repo on your machine and run.
+reflekt uses [poetry](https://python-poetry.org/) for packaging and dependency management. If you use poetry, this repo includes `poetry.lock` and `pyproject.toml` files to help spin up a dev environment. Simply navigate to the root of this repo on your machine and run.
 ```bash
 poetry install
 ```
