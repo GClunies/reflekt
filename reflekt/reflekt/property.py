@@ -197,7 +197,7 @@ class ReflektProperty(object):
                 f" defined by `{rule_type} {rule_str}` in reflekt_project.yml "
                 f"\n\nEither: "
                 f"\n    - Rename property to match pattern. OR;"
-                f"\n    - Change `{rule_type} {rule_str}` in reflekt_project.yml."  # noqa: E501
+                f"\n    - Change `{rule_type} {rule_str}` in reflekt_project.yml."
             )
 
     def validate(self):

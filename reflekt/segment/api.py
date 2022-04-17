@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import sys
 
 import requests
 from loguru import logger
@@ -74,8 +73,7 @@ class SegmentApi:
         plan_id = self._get_plan_id_from_name(plan_name, name_to_id)
 
         if plan_id is None:
-            logger.error(f"Tracking plan `{plan_name}` was not found.")
-            sys.exit(1)
+            raise SegmentApiError(f"Tracking plan `{plan_name}` was not found.")
         else:
             url, headers = self._setup_url_headers(plan_id=plan_id)
 

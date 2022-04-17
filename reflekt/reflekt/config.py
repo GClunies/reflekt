@@ -5,7 +5,9 @@
 from pathlib import Path
 
 import yaml
+from loguru import logger
 
+from reflekt.logger import logger_config
 from reflekt.reflekt.constants import WAREHOUSES
 from reflekt.reflekt.errors import ReflektConfigError
 from reflekt.reflekt.project import ReflektProject
@@ -14,6 +16,7 @@ from reflekt.reflekt.project import ReflektProject
 class ReflektConfig:
     def __init__(self, raise_config_errors=True):
         if ReflektProject().exists:
+            logger.configure(**logger_config)
             try:
                 self.config_errors = []
                 self.project = ReflektProject()
@@ -52,8 +55,9 @@ class ReflektConfig:
     def _get_warehouse_type(self):
         if len(self.warehouse.keys()) > 1:
             raise ReflektConfigError(
-                f"More than one warehouse defined in {self.path}\n"
-                f"Only one warehouse can be defined."
+                f"Multiple warehouses defined for "
+                f"`config_profile: {self.config_profile}` in {self.path}"
+                f"\nOnly one warehouse can be defined."
             )
 
         warehouse_type = list(self.warehouse.keys())[0]

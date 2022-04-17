@@ -4,7 +4,6 @@
 
 import copy
 import shutil
-import sys
 
 import pkg_resources
 import yaml
@@ -84,16 +83,14 @@ class ReflektTransformer(object):
             return self.plan_schema_map[plan_name]
 
         except KeyError:
-            logger.error(
-                f"[ERROR] Tracking plan '{plan_name}' not found in "
-                f"`schema_map:` in reflekt_project.yml. Please add "
-                f"corresponding `{plan_name}: <schema>` key value pair to "
-                f"`schema_map:`"
+            raise KeyError(
+                f"Tracking plan '{plan_name}' not found in "
+                f"`plan_schema_map:` in reflekt_project.yml. Please add "
+                f"corresponding `{plan_name}: <schema>` key value pair."
             )
-            sys.exit(1)
 
-    # NOTE - Avo and Iteratively only support `reflekt pull`. Avo and Iteratively
-    # exist to use there UI for planning. We should not interfere!
+    # NOTE - Avo and Iteratively only support `reflekt pull`. Pushing would
+    # disrupt the flow inside those tools.
 
     def _plan_rudderstack(self, reflekt_plan):
         pass
@@ -287,7 +284,7 @@ class ReflektTransformer(object):
         pass
 
     def build_cdp_plan(self):
-        # NOTE - will never push a plan to Analytics governance tool. Only `reflekt pull`
+        # NOTE - `No reflekt push` to Avo Iteratively. Only `reflekt pull`
         if self.plan_type == "rudderstack":
             return self._plan_rudderstack(self.reflekt_plan)
         elif self.plan_type == "segment":
@@ -368,7 +365,8 @@ class ReflektTransformer(object):
             pass
         else:
             logger.info(
-                "Templating dbt source, staging model, and docs for: identify() calls data"
+                "Templating dbt source, staging model, and docs for: "
+                "identify() calls data"
             )
             idf_tbl = copy.deepcopy(dbt_table_schema)
             idf_tbl["name"] = "identifies"
@@ -377,7 +375,7 @@ class ReflektTransformer(object):
                 f"{reflekt_plan.name}. Each row is a single identify "
                 f"call identifying a user."
             )
-            idf_sql = (  # HACK - for SQL style
+            idf_sql = (
                 "{{\n"
                 "  config(\n"
                 "    materialized = 'incremental',\n"
@@ -389,7 +387,7 @@ class ReflektTransformer(object):
             elif self.warehouse_type == "snowflake":
                 idf_sql += "    cluster_by = 'tstamp'\n"
 
-            idf_sql += (  # HACK - for SQL style
+            idf_sql += (
                 "  )\n"
                 "}}\n\n"
                 "with\n\n"
@@ -448,7 +446,7 @@ class ReflektTransformer(object):
 
                 idf_sql = idf_sql[:-1]
                 # fmt: off
-                idf_sql += (  # HACK - for SQL style
+                idf_sql += (
                     "\n\n    from source"
                     "\n\n)"
                     "\n\n"
@@ -461,7 +459,7 @@ class ReflektTransformer(object):
                 idf_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__identifies.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__identifies.sql"
                 )
 
                 with open(idf_sql_path, "w") as f:
@@ -471,7 +469,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__identifies.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__identifies.yml"
                 )
 
                 with open(idf_stg_path, "w") as f:
@@ -498,7 +496,7 @@ class ReflektTransformer(object):
                 f"A source table with the latest traits for users identified"
                 f" on {reflekt_plan.name}. Each row is user."
             )
-            users_sql = (  # HACK - for SQL style
+            users_sql = (
                 "{{\n"
                 "  config(\n"
                 "    materialized = 'table',\n"
@@ -562,7 +560,7 @@ class ReflektTransformer(object):
 
                 users_sql = users_sql[:-1]
                 # fmt: off
-                users_sql += (  # HACK - for SQL style
+                users_sql += (
                     "\n\n    from source"
                     "\n\n)"
                     "\n\n"
@@ -575,7 +573,7 @@ class ReflektTransformer(object):
                 users_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__users.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__users.sql"
                 )
 
                 with open(users_sql_path, "w") as f:
@@ -585,7 +583,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__users.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__users.yml"
                 )
 
                 with open(users_stg_path, "w") as f:
@@ -615,7 +613,7 @@ class ReflektTransformer(object):
                 f"{reflekt_plan.name}. Each row is a single group() "
                 f"call identifying a group."
             )
-            groups_sql = (  # HACK - for SQL style
+            groups_sql = (
                 "{{\n"
                 "  config(\n"
                 "    materialized = 'incremental',\n"
@@ -627,7 +625,7 @@ class ReflektTransformer(object):
             elif self.warehouse_type == "snowflake":
                 groups_sql += "    cluster_by = 'tstamp'\n"
 
-            groups_sql += (  # HACK - for SQL style
+            groups_sql += (
                 "  )\n"
                 "}}\n\n"
                 "with\n\n"
@@ -684,7 +682,7 @@ class ReflektTransformer(object):
 
                 groups_sql = groups_sql[:-1]
                 # fmt: off
-                groups_sql += (  # HACK - for SQL style
+                groups_sql += (
                     "\n\n    from source"
                     "\n\n)"
                     "\n\n"
@@ -698,7 +696,7 @@ class ReflektTransformer(object):
                 groups_stg_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__groups.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__groups.sql"
                 )
 
                 with open(groups_stg_sql_path, "w") as f:
@@ -708,7 +706,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__groups.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__groups.yml"
                 )
 
                 with open(groups_stg_path, "w") as f:
@@ -747,7 +745,7 @@ class ReflektTransformer(object):
                 f"A source table with page() calls for "
                 f"{reflekt_plan.name}. Each row is a single page view."
             )
-            pages_sql = (  # HACK - for SQL style
+            pages_sql = (
                 "{{\n"
                 "  config(\n"
                 "    materialized = 'incremental',\n"
@@ -759,7 +757,7 @@ class ReflektTransformer(object):
             elif self.warehouse_type == "snowflake":
                 pages_sql += "    cluster_by = 'tstamp'\n"
 
-            pages_sql += (  # HACK - for SQL style
+            pages_sql += (
                 "  )\n"
                 "}}\n\n"
                 "with\n\n"
@@ -819,7 +817,7 @@ class ReflektTransformer(object):
 
                 pages_sql = pages_sql[:-1]
                 # fmt: off
-                pages_sql += (  # HACK - for SQL style
+                pages_sql += (
                     "\n\n    from source"
                     "\n\n)"
                     "\n\n"
@@ -832,7 +830,7 @@ class ReflektTransformer(object):
                 pages_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__pages.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__pages.sql"
                 )
 
                 with open(pages_sql_path, "w") as f:
@@ -842,7 +840,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__pages.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__pages.yml"
                 )
 
                 with open(pages_stg_path, "w") as f:
@@ -883,7 +881,7 @@ class ReflektTransformer(object):
                 f"{reflekt_plan.name}. Each row is a single screen "
                 f"view."
             )
-            screens_sql = (  # HACK - for SQL style
+            screens_sql = (
                 "{{\n"
                 "  config(\n"
                 "    materialized = 'incremental',\n"
@@ -895,7 +893,7 @@ class ReflektTransformer(object):
             elif self.warehouse_type == "snowflake":
                 screens_sql += "    cluster_by = 'tstamp'\n"
 
-            screens_sql += (  # HACK - for SQL style
+            screens_sql += (
                 "  )\n"
                 "}}\n\n"
                 "with\n\n"
@@ -955,7 +953,7 @@ class ReflektTransformer(object):
 
                 screens_sql = screens_sql[:-1]
                 # fmt: off
-                screens_sql += (  # HACK - for SQL style
+                screens_sql += (
                     "\n\n    from source"
                     "\n\n)"
                     "\n\n"
@@ -968,7 +966,7 @@ class ReflektTransformer(object):
                 screens_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__screens.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__screens.sql"
                 )
 
                 with open(screens_sql_path, "w") as f:
@@ -978,7 +976,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__screens.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__screens.yml"
                 )
 
                 with open(screens_stg_path, "w") as f:
@@ -1011,7 +1009,7 @@ class ReflektTransformer(object):
                 f"its own table that contains its unique event properties "
                 f"data."
             )
-            tracks_sql = (  # HACK - for SQL style
+            tracks_sql = (
                 "{{\n"
                 "  config(\n"
                 "    materialized = 'incremental',\n"
@@ -1023,7 +1021,7 @@ class ReflektTransformer(object):
             elif self.warehouse_type == "snowflake":
                 tracks_sql += "    cluster_by = 'tstamp'\n"
 
-            tracks_sql += (  # HACK - for SQL style
+            tracks_sql += (
                 "  )\n"
                 "}}\n\n"
                 "with\n\n"
@@ -1077,7 +1075,7 @@ class ReflektTransformer(object):
 
                 tracks_sql = tracks_sql[:-1]
                 # fmt: off
-                tracks_sql += (  # HACK - for SQL style
+                tracks_sql += (
                     "\n\n    from source"
                     "\n\n)"
                     "\n\n"
@@ -1090,7 +1088,7 @@ class ReflektTransformer(object):
                 tracks_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__tracks.sql"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__tracks.sql"
                 )
 
                 with open(tracks_sql_path, "w") as f:
@@ -1100,7 +1098,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__tracks.yml"  # noqa: E501
+                    / f"{self.stg_prefix}{underscore(self.plan_name)}__tracks.yml"
                 )
 
                 with open(tracks_stg_path, "w") as f:
@@ -1140,7 +1138,7 @@ class ReflektTransformer(object):
                         event_tbl = copy.deepcopy(dbt_table_schema)
                         event_tbl["name"] = segment_2_snake(event.name)
                         event_tbl["description"] = event.description
-                        event_sql = (  # HACK - for SQL style
+                        event_sql = (
                             "{{\n"
                             "  config(\n"
                             "    materialized = 'incremental',\n"
@@ -1148,13 +1146,13 @@ class ReflektTransformer(object):
                         )
 
                         if self.warehouse_type == "redshift":
-                            event_sql += (  # HACK - for SQL style
+                            event_sql += (
                                 "    sort = 'tstamp',\n" "    dist = 'event_id'\n"
                             )
                         elif self.warehouse_type == "snowflake":
                             event_sql += "    cluster_by = 'tstamp'\n"
 
-                        event_sql += (  # HACK - for SQL style
+                        event_sql += (
                             "  )\n"
                             "}}\n\n"
                             "with\n\n"
