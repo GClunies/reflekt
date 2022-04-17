@@ -126,9 +126,9 @@ def pull(plan_name, plans_dir, raw):
         if plans_dir != ReflektProject().project_dir / "tracking-plans":
             plan_dir = Path(plans_dir) / plan_name
 
-        if config.plan_type.lower() == "avo":
-            plan = AvoPlan(plan_json)
-        elif config.plan_type.lower() == "segment":
+        if api.type.lower() == "avo":
+            plan = AvoPlan(plan_json, plan_name)
+        elif api.type.lower() == "segment":
             plan = SegmentPlan(plan_json)
         # TODO: Add support for other tracking plan types
         # elif config.plan_type.lower() == "iteratively":
@@ -182,7 +182,7 @@ def push(plan_name, plans_dir, dry):
         plan_dir = Path(plans_dir) / plan_name
 
     logger.info(f"Loading tracking plan {plan_name} at {str(plan_dir)}")
-    loader = ReflektLoader(plan_dir)
+    loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
     logger.info(f"Loaded tracking plan {plan_name}\n")
     transformer = ReflektTransformer(reflekt_plan)
@@ -227,8 +227,9 @@ def test(plan_name, plans_dir):
 
     logger.info(f"Testing tracking plan {plan_name} at {str(plan_dir)}")
     loader = ReflektLoader(
-        plan_dir,
-        raise_validation_errors=False,  # Raise errors after tests have ran
+        plan_dir=plan_dir,
+        plan_name=plan_name,
+        raise_validation_errors=False,  # Raise errors after tests run (if any)
     )
 
     if loader.has_validation_errors:
@@ -333,7 +334,7 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
                 version = dbt_pkg_version
 
     logger.info(f"Loading reflekt tracking plan {plan_name} at {str(plan_dir)}")
-    loader = ReflektLoader(plan_dir)
+    loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
     logger.info(f"Loaded reflekt tracking plan {plan_name}\n")
     transformer = ReflektTransformer(reflekt_plan, dbt_pkg_dir, pkg_version=version)
@@ -577,9 +578,10 @@ cli.add_command(dbt)
 # Used for CLI debugging
 if __name__ == "__main__":
     # Call CLI command here with arguments as a list
-    pull(["--name", "tracking-plan-example"])
+    # pull(["--name", "tracking-plan-example"])
     # pull(["--name", "patty-bar-dev-avo"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
     # dbt(["--name", "my-plan"])
+    dbt(["--name", "patty-bar-dev-avo"])
     # init(["--project-dir", "/Users/gclunies/Repos/patty-bar-reflekt"])

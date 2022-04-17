@@ -22,10 +22,11 @@ logger.configure(**logger_config)
 # PlanLoader from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektLoader(object):
-    def __init__(self, plan_dir, raise_validation_errors=True):
+    def __init__(self, plan_dir, plan_name, raise_validation_errors=True):
         self._validation_errors = []
         if ReflektProject().exists:
             try:
+                self.plan_name = plan_name
                 self._load_plan_file(plan_dir / "plan.yml")
                 self._load_events(plan_dir / "events")
                 self._load_identify_traits(plan_dir / "identify_traits.yml")
@@ -52,7 +53,7 @@ class ReflektLoader(object):
     def _load_plan_file(self, path):
         with open(path, "r") as plan_file:
             yaml_obj = yaml.safe_load(plan_file)
-            self._plan = ReflektPlan.from_yaml(yaml_obj)
+            self._plan = ReflektPlan(plan_yaml=yaml_obj, plan_name=self.plan_name)
 
     def _load_events(self, path):
         for file in Path(path).glob("**/*.yml"):  # Get .yml files in /events
@@ -63,7 +64,7 @@ class ReflektLoader(object):
             with open(file, "r") as event_file:
                 yaml_event_obj = yaml.safe_load(event_file)
                 for event_version in yaml_event_obj:
-                    self._plan.add_event(event_version)
+                    self.plan.add_event(event_version)
 
     def _load_identify_traits(self, path):
         if not path.exists():
@@ -72,7 +73,7 @@ class ReflektLoader(object):
         with open(path, "r") as identify_file:
             yaml_obj = yaml.safe_load(identify_file)
             for trait in yaml_obj.get("traits", []):
-                self._plan.add_identify_trait(trait)
+                self.plan.add_identify_trait(trait)
 
     def _load_group_traits(self, path):
         if not path.exists():
@@ -81,4 +82,38 @@ class ReflektLoader(object):
         with open(path, "r") as group_file:
             yaml_obj = yaml.safe_load(group_file)
             for trait in yaml_obj.get("traits", []):
-                self._plan.add_group_trait(trait)
+                self.plan.add_group_trait(trait)
+
+    # def _load_plan_file(self, path):
+    #     with open(path, "r") as plan_file:
+    #         yaml_obj = yaml.safe_load(plan_file)
+    #         self._plan = ReflektPlan.from_yaml(yaml_obj)
+
+    # def _load_events(self, path):
+    #     for file in Path(path).glob("**/*.yml"):  # Get .yml files in /events
+    #         logger.info(
+    #             f"  ...Parsing event file {file.name}",
+    #         )
+
+    #         with open(file, "r") as event_file:
+    #             yaml_event_obj = yaml.safe_load(event_file)
+    #             for event_version in yaml_event_obj:
+    #                 self._plan.add_event(event_version)
+
+    # def _load_identify_traits(self, path):
+    #     if not path.exists():
+    #         return
+
+    #     with open(path, "r") as identify_file:
+    #         yaml_obj = yaml.safe_load(identify_file)
+    #         for trait in yaml_obj.get("traits", []):
+    #             self._plan.add_identify_trait(trait)
+
+    # def _load_group_traits(self, path):
+    #     if not path.exists():
+    #         return
+
+    #     with open(path, "r") as group_file:
+    #         yaml_obj = yaml.safe_load(group_file)
+    #         for trait in yaml_obj.get("traits", []):
+    #             self._plan.add_group_trait(trait)

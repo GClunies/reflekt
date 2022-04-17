@@ -18,7 +18,7 @@ class WarehouseConnection:
     reflekt_config.yml
     """
 
-    def __init__(self, reflekt_config):
+    def __init__(self):
         logger.configure(**logger_config)
         self._config = ReflektConfig()
         self.warehouse = self._config.warehouse
@@ -44,7 +44,7 @@ class WarehouseConnection:
                     role=self.warehouse.get("snowflake").get("role"),
                     database=self.warehouse.get("snowflake").get("database"),
                     warehouse=self.warehouse.get("snowflake").get("warehouse"),
-                    schema=self.warehouse.get("snowflake").get("schema"),
+                    # schema=self.warehouse.get("snowflake").get("schema"),
                 )
             )
 

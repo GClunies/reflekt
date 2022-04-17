@@ -27,7 +27,8 @@ def parse_avo_property(name, property_json, required=[]):
         # Unlike Segment, Avo takes a simplified approach to array types, user
         # can only specify the type of the array elements. No 'array items'
         # like Segment. This placeholder is kept in case this changes.
-        pass
+        return p
+
     elif p["type"] == "object":
         object_props = []
         reqd_object_props = property_json.get("required")

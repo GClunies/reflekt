@@ -15,9 +15,10 @@ from reflekt.reflekt.dumper import ReflektYamlDumper
 
 
 class AvoPlan(object):
-    def __init__(self, plan_json):
+    def __init__(self, plan_json, plan_name):
         logger.configure(**logger_config)
         self.plan_json = plan_json
+        self.name = plan_name
 
     @classmethod
     def parse_string(cls, json_string):
@@ -29,10 +30,6 @@ class AvoPlan(object):
         with open(json_file_path, "r") as f:
             contents = f.read()
         return cls.parse_string(contents)
-
-    @property
-    def name(self):
-        return self.plan_json.get("name")
 
     def build_reflekt(self, plan_dir):
         events_dir = plan_dir / "events"
@@ -70,10 +67,12 @@ class AvoPlan(object):
         event_file = events_dir / f"{event_file_name}.yml"
         logger.info(f"Building reflekt event `{event_name}` at {event_file}")
         event_obj = parse_avo_event(event_json)
+        event_obj_with_version = {"version": 1}  # No event versions in Avo. Set to 1
+        event_obj_with_version.update(event_obj)
 
         with open(event_file, "w") as f:
             yaml.dump(
-                [event_obj],
+                [event_obj_with_version],
                 f,
                 indent=2,
                 width=70,

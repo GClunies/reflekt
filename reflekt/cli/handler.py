@@ -14,6 +14,7 @@ class ReflektApiHandler:
 
     def __init__(self):
         self._config = ReflektConfig()
+        self.type = self._config.plan_type
 
     def get_api(self):
         if self._config.plan_type == "avo":

@@ -64,7 +64,7 @@ class ReflektTransformer(object):
         if dbt_pkg_dir is not None:
             self.reflekt_project = ReflektProject()
             self.project_dir = self.reflekt_project.project_dir
-            self.dbt_package_name = f"reflekt_{underscore(self.plan_name)}"
+            self.dbt_package_name = f"reflekt_{underscore(self.reflekt_plan.name)}"
             self.tmp_pkg_dir = (
                 self.project_dir / ".reflekt" / "tmp" / self.dbt_package_name
             )
@@ -73,7 +73,7 @@ class ReflektTransformer(object):
                 "reflekt", "dbt/package/"
             )
             self.pkg_version = pkg_version
-            self.db_engine = WarehouseConnection(self.reflekt_config)
+            self.db_engine = WarehouseConnection()
             self.schema_map = self.reflekt_project.schema_map
             self.schema = self._get_plan_schema_from_map(self.plan_name)
             self.src_prefix = self.reflekt_project.src_prefix

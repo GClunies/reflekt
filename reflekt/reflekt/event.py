@@ -22,8 +22,6 @@ from reflekt.reflekt.project import ReflektProject
 from reflekt.reflekt.property import ReflektProperty
 from reflekt.reflekt.schema import reflekt_event_schema, reflekt_metadata_schema
 
-# reserved_properties = ReflektProject().properties_reserved
-
 
 # The class ReflektEvent is a derivative work based on the class
 # YamlEvent from project tracking-plan-kit licensed under MIT. All
@@ -75,11 +73,13 @@ class ReflektEvent(object):
         pattern_rule = project.events_pattern
 
         if pattern_rule is not None:
+            rule_str = f"regex: {pattern_rule}"
             regex = r"{}".format(pattern_rule)
             matched = re.match(regex, self.name)
             is_match = bool(matched)
 
         if case_rule is not None:
+            rule_str = f"case: {case_rule.lower()}"
             if case_rule.lower() == "title":
                 if allow_numbers:
                     regex = TITLE_CASE_NUMBERS_RE
@@ -105,8 +105,8 @@ class ReflektEvent(object):
             pass
         else:
             raise ReflektValidationError(
-                f"Event name '{self.name}' does not match regular "
-                f"expression pattern = {pattern_rule}"
+                f"Event name '{self.name}' does not match `{rule_str}` "
+                f"defined in reflekt_project.yml"
                 f"\n\nEither: "
                 f"\n    - Rename property to match pattern. OR;"
                 f"\n    - Change `pattern:` in reflekt_project.yml."
