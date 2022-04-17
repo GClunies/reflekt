@@ -368,7 +368,8 @@ class ReflektTransformer(object):
             pass
         else:
             logger.info(
-                "Templating dbt source, staging model, and docs for: identify() calls data"
+                "Templating dbt source, staging model, and docs for: "
+                "identify() calls data"
             )
             idf_tbl = copy.deepcopy(dbt_table_schema)
             idf_tbl["name"] = "identifies"
