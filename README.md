@@ -24,7 +24,7 @@ reflekt is ***Modular***, meaning you can choose what features to use. Prefer to
 Each reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
 <br>
 
-<details><summary><strong>reflekt_project.yml</strong> (click to expand example code)</summary><p>
+<details><summary><code>reflekt_project.yml</code> (click to expand example code)</summary><p>
 
 ```yaml
 # reflekt_project.yml
@@ -97,7 +97,7 @@ staged_models:
 
 reflekt defines tracking plans as YAML in the reflekt spec. An example spec for a `Product Added` event.
 
-<details><summary><strong>product-added.yml</strong> (click to expand example code)</summary><p>
+<details><summary><code>product-added.yml</code> (click to expand example code)</summary><p>
 
 ```yaml
 # product-added.yml
