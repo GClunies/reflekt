@@ -143,7 +143,7 @@ dmypy.json
 /tracking-plans/
 /dbt_packages/
 /avo/
-reflekt_project.yml
+./reflekt_project.yml
 reflekt_project_backup.yml
 reflekt_project_pb.yml
 reflekt_project_sl.yml

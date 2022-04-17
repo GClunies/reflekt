@@ -1,0 +1,67 @@
+name: default_project
+
+config_profile: default_profile  # Profile defined in reflekt_config.yml
+#config_path: /absolute/path/to/reflekt_config.yml  # OPTIONAL - Absolute path to reflekt_config.yml
+
+tracking_plans:
+  naming: # REQUIRED - For `events:` and `properties:` below
+    #   - Provide one of `casing` or `pattern` (regex).
+    #   - Set whether numbers are allowed in event/property names
+    events:
+      case: title  # One of title|snake|camel
+      allow_numbers: true
+      # pattern: '\b([a-z]*)([A-Z][a-z]+)+\b'
+      reserved: []  # Reserved event names not allowed (casing matters)
+
+    properties:
+      case: snake  # One of title|snake|camel
+      allow_numbers: true
+      # pattern: '[A-Z][a-z]+'s
+      reserved: [] # Reserved property names not allowed (casing matters)
+
+  data_types:  # REQUIRED - Specify allowed data types
+    allowed:   # Available data types are listed below
+      - string
+      - integer
+      - boolean
+      - number
+      - object
+      - array
+      - any
+
+  plan_schema_map:  # REQUIRED
+    # For each reflekt tracking plan, specify the corresponding schema in data warehouse holding raw event data
+    # Replace the example mapping below with your mappings
+    example-plan: example_plan
+
+  # OPTIONAL - Define a schema to ensure certain metadata is always defined for events.
+  # Test for metadata by running `reflekt test --name <plan-name>`
+  # Uncomment the `metadata` block below and modify to define your metadata
+  # metadata:
+  #   schema:
+  #     product_owner:     # e.g 'John Doe'
+  #       type: string
+  #       required: true
+  #     code_owner:        # e.g 'Jane Doe'
+  #       required: true
+  #       type: string
+  #     stakeholders:
+  #       type: string
+  #       allowed:
+  #         - Product
+  #         - Engineering
+  #         - Data
+
+dbt:
+  sources:
+    prefix: reflekt_src_  # REQUIRED - prefix for dbt package source files
+
+  staged_models:
+    prefix: reflekt_stg_  # REQUIRED - prefix for dbt package staging models & docs
+    incremental_logic: |  # REQUIRED - Specify the incremental logic to use when templating dbt models. This should include the {%- if is_incremental() %} ... {%- endif %} block
+      {%- if is_incremental() %}
+      where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
+      {%- endif %}
+    # See this article for details on dbt incremental logic: https://discourse.getdbt.com/t/on-the-limits-of-incrementality/303
+
+  # materialize_schema: <schema_name>  # OPTIONAL - schema to materialize dbt pkg in

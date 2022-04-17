@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: patty_bar_reflekt  # Profile defined in reflekt_config.yml
+
+config_profile: patty_bar  # REQUIRED - this should match a profile found in the reflekt reflekt_config.yml
+
+tracking_plans:
+  naming:
+    events:
+      case: title
+      allow_numbers: false
+      reserved: []
+
+    properties:
+      case: camel
+      allow_numbers: false
+      reserved: []
+
+  data_types:
+    allowed:
+      - string
+      - integer
+      - boolean
+      - number
+      - object
+      - array
+
+  plan_schema_map:  # REQUIRED
+    # For each reflekt tracking plan, specify the corresponding schema in data
+    # warehouse holding raw event data. Replace the example mapping below with
+    # your mappings
+    patty-bar-dev-avo: patty_bar_segment
+    patty-bar-prod-avo: patty_bar_segment
+
+  metadata:  # OPTIONAL - Define the schema for event metadata
+    schema:
+      code_owner:
+        required: true
+        type: string
+        allowed:
+          - Greg
+          - Maura
+      product_owner:
+        required: true
+        type: string
+        allowed:
+          - Greg
+          - Maura
+
+dbt:
+  sources:
+    prefix: reflekt_src_  # REQUIRED - Prefix for source files in dbt package
+
+  staged_models:
+    prefix: reflekt_stg_  # REQUIRED - Prefix for staging models in dbt package
+    incremental_logic: |  # REQUIRED - Incremental logic to use when templating dbt models. Should include the {%- if is_incremental() %} ... {%- endif %} block
+      {%- if is_incremental() %}
+      where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
+      {%- endif %}
+
+  materialize_schema: analytics  # OPTIONAL - schema to materialize dbt pkg in
