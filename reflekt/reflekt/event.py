@@ -136,7 +136,7 @@ class ReflektEvent(object):
         for prop_name in prop_names:
             if prop_name in ReflektProject().properties_reserved:
                 raise ReflektValidationError(
-                    f"Property name '{prop_name}' is reserved and cannot be " f"used"
+                    f"Property name '{prop_name}' is reserved and cannot be used"
                 )
 
     def validate_event(self):

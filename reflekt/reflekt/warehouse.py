@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import sys
-
 import sqlalchemy
 from loguru import logger
 from snowflake.sqlalchemy import URL as snow_url
@@ -11,6 +9,7 @@ from sqlalchemy.engine.url import URL as redshift_url
 
 from reflekt.logger import logger_config
 from reflekt.reflekt.config import ReflektConfig
+from reflekt.reflekt.errors import ReflektConfigError
 
 
 class WarehouseConnection:
@@ -49,8 +48,9 @@ class WarehouseConnection:
             )
 
         else:
-            logger.error(f"Invalid warehouse type specified in {self._config.path}")
-            sys.exit(1)
+            raise ReflektConfigError(
+                f"Invalid warehouse type specified in {self._config.path}"
+            )
 
     def get_columns(self, schema, table_name):
         with self.engine.connect() as conn:
