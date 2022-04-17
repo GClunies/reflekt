@@ -234,17 +234,17 @@ class ReflektProject:
                 "\nAvailable data types are: ['string', 'integer', 'boolean', 'number', 'object', 'array', 'any']"  # noqa E501
             )
 
-    def _get_dbt_schema_map(self):
+    def _get_plan_schema_map(self):
         try:
-            self.schema_map = self.project["dbt"]["schema_map"]
+            self.plan_schema_map = self.project["tracking_plans"]["plan_schema_map"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define `schema_map:` in reflekt_project.yml. Each trackign plan in your reflekt project must"  # noqa E501
+                "\n\nMust define `plan_schema_map:` in reflekt_project.yml. Each trackign plan in your reflekt project must"  # noqa E501
                 " be mapped to a corresponding schema in data warehouse where it's raw event data is stored. Example:"  # noqa E501
                 "\n"
-                "\ndbt:"
+                "\ntracking_plans:"
                 "\n  schema_map:"
-                "\n    my-plan-name: schema_with_raw_events"
+                "\n    plan-name: schema_name"
                 "\n"
             )
 
@@ -296,6 +296,12 @@ class ReflektProject:
         else:
             self.metadata_schema = None
 
+    def _get_materialize_schema(self):
+        if self.project.get("dbt").get("materialize_schema") is not None:
+            self.materialize_schema = self.project.get("dbt").get("materialize_schema")
+        else:
+            self.materialize_schema = None
+
     def validate_project(self):
         self._get_project_name()
         self._get_config_profile()
@@ -307,8 +313,9 @@ class ReflektProject:
         self._get_properties_allow_numbers()
         self._get_properties_reserved()
         self._get_data_types()
-        self._get_dbt_schema_map()
+        self._get_plan_schema_map()
         self._get_dbt_src_prefix()
         self._get_dbt_stg_prefix()
         self._get_dbt_stg_incremental_logic()
         self._get_metadata_schema()
+        self._get_materialize_schema()

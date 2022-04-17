@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from reflekt.reflekt._global import WAREHOUSES
+from reflekt.reflekt.constants import WAREHOUSES
 from reflekt.reflekt.errors import ReflektConfigError
 from reflekt.reflekt.project import ReflektProject
 

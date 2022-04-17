@@ -17,12 +17,7 @@ from packaging.version import parse as parse_version
 from reflekt.avo.plan import AvoPlan
 from reflekt.cli.handler import ReflektApiHandler
 from reflekt.logger import logger_config
-from reflekt.reflekt._global import (
-    CDP_INIT_STRING,
-    CDP_MAP,
-    WAREHOUSE_INIT_STRING,
-    WAREHOUSE_MAP,
-)
+from reflekt.reflekt import constants
 from reflekt.reflekt.config import ReflektConfig
 from reflekt.reflekt.loader import ReflektLoader
 from reflekt.reflekt.project import ReflektProject
@@ -279,9 +274,6 @@ def test(plan_name, plans_dir):
 @click.command()
 def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
     """Build dbt package with sources, models, and docs based on tracking plan."""
-
-    # TODO - figure out how to template dbt package from reflekt plans that were pulled from Avo
-
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
         plan_dir = Path(plans_dir).resolve() / plan_name
 
@@ -384,7 +376,8 @@ def init(project_dir_str):
     if not reflekt_config_path.exists():
         reflekt_config_obj = {
             config_name: {
-                "cdp": {},
+                "plan_type": "",
+                "cdp": "",
                 "warehouse": {},
             }
         }
@@ -402,20 +395,30 @@ def init(project_dir_str):
             reflekt_config_obj.update(
                 {
                     config_name: {
-                        "cdp": {},
+                        "plan_type": "",
+                        "cdp": "",
                         "warehouse": {},
                     }
                 }
             )
 
     if collect_config:
-        cdp_num = click.prompt(
-            f"Which CDP or Analytics Governance tool do you use?"
-            f"{CDP_INIT_STRING}"
+        plan_type_prompt = click.prompt(
+            f"What tool do you use to manage your tracking plan(s)?"
+            f"{constants.PLAN_INIT_STRING}"
             f"\nEnter a number",
             type=int,
         )
-        cdp = CDP_MAP[str(cdp_num)]
+        plan_type = constants.PLAN_MAP[str(plan_type_prompt)]
+        reflekt_config_obj[config_name]["plan_type"] = plan_type
+        cdp_num_prompt = click.prompt(
+            f"Which CDP or Analytics Governance tool do you use?"
+            f"{constants.CDP_INIT_STRING}"
+            f"\nEnter a number",
+            type=int,
+        )
+        cdp = constants.CDP_MAP[str(cdp_num_prompt)]
+        reflekt_config_obj[config_name]["cdp"] = cdp
 
         if cdp == "segment":
             workspace_name = click.prompt(
@@ -423,20 +426,14 @@ def init(project_dir_str):
                 "account URL (i.e. https://app.segment.com/your-workspace-name/)",
                 type=str,
             )
+            reflekt_config_obj[config_name]["workspace_name"] = workspace_name
             access_token = click.prompt(
                 "Enter your Segment Config API access token (To generate a "
                 "token, see Segment's documentation https://segment.com/docs/config-api/authentication/#create-an-access-token)",  # noqa: E501
                 type=str,
                 hide_input=True,
             )
-            reflekt_config_obj[config_name]["cdp"].update(
-                {
-                    "segment": {
-                        "workspace_name": workspace_name,
-                        "access_token": access_token,
-                    }
-                }
-            )
+            reflekt_config_obj[config_name]["access_token"] = access_token
         # TODO - Enable support for other CDPs below as developed
         # elif cdp == "rudderstack":
         #     pass
@@ -449,11 +446,11 @@ def init(project_dir_str):
 
         warehouse_num = click.prompt(
             f"Which data warehouse do you use?"
-            f"{WAREHOUSE_INIT_STRING}"
+            f"{constants.WAREHOUSE_INIT_STRING}"
             f"\nEnter a number",
             type=int,
         )
-        warehouse = WAREHOUSE_MAP[str(warehouse_num)]
+        warehouse = constants.WAREHOUSE_MAP[str(warehouse_num)]
         reflekt_config_obj[config_name]["warehouse"].update({warehouse: {}})
 
         if warehouse == "snowflake":
@@ -483,12 +480,6 @@ def init(project_dir_str):
             reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"warehouse": snowflake_warehouse}
             )
-            # TODO - Allow user to set schema dbt pkg will materialize in
-            # schema = click.prompt("schema", type=str)
-            # reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-            #     {"schema": schema}
-            # )
-
         elif warehouse == "redshift":
             host_url = click.prompt(
                 "host_url (hostname.region.redshift.amazonaws.com)", type=str
@@ -515,15 +506,6 @@ def init(project_dir_str):
             reflekt_config_obj[config_name]["warehouse"][warehouse].update(
                 {"db_name": db_name}
             )
-            # TODO - Allow user to set schema dbt pkg will materialize in
-            # schema = click.prompt(
-            #     "schema (schema that reflekt dbt packages will build objects in)",
-            #     type=str,
-            # )
-            # reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-            #     {"schema": schema}
-            # )
-
         # TODO - Enable support for other warehouses below as developed
         # elif warehouse == "bigquery":
         #     pass
@@ -578,10 +560,13 @@ cli.add_command(dbt)
 # Used for CLI debugging
 if __name__ == "__main__":
     # Call CLI command here with arguments as a list
+    # init(["--project-dir", "/Users/gclunies/Repos/patty-bar-reflekt"])
+    # new(["--project-dir", "test-plan"])
     # pull(["--name", "tracking-plan-example"])
-    # pull(["--name", "patty-bar-dev-avo"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
-    # dbt(["--name", "my-plan"])
-    dbt(["--name", "patty-bar-dev-avo"])
-    # init(["--project-dir", "/Users/gclunies/Repos/patty-bar-reflekt"])
+    pull(["--name", "patty-bar-dev-avo"])
+    push(["--name", "patty-bar-dev-avo"])
+    test(["--name", "patty-bar-dev-avo"])
+    # dbt(["--name", "patty-bar-dev-avo"])
+    # dbt(["--name", "patty-bar-prod-avo"])

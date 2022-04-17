@@ -4,12 +4,28 @@
 
 # fmt: off
 PLANS = [
-    "avo",
     "segment",
+    "avo",
     # "rudderstack",
     # "snowplow",
     # "iteratively",
 ]
+
+PLAN_INIT_STRING = (
+    "\n[1] Segment"
+    "\n[2] Avo"
+    # "\n[3] Rudderstack"
+    # "\n[4] Snowplow"
+    # "\n[5] Iteratively"
+)
+
+PLAN_MAP = {
+    "1": "segment",
+    "2": "avo",
+    # "3": "rudderstack",
+    # "4": "snowplow",
+    # "5": "iteratively",
+}
 
 CDPS = [
     "segment",

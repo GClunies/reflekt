@@ -24,24 +24,24 @@ class AvoCli:
         logger.configure(**logger_config)
 
     def get(self, plan_name):
-        if plan_name != self.avo_json_source:
+        schema_map = self._project.plan_schema_map
+
+        if plan_name not in schema_map:
             raise AvoCliError(
-                f"Plan name {plan_name} does not match 'avo_json_source: "
-                f"{self.avo_json_source}' specified in {self._config.config_path}"
+                f"Plan {plan_name} not found in schema_map in "
+                f"{self._project.project_dir}/reflekt_project.yml"
             )
         else:
-            self._run_avo_pull()
-            avo_json_file = self.avo_dir / f"{self.avo_json_source}.json"
+            self._run_avo_pull(plan_name)
+            avo_json_file = self.avo_dir / f"{plan_name}.json"
             with open(avo_json_file) as f:
                 return json.load(f)
 
-    def _run_avo_pull(self):
-        logger.info(
-            f"Running `avo pull` to fetch {self.avo_json_source} from Avo account.\n"
-        )
+    def _run_avo_pull(self, plan_name):
+        logger.info(f"Running `avo pull` to fetch {plan_name} from Avo account.\n")
         avo_executable = shutil.which("avo")
         subprocess.call(
-            [avo_executable, "pull", self.avo_json_source],
+            [avo_executable, "pull", plan_name],
             cwd=self.avo_dir,
         )
         print("")  # Make output look nicer
