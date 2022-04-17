@@ -9,7 +9,6 @@ logger_config = {
         {
             "sink": sys.stdout,
             "format": "{time:HH:mm:ss} {message}",
-            # "format": "{time:HH:mm:ss} | {level} | {message}",
         },
         {
             "sink": "./.reflekt/logs/reflekt_{time:YYYY-MM-DD-HHmmss}.log",

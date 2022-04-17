@@ -5,9 +5,7 @@
 from reflekt.reflekt.project import ReflektProject
 
 # fmt: off
-
-# TODO - How should these be enforced? These would 'collide' with standard
-# tracker properties.
+# TODO - How should these be enforced? These collide with standard tracker properties.
 prohibited_properties = [
     "anonymousId",
     "messageId",
@@ -34,7 +32,6 @@ reflekt_event_schema = {
     "properties": {"required": True, "type": "list"},
 }
 
-# Get any schema considerations from reflekt_reflekt_project.yml
 reflekt_project = ReflektProject()
 
 if reflekt_project.exists:

@@ -3,29 +3,40 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import requests
 import sys
-from loguru import logger
-from reflekt.logger import logger_config
-from reflekt.segment.errors import SegmentApiError
 
-# Setup logger
-logger.configure(**logger_config)
+import requests
+from loguru import logger
+
+from reflekt.logger import logger_config
+from reflekt.reflekt.config import ReflektConfig
+from reflekt.segment.errors import SegmentApiError
 
 
 class SegmentApi:
     def __init__(self, workspace_name, access_token):
+        logger.configure(**logger_config)
+        self._config = ReflektConfig()
+        self.type = self._config.plan_type
         self.workspace_name = workspace_name
         self.access_token = access_token
-        self.base_url = f"https://platform.segmentapis.com/v1beta/workspaces/" f"{workspace_name}/tracking-plans/"
+        self.base_url = (
+            f"https://platform.segmentapis.com/v1beta/workspaces/"
+            f"{workspace_name}/tracking-plans/"
+        )
 
     def _list_plans(self):
         url, headers = self._setup_url_headers()
         r = requests.get(url=url, headers=headers)
         self._handle_response(r)
         plans = r.json().get("tracking_plans")
-        name_to_id = {plan.get("display_name"): plan.get("name").split("/")[-1] for plan in plans}
-        id_to_name = {plan.get("name").split("/")[-1]: plan.get("display_name") for plan in plans}
+        name_to_id = {
+            plan.get("display_name"): plan.get("name").split("/")[-1] for plan in plans
+        }
+        id_to_name = {
+            plan.get("name").split("/")[-1]: plan.get("display_name") for plan in plans
+        }
+
         return name_to_id, id_to_name
 
     def _get_plan_id_from_name(self, plan_name, name_to_id_dict):
@@ -39,10 +50,12 @@ class SegmentApi:
             url = self.base_url
         else:
             url = self.base_url + plan_id
+
         headers = {
             "Authorization": f"Bearer {self.access_token}",
             "Content-Type": "application/json",
         }
+
         return url, headers
 
     def _handle_response(self, response):
@@ -69,6 +82,7 @@ class SegmentApi:
         url, headers = self._setup_url_headers(plan_id=plan_id)
         r = requests.get(url=url, headers=headers)
         self._handle_response(r)
+
         return r.json()
 
     def sync(self, plan_name, json_plan, dry=False):
@@ -79,16 +93,13 @@ class SegmentApi:
         if plan_id is None:
             if dry:
                 return json_plan
-
             else:
                 url, headers = self._setup_url_headers()
                 r = requests.post(url=url, headers=headers, data=payload)
                 self._handle_response(r)
-
         else:
             if dry:
                 return json_plan
-
             else:
                 url, headers = self._setup_url_headers(plan_id)
                 r = requests.put(url=url, headers=headers, data=payload)

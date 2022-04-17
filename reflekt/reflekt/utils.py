@@ -20,5 +20,7 @@ def segment_2_snake(in_str):
     """
     temp = re.sub("([a-z])([A-Z]+)", r"\1_\2", in_str)
     temp2 = temp.lower()
-    warehouse_case = temp2.replace(".", "_").replace(" ", "_").replace("_-_", "_").replace("/", "_")
+    warehouse_case = (
+        temp2.replace(".", "_").replace(" ", "_").replace("_-_", "_").replace("/", "_")
+    )
     return warehouse_case

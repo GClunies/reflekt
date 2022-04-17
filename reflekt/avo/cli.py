@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+import json
+import shutil
+import subprocess
+
+from loguru import logger
+
+from reflekt.avo.errors import AvoCliError
+from reflekt.logger import logger_config
+from reflekt.reflekt.config import ReflektConfig
+from reflekt.reflekt.project import ReflektProject
+
+
+class AvoCli:
+    def __init__(self):
+        self._project = ReflektProject()
+        self._config = ReflektConfig()
+        self.type = self._config.plan_type
+        self.avo_json_source = self._config.avo_json_source
+        self.avo_dir = self._project.project_dir / ".reflekt" / "avo"
+        logger.configure(**logger_config)
+
+    def get(self, plan_name):
+        schema_map = self._project.plan_schema_map
+
+        if plan_name not in schema_map:
+            raise AvoCliError(
+                f"Plan {plan_name} not found in schema_map in "
+                f"{self._project.project_dir}/reflekt_project.yml"
+            )
+        else:
+            self._run_avo_pull(plan_name)
+            avo_json_file = self.avo_dir / f"{plan_name}.json"
+            with open(avo_json_file) as f:
+                return json.load(f)
+
+    def _run_avo_pull(self, plan_name):
+        logger.info(f"Running `avo pull` to fetch {plan_name} from Avo account.\n")
+        avo_executable = shutil.which("avo")
+        subprocess.call(
+            [avo_executable, "pull", plan_name],
+            cwd=self.avo_dir,
+        )
+        print("")  # Make output look nicer

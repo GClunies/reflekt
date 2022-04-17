@@ -5,10 +5,10 @@
 
 class AmplitudeApi:
     # fmt: off
-    """This API class allows reflekt to pass tracking plan docs and metadata to
-    Amplitude's Taxonomy API. In particular, the ability to update Event
-    properties in Amplitude (https://developers.amplitude.com/docs/taxonomy-api#update-an-event-property).
-    to ensure they are consistent with the tracking plan.
+    """API class to pass tracking plan docs and metadata to Amplitude's
+    Taxonomy API. In particular, the ability to update Event properties in
+    Amplitude to ensure they are consistent with the tracking plan.
+
+    Amplitude docs: https://developers.amplitude.com/docs/taxonomy-api#update-an-event-property
     """
     # fmt: on
-    pass
