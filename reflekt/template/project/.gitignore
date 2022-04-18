@@ -130,6 +130,6 @@ dmypy.json
 
 # reflekt
 .DS_Store
-.reflekt/
-.vscode/
-.VSCodeCounter/
+.reflekt/avo
+.reflekt/tmp
+.reflekt/logs

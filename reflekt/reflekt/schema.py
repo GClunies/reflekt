@@ -22,6 +22,7 @@ prohibited_properties = [
 
 reflekt_plan_schema = {
     "name": {"required": True, "type": "string"},
+    "dbt_pkg_schema": {"required": False, "type": "string"},
 }
 
 reflekt_event_schema = {

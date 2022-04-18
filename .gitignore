@@ -134,9 +134,11 @@ dmypy.json
 
 # reflekt
 .DS_Store
-.reflekt/
-.vscode/
-.VSCodeCounter/
+.reflekt/avo
+.reflekt/logs
+.reflekt/tmp
+.reflekt/reflekt_config.yml
+
 
 # reflekt dev
 .tmp/
@@ -147,7 +149,8 @@ reflekt_project.yml
 reflekt_project_backup.yml
 reflekt_project_pb.yml
 reflekt_project_sl.yml
+.vscode/
+.VSCodeCounter/
 
-
-# ALLOW
+# reflekt ALLOW
 !reflekt/template

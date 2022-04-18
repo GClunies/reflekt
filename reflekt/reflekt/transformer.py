@@ -52,6 +52,7 @@ class ReflektTransformer(object):
         logger.configure(**logger_config)
         self.reflekt_plan = reflekt_plan
         self.plan_name = str.lower(self.reflekt_plan.name)
+        self.dbt_package_schema = self.reflekt_plan.dbt_package_schema
         self.reflekt_config = ReflektConfig()
         # self.cdp = self.reflekt_config.cdp
         self.cdp_name = self.reflekt_config.cdp_name
@@ -71,21 +72,21 @@ class ReflektTransformer(object):
             )
             self.pkg_version = pkg_version
             self.db_engine = WarehouseConnection()
-            self.plan_schema_map = self.reflekt_project.plan_schema_map
+            self.plan_db_schemas = self.reflekt_project.plan_db_schemas
             self.schema = self._get_plan_schema_from_map(self.plan_name)
             self.src_prefix = self.reflekt_project.src_prefix
             self.stg_prefix = self.reflekt_project.stg_prefix
             self.incremental_logic = self.reflekt_project.incremental_logic
-            self.materialize_schema = self.reflekt_project.materialize_schema
+            # self.materialize_schema = self.reflekt_project.materialize_schema
 
     def _get_plan_schema_from_map(self, plan_name):
         try:
-            return self.plan_schema_map[plan_name]
+            return self.plan_db_schemas[plan_name]
 
         except KeyError:
             raise KeyError(
                 f"Tracking plan '{plan_name}' not found in "
-                f"`plan_schema_map:` in reflekt_project.yml. Please add "
+                f"`plan_db_schemas:` in reflekt_project.yml. Please add "
                 f"corresponding `{plan_name}: <schema>` key value pair."
             )
 
@@ -1286,11 +1287,11 @@ class ReflektTransformer(object):
             "0.1.0", str(self.pkg_version)
         ).replace("reflekt_package_name", self.dbt_package_name)
 
-        if self.materialize_schema is not None:
+        if self.dbt_package_schema is not None:
             dbt_project_yml_str += (
                 f"\nmodels:"
                 f"\n  {self.dbt_package_name}:"
-                f"\n    +schema: {self.materialize_schema}"
+                f"\n    +schema: {self.dbt_package_schema}"
             )
 
         with open(self.tmp_pkg_dir / "dbt_project.yml", "w") as f:

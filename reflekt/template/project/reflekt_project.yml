@@ -1,26 +1,32 @@
 name: default_project
 
 config_profile: default_profile  # Profile defined in reflekt_config.yml
-#config_path: /absolute/path/to/reflekt_config.yml  # OPTIONAL - Absolute path to reflekt_config.yml
 
+# OPTIONAL (uncomment `config_path:` to use)
+# Absolute path to reflekt_config.yml
+# config_path: /absolute/path/to/reflekt_config.yml
+
+# REQUIRED
 tracking_plans:
-  naming: # REQUIRED - For `events:` and `properties:` below
+  naming:
+    # For `events:` and `properties:` below:
     #   - Provide one of `casing` or `pattern` (regex).
     #   - Set whether numbers are allowed in event/property names
     events:
       case: title  # One of title|snake|camel
+      # pattern: 'your-regex-here'
       allow_numbers: true
-      # pattern: '\b([a-z]*)([A-Z][a-z]+)+\b'
-      reserved: []  # Reserved event names not allowed (casing matters)
+      reserved: []  # Reserved event names (casing matters)
 
     properties:
       case: snake  # One of title|snake|camel
+      # pattern: 'your-regex-here'
       allow_numbers: true
-      # pattern: '[A-Z][a-z]+'s
-      reserved: [] # Reserved property names not allowed (casing matters)
+      reserved: [] # Reserved property names (casing matters)
 
-  data_types:  # REQUIRED - Specify allowed data types
-    allowed:   # Available data types are listed below
+  data_types:
+    # Specify allowed data types. Available types listed below
+    allowed:
       - string
       - integer
       - boolean
@@ -29,16 +35,17 @@ tracking_plans:
       - array
       - any
 
-  plan_schema_map:  # REQUIRED
-    # For each reflekt tracking plan, specify the corresponding schema in data warehouse holding raw event data
+  plan_db_schemas:
+    # For each reflekt tracking plan, specify schema in database with raw event data.
     # Replace the example mapping below with your mappings
-    example-plan: example_plan
+    example-plan: example_schema
 
-  # OPTIONAL - Define a schema to ensure certain metadata is always defined for events.
-  # Test for metadata by running `reflekt test --name <plan-name>`
-  # Uncomment the `metadata` block below and modify to define your metadata
+  # OPTIONAL (uncomment `metadata` block to use)
+  # Define a schema for event metadata, this is tested when running
+  #     `reflekt test --name <plan-name>`
   # metadata:
   #   schema:
+  #     # Example metadata schema
   #     product_owner:     # e.g 'John Doe'
   #       type: string
   #       required: true
@@ -52,16 +59,24 @@ tracking_plans:
   #         - Engineering
   #         - Data
 
+# REQUIRED
 dbt:
   sources:
-    prefix: reflekt_src_  # REQUIRED - prefix for dbt package source files
+    # Prefix for dbt package source files
+    prefix: reflekt_src_
 
   staged_models:
-    prefix: reflekt_stg_  # REQUIRED - prefix for dbt package staging models & docs
-    incremental_logic: |  # REQUIRED - Specify the incremental logic to use when templating dbt models. This should include the {%- if is_incremental() %} ... {%- endif %} block
+    # Prefix for dbt package staging models & docs
+    prefix: reflekt_stg_
+    # Specify incremental logic to use when templating dbt models.
+    # This should include the {%- if is_incremental() %} ... {%- endif %} block
+    incremental_logic: |
       {%- if is_incremental() %}
       where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
       {%- endif %}
     # See this article for details on dbt incremental logic: https://discourse.getdbt.com/t/on-the-limits-of-incrementality/303
 
-  # materialize_schema: <schema_name>  # OPTIONAL - schema to materialize dbt pkg in
+  # OPTIONAL (uncomment `pkg_db_schemas` block to use)
+  # For each reflekt tracking plan, you may specify a schema in database to materialize dbt pkg models.
+  # pkg_db_schemas:
+  #   example-plan: example_schema

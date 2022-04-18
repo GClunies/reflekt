@@ -23,32 +23,20 @@ class ReflektPlan(object):
     def __init__(self, plan_yaml, plan_name):
         if ReflektProject().exists:
             self._config = ReflektConfig()
+            self._project = ReflektProject()
             self.plan_yaml = plan_yaml
             self.name = plan_name
+            self.dbt_package_schema = self._get_dbt_package_schema()
             self.events = []
             self.identify_traits = []
             self.group_traits = []
-            # self.validate_plan()
 
-    # @classmethod
-    # def from_yaml(cls, plan_yaml):
-    #     return cls(plan_yaml)
-
-    # @property
-    # def name(self):
-    #     return self._plan_yaml.get("name")
-
-    # @property
-    # def events(self):
-    #     return self._events
-
-    # @property
-    # def identify_traits(self):
-    #     return self._identify_traits
-
-    # @property
-    # def group_traits(self):
-    #     return self._group_traits
+    def _get_dbt_package_schema(self):
+        if self._project.pkg_db_schemas is not None:
+            if self.name in self._project.pkg_db_schemas:
+                return self._project.pkg_db_schemas[self.name]
+        else:
+            return None
 
     def add_event(self, event_yaml):
         event = ReflektEvent(event_yaml)
