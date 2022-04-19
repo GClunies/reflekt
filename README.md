@@ -199,10 +199,8 @@ $ reflekt dbt --name <plan-name>
 ### Cloud Warehouses
 - **Supported**: Snowflake, Redshift
 - **Under evaluation**: BigQuery
-<br>
-<br>
-## Contributing
 
+## Contributing
 Contributions are welcome. Please feel free to raise issues and submit PRs.
 
 ### dev environment
