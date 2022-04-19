@@ -24,11 +24,11 @@ class AvoCli:
         logger.configure(**logger_config)
 
     def get(self, plan_name):
-        schema_map = self._project.plan_schema_map
+        plan_db_schemas = self._project.plan_db_schemas
 
-        if plan_name not in schema_map:
+        if plan_name not in plan_db_schemas:
             raise AvoCliError(
-                f"Plan {plan_name} not found in schema_map in "
+                f"Plan {plan_name} not found in `plan_db_schemas:` in "
                 f"{self._project.project_dir}/reflekt_project.yml"
             )
         else:

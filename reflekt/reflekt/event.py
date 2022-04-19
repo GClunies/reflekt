@@ -31,7 +31,7 @@ class ReflektEvent(object):
         if ReflektProject().exists:
             self._event_yaml = event_yaml
             self._properties = [
-                ReflektProperty(property) for property in event_yaml["properties"]
+                ReflektProperty(property) for property in self._event_yaml["properties"]
             ]
             self.validate_event()
 
