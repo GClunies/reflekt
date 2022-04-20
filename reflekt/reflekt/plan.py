@@ -20,11 +20,11 @@ from reflekt.reflekt.schema import reflekt_plan_schema
 # YamlTrackingPlan from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektPlan(object):
-    def __init__(self, plan_yaml, plan_name):
+    def __init__(self, plan_yaml_obj, plan_name):
         if ReflektProject().exists:
             self._config = ReflektConfig()
             self._project = ReflektProject()
-            self.plan_yaml = plan_yaml
+            self.plan_yaml_obj = plan_yaml_obj
             self.name = plan_name
             self.dbt_package_schema = self._get_dbt_package_schema()
             self.events = []
@@ -38,8 +38,8 @@ class ReflektPlan(object):
         else:
             return None
 
-    def add_event(self, event_yaml):
-        event = ReflektEvent(event_yaml)
+    def add_event(self, event_yaml_obj):
+        event = ReflektEvent(event_yaml_obj)
         self.events.append(event)
 
     def add_identify_trait(self, trait_yaml):
@@ -75,7 +75,7 @@ class ReflektPlan(object):
 
     def validate_plan(self):
         validator = Validator(reflekt_plan_schema)
-        is_valid = validator.validate(self.plan_yaml, reflekt_plan_schema)
+        is_valid = validator.validate(self.plan_yaml_obj, reflekt_plan_schema)
 
         if not is_valid:
             message = f"For plan `{self.name}` - {validator.errors}"

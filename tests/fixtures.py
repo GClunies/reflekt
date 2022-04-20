@@ -6,6 +6,10 @@ REFLEKT_PLAN = """
 name: test-plan
 """
 
+REFLEKT_PLAN_BAD = """
+foobar: test-plan
+"""
+
 REFLEKT_EVENT = """
 - version: 1
   name: Test Event
@@ -145,6 +149,24 @@ REFLEKT_EVENT_BAD = """
       allow_null: true
 """
 
+REFLEKT_EVENT_DUPLICATE_PROPS = """
+- version: 1
+  name: Test Event
+  description: This is a test event.
+  metadata:
+    product_owner: Maura
+    code_owner: Greg
+  properties:
+    - name: property_one
+      description: A string property.
+      type: string
+      required: true
+    - name: property_one
+      description: A string property.
+      type: string
+      required: true
+"""
+
 REFLEKT_IDENTIFY = """
 traits:
   - name: user_trait_1
@@ -170,4 +192,36 @@ traits:
   - name: group_trait_two
     description: A group trait
     type: string
+"""
+
+REFLEKT_PROPERTY = """
+name: property_one
+description: A test property.
+type: string
+enum:
+  - one
+  - two
+  - three
+allow_null: true
+required: true
+"""
+
+# Can't mix integer type with enum
+REFLEKT_PROPERTY_BAD = """
+name: property_one
+description: A test property.
+type: integer
+enum:
+  - one
+  - two
+  - three
+allow_null: true
+"""
+
+# Can't mix integer type with enum
+REFLEKT_PROPERTY_BAD_PATTERN = """
+name: property_one
+description: A test property.
+type: integer
+pattern: '[A-Z]'
 """

@@ -53,7 +53,7 @@ class ReflektLoader(object):
     def _load_plan_file(self, path):
         with open(path, "r") as plan_file:
             yaml_obj = yaml.safe_load(plan_file)
-            self._plan = ReflektPlan(plan_yaml=yaml_obj, plan_name=self.plan_name)
+            self._plan = ReflektPlan(plan_yaml_obj=yaml_obj, plan_name=self.plan_name)
 
     def _load_events(self, path):
         for file in Path(path).glob("**/*.yml"):  # Get .yml files in /events

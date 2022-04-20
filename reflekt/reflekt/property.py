@@ -32,7 +32,7 @@ class ReflektProperty(object):
     def __init__(self, property_yaml):
         if ReflektProject().exists:
             self._property_yaml = property_yaml
-            self.validate()
+            self.validate_property()
 
     @property
     def name(self):
@@ -200,7 +200,7 @@ class ReflektProperty(object):
                 f"\n    - Change `{rule_type} {rule_str}` in reflekt_project.yml."
             )
 
-    def validate(self):
+    def validate_property(self):
         """Validate event property against reflekt schema."""
         validator = Validator(reflekt_property_schema)
         is_valid = validator.validate(self._property_yaml, reflekt_property_schema)

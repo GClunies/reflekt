@@ -50,7 +50,6 @@ def _create_reflekt_group(tmp_dir):
 
 def test_loader_reflekt_plan(tmpdir):
     plan_dir = _create_reflekt_plan(tmpdir)
-
     loader = ReflektLoader(plan_dir, "test-plan")
     yaml_obj = yaml.safe_load(REFLEKT_PLAN)
     expected = ReflektPlan(yaml_obj, "test-plan")
@@ -61,7 +60,6 @@ def test_loader_reflekt_plan(tmpdir):
 
 def test_loader_reflekt_event(tmpdir):
     plan_dir = _create_reflekt_plan(tmpdir)
-
     loader = ReflektLoader(plan_dir, "test-plan")
     yaml_obj = yaml.safe_load(REFLEKT_EVENT)
     expected = ReflektEvent(yaml_obj[0])
@@ -74,7 +72,6 @@ def test_loader_reflekt_event(tmpdir):
 
 def test_loader_identify(tmpdir):
     plan_dir = _create_reflekt_plan(tmpdir)
-
     loader = ReflektLoader(plan_dir, "test-plan")
     traits = loader.plan.identify_traits
 
