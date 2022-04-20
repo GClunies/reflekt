@@ -132,25 +132,22 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# reflekt
+# macOS stuff
 .DS_Store
-.reflekt/avo
-.reflekt/logs
-.reflekt/tmp
-.reflekt/reflekt_config.yml
 
-
-# reflekt dev
-.tmp/
-/tracking-plans/
-/dbt_packages/
-/avo/
-reflekt_project.yml
-reflekt_project_backup.yml
-reflekt_project_pb.yml
-reflekt_project_sl.yml
+# VSCode dev tools
 .vscode/
 .VSCodeCounter/
 
-# reflekt ALLOW
-!reflekt/template
+# reflekt
+.reflekt/
+avo.json
+reflekt_config.yml
+reflekt_project.yml
+reflekt_project*.yml
+tracking-plans/
+dbt_packages/
+
+# Allow template files in reflekt python package
+!reflekt/template/*
+!reflekt/template/project/.reflekt

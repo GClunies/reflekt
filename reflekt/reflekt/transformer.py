@@ -54,7 +54,6 @@ class ReflektTransformer(object):
         self.plan_name = str.lower(self.reflekt_plan.name)
         self.dbt_package_schema = self.reflekt_plan.dbt_package_schema
         self.reflekt_config = ReflektConfig()
-        # self.cdp = self.reflekt_config.cdp
         self.cdp_name = self.reflekt_config.cdp_name
         self.plan_type = self.reflekt_config.plan_type
         self.warehouse = self.reflekt_config.warehouse
@@ -77,7 +76,6 @@ class ReflektTransformer(object):
             self.src_prefix = self.reflekt_project.src_prefix
             self.stg_prefix = self.reflekt_project.stg_prefix
             self.incremental_logic = self.reflekt_project.incremental_logic
-            # self.materialize_schema = self.reflekt_project.materialize_schema
 
     def _get_plan_schema_from_map(self, plan_name):
         try:
