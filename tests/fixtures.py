@@ -225,3 +225,39 @@ description: A test property.
 type: integer
 pattern: '[A-Z]'
 """
+
+
+def _build_reflekt_plan_dir(
+    tmp_dir,
+    plan_fixture=REFLEKT_PLAN,
+    event_fixture=REFLEKT_EVENT,
+    identify_fixture=REFLEKT_IDENTIFY,
+    group_fixture=REFLEKT_GROUP,
+):
+    plan_dir = tmp_dir.mkdir("tracking-plans").mkdir("test-plan")
+    _create_reflekt_plan(plan_dir, plan_fixture)
+    _create_reflekt_identify(plan_dir, identify_fixture)
+    _create_reflekt_group(plan_dir, group_fixture)
+    _create_reflekt_event(plan_dir, event_fixture)
+
+    return plan_dir
+
+
+def _create_reflekt_plan(tmp_dir, plan_fixture=REFLEKT_PLAN):
+    r_prop = tmp_dir / "plan.yml"
+    r_prop.write(plan_fixture)
+
+
+def _create_reflekt_event(tmp_dir, event_fixture=REFLEKT_EVENT):
+    r_event = tmp_dir.mkdir("events") / "test-event.yml"
+    r_event.write(event_fixture)
+
+
+def _create_reflekt_identify(tmp_dir, identify_fixture=REFLEKT_IDENTIFY):
+    r_identify = tmp_dir / "identify_traits.yml"
+    r_identify.write(identify_fixture)
+
+
+def _create_reflekt_group(tmp_dir, group_fixture=REFLEKT_GROUP):
+    r_group = tmp_dir / "group_traits.yml"
+    r_group.write(group_fixture)
