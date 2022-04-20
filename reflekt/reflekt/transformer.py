@@ -74,7 +74,7 @@ class ReflektTransformer(object):
             self.plan_db_schemas = self.reflekt_project.plan_db_schemas
             self.schema = self._get_plan_schema_from_map(self.plan_name)
             self.src_prefix = self.reflekt_project.src_prefix
-            self.stg_prefix = self.reflekt_project.stg_prefix
+            self.model_prefix = self.reflekt_project.model_prefix
             self.incremental_logic = self.reflekt_project.incremental_logic
 
     def _get_plan_schema_from_map(self, plan_name):
@@ -400,7 +400,7 @@ class ReflektTransformer(object):
             )
             idf_stg = copy.deepcopy(dbt_model_schema)
             idf_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__identifies"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__identifies"
             )
             idf_stg["description"] = (
                 f"A staging model with identify() calls for "
@@ -458,7 +458,7 @@ class ReflektTransformer(object):
                 idf_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__identifies.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__identifies.sql"
                 )
 
                 with open(idf_sql_path, "w") as f:
@@ -468,7 +468,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__identifies.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__identifies.yml"
                 )
 
                 with open(idf_stg_path, "w") as f:
@@ -511,7 +511,7 @@ class ReflektTransformer(object):
             )
             users_stg = copy.deepcopy(dbt_model_schema)
             users_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__users"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__users"
             )
             users_stg["description"] = (
                 f"A staging model with the latest traits for users "
@@ -572,7 +572,7 @@ class ReflektTransformer(object):
                 users_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__users.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__users.sql"
                 )
 
                 with open(users_sql_path, "w") as f:
@@ -582,7 +582,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__users.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__users.yml"
                 )
 
                 with open(users_stg_path, "w") as f:
@@ -636,7 +636,7 @@ class ReflektTransformer(object):
             )
             groups_stg = copy.deepcopy(dbt_model_schema)
             groups_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__groups"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__groups"
             )
             groups_stg["description"] = (
                 f"A staging model with group() calls for "
@@ -695,7 +695,7 @@ class ReflektTransformer(object):
                 groups_stg_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__groups.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__groups.sql"
                 )
 
                 with open(groups_stg_sql_path, "w") as f:
@@ -705,7 +705,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__groups.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__groups.yml"
                 )
 
                 with open(groups_stg_path, "w") as f:
@@ -771,7 +771,7 @@ class ReflektTransformer(object):
 
             pages_stg = copy.deepcopy(dbt_model_schema)
             pages_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__pages"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__pages"
             )
             pages_stg["description"] = (
                 f"A staging model with page() calls for "
@@ -829,7 +829,7 @@ class ReflektTransformer(object):
                 pages_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__pages.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__pages.sql"
                 )
 
                 with open(pages_sql_path, "w") as f:
@@ -839,7 +839,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__pages.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__pages.yml"
                 )
 
                 with open(pages_stg_path, "w") as f:
@@ -907,7 +907,7 @@ class ReflektTransformer(object):
 
             screens_stg = copy.deepcopy(dbt_model_schema)
             screens_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__screens"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__screens"
             )
             screens_stg["description"] = (
                 f"A staging model with screen() calls for "
@@ -965,7 +965,7 @@ class ReflektTransformer(object):
                 screens_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__screens.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__screens.sql"
                 )
 
                 with open(screens_sql_path, "w") as f:
@@ -975,7 +975,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__screens.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__screens.yml"
                 )
 
                 with open(screens_stg_path, "w") as f:
@@ -1034,7 +1034,7 @@ class ReflektTransformer(object):
             )
             tracks_stg = copy.deepcopy(dbt_model_schema)
             tracks_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__tracks"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__tracks"
             )
             tracks_stg["description"] = (
                 f"A staging model summarizing all track() calls (events) fired"
@@ -1087,7 +1087,7 @@ class ReflektTransformer(object):
                 tracks_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__tracks.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__tracks.sql"
                 )
 
                 with open(tracks_sql_path, "w") as f:
@@ -1097,7 +1097,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__tracks.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__tracks.yml"
                 )
 
                 with open(tracks_stg_path, "w") as f:
@@ -1165,7 +1165,7 @@ class ReflektTransformer(object):
                         )
                         event_stg = copy.deepcopy(dbt_model_schema)
                         event_stg["name"] = (
-                            f"{self.stg_prefix}{underscore(self.plan_name)}"
+                            f"{self.model_prefix}{underscore(self.plan_name)}"
                             f"__{segment_2_snake(event.name)}"
                         )
                         event_stg["description"] = event.description
@@ -1245,7 +1245,7 @@ class ReflektTransformer(object):
                             event_sql_path = (
                                 self.tmp_pkg_dir
                                 / "models"
-                                / f"{self.stg_prefix}{underscore(self.plan_name)}__{segment_2_snake(event.name)}.sql"  # noqa: E501
+                                / f"{self.model_prefix}{underscore(self.plan_name)}__{segment_2_snake(event.name)}.sql"  # noqa: E501
                             )
 
                             with open(event_sql_path, "w") as f:
@@ -1255,7 +1255,7 @@ class ReflektTransformer(object):
                                 self.tmp_pkg_dir
                                 / "models"
                                 / "docs"
-                                / f"{self.stg_prefix}{underscore(self.plan_name)}__{segment_2_snake(event.name)}.yml"  # noqa: E501
+                                / f"{self.model_prefix}{underscore(self.plan_name)}__{segment_2_snake(event.name)}.yml"  # noqa: E501
                             )
 
                             with open(event_stg_path, "w") as f:

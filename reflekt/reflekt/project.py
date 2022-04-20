@@ -260,9 +260,9 @@ class ReflektProject:
                 "\n    prefix: src_"
             )
 
-    def _get_dbt_stg_prefix(self):
+    def _get_dbt_model_prefix(self):
         try:
-            self.stg_prefix = self.project["dbt"]["staged_models"]["prefix"]
+            self.model_prefix = self.project["dbt"]["models"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
                 "\n\nMust define `prefix:` for templated dbt staged models in reflekt_project.yml. Example:"  # noqa E501
@@ -274,9 +274,7 @@ class ReflektProject:
 
     def _get_dbt_stg_incremental_logic(self):
         try:
-            self.incremental_logic = self.project["dbt"]["staged_models"][
-                "incremental_logic"
-            ]
+            self.incremental_logic = self.project["dbt"]["models"]["incremental_logic"]
         except KeyError:
             raise ReflektProjectError(
                 "\n\nMust define incremental logic for staged dbt models in reflekt_project.yml. Example:"  # noqa E501
@@ -316,6 +314,6 @@ class ReflektProject:
         self._get_plan_db_schemas()
         self._get_metadata_schema()
         self._get_dbt_src_prefix()
-        self._get_dbt_stg_prefix()
+        self._get_dbt_model_prefix()
         self._get_dbt_stg_incremental_logic()
         self._get_pkg_db_schemas()

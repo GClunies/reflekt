@@ -63,11 +63,11 @@ tracking_plans:
 dbt:
   sources:
     # Prefix for dbt package source files
-    prefix: reflekt_src_
+    prefix: src_reflekt_
 
-  staged_models:
+  models:
     # Prefix for dbt package staging models & docs
-    prefix: reflekt_stg_
+    prefix: reflekt_
     # Specify incremental logic to use when templating dbt models.
     # This should include the {%- if is_incremental() %} ... {%- endif %} block
     incremental_logic: |
