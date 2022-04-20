@@ -25,6 +25,11 @@ class AvoCli:
 
     def get(self, plan_name):
         plan_db_schemas = self._project.plan_db_schemas
+        avo_json_file = self.avo_dir / f"{plan_name}.json"
+
+        if not avo_json_file.exists():
+            avo_json_file.touch()
+            avo_json_file.write_text("{}")
 
         if plan_name not in plan_db_schemas:
             raise AvoCliError(
@@ -33,7 +38,6 @@ class AvoCli:
             )
         else:
             self._run_avo_pull(plan_name)
-            avo_json_file = self.avo_dir / f"{plan_name}.json"
             with open(avo_json_file) as f:
                 return json.load(f)
 

@@ -48,6 +48,8 @@ class ReflektTransformer(object):
     - dbt package with sources, staging models, and docs
     """
 
+    # TODO - don't include '_avo' in dbt package name
+    # Should this be solved in Avo?
     def __init__(self, reflekt_plan, dbt_pkg_dir=None, pkg_version=None):
         logger.configure(**logger_config)
         self.reflekt_plan = reflekt_plan
