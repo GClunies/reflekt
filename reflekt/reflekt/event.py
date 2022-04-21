@@ -27,33 +27,36 @@ from reflekt.reflekt.schema import reflekt_event_schema, reflekt_metadata_schema
 # YamlEvent from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektEvent(object):
-    def __init__(self, event_yaml):
+    def __init__(self, event_yaml_obj):
         if ReflektProject().exists:
-            self._event_yaml = event_yaml
+            self._event_yaml_obj = event_yaml_obj
             self._properties = [
-                ReflektProperty(property) for property in event_yaml["properties"]
+                ReflektProperty(property)
+                for property in self._event_yaml_obj["properties"]
             ]
             self.validate_event()
 
     @property
     def version(self):
-        return self._event_yaml.get("version")
+        return self._event_yaml_obj.get("version")
 
     @property
     def name(self):
-        return self._event_yaml.get("name")
+        return self._event_yaml_obj.get("name")
 
     @property
     def description(self):
-        return self._event_yaml.get("description")
+        return self._event_yaml_obj.get("description")
 
     @property
     def metadata(self):
-        return self._event_yaml.get("metadata")
+        return self._event_yaml_obj.get("metadata")
 
     @property
     def properties(self):
-        return [ReflektProperty(property) for property in self._event_yaml["properties"]]
+        return [
+            ReflektProperty(property) for property in self._event_yaml_obj["properties"]
+        ]
 
     def _check_event_metadata(self):
         if self.metadata:
@@ -142,7 +145,7 @@ class ReflektEvent(object):
     def validate_event(self):
         """Validate event against reflekt schema."""
         validator = Validator(reflekt_event_schema)
-        is_valid = validator.validate(self._event_yaml, reflekt_event_schema)
+        is_valid = validator.validate(self._event_yaml_obj, reflekt_event_schema)
 
         if not is_valid:
             message = f"for event `{self.name}` - {validator.errors}"

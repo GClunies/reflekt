@@ -85,7 +85,7 @@ schema_map: # REQUIRED
     my-plan: my_schema
 sources:
     prefix: reflekt_src_  # REQUIRED - prefix for dbt package source files
-staged_models:
+models:
     prefix: reflekt_stg_  # REQUIRED - prefix for dbt package staging models & docs
     incremental_logic: |  # REQUIRED - Specify the incremental logic to use when templating dbt models. This should include the {%- if is_incremental() %} ... {%- endif %} block
     {%- if is_incremental() %}

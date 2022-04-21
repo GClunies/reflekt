@@ -20,38 +20,26 @@ from reflekt.reflekt.schema import reflekt_plan_schema
 # YamlTrackingPlan from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektPlan(object):
-    def __init__(self, plan_yaml, plan_name):
+    def __init__(self, plan_yaml_obj, plan_name):
         if ReflektProject().exists:
             self._config = ReflektConfig()
-            self.plan_yaml = plan_yaml
+            self._project = ReflektProject()
+            self.plan_yaml_obj = plan_yaml_obj
             self.name = plan_name
+            self.dbt_package_schema = self._get_dbt_package_schema()
             self.events = []
             self.identify_traits = []
             self.group_traits = []
-            # self.validate_plan()
 
-    # @classmethod
-    # def from_yaml(cls, plan_yaml):
-    #     return cls(plan_yaml)
+    def _get_dbt_package_schema(self):
+        if self._project.pkg_db_schemas is not None:
+            if self.name in self._project.pkg_db_schemas:
+                return self._project.pkg_db_schemas[self.name]
+        else:
+            return None
 
-    # @property
-    # def name(self):
-    #     return self._plan_yaml.get("name")
-
-    # @property
-    # def events(self):
-    #     return self._events
-
-    # @property
-    # def identify_traits(self):
-    #     return self._identify_traits
-
-    # @property
-    # def group_traits(self):
-    #     return self._group_traits
-
-    def add_event(self, event_yaml):
-        event = ReflektEvent(event_yaml)
+    def add_event(self, event_yaml_obj):
+        event = ReflektEvent(event_yaml_obj)
         self.events.append(event)
 
     def add_identify_trait(self, trait_yaml):
@@ -87,7 +75,7 @@ class ReflektPlan(object):
 
     def validate_plan(self):
         validator = Validator(reflekt_plan_schema)
-        is_valid = validator.validate(self.plan_yaml, reflekt_plan_schema)
+        is_valid = validator.validate(self.plan_yaml_obj, reflekt_plan_schema)
 
         if not is_valid:
             message = f"For plan `{self.name}` - {validator.errors}"

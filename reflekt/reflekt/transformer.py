@@ -48,12 +48,14 @@ class ReflektTransformer(object):
     - dbt package with sources, staging models, and docs
     """
 
+    # TODO - don't include '_avo' in dbt package name
+    # Should this be solved in Avo?
     def __init__(self, reflekt_plan, dbt_pkg_dir=None, pkg_version=None):
         logger.configure(**logger_config)
         self.reflekt_plan = reflekt_plan
         self.plan_name = str.lower(self.reflekt_plan.name)
+        self.dbt_package_schema = self.reflekt_plan.dbt_package_schema
         self.reflekt_config = ReflektConfig()
-        # self.cdp = self.reflekt_config.cdp
         self.cdp_name = self.reflekt_config.cdp_name
         self.plan_type = self.reflekt_config.plan_type
         self.warehouse = self.reflekt_config.warehouse
@@ -71,21 +73,20 @@ class ReflektTransformer(object):
             )
             self.pkg_version = pkg_version
             self.db_engine = WarehouseConnection()
-            self.plan_schema_map = self.reflekt_project.plan_schema_map
+            self.plan_db_schemas = self.reflekt_project.plan_db_schemas
             self.schema = self._get_plan_schema_from_map(self.plan_name)
             self.src_prefix = self.reflekt_project.src_prefix
-            self.stg_prefix = self.reflekt_project.stg_prefix
+            self.model_prefix = self.reflekt_project.model_prefix
             self.incremental_logic = self.reflekt_project.incremental_logic
-            self.materialize_schema = self.reflekt_project.materialize_schema
 
     def _get_plan_schema_from_map(self, plan_name):
         try:
-            return self.plan_schema_map[plan_name]
+            return self.plan_db_schemas[plan_name]
 
         except KeyError:
             raise KeyError(
                 f"Tracking plan '{plan_name}' not found in "
-                f"`plan_schema_map:` in reflekt_project.yml. Please add "
+                f"`plan_db_schemas:` in reflekt_project.yml. Please add "
                 f"corresponding `{plan_name}: <schema>` key value pair."
             )
 
@@ -283,14 +284,17 @@ class ReflektTransformer(object):
     def _plan_snowplow(self, reflekt_plan):
         pass
 
-    def build_cdp_plan(self):
-        # NOTE - `No reflekt push` to Avo Iteratively. Only `reflekt pull`
-        if self.plan_type == "rudderstack":
+    def build_cdp_plan(self, plan_type=None):
+        if plan_type is None:
+            plan_type = self.plan_type
+
+        if plan_type.lower() == "rudderstack":
             return self._plan_rudderstack(self.reflekt_plan)
-        elif self.plan_type == "segment":
+        elif plan_type.lower() == "segment":
             return self._plan_segment(self.reflekt_plan)
-        elif self.plan_type == "snowplow":
+        elif plan_type.lower() == "snowplow":
             return self._plan_snowplow(self.reflekt_plan)
+        # `No reflekt push` to Avo Iteratively. Only `reflekt pull`
 
     def _dbt_segment(self, reflekt_plan):
         logger.info(
@@ -401,7 +405,7 @@ class ReflektTransformer(object):
             )
             idf_stg = copy.deepcopy(dbt_model_schema)
             idf_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__identifies"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__identifies"
             )
             idf_stg["description"] = (
                 f"A staging model with identify() calls for "
@@ -459,7 +463,7 @@ class ReflektTransformer(object):
                 idf_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__identifies.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__identifies.sql"
                 )
 
                 with open(idf_sql_path, "w") as f:
@@ -469,7 +473,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__identifies.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__identifies.yml"
                 )
 
                 with open(idf_stg_path, "w") as f:
@@ -512,7 +516,7 @@ class ReflektTransformer(object):
             )
             users_stg = copy.deepcopy(dbt_model_schema)
             users_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__users"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__users"
             )
             users_stg["description"] = (
                 f"A staging model with the latest traits for users "
@@ -573,7 +577,7 @@ class ReflektTransformer(object):
                 users_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__users.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__users.sql"
                 )
 
                 with open(users_sql_path, "w") as f:
@@ -583,7 +587,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__users.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__users.yml"
                 )
 
                 with open(users_stg_path, "w") as f:
@@ -637,7 +641,7 @@ class ReflektTransformer(object):
             )
             groups_stg = copy.deepcopy(dbt_model_schema)
             groups_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__groups"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__groups"
             )
             groups_stg["description"] = (
                 f"A staging model with group() calls for "
@@ -696,7 +700,7 @@ class ReflektTransformer(object):
                 groups_stg_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__groups.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__groups.sql"
                 )
 
                 with open(groups_stg_sql_path, "w") as f:
@@ -706,7 +710,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__groups.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__groups.yml"
                 )
 
                 with open(groups_stg_path, "w") as f:
@@ -772,7 +776,7 @@ class ReflektTransformer(object):
 
             pages_stg = copy.deepcopy(dbt_model_schema)
             pages_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__pages"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__pages"
             )
             pages_stg["description"] = (
                 f"A staging model with page() calls for "
@@ -830,7 +834,7 @@ class ReflektTransformer(object):
                 pages_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__pages.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__pages.sql"
                 )
 
                 with open(pages_sql_path, "w") as f:
@@ -840,7 +844,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__pages.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__pages.yml"
                 )
 
                 with open(pages_stg_path, "w") as f:
@@ -908,7 +912,7 @@ class ReflektTransformer(object):
 
             screens_stg = copy.deepcopy(dbt_model_schema)
             screens_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__screens"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__screens"
             )
             screens_stg["description"] = (
                 f"A staging model with screen() calls for "
@@ -966,7 +970,7 @@ class ReflektTransformer(object):
                 screens_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__screens.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__screens.sql"
                 )
 
                 with open(screens_sql_path, "w") as f:
@@ -976,7 +980,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__screens.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__screens.yml"
                 )
 
                 with open(screens_stg_path, "w") as f:
@@ -1035,7 +1039,7 @@ class ReflektTransformer(object):
             )
             tracks_stg = copy.deepcopy(dbt_model_schema)
             tracks_stg["name"] = (
-                f"{self.stg_prefix}{underscore(self.plan_name)}" f"__tracks"
+                f"{self.model_prefix}{underscore(self.plan_name)}" f"__tracks"
             )
             tracks_stg["description"] = (
                 f"A staging model summarizing all track() calls (events) fired"
@@ -1088,7 +1092,7 @@ class ReflektTransformer(object):
                 tracks_sql_path = (
                     self.tmp_pkg_dir
                     / "models"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__tracks.sql"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__tracks.sql"
                 )
 
                 with open(tracks_sql_path, "w") as f:
@@ -1098,7 +1102,7 @@ class ReflektTransformer(object):
                     self.tmp_pkg_dir
                     / "models"
                     / "docs"
-                    / f"{self.stg_prefix}{underscore(self.plan_name)}__tracks.yml"
+                    / f"{self.model_prefix}{underscore(self.plan_name)}__tracks.yml"
                 )
 
                 with open(tracks_stg_path, "w") as f:
@@ -1166,7 +1170,7 @@ class ReflektTransformer(object):
                         )
                         event_stg = copy.deepcopy(dbt_model_schema)
                         event_stg["name"] = (
-                            f"{self.stg_prefix}{underscore(self.plan_name)}"
+                            f"{self.model_prefix}{underscore(self.plan_name)}"
                             f"__{segment_2_snake(event.name)}"
                         )
                         event_stg["description"] = event.description
@@ -1246,7 +1250,7 @@ class ReflektTransformer(object):
                             event_sql_path = (
                                 self.tmp_pkg_dir
                                 / "models"
-                                / f"{self.stg_prefix}{underscore(self.plan_name)}__{segment_2_snake(event.name)}.sql"  # noqa: E501
+                                / f"{self.model_prefix}{underscore(self.plan_name)}__{segment_2_snake(event.name)}.sql"  # noqa: E501
                             )
 
                             with open(event_sql_path, "w") as f:
@@ -1256,7 +1260,7 @@ class ReflektTransformer(object):
                                 self.tmp_pkg_dir
                                 / "models"
                                 / "docs"
-                                / f"{self.stg_prefix}{underscore(self.plan_name)}__{segment_2_snake(event.name)}.yml"  # noqa: E501
+                                / f"{self.model_prefix}{underscore(self.plan_name)}__{segment_2_snake(event.name)}.yml"  # noqa: E501
                             )
 
                             with open(event_stg_path, "w") as f:
@@ -1286,11 +1290,11 @@ class ReflektTransformer(object):
             "0.1.0", str(self.pkg_version)
         ).replace("reflekt_package_name", self.dbt_package_name)
 
-        if self.materialize_schema is not None:
+        if self.dbt_package_schema is not None:
             dbt_project_yml_str += (
                 f"\nmodels:"
                 f"\n  {self.dbt_package_name}:"
-                f"\n    +schema: {self.materialize_schema}"
+                f"\n    +schema: {self.dbt_package_schema}"
             )
 
         with open(self.tmp_pkg_dir / "dbt_project.yml", "w") as f:

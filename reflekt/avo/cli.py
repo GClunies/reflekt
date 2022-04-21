@@ -24,16 +24,20 @@ class AvoCli:
         logger.configure(**logger_config)
 
     def get(self, plan_name):
-        schema_map = self._project.plan_schema_map
+        plan_db_schemas = self._project.plan_db_schemas
+        avo_json_file = self.avo_dir / f"{plan_name}.json"
 
-        if plan_name not in schema_map:
+        if not avo_json_file.exists():
+            avo_json_file.touch()
+            avo_json_file.write_text("{}")
+
+        if plan_name not in plan_db_schemas:
             raise AvoCliError(
-                f"Plan {plan_name} not found in schema_map in "
+                f"Plan {plan_name} not found in `plan_db_schemas:` in "
                 f"{self._project.project_dir}/reflekt_project.yml"
             )
         else:
             self._run_avo_pull(plan_name)
-            avo_json_file = self.avo_dir / f"{plan_name}.json"
             with open(avo_json_file) as f:
                 return json.load(f)
 

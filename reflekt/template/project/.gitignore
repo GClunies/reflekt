@@ -128,8 +128,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# reflekt
+# macOS stuff
 .DS_Store
-.reflekt/
-.vscode/
-.VSCodeCounter/
+
+# reflekt
+avo.json
+reflekt_config.yml
+reflekt_project.yml
+reflekt_project*.yml
