@@ -5,26 +5,33 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # reflekt
-reflekt is a command-line interface (CLI) and continuous integration (CI) tool for your tracking plan. With reflekt defines your tracking plan as `code`. This code is:
-- **Human readable** (i.e. not JSON schema). Technical *and* business users must be able read and understand the plan.
-- **Version controlled**. Create branches for your dev, staging, and production tracking plans. Submit PRs for review. Roll-back if something goes wrong.
-- **Testable**. Naming conventions, prohibited property names, expected metadata, etc. should be testable whenever a change is made. Think a *CI suite for your tracking plan*.
+reflekt is a command-line interface (CLI) and continuous integration (CI) tool for your tracking plan, defining it as `code`. reflekt uses these codified tracking plans to template dbt packages in which:
+- The raw data source for every event is defined in your dbt sources.
+- Every event has a dbt model.
+- Every event is documented in your dbt docs.
+
+**reflekt dbt DEMO GIF HERE**
+
+reflekt integrates with your CDP and Analytics Governance tools to help bring DevOps best practices to how you create, iterate, and manage tracking plans and product analytics.
+
+**reflekt pull DEMO GIF HERE**
+
+See the sections below for a full list of integrations and commands.
+
+
+## Tracking plans as `code`
+reflekt tracking plan code is:
+- **Human readable**. reflekt plans can be read and understood by technical *and* business users.
+- **Version controlled**. Create tracking plan branches for dev, staging, and production. Submit PRs. Revert when things break.
 - Able to support **Metadata**, customizable for unique use cases.
+- **Testable**. Naming conventions, prohibited property names, expected metadata, etc. are all testable. You decide when to run tests to suit your continuos-integration strategy and tooling.
 - **Extensible**. Enabling integration with other tools in the data stack (e.g. Segment, Avo, dbt, Amplitude, etc.). Build custom data pipelines and products using reflekt's artifacts.
+- **Modular**. You choose what features to use. Prefer to manage your tracking plan in Segment/Avo/etc? No problem, you can still use reflekt to template your dbt packages.
 
-This extensibility allows reflekt to template dbt packages modeling your product analytics data. The sources, staging models, and docs in the dbt package ***reflekt your tracking plan.***
-
-**DEMO GIF HERE**
-
-See more details on reflekt's other commands and capabilities.
-
-reflekt is ***Modular***, meaning you can choose what features to use. Prefer to manage your tracking plan in Segment/Avo/etc? No problem! You can still use reflekt to pull a copy of your latest plan and build a dbt packages for use in your dbt project.
-
-## Your tracking plan as `code`
-Each reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
+Every reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
 <br>
 
-<details><summary><code>reflekt_project.yml</code> (click to expand example code)</summary><p>
+<details><summary><code>reflekt_project.yml</code> (click to expand)</summary><p>
 
 ```yaml
 # reflekt_project.yml
@@ -95,9 +102,10 @@ models:
 ```
 </p></details>
 
-reflekt defines tracking plans as YAML in the reflekt spec. An example spec for a `Product Added` event.
+<br>
 
-<details><summary><code>product-added.yml</code> (click to expand example code)</summary><p>
+An example spec for a `Product Added` event.
+<details><summary><code>product-added.yml</code> (click to expand)</summary><p>
 
 ```yaml
 # product-added.yml
@@ -186,11 +194,13 @@ $ reflekt dbt --name <plan-name>
 
 ## Integrations
 ### CDPs
-- **Supported**: Segment Protocols
+- **Supported**: Segment
 - **Under evaluation**: Rudderstack, Snowplow
 
 ### Analytics Governance
-- **Supported**: Avo (reflekt pull, reflekt dbt only)
+- **Supported**:
+  - Segment Protocols
+  - Avo (reflekt pull, reflekt dbt only)
 - **Under evaluation**: Iteratively (reflekt pull, reflekt dbt only), Amplitude Govern (reflekt push only)
 
 ### Transform
@@ -200,10 +210,12 @@ $ reflekt dbt --name <plan-name>
 - **Supported**: Snowflake, Redshift
 - **Under evaluation**: BigQuery
 
+<br>
+
 ## Contributing
 Contributions are welcome. Please feel free to raise issues and submit PRs.
 
-### dev environment
+#### dev environment
 reflekt uses [poetry](https://python-poetry.org/) for packaging and dependency management. If you use poetry, this repo includes `poetry.lock` and `pyproject.toml` files to help spin up a dev environment. Simply navigate to the root of this repo on your machine and run.
 ```bash
 poetry install
