@@ -284,14 +284,17 @@ class ReflektTransformer(object):
     def _plan_snowplow(self, reflekt_plan):
         pass
 
-    def build_cdp_plan(self):
-        # NOTE - `No reflekt push` to Avo Iteratively. Only `reflekt pull`
-        if self.plan_type == "rudderstack":
+    def build_cdp_plan(self, plan_type=None):
+        if plan_type is None:
+            plan_type = self.plan_type
+
+        if plan_type.lower() == "rudderstack":
             return self._plan_rudderstack(self.reflekt_plan)
-        elif self.plan_type == "segment":
+        elif plan_type.lower() == "segment":
             return self._plan_segment(self.reflekt_plan)
-        elif self.plan_type == "snowplow":
+        elif plan_type.lower() == "snowplow":
             return self._plan_snowplow(self.reflekt_plan)
+        # `No reflekt push` to Avo Iteratively. Only `reflekt pull`
 
     def _dbt_segment(self, reflekt_plan):
         logger.info(

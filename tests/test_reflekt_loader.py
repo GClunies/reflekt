@@ -10,10 +10,10 @@ from reflekt.reflekt.event import ReflektEvent
 from reflekt.reflekt.loader import ReflektLoader
 from reflekt.reflekt.plan import ReflektPlan
 from tests.fixtures import (
-    _build_reflekt_plan_dir,
     REFLEKT_EVENT,
     REFLEKT_EVENT_BAD,
     REFLEKT_PLAN,
+    _build_reflekt_plan_dir,
 )
 
 
