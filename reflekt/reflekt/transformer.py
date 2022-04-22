@@ -45,7 +45,7 @@ from reflekt.segment.schema import (
 class ReflektTransformer(object):
     """Class that accepts a reflekt tracking plan and transforms it to either:
     - CDP tracking plan
-    - dbt package with sources, staging models, and docs
+    - dbt package with sources, models, and docs
     """
 
     # TODO - don't include '_avo' in dbt package name
@@ -369,8 +369,7 @@ class ReflektTransformer(object):
             pass
         else:
             logger.info(
-                "Templating dbt source, staging model, and docs for: "
-                "identify() calls data"
+                "Templating dbt source, model, and docs for: " "identify() calls data"
             )
             idf_tbl = copy.deepcopy(dbt_table_schema)
             idf_tbl["name"] = "identifies"
@@ -408,7 +407,7 @@ class ReflektTransformer(object):
                 f"{self.model_prefix}{underscore(self.plan_name)}" f"__identifies"
             )
             idf_stg["description"] = (
-                f"A staging model with identify() calls for "
+                f"A model with identify() calls for "
                 f"{reflekt_plan.name}. Each row is a single identify "
                 f"call identifying a user."
             )
@@ -493,7 +492,7 @@ class ReflektTransformer(object):
         if reflekt_plan.identify_traits == []:
             pass
         else:
-            logger.info("Templating dbt source, staging model, and docs for: users data")
+            logger.info("Templating dbt source, model, and docs for: users data")
             users_tbl = copy.deepcopy(dbt_table_schema)
             users_tbl["name"] = "users"
             users_tbl["description"] = (
@@ -519,7 +518,7 @@ class ReflektTransformer(object):
                 f"{self.model_prefix}{underscore(self.plan_name)}" f"__users"
             )
             users_stg["description"] = (
-                f"A staging model with the latest traits for users "
+                f"A model with the latest traits for users "
                 f"identified on {reflekt_plan.name}. Each row is user."
             )
             db_columns, error_msg = self.db_engine.get_columns(self.schema, "users")
@@ -607,9 +606,7 @@ class ReflektTransformer(object):
         if reflekt_plan.group_traits == []:
             pass
         else:
-            logger.info(
-                "Templating dbt source, staging model, and docs for: group() calls data"
-            )
+            logger.info("Templating dbt source, model, and docs for: group() calls data")
             groups_tbl = copy.deepcopy(dbt_table_schema)
             groups_tbl["name"] = "groups"
             groups_tbl["description"] = (
@@ -644,7 +641,7 @@ class ReflektTransformer(object):
                 f"{self.model_prefix}{underscore(self.plan_name)}" f"__groups"
             )
             groups_stg["description"] = (
-                f"A staging model with group() calls for "
+                f"A model with group() calls for "
                 f"{reflekt_plan.name}. Each row is a single group() "
                 f"call identifying a group."
             )
@@ -739,9 +736,7 @@ class ReflektTransformer(object):
                 f"{reflekt_plan.name}. Skipping."
             )
         else:
-            logger.info(
-                "Templating dbt source, staging model, and docs for: page() calls data"
-            )
+            logger.info("Templating dbt source, model, and docs for: page() calls data")
             page_viewed = pages_event_list[0]
             pages_tbl = copy.deepcopy(dbt_table_schema)
             pages_tbl["name"] = "pages"
@@ -779,7 +774,7 @@ class ReflektTransformer(object):
                 f"{self.model_prefix}{underscore(self.plan_name)}" f"__pages"
             )
             pages_stg["description"] = (
-                f"A staging model with page() calls for "
+                f"A model with page() calls for "
                 f"{reflekt_plan.name}. Each row is a single page "
                 f"call pageing a user."
             )
@@ -875,7 +870,7 @@ class ReflektTransformer(object):
             )
         else:
             logger.info(
-                "Templating dbt source, staging model, and docs for: screen() calls data"
+                "Templating dbt source, model, and docs for: screen() calls data"
             )
             screen_viewed = screens_event_list[0]
             screens_tbl = copy.deepcopy(dbt_table_schema)
@@ -915,7 +910,7 @@ class ReflektTransformer(object):
                 f"{self.model_prefix}{underscore(self.plan_name)}" f"__screens"
             )
             screens_stg["description"] = (
-                f"A staging model with screen() calls for "
+                f"A model with screen() calls for "
                 f"{reflekt_plan.name}. Each row is a single screen "
                 f"call screening a user."
             )
@@ -1000,9 +995,7 @@ class ReflektTransformer(object):
         if len(reflekt_plan.events) == 0:
             pass
         else:
-            logger.info(
-                "Templating dbt source, staging model, and docs for: track() calls data"
-            )
+            logger.info("Templating dbt source, model, and docs for: track() calls data")
             tracks_tbl = copy.deepcopy(dbt_table_schema)
             tracks_tbl["name"] = "tracks"
             tracks_tbl["description"] = (
@@ -1042,7 +1035,7 @@ class ReflektTransformer(object):
                 f"{self.model_prefix}{underscore(self.plan_name)}" f"__tracks"
             )
             tracks_stg["description"] = (
-                f"A staging model summarizing all track() calls (events) fired"
+                f"A model summarizing all track() calls (events) fired"
                 f" on {reflekt_plan.name}. Each row is a single event."
                 f" This table summarizes all events. It does not include the"
                 f" the detailed property data for each event. Each event has "
@@ -1136,7 +1129,7 @@ class ReflektTransformer(object):
 
                     if event.version == max(versions):
                         logger.info(
-                            f"Templating dbt source, staging model, and docs for "
+                            f"Templating dbt source, model, and docs for "
                             f"event: {event.name}"
                         )
                         event_tbl = copy.deepcopy(dbt_table_schema)
