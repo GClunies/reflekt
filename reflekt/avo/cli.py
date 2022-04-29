@@ -45,7 +45,12 @@ class AvoCli:
         logger.info(f"Running `avo pull` to fetch {plan_name} from Avo account.\n")
         avo_executable = shutil.which("avo")
         subprocess.call(
-            [avo_executable, "pull", plan_name],
+            [
+                avo_executable,
+                "pull",
+                plan_name,
+                "--force",  # --force flag used in case object type used in plan
+            ],
             cwd=self.avo_dir,
         )
         print("")  # Make output look nicer

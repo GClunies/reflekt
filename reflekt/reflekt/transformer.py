@@ -1135,6 +1135,7 @@ class ReflektTransformer(object):
                         event_tbl = copy.deepcopy(dbt_table_schema)
                         event_tbl["name"] = segment_2_snake(event.name)
                         event_tbl["description"] = event.description
+                        event_tbl["meta"] = event.metadata
                         event_sql = (
                             "{{\n"
                             "  config(\n"
@@ -1167,6 +1168,7 @@ class ReflektTransformer(object):
                             f"__{segment_2_snake(event.name)}"
                         )
                         event_stg["description"] = event.description
+                        event_stg["meta"] = event.metadata
                         db_columns, error_msg = self.db_engine.get_columns(
                             self.schema,
                             segment_2_snake(event.name),

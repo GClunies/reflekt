@@ -1,12 +1,11 @@
+# NOTE - All configurations in reflekt_project.yml are REQUIRED unless flagged with # OPTIONAL comment
+
 name: default_project
 
 config_profile: default_profile  # Profile defined in reflekt_config.yml
 
-# OPTIONAL (uncomment `config_path:` to use)
-# Absolute path to reflekt_config.yml
-# config_path: /absolute/path/to/reflekt_config.yml
+# config_path: /absolute/path/to/reflekt_config.yml  # OPTIONAL
 
-# REQUIRED
 tracking_plans:
   naming:
     # For `events:` and `properties:` below:
@@ -34,13 +33,14 @@ tracking_plans:
       - object
       - array
       - any
+      - 'null'  # Specify null type in quotes
 
   plan_db_schemas:
     # For each reflekt tracking plan, specify schema in database with raw event data.
     # Replace the example mapping below with your mappings
     example-plan: example_schema
 
-  # OPTIONAL (uncomment `metadata` block to use)
+  # OPTIONAL (uncomment `metadata:` block to use)
   # Define a schema for event metadata, this is tested when running
   #     `reflekt test --name <plan-name>`
   # metadata:
@@ -59,7 +59,6 @@ tracking_plans:
   #         - Engineering
   #         - Data
 
-# REQUIRED
 dbt:
   sources:
     # Prefix for dbt package source files
@@ -76,7 +75,7 @@ dbt:
       {%- endif %}
     # See this article for details on dbt incremental logic: https://discourse.getdbt.com/t/on-the-limits-of-incrementality/303
 
-  # OPTIONAL (uncomment `pkg_db_schemas` block to use)
+  # OPTIONAL (uncomment `pkg_db_schemas:` block to use)
   # For each reflekt tracking plan, you may specify a schema in database to materialize dbt pkg models.
   # pkg_db_schemas:
   #   example-plan: example_schema
