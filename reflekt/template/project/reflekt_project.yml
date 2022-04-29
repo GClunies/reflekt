@@ -1,4 +1,4 @@
-# NOTE - All configurations in reflekt_project.yml are REQUIRED unless flagged with # OPTIONAL comment
+# NOTE - Configs below are required unless flagged with # OPTIONAL comment
 
 name: default_project
 
