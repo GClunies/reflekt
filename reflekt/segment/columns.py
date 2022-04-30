@@ -10,7 +10,7 @@ seg_event_cols = {
         {
             "source_name": "id",
             "schema_name": "event_id",
-            "description": "The unique identifier of the event call.",
+            "description": "The event's unique identifier.",
             "tests": ["not_null", "unique"],
             "sql": "id as event_id",
         }
@@ -35,7 +35,7 @@ seg_event_cols = {
         {
             "source_name": None,
             "schema_name": "tracking_plan",
-            "description": "Name of the tracking plan the event is defined in.",
+            "description": "The name of the tracking plan where the event is defined.",
             "sql": "'__PLAN_NAME__'::varchar as tracking_plan",
         },
     ],
@@ -43,7 +43,7 @@ seg_event_cols = {
         {
             "source_name": "context_library_name",
             "schema_name": "library_name",
-            "description": "Name of the library that invoked the call.",
+            "description": "The name of the library that generated the event.",
             "sql": "context_library_name as library_name",
         }
     ],
@@ -51,7 +51,7 @@ seg_event_cols = {
         {
             "source_name": "context_library_version",
             "schema_name": "library_version",
-            "description": "Version of the library that invoked the call.",
+            "description": "The version of the library that generated the event.",
             "sql": "context_library_version as library_version",
         }
     ],
@@ -67,7 +67,7 @@ seg_event_cols = {
         {
             "source_name": "sent_at",
             "schema_name": "sent_at_tstamp",
-            "description": "Timestamp when call was sent by client device, OR sent_at value manually passed in. This timestamp can be affected by clock skew on the client device.",
+            "description": "Time on client device when call was sent, OR sent_at value manually passed in. NOTE - sent_at is NOT USEFUL for analysis since it’s not always trustworthy as it can be easily adjusted and affected by clock skew.",
             "sql": "sent_at as sent_at_tstamp",
         }
     ],
@@ -75,7 +75,7 @@ seg_event_cols = {
         {
             "source_name": "received_at",
             "schema_name": "received_at_tstamp",
-            "description": "Timestamp when Segment's servers received the call.",
+            "description": "Time on Segment server clock when call was received. received_at is used as sort key in Warehouses. For max query speed, received_at is the recommended timestamp for analysis when chronology DOES NOT matter as chronology is NOT ENSURED.",
             "sql": "received_at as received_at_tstamp",
         }
     ],
@@ -83,7 +83,7 @@ seg_event_cols = {
         {
             "source_name": "timestamp",
             "schema_name": "tstamp",
-            "description": "Timestamp when the call was invoked. Calculated by Segment to correct client-device clock skew.",
+            "description": "When the event occurred. Calculated by Segment to correct client-device clock skew. Use for analysis when chronology DOES matter.",
             "sql": 'timestamp as tstamp',
         }
     ],
@@ -91,7 +91,7 @@ seg_event_cols = {
         {
             "source_name": "anonymous_id",
             "schema_name": "anonymous_id",
-            "description": "A pseudo-unique substitute for a user ID, for cases when absolute unique identifier not available (e.g. user not signed in).",
+            "description": "A pseudo-unique substitute for a user ID, for cases when we don’t have an absolutely unique identifier. A user_id or an anonymous_id is required for all events.",
             "sql": "anonymous_id",
         }
     ],
@@ -99,7 +99,7 @@ seg_event_cols = {
         {
             "source_name": "user_id",
             "schema_name": "user_id",
-            "description": "Unique identifier for the user.",
+            "description": "Unique identifier for the user. A user_id or an anonymous_id is required for all events.",
             "sql": "user_id",
         }
     ],
@@ -108,7 +108,7 @@ seg_event_cols = {
         {
             "source_name": "context_page_url",
             "schema_name": "page_url",
-            "description": "The URL of the page where the call was invoked.",
+            "description": "The URL of the page where the event occurred.",
             "sql": """
             -- CASE statement solves issue where the url column doesn't include query string parameters.
             case
@@ -121,7 +121,7 @@ seg_event_cols = {
         {
             "source_name": None,
             "schema_name": "page_url_host",
-            "description": "The hostname of the page where the call was invoked.",
+            "description": "The hostname of the page where the event occurred.",
             "sql": "{{ dbt_utils.get_url_host('context_page_url') }} as page_url_host",
         },
     ],
@@ -129,7 +129,7 @@ seg_event_cols = {
         {
             "source_name": "context_page_path",
             "schema_name": "page_url_path",
-            "description": "The path of the page where the call was invoked.",
+            "description": "The path of the page where the event occurred.",
             "sql": "context_page_path as page_url_path",
         }
     ],
@@ -137,7 +137,7 @@ seg_event_cols = {
         {
             "source_name": "context_page_title",
             "schema_name": "page_title",
-            "description": "The title of the page where the call was invoked.",
+            "description": "The title of the page where the event occurred.",
             "sql": "context_page_title as page_title",
         }
     ],
@@ -145,7 +145,7 @@ seg_event_cols = {
         {
             "source_name": "context_page_search",
             "schema_name": "page_url_query",
-            "description": "The the URL search query parameters of the page where the call was invoked.",
+            "description": "The the URL search query parameters of the page where the event occurred.",
             "sql": "context_page_search as page_url_query",
         }
     ],
@@ -153,13 +153,13 @@ seg_event_cols = {
         {
             "source_name": "context_page_referrer",
             "schema_name": "referrer",
-            "description": "The URL of the page that referred the user to the page where the call was invoked.",
+            "description": "The URL of the page that referred the user to the page where the event occurred.",
             "sql": "context_page_referrer as referrer",
         },
         {
             "source_name": None,
             "schema_name": "referrer_host",
-            "description": "The hostname of the page that referred the user to the page where the call was invoked.",
+            "description": "The hostname of the page that referred the user to the page where the event occurred.",
             "sql": """
             cast(
                 replace( {{ dbt_utils.get_url_host('context_page_referrer') }}, 'www.', '')
@@ -173,7 +173,7 @@ seg_event_cols = {
         {
             "source_name": "context_app_name",
             "schema_name": "app_name",
-            "description": "The name of the app that invoked the call.",
+            "description": "The name of the app that generated the event.",
             "sql": "context_app_name as app_name",
         }
     ],
@@ -181,7 +181,7 @@ seg_event_cols = {
         {
             "source_name": "context_app_version",
             "schema_name": "app_version",
-            "description": "The version of the app that invoked the call.",
+            "description": "The version of the app that generated the event.",
             "sql": "context_app_version as app_version",
         }
     ],
@@ -189,7 +189,7 @@ seg_event_cols = {
         {
             "source_name": "context_app_build",
             "schema_name": "app_build",
-            "description": "The build of the app that invoked the call.",
+            "description": "The build of the app that generated the event.",
             "sql": "context_app_build as app_build",
         }
     ],
@@ -228,7 +228,7 @@ seg_event_cols = {
         {
             "source_name": None,
             "schema_name": "device",
-            "description": "The device that invoked the call.",
+            "description": "The device that generated the event.",
             "sql": """
             cast(
                 case
@@ -249,7 +249,7 @@ seg_event_cols = {
         {
             "source_name": "context_device_id",
             "schema_name": "device_id",
-            "description": "The ID of the device that invoked the call.",
+            "description": "The ID of the device that generated the event.",
             "sql": "context_device_id as device_id",
         }
     ],
@@ -257,7 +257,7 @@ seg_event_cols = {
         {
             "source_name": "context_device_manufacturer",
             "schema_name": "device_manufacturer",
-            "description": "The manufacturer of device that invoked the call.",
+            "description": "The manufacturer of device that generated the event.",
             "sql": "context_device_manufacturer as device_manufacturer",
         }
     ],
@@ -265,7 +265,7 @@ seg_event_cols = {
         {
             "source_name": "context_device_type",
             "schema_name": "device_type",
-            "description": "The type of device that invoked the call.",
+            "description": "The type of device that generated the event.",
             "sql": "context_device_type as device_type",
         }
     ],
@@ -273,13 +273,13 @@ seg_event_cols = {
         {
             "source_name": "context_device_model",
             "schema_name": "device",
-            "description": "The device that invoked the call.",
+            "description": "The device that generated the event.",
             "sql": "regexp_substr(context_device_model, '[a-zA-Z]+') as device",
         },
         {
             "source_name": None,
             "schema_name": "device_version",
-            "description": "The version of the device that invoked the call.",
+            "description": "The version of the device that generated the event.",
             "sql": "regexp_replace(regexp_replace(context_device_model, '[a-zA-Z]', ''), ',', '.') as device_version",
         },
     ],
@@ -287,7 +287,7 @@ seg_event_cols = {
         {
             "source_name": "context_timezone",
             "schema_name": "device_timezone",
-            "description": "The timezone of the device that invoked the call.",
+            "description": "The timezone of the device that generated the event.",
             "sql": "context_timezone as device_timezone",
         }
     ],
@@ -361,7 +361,7 @@ seg_event_cols = {
         {
             "source_name": "context_campaign_source",
             "schema_name": "utm_source",
-            "description": "The source of the campaign that the user was in when the call was invoked.",
+            "description": "The source of the campaign that the user was in when the event occurred.",
             "sql": "context_campaign_source as utm_source",
         }
     ],
@@ -369,7 +369,7 @@ seg_event_cols = {
         {
             "source_name": "context_campaign_medium",
             "schema_name": "utm_medium",
-            "description": "The medium of the campaign that the user was in when the call was invoked.",
+            "description": "The medium of the campaign that the user was in when the event occurred.",
             "sql": "context_campaign_medium as utm_medium",
         }
     ],
@@ -377,7 +377,7 @@ seg_event_cols = {
         {
             "source_name": "context_campaign_name",
             "schema_name": "utm_campaign",
-            "description": "The name of the campaign that the user was in when the call was invoked.",
+            "description": "The name of the campaign that the user was in when the event occurred.",
             "sql": "context_campaign_name as utm_campaign",
         }
     ],
@@ -385,7 +385,7 @@ seg_event_cols = {
         {
             "source_name": "context_campaign_term",
             "schema_name": "utm_term",
-            "description": "The term of the campaign that the user was in when the call was invoked.",
+            "description": "The term of the campaign that the user was in when the event occurred.",
             "sql": "context_campaign_term as utm_term",
         }
     ],
@@ -393,7 +393,7 @@ seg_event_cols = {
         {
             "source_name": "context_campaign_content",
             "schema_name": "utm_content",
-            "description": "The content of the campaign that the user was in when the call was invoked. Maps directly to utm_content parameter.",
+            "description": "The content of the campaign that the user was in when the event occurred. Maps directly to utm_content parameter.",
             "sql": "context_campaign_content as utm_content",
         }
     ],
@@ -425,7 +425,7 @@ seg_event_cols = {
         {
             "source_name": "context_device_advertising_id",
             "schema_name": "advertising_id",
-            "description": "The advertising ID of the device that invoked the call.",
+            "description": "The advertising ID of the device that generated the event.",
             "sql": "context_device_advertising_id as advertising_id",
         }
     ],
@@ -471,7 +471,7 @@ seg_pages_cols = {
         {
             "source_name": "id",
             "schema_name": "page_id",
-            "description": "The unique identifier of the page call.",
+            "description": "The page's unique identifier.",
             "tests": ["not_null", "unique"],
             "sql": "id as page_id",
         }
@@ -512,7 +512,7 @@ seg_pages_cols = {
         {
             "source_name": "context_library_name",
             "schema_name": "library_name",
-            "description": "The name of the library that invoked the call.",
+            "description": "The name of the library that generated the event.",
             "sql": "context_library_name as library_name",
         }
     ],
@@ -520,7 +520,7 @@ seg_pages_cols = {
         {
             "source_name": "context_library_version",
             "schema_name": "library_version",
-            "description": "The version of the library that invoked the call.",
+            "description": "The version of the library that generated the event.",
             "sql": "context_library_version as library_version",
         }
     ],
@@ -552,7 +552,7 @@ seg_pages_cols = {
         {
             "source_name": "timestamp",
             "schema_name": "tstamp",
-            "description": "When the call was invoked. Calculated by Segment to correct client-device clock skew. Use for analysis when chronology DOES matter.",
+            "description": "When the event occurred. Calculated by Segment to correct client-device clock skew. Use for analysis when chronology DOES matter.",
             "sql": 'timestamp as tstamp',
         }
     ],
@@ -576,7 +576,7 @@ seg_pages_cols = {
         {
             "source_name": "context_page_url",
             "schema_name": "page_url",
-            "description": "The URL of the page where the call was invoked.",
+            "description": "The URL of the page where the event occurred.",
             "sql": """
             -- CASE statement solves issue where the url column doesn't include query string parameters.
             case
@@ -589,7 +589,7 @@ seg_pages_cols = {
         {
             "source_name": None,
             "schema_name": "page_url_host",
-            "description": "The hostname of the page where the call was invoked.",
+            "description": "The hostname of the page where the event occurred.",
             "sql": "{{ dbt_utils.get_url_host('context_page_url') }} as page_url_host",
         },
     ],
@@ -597,7 +597,7 @@ seg_pages_cols = {
         {
             "source_name": "context_page_path",
             "schema_name": "page_url_path",
-            "description": "The path of the page where the call was invoked.",
+            "description": "The path of the page where the event occurred.",
             "sql": "context_page_path as page_url_path",
         }
     ],
@@ -605,7 +605,7 @@ seg_pages_cols = {
         {
             "source_name": "context_page_title",
             "schema_name": "page_title",
-            "description": "The title of the page where the call was invoked.",
+            "description": "The title of the page where the event occurred.",
             "sql": "context_page_title as page_title",
         }
     ],
@@ -613,7 +613,7 @@ seg_pages_cols = {
         {
             "source_name": "context_page_search",
             "schema_name": "page_url_query",
-            "description": "The the URL search query parameters of the page where the call was invoked.",
+            "description": "The the URL search query parameters of the page where the event occurred.",
             "sql": "context_page_search as page_url_query",
         }
     ],
@@ -621,13 +621,13 @@ seg_pages_cols = {
         {
             "source_name": "context_page_referrer",
             "schema_name": "referrer",
-            "description": "The URL of the page that referred the user to the page where the call was invoked.",
+            "description": "The URL of the page that referred the user to the page where the event occurred.",
             "sql": "context_page_referrer as referrer",
         },
         {
             "source_name": None,
             "schema_name": "referrer_host",
-            "description": "The hostname of the page that referred the user to the page where the call was invoked.",
+            "description": "The hostname of the page that referred the user to the page where the event occurred.",
             "sql": """
             cast(
                 replace( {{ dbt_utils.get_url_host('context_page_referrer') }}, 'www.', '')
@@ -640,7 +640,7 @@ seg_pages_cols = {
         {
             "source_name": "context_campaign_source",
             "schema_name": "utm_source",
-            "description": "The source of the campaign that the user was in when the call was invoked.",
+            "description": "The source of the campaign that the user was in when the event occurred.",
             "sql": "context_campaign_source as utm_source",
         }
     ],
@@ -648,7 +648,7 @@ seg_pages_cols = {
         {
             "source_name": "context_campaign_medium",
             "schema_name": "utm_medium",
-            "description": "The medium of the campaign that the user was in when the call was invoked.",
+            "description": "The medium of the campaign that the user was in when the event occurred.",
             "sql": "context_campaign_medium as utm_medium",
         }
     ],
@@ -656,7 +656,7 @@ seg_pages_cols = {
         {
             "source_name": "context_campaign_name",
             "schema_name": "utm_campaign",
-            "description": "The name of the campaign that the user was in when the call was invoked.",
+            "description": "The name of the campaign that the user was in when the event occurred.",
             "sql": "context_campaign_name as utm_campaign",
         }
     ],
@@ -664,7 +664,7 @@ seg_pages_cols = {
         {
             "source_name": "context_campaign_term",
             "schema_name": "utm_term",
-            "description": "The term of the campaign that the user was in when the call was invoked.",
+            "description": "The term of the campaign that the user was in when the event occurred.",
             "sql": "context_campaign_term as utm_term",
         }
     ],
@@ -672,7 +672,7 @@ seg_pages_cols = {
         {
             "source_name": "context_campaign_content",
             "schema_name": "utm_content",
-            "description": "The content of the campaign that the user was in when the call was invoked. Maps directly to utm_content parameter.",
+            "description": "The content of the campaign that the user was in when the event occurred. Maps directly to utm_content parameter.",
             "sql": "context_campaign_content as utm_content",
         }
     ],
@@ -710,7 +710,7 @@ seg_pages_cols = {
         {
             "source_name": None,
             "schema_name": "device",
-            "description": "The device that invoked the call.",
+            "description": "The device that generated the event.",
             "sql": """
             cast(
                 case
@@ -774,7 +774,7 @@ seg_screens_cols = {
         {
             "source_name": "id",
             "schema_name": "screen_id",
-            "description": "The unique identifier of the screen call.",
+            "description": "The screen's unique identifier.",
             "tests": ["not_null", "unique"],
             "sql": "id as screen_id",
         }
@@ -815,7 +815,7 @@ seg_screens_cols = {
         {
             "source_name": "context_library_name",
             "schema_name": "library_name",
-            "description": "The name of the library that invoked the call.",
+            "description": "The name of the library that generated the event.",
             "sql": "context_library_name as library_name",
         }
     ],
@@ -823,7 +823,7 @@ seg_screens_cols = {
         {
             "source_name": "context_library_version",
             "schema_name": "library_version",
-            "description": "The version of the library that invoked the call.",
+            "description": "The version of the library that generated the event.",
             "sql": "context_library_version as library_version",
         }
     ],
@@ -855,7 +855,7 @@ seg_screens_cols = {
         {
             "source_name": "timestamp",
             "schema_name": "tstamp",
-            "description": "When the call was invoked. Calculated by Segment to correct client-device clock skew. Use for analysis when chronology DOES matter.",
+            "description": "When the event occurred. Calculated by Segment to correct client-device clock skew. Use for analysis when chronology DOES matter.",
             "sql": 'timestamp as tstamp',
         }
     ],
@@ -879,7 +879,7 @@ seg_screens_cols = {
         {
             "source_name": "context_app_name",
             "schema_name": "app_name",
-            "description": "The name of the app that invoked the call.",
+            "description": "The name of the app that generated the event.",
             "sql": "context_app_name as app_name",
         }
     ],
@@ -887,7 +887,7 @@ seg_screens_cols = {
         {
             "source_name": "context_app_version",
             "schema_name": "app_version",
-            "description": "The version of the app that invoked the call.",
+            "description": "The version of the app that generated the event.",
             "sql": "context_app_version as app_version",
         }
     ],
@@ -895,7 +895,7 @@ seg_screens_cols = {
         {
             "source_name": "context_app_build",
             "schema_name": "app_build",
-            "description": "The build of the app that invoked the call.",
+            "description": "The build of the app that generated the event.",
             "sql": "context_app_build as app_build",
         }
     ],
@@ -919,7 +919,7 @@ seg_screens_cols = {
         {
             "source_name": "context_device_id",
             "schema_name": "device_id",
-            "description": "The ID of the device that invoked the call.",
+            "description": "The ID of the device that generated the event.",
             "sql": "context_device_id as device_id",
         }
     ],
@@ -927,7 +927,7 @@ seg_screens_cols = {
         {
             "source_name": "context_device_manufacturer",
             "schema_name": "device_manufacturer",
-            "description": "The manufacturer of device that invoked the call.",
+            "description": "The manufacturer of device that generated the event.",
             "sql": "context_device_manufacturer as device_manufacturer",
         }
     ],
@@ -935,7 +935,7 @@ seg_screens_cols = {
         {
             "source_name": "context_device_type",
             "schema_name": "device_type",
-            "description": "The type of device that invoked the call.",
+            "description": "The type of device that generated the event.",
             "sql": "context_device_type as device_type",
         }
     ],
@@ -943,13 +943,13 @@ seg_screens_cols = {
         {
             "source_name": "context_device_model",
             "schema_name": "device",
-            "description": "The device that invoked the call.",
+            "description": "The device that generated the event.",
             "sql": "regexp_substr(context_device_model, '[a-zA-Z]+') as device",
         },
         {
             "source_name": None,
             "schema_name": "device_version",
-            "description": "The version of the device that invoked the call.",
+            "description": "The version of the device that generated the event.",
             "sql": "regexp_replace(regexp_replace(context_device_model, '[a-zA-Z]', ''), ',', '.') as device_version",
         },
     ],
@@ -957,7 +957,7 @@ seg_screens_cols = {
         {
             "source_name": "context_timezone",
             "schema_name": "device_timezone",
-            "description": "The timezone of the device that invoked the call.",
+            "description": "The timezone of the device that generated the event.",
             "sql": "context_timezone as device_timezone",
         }
     ],
@@ -1045,7 +1045,7 @@ seg_screens_cols = {
         {
             "source_name": "context_device_advertising_id",
             "schema_name": "advertising_id",
-            "description": "The advertising ID of the device that invoked the call.",
+            "description": "The advertising ID of the device that generated the event.",
             "sql": "context_device_advertising_id as advertising_id",
         }
     ],
@@ -1088,7 +1088,7 @@ seg_identify_cols = {
         {
             "source_name": "id",
             "schema_name": "event_id",
-            "description": "The unique identifier of the identify call.",
+            "description": "The unique identifier for the identify call.",
             "tests": ["not_null", "unique"],
             "sql": "id as event_id",
         }
@@ -1137,7 +1137,7 @@ seg_identify_cols = {
         {
             "source_name": "timestamp",
             "schema_name": "tstamp",
-            "description": "When the call was invoked. Calculated by Segment to correct client-device clock skew. Use for analysis when chronology DOES matter.",
+            "description": "When the event occurred. Calculated by Segment to correct client-device clock skew. Use for analysis when chronology DOES matter.",
             "sql": '"timestamp" as tstamp',
         },
     ],
@@ -1164,7 +1164,7 @@ seg_users_cols = {
         {
             "source_name": "id",
             "schema_name": "user_id",
-            "description": "The unique identifier of the user.",
+            "description": "The user's unique identifier.",
             "tests": ["not_null", "unique"],
             "sql": "id as user_id",
         },
@@ -1213,7 +1213,7 @@ seg_users_cols = {
         {
             "source_name": "timestamp",
             "schema_name": "tstamp",
-            "description": "When the call was invoked. Calculated by Segment to correct client-device clock skew. Use for analysis when chronology DOES matter.",
+            "description": "When the event occurred. Calculated by Segment to correct client-device clock skew. Use for analysis when chronology DOES matter.",
             "sql": '"timestamp" as tstamp',
         },
     ],
@@ -1240,7 +1240,7 @@ seg_groups_cols = {
         {
             "source_name": "id",
             "schema_name": "group_id",
-            "description": "The unique identifier of the group.",
+            "description": "The groups's unique identifier.",
             "tests": ["not_null", "unique"],
             "sql": "id as group_id",
         },
@@ -1289,7 +1289,7 @@ seg_groups_cols = {
         {
             "source_name": "timestamp",
             "schema_name": "tstamp",
-            "description": "When the call was invoked. Calculated by Segment to correct client-device clock skew. Use timestamp for analysis when chronology DOES matter.",
+            "description": "When the event occurred. Calculated by Segment to correct client-device clock skew. Use timestamp for analysis when chronology DOES matter.",
             "sql": '"timestamp" as tstamp',
         },
     ],
