@@ -10,8 +10,8 @@ import yaml
 from inflection import titleize, underscore
 from loguru import logger
 
-from reflekt.dbt.columns.reflekt import reflekt_columns
-from reflekt.dbt.columns.segment import (
+from reflekt.reflekt.columns import reflekt_columns
+from reflekt.segment.columns import (
     seg_event_cols,
     seg_groups_cols,
     seg_identify_cols,
@@ -20,7 +20,7 @@ from reflekt.dbt.columns.segment import (
     seg_tracks_cols,
     seg_users_cols,
 )
-from reflekt.dbt.docs import (
+from reflekt.reflekt.dbt_templater import (
     dbt_column_schema,
     dbt_model_schema,
     dbt_src_schema,
@@ -69,7 +69,7 @@ class ReflektTransformer(object):
             )
             self.dbt_pkg_path = dbt_pkg_dir / self.dbt_package_name
             self.pkg_template = pkg_resources.resource_filename(
-                "reflekt", "dbt/package/"
+                "reflekt", "templates/dbt/"
             )
             self.pkg_version = pkg_version
             self.db_engine = WarehouseConnection()
@@ -349,7 +349,7 @@ class ReflektTransformer(object):
             shutil.rmtree(self.dbt_pkg_path)
 
         shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_path)
-        logger.info(f"Completed building dbt package at {self.dbt_pkg_path}")
+        logger.info(f"SUCCESS - built dbt package at {self.dbt_pkg_path}")
 
         if self.db_errors:
             logger.warning(

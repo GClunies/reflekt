@@ -15,7 +15,7 @@ from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
 
 from reflekt.avo.plan import AvoPlan
-from reflekt.cli.handler import ReflektApiHandler
+from reflekt.cli.api_handler import ReflektApiHandler
 from reflekt.logger import logger_config
 from reflekt.reflekt import constants
 from reflekt.reflekt.config import ReflektConfig
@@ -49,7 +49,7 @@ def cli():
 )
 def new(plan_name, plans_dir):
     """Create a new empty tracking plan using provided name."""
-    plan_template_dir = pkg_resources.resource_filename("reflekt", "template/plan/")
+    plan_template_dir = pkg_resources.resource_filename("reflekt", "templates/plan/")
 
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
         plan_dir = Path(plans_dir) / plan_name
@@ -519,7 +519,7 @@ def init(project_dir_str):
         f"{reflekt_config_path}."
     )
     project_template_dir = pkg_resources.resource_filename(
-        "reflekt", "template/project/"
+        "reflekt", "templates/project/"
     )
     shutil.copytree(project_template_dir, project_dir, dirs_exist_ok=True)
 

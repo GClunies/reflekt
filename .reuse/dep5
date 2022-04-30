@@ -6,7 +6,3 @@ Source: https://github.com/reflekt-ci/reflekt
 Files: reflekt/template/*
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
 License: Apache-2.0
-
-Files: reflekt/dbt/package/*
-Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
-License: Apache-2.0

@@ -2,6 +2,27 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+
+def template_dbt_config():
+    pass
+
+
+def template_dbt_source_cte():
+    pass
+
+
+def template_dbt_renamed_cte():
+    pass
+
+
+def template_dbt_std_columns():
+    pass
+
+
+def template_dbt_event_columns():
+    pass
+
+
 # flake8: noqa
 # fmt: off
 dbt_src_schema = {
@@ -36,3 +57,4 @@ dbt_column_schema = {
     "name": "",
     "description": "",
 }
+# fmt: on
