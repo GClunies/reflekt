@@ -396,8 +396,8 @@ class ReflektTransformer(object):
                 "with\n\n"
                 "source as (\n\n"
                 f"    select *\n\n"
-                f"    from source {{{{ source('{underscore(self.schema)}', 'identifies') }}}}\n\n"  # noqa: E501
-                f"{self.incremental_logic}\n"
+                f"    from source {{{{ source('{underscore(self.schema)}', 'identifies') }}}}\n"  # noqa: E501
+                f"\n{self.incremental_logic}\n"
                 "),\n\n"
                 "renamed as (\n\n"
                 "    select"
@@ -763,7 +763,7 @@ class ReflektTransformer(object):
                 "source as (\n\n"
                 f"    select *\n\n"
                 f"    from source {{{{ source('{underscore(self.schema)}', 'pages') }}}}\n\n"  # noqa: E501
-                f"{self.incremental_logic}\n"
+                f"\n{self.incremental_logic}\n"
                 "),\n\n"
                 "renamed as (\n\n"
                 "    select"
@@ -898,8 +898,8 @@ class ReflektTransformer(object):
                 "with\n\n"
                 "source as (\n\n"
                 f"    select *\n\n"
-                f"    from source {{{{ source('{underscore(self.schema)}', 'screens') }}}}\n\n"  # noqa: E501
-                f"{self.incremental_logic}\n"
+                f"    from source {{{{ source('{underscore(self.schema)}', 'screens') }}}}\n"  # noqa: E501
+                f"\n{self.incremental_logic}\n"
                 "),\n\n"
                 "renamed as (\n\n"
                 "    select"
@@ -1024,8 +1024,8 @@ class ReflektTransformer(object):
                 "with\n\n"
                 "source as (\n\n"
                 f"    select *\n\n"
-                f"    from source {{{{ source('{underscore(self.schema)}', 'tracks') }}}}\n\n"  # noqa: E501
-                f"{self.incremental_logic}\n"
+                f"    from source {{{{ source('{underscore(self.schema)}', 'tracks') }}}}\n"  # noqa: E501
+                f"\n{self.incremental_logic}\n"
                 "),\n\n"
                 "renamed as (\n\n"
                 "    select"
@@ -1156,8 +1156,8 @@ class ReflektTransformer(object):
                             "with\n\n"
                             "source as (\n\n"
                             f"    select *\n\n"
-                            f"    from source {{{{ source('{underscore(self.schema)}', '{segment_2_snake(event.name)}') }}}}\n\n"  # noqa: E501
-                            f"{self.incremental_logic:<4}\n"
+                            f"    from source {{{{ source('{underscore(self.schema)}', '{segment_2_snake(event.name)}') }}}}\n"  # noqa: E501
+                            f"\n{self.incremental_logic}\n"
                             "),\n\n"
                             "renamed as (\n\n"
                             "    select"
