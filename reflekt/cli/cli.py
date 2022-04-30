@@ -404,23 +404,14 @@ def init(project_dir_str):
 
     if collect_config:
         plan_type_prompt = click.prompt(
-            f"What tool do you use to manage your tracking plan(s)?"
+            f"How do you manage your tracking plans?"
             f"{constants.PLAN_INIT_STRING}"
             f"\nEnter a number",
             type=int,
         )
         plan_type = constants.PLAN_MAP[str(plan_type_prompt)]
         reflekt_config_obj[config_name]["plan_type"] = plan_type
-        cdp_num_prompt = click.prompt(
-            f"Which CDP or Analytics Governance tool do you use?"
-            f"{constants.CDP_INIT_STRING}"
-            f"\nEnter a number",
-            type=int,
-        )
-        cdp = constants.CDP_MAP[str(cdp_num_prompt)]
-        reflekt_config_obj[config_name]["cdp"] = cdp
-
-        if cdp == "segment":
+        if plan_type == "segment":
             workspace_name = click.prompt(
                 "Enter your Segment workspace name. You can find this in your Segment "
                 "account URL (i.e. https://app.segment.com/your-workspace-name/)",
@@ -434,6 +425,16 @@ def init(project_dir_str):
                 hide_input=True,
             )
             reflekt_config_obj[config_name]["access_token"] = access_token
+
+        cdp_num_prompt = click.prompt(
+            f"How do you collect first-party data?"
+            f"{constants.CDP_INIT_STRING}"
+            f"\nEnter a number",
+            type=int,
+        )
+        cdp = constants.CDP_MAP[str(cdp_num_prompt)]
+        reflekt_config_obj[config_name]["cdp"] = cdp
+
         # TODO - Enable support for other CDPs below as developed
         # elif cdp == "rudderstack":
         #     pass
