@@ -10,7 +10,20 @@ import yaml
 from inflection import titleize, underscore
 from loguru import logger
 
+from reflekt.logger import logger_config
 from reflekt.reflekt.columns import reflekt_columns
+from reflekt.reflekt.config import ReflektConfig
+from reflekt.reflekt.dbt_templater import (
+    dbt_column_schema,
+    dbt_model_schema,
+    dbt_src_schema,
+    dbt_stg_schema,
+    dbt_table_schema,
+)
+from reflekt.reflekt.dumper import ReflektYamlDumper
+from reflekt.reflekt.project import ReflektProject
+from reflekt.reflekt.utils import segment_2_snake
+from reflekt.reflekt.warehouse import WarehouseConnection
 from reflekt.segment.columns import (
     seg_event_cols,
     seg_groups_cols,
@@ -20,19 +33,6 @@ from reflekt.segment.columns import (
     seg_tracks_cols,
     seg_users_cols,
 )
-from reflekt.reflekt.dbt_templater import (
-    dbt_column_schema,
-    dbt_model_schema,
-    dbt_src_schema,
-    dbt_stg_schema,
-    dbt_table_schema,
-)
-from reflekt.logger import logger_config
-from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.dumper import ReflektYamlDumper
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.utils import segment_2_snake
-from reflekt.reflekt.warehouse import WarehouseConnection
 from reflekt.segment.schema import (
     segment_event_schema,
     segment_items_schema,
@@ -48,8 +48,6 @@ class ReflektTransformer(object):
     - dbt package with sources, models, and docs
     """
 
-    # TODO - don't include '_avo' in dbt package name
-    # Should this be solved in Avo?
     def __init__(self, reflekt_plan, dbt_pkg_dir=None, pkg_version=None):
         logger.configure(**logger_config)
         self.reflekt_plan = reflekt_plan
@@ -294,7 +292,7 @@ class ReflektTransformer(object):
             return self._plan_segment(self.reflekt_plan)
         elif plan_type.lower() == "snowplow":
             return self._plan_snowplow(self.reflekt_plan)
-        # `No reflekt push` to Avo Iteratively. Only `reflekt pull`
+        # `No reflekt push` to Avo or Iteratively. Only `reflekt pull`
 
     def _dbt_segment(self, reflekt_plan):
         logger.info(
