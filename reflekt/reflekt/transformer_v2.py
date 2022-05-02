@@ -244,11 +244,11 @@ class ReflektTransformer(object):
             updated_segment_property["required"] = []
 
             for object_property in reflekt_property.object_properties:
-                segment_object_property = copy.deepcopy(segment_property_schema)
-                segment_object_property["description"] = object_property["description"]
-                segment_object_property["type"] = object_property["type"]
+                segmentect_property = copy.deepcopy(segment_property_schema)
+                segmentect_property["description"] = object_property["description"]
+                segmentect_property["type"] = object_property["type"]
                 updated_segment_property["properties"].update(
-                    {object_property["name"]: segment_object_property}
+                    {object_property["name"]: segmentect_property}
                 )
 
                 if "required" in object_property and object_property["required"]:
@@ -298,33 +298,122 @@ class ReflektTransformer(object):
             f"\n        dbt pkg path: {self.dbt_pkg_path}\n"
         )
         self.db_errors = []
-        dbt_src_obj = self._template_dbt_source()
-        for segment_call in ["identifies", "users", "pages", "screens", "tracks"]:
+        dbt_src = self._template_dbt_source()
+        for segment_call in [
+            {
+                "name": "identifies",
+                "description": f"A table with identify() calls fired on {reflekt_plan.name}.",
+                "cdp_cols": seg_identify_cols,
+            },
+            {
+                "name": "users",
+                "description": f"A table with the latest traits for users identified on {reflekt_plan.name}.",
+                "cdp_cols": seg_users_cols,
+            },
+            {
+                "name": "groups",
+                "description": f"A table with group() calls fired on {reflekt_plan.name}.",
+                "cdp_cols": seg_groups_cols,
+            },
+            {
+                "name": "pages",
+                "description": f"A table with page() calls fired on {reflekt_plan.name}.",
+                "cdp_cols": seg_pages_cols,
+                "plan_event": [
+                    event
+                    for event in reflekt_plan.events
+                    if str.lower(event.name).replace("_", " ").replace("-", " ")
+                    == "page viewed"
+                ],
+            },
+            {
+                "name": "screens",
+                "description": f"A table with screen() calls fired on {reflekt_plan.name}.",
+                "cdp_cols": seg_screens_cols,
+            },
+            {
+                "name": "tracks",
+                "description": f"A table with track() event calls fired on {reflekt_plan.name}.",
+                "cdp_cols": seg_tracks_cols,
+            },
+        ]:
             # TODO - template generic segment calls
-            pass
+            db_columns, error_msg = self.db_engine.get_columns(
+                self.schema, segment_call["name"]
+            )
+            if error_msg is not None:
+                logger.warning(f"Database error: {error_msg}. Skipping...")
+                self.db_errors.append(error_msg)
+            else:
+                if segment_call["plan_event"] != []:
+                    plan_event = None
+                else:
+                    plan_event = segment_call["plan_event"][0]
+
+                self._template_dbt_table(
+                    dbt_src=dbt_src,
+                    tbl_name=segment_call["name"],
+                    tbl_description=segment_call["description"],
+                    db_columns=db_columns,
+                    cdp_cols=segment_call["cdp_cols"],
+                    plan_cols=plan_event.properties,  # TODO - how will this work for pages/screens/tracks/etc
+                )
 
         for event in reflekt_plan.events:
-            # TODO - template unique event calls from reflekt trackign plan
-            pass
+            self._template_dbt_table(
+                dbt_src=dbt_src,
+                tbl_name=event.name,
+                tbl_description=event.description,
+                db_columns=db_columns,
+                cdp_cols=seg_event_cols,
+                plan_cols=event.properties,
+            )
 
     def _dbt_package_snowplow(self):
         pass
 
     def _template_dbt_source(self, reflekt_plan: ReflektPlan):
-        dbt_src_obj = copy.deepcopy(dbt_src_schema)
-        dbt_src_obj["sources"][0]["name"] = self.schema
-        dbt_src_obj["sources"][0]["description"] = (
+        dbt_src = copy.deepcopy(dbt_src_schema)
+        dbt_src["sources"][0]["name"] = self.schema
+        dbt_src["sources"][0]["description"] = (
             f"Schema in {titleize(self.warehouse_type)} where data for the "
             f"{reflekt_plan.name} {titleize(self.cdp_name)} source is stored."
         )
 
-        return dbt_src_obj
+        return dbt_src
 
-    def _template_dbt_table(self, reflekt_plan: ReflektPlan, dbt_src_obj: dict):
+    def _template_dbt_table(
+        self,
+        dbt_src: dict,
+        tbl_name: str,
+        tbl_description: str,
+        db_columns: list,
+        cdp_cols: dict,
+        plan_cols: typing.Optional[list] = None,
+    ):
+        dbt_tbl = copy.deepcopy(dbt_table_schema)
+        dbt_tbl["name"] = tbl_name
+        dbt_tbl["description"] = tbl_description
+
+        for column, mapped_columns in cdp_cols.items():
+            if column in db_columns or column in reflekt_columns:
+                for mapped_column in mapped_columns:
+                    if mapped_column["source_name"] is not None:
+                        tbl_col = copy.deepcopy(dbt_column_schema)
+                        tbl_col["name"] = mapped_column["source_name"]
+                        tbl_col["description"] = mapped_column["description"]
+                        dbt_tbl["columns"].append(tbl_col)
+
+        for column in plan_cols:
+            tbl_col = copy.deepcopy(dbt_column_schema)
+            tbl_col["name"] = segment_2_snake(column.name)
+            tbl_col["description"] = column.description
+            dbt_tbl["columns"].append(tbl_col)
+
+        dbt_src["sources"][0]["tables"].append(dbt_tbl)
+
+    def _template_dbt_model(self, reflekt_plan: ReflektPlan, dbt_src: dict):
         pass
 
-    def _template_dbt_model(self, reflekt_plan: ReflektPlan, dbt_src_obj: dict):
-        pass
-
-    def _template_dbt_doc(self, reflekt_plan: ReflektPlan, dbt_src_obj: dict):
+    def _template_dbt_doc(self, reflekt_plan: ReflektPlan, dbt_src: dict):
         pass
