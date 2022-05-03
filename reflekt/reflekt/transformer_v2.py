@@ -12,18 +12,20 @@ import yaml
 from inflection import titleize, underscore
 from loguru import logger
 from packaging.version import Version
+from sqlalchemy import table
 
 from reflekt.logger import logger_config
 from reflekt.reflekt.columns import reflekt_columns
 from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.dbt_templater import (
+from reflekt.reflekt.dbt import (
     dbt_column_schema,
+    dbt_doc_schema,
     dbt_model_schema,
     dbt_src_schema,
-    dbt_stg_schema,
     dbt_table_schema,
 )
 from reflekt.reflekt.dumper import ReflektYamlDumper
+from reflekt.reflekt.errors import ReflektProjectError
 from reflekt.reflekt.event import ReflektEvent
 from reflekt.reflekt.plan import ReflektPlan
 from reflekt.reflekt.project import ReflektProject
@@ -82,6 +84,7 @@ class ReflektTransformer(object):
             self.schema = self._get_plan_db_schema(self.plan_name)
             self.src_prefix = self.reflekt_project.src_prefix
             self.model_prefix = self.reflekt_project.model_prefix
+            self.materialized = self.reflekt_project.materialized
             self.incremental_logic = self.reflekt_project.incremental_logic
 
     def _get_plan_db_schema(self, plan_name: str):
@@ -196,7 +199,8 @@ class ReflektTransformer(object):
         if hasattr(reflekt_property, "allow_null") and reflekt_property.allow_null:
             updated_segment_property["type"].append("null")
         elif hasattr(reflekt_property, "type") and reflekt_property.type == "any":
-            # If data type is 'any', delete type key. Otherwise, triggers 'invalid argument' from Segment API)  # noqa: E501
+            # If data type is 'any', delete type key. Otherwise, triggers
+            # 'invalid argument' from Segment API
             updated_segment_property.pop("type", None)
         elif (
             hasattr(reflekt_property, "pattern") and reflekt_property.pattern is not None
@@ -244,11 +248,11 @@ class ReflektTransformer(object):
             updated_segment_property["required"] = []
 
             for object_property in reflekt_property.object_properties:
-                segmentect_property = copy.deepcopy(segment_property_schema)
-                segmentect_property["description"] = object_property["description"]
-                segmentect_property["type"] = object_property["type"]
+                segment_property = copy.deepcopy(segment_property_schema)
+                segment_property["description"] = object_property["description"]
+                segment_property["type"] = object_property["type"]
                 updated_segment_property["properties"].update(
-                    {object_property["name"]: segmentect_property}
+                    {object_property["name"]: segment_property}
                 )
 
                 if "required" in object_property and object_property["required"]:
@@ -269,7 +273,8 @@ class ReflektTransformer(object):
         if reflekt_trait.allow_null:
             updated_segment_trait["type"].append("null")
         elif reflekt_trait.type == "any":
-            # If data type is 'any', delete type key. Otherwise, triggers 'invalid argument' from Segment API)  # noqa: E501
+            # If data type is 'any', delete type key. Otherwise, triggers
+            # 'invalid argument' from Segment API
             updated_segment_trait.pop("type", None)
         elif reflekt_trait.pattern is not None:
             updated_segment_trait["pattern"] = reflekt_trait.pattern
@@ -284,9 +289,50 @@ class ReflektTransformer(object):
         pass
 
     def build_dbt_package(self, reflekt_plan: ReflektPlan):
-        pass
+        if self.tmp_pkg_dir.exists():
+            shutil.rmtree(str(self.tmp_pkg_dir))
+        shutil.copytree(self.pkg_template, str(self.tmp_pkg_dir))
+
+        # Update the version string in templated dbt_project.yml
+        with open(self.tmp_pkg_dir / "dbt_project.yml", "r") as f:
+            dbt_project_yml_str = f.read()
+
+        dbt_project_yml_str = dbt_project_yml_str.replace(
+            "0.1.0", str(self.pkg_version)  # Template always has version '0.1.0'
+        ).replace("reflekt_package_name", self.dbt_package_name)
+
+        if self.dbt_package_schema is not None:
+            dbt_project_yml_str += (
+                f"\nmodels:"
+                f"\n  {self.dbt_package_name}:"
+                f"\n    +schema: {self.dbt_package_schema}"
+            )
+
+        with open(self.tmp_pkg_dir / "dbt_project.yml", "w") as f:
+            f.write(dbt_project_yml_str)
+
+        # Set dbt_pkg_name and plan_name in README.md
+        with open(self.tmp_pkg_dir / "README.md", "r") as f:
+            readme_str = f.read()
+
+        readme_str = readme_str.replace("_DBT_PKG_NAME_", self.dbt_package_name).replace(
+            "_PLAN_NAME_", self.plan_name
+        )
+
+        with open(self.tmp_pkg_dir / "README.md", "w") as f:
+            f.write(readme_str)
+
+        if self.cdp_name == "rudderstack":
+            return self._dbt_package_rudderstack(self.reflekt_plan)
+        elif self.cdp_name == "segment":
+            return self._dbt_package_segment(self.reflekt_plan)
+        elif self.cdp_name == "snowplow":
+            return self._dbt_package_snowplow(self.reflekt_plan)
 
     def _dbt_package_rudderstack(self):
+        pass
+
+    def _dbt_package_snowplow(self):
         pass
 
     def _dbt_package_segment(self, reflekt_plan: ReflektPlan):
@@ -298,79 +344,185 @@ class ReflektTransformer(object):
             f"\n        dbt pkg path: {self.dbt_pkg_path}\n"
         )
         self.db_errors = []
-        dbt_src = self._template_dbt_source()
-        for segment_call in [
+
+        # Setup `Page Viewed` and `Screen Viewed` events, if they exist in reflekt plan
+        event_page_viewed = [
+            event
+            for event in reflekt_plan.events
+            if str.lower(event.name).replace("_", " ").replace("-", " ") == "page viewed"
+        ]
+        if event_page_viewed == []:  # Page Viewed not in tracking plan
+            page_viewed_props = []
+        else:
+            page_viewed_props = event_page_viewed[0].properties
+
+        event_screen_viewed = [
+            event
+            for event in reflekt_plan.events
+            if str.lower(event.name).replace("_", " ").replace("-", " ")
+            == "screen viewed"
+        ]
+        if event_screen_viewed == []:  # Page Viewed not in tracking plan
+            screen_viewed_props = []
+        else:
+            screen_viewed_props = event_screen_viewed[0].properties
+
+        std_segment_tables = [
             {
                 "name": "identifies",
-                "description": f"A table with identify() calls fired on {reflekt_plan.name}.",
+                "description": f"A table with identify() calls fired on {reflekt_plan.name}.",  # noqa: E501
+                "unique_key": "identify_id",
                 "cdp_cols": seg_identify_cols,
+                "plan_cols": [],
             },
             {
                 "name": "users",
-                "description": f"A table with the latest traits for users identified on {reflekt_plan.name}.",
+                "description": f"A table with the latest traits for users identified on {reflekt_plan.name}.",  # noqa: E501
+                "unique_key": "user_id",
                 "cdp_cols": seg_users_cols,
+                "plan_cols": [],
             },
             {
                 "name": "groups",
-                "description": f"A table with group() calls fired on {reflekt_plan.name}.",
+                "description": f"A table with group() calls fired on {reflekt_plan.name}.",  # noqa: E501
+                "unique_key": "group_id",
                 "cdp_cols": seg_groups_cols,
+                "plan_cols": [],
             },
             {
                 "name": "pages",
-                "description": f"A table with page() calls fired on {reflekt_plan.name}.",
+                "description": f"A table with page() calls fired on {reflekt_plan.name}.",  # noqa: E501
+                "unique_key": "page_id",
                 "cdp_cols": seg_pages_cols,
-                "plan_event": [
-                    event
-                    for event in reflekt_plan.events
-                    if str.lower(event.name).replace("_", " ").replace("-", " ")
-                    == "page viewed"
-                ],
+                "plan_cols": page_viewed_props,
             },
             {
                 "name": "screens",
-                "description": f"A table with screen() calls fired on {reflekt_plan.name}.",
+                "description": f"A table with screen() calls fired on {reflekt_plan.name}.",  # noqa: E501
+                "unique_key": "screen_id",
                 "cdp_cols": seg_screens_cols,
+                "plan_cols": screen_viewed_props,
             },
             {
                 "name": "tracks",
-                "description": f"A table with track() event calls fired on {reflekt_plan.name}.",
+                "description": f"A table with track() event calls fired on {reflekt_plan.name}.",  # noqa: E501
+                "unique_key": "event_id",
                 "cdp_cols": seg_tracks_cols,
+                "plan_cols": [],
             },
-        ]:
-            # TODO - template generic segment calls
-            db_columns, error_msg = self.db_engine.get_columns(
-                self.schema, segment_call["name"]
-            )
-            if error_msg is not None:
-                logger.warning(f"Database error: {error_msg}. Skipping...")
-                self.db_errors.append(error_msg)
-            else:
-                if segment_call["plan_event"] != []:
-                    plan_event = None
-                else:
-                    plan_event = segment_call["plan_event"][0]
+        ]
 
-                self._template_dbt_table(
-                    dbt_src=dbt_src,
-                    tbl_name=segment_call["name"],
-                    tbl_description=segment_call["description"],
-                    db_columns=db_columns,
-                    cdp_cols=segment_call["cdp_cols"],
-                    plan_cols=plan_event.properties,  # TODO - how will this work for pages/screens/tracks/etc
+        dbt_src = self._template_dbt_source(reflekt_plan=reflekt_plan)
+
+        for std_segment_table in std_segment_tables:
+            if self.plan_type == "avo" and std_segment_table["name"] in [
+                "identifies",
+                "users",
+                "groups",
+            ]:
+                pass
+            else:
+                db_columns, error_msg = self.db_engine.get_columns(
+                    self.schema, std_segment_table["name"]
                 )
+                if error_msg is not None:
+                    logger.warning(f"Database error: {error_msg}. Skipping...")
+                    self.db_errors.append(error_msg)
+                else:
+                    self._template_dbt_table(
+                        dbt_src=dbt_src,
+                        table_name=std_segment_table["name"],
+                        table_description=std_segment_table["description"],
+                        db_columns=db_columns,
+                        cdp_cols=std_segment_table["cdp_cols"],
+                        plan_cols=std_segment_table["plan_cols"],
+                    )
+                    self._template_dbt_model(
+                        materialized=self.materialized,
+                        unique_key=std_segment_table["unique_key"],
+                        table_name=std_segment_table["name"],
+                        db_columns=db_columns,
+                        cdp_cols=std_segment_table["cdp_cols"],
+                        plan_cols=std_segment_table["plan_cols"],
+                    )
+                    self._template_dbt_doc(
+                        model_name=std_segment_table["name"],
+                        model_description=std_segment_table["description"],
+                        db_columns=db_columns,
+                        cdp_cols=std_segment_table["cdp_cols"],
+                        plan_cols=std_segment_table["plan_cols"],
+                    )
 
         for event in reflekt_plan.events:
-            self._template_dbt_table(
-                dbt_src=dbt_src,
-                tbl_name=event.name,
-                tbl_description=event.description,
-                db_columns=db_columns,
-                cdp_cols=seg_event_cols,
-                plan_cols=event.properties,
+            if event.name in ["page viewed", "screen viewed"]:
+                pass  # Already handled above by std_segment_tables for loop
+            else:
+                db_columns, error_msg = self.db_engine.get_columns(
+                    self.schema, segment_2_snake(event.name)
+                )
+                if error_msg is not None:
+                    logger.warning(f"Database error: {error_msg}. Skipping...")
+                    self.db_errors.append(error_msg)
+                else:
+                    self._template_dbt_table(
+                        dbt_src=dbt_src,
+                        table_name=event.name,
+                        table_description=event.description,
+                        db_columns=db_columns,
+                        cdp_cols=seg_event_cols,
+                        plan_cols=event.properties,
+                    )
+                    self._template_dbt_model(
+                        materialized=self.materialized,
+                        unique_key="event_id",
+                        table_name=segment_2_snake(event.name),
+                        db_columns=db_columns,
+                        cdp_cols=seg_event_cols,
+                        plan_cols=event.properties,
+                    )
+                    self._template_dbt_doc(
+                        model_name=segment_2_snake(event.name),
+                        model_description=event.description,
+                        db_columns=db_columns,
+                        cdp_cols=seg_event_cols,
+                        plan_cols=event.properties,
+                    )
+
+        dbt_src_path = (
+            self.tmp_pkg_dir
+            / "models"
+            / f"{self.src_prefix}{underscore(self.plan_name)}.yml"
+        )
+
+        with open(dbt_src_path, "w") as f:
+            yaml.dump(
+                dbt_src,
+                f,
+                indent=2,
+                width=70,
+                Dumper=ReflektYamlDumper,
+                sort_keys=False,
+                default_flow_style=False,
+                allow_unicode=True,
+                encoding=("utf-8"),
             )
 
-    def _dbt_package_snowplow(self):
-        pass
+        logger.info(
+            f"Copying dbt package from temporary path "
+            f"{self.tmp_pkg_dir} to {self.dbt_pkg_path}"
+        )
+
+        if self.dbt_pkg_path.exists():
+            shutil.rmtree(self.dbt_pkg_path)
+
+        shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_path)
+        logger.info(f"SUCCESS - dbt package built at {self.dbt_pkg_path}")
+
+        if self.db_errors:
+            logger.warning(
+                f"The following {len(self.db_errors)} database error(s) were encountered"
+                f" during the dbt package build:\n\n{self.db_errors}"
+            )
 
     def _template_dbt_source(self, reflekt_plan: ReflektPlan):
         dbt_src = copy.deepcopy(dbt_src_schema)
@@ -385,15 +537,15 @@ class ReflektTransformer(object):
     def _template_dbt_table(
         self,
         dbt_src: dict,
-        tbl_name: str,
-        tbl_description: str,
+        table_name: str,
+        table_description: str,
         db_columns: list,
         cdp_cols: dict,
-        plan_cols: typing.Optional[list] = None,
+        plan_cols: list,
     ):
         dbt_tbl = copy.deepcopy(dbt_table_schema)
-        dbt_tbl["name"] = tbl_name
-        dbt_tbl["description"] = tbl_description
+        dbt_tbl["name"] = table_name
+        dbt_tbl["description"] = table_description
 
         for column, mapped_columns in cdp_cols.items():
             if column in db_columns or column in reflekt_columns:
@@ -412,8 +564,158 @@ class ReflektTransformer(object):
 
         dbt_src["sources"][0]["tables"].append(dbt_tbl)
 
-    def _template_dbt_model(self, reflekt_plan: ReflektPlan, dbt_src: dict):
-        pass
+    def _template_dbt_model(
+        self,
+        materialized: str,
+        unique_key: str,
+        table_name: str,
+        db_columns: list,
+        cdp_cols: dict,
+        plan_cols: list,
+    ):
+        mdl_sql = self._template_dbt_model_config(
+            materialized,
+            unique_key,
+            self.warehouse_type,
+        )
 
-    def _template_dbt_doc(self, reflekt_plan: ReflektPlan, dbt_src: dict):
-        pass
+        mdl_sql += self._template_dbt_source_cte(
+            source_schema=self.schema,
+            source_table=table_name,
+            incremental_logic=self.incremental_logic,
+        )
+
+        mdl_sql += "renamed as (\n\n" "    select"
+
+        for column, mapped_columns in cdp_cols.items():
+            if column in db_columns or column in reflekt_columns:
+                for mapped_column in mapped_columns:
+                    if mapped_column["schema_name"] is not None:
+                        col_sql = (
+                            mapped_column["sql"]
+                            .replace("__SCHEMA_NAME__", self.schema)
+                            .replace("__TABLE_NAME__", table_name)
+                            .replace("__PLAN_NAME__", self.plan_name)
+                        )
+                        mdl_sql += "\n        " + col_sql + ","
+
+        for column in plan_cols:
+            col_sql = segment_2_snake(column)
+            mdl_sql += "\n        " + col_sql + ","
+
+        model_path = (
+            self.tmp_pkg_dir
+            / "models"
+            / f"{self.model_prefix}{underscore(self.plan_name)}__{table_name}.sql"
+        )
+
+        with open(model_path, "w") as f:
+            f.write(mdl_sql)
+
+    def _template_dbt_model_config(
+        self,
+        materialized: str,
+        unique_key: str,
+        warehouse_type: str,
+    ):
+        if materialized == "view":
+            # fmt: off
+            model_config = (
+                "{{\n"
+                "  config(\n"
+                "    materialized = 'view',\n"
+                "  )\n"
+                "}}\n\n"
+            )
+            # fmt: on
+        elif materialized == "incremental":
+            if warehouse_type == "redshift":
+                sort_str = "sort = 'tstamp'"
+            elif warehouse_type == "snowflake":
+                sort_str = "cluster_by = 'tstamp'"
+            model_config = (
+                "{{\n"
+                f"  config(\n"
+                f"    materialized = 'incremental',\n"
+                f"    unique_key = '{id}',\n"
+                f"    {sort_str}\n"
+                f"  )\n"
+                "}}\n\n"
+            )
+        else:
+            raise ReflektProjectError(
+                f"Invalid materialized config in reflekt_project.yml...\n"
+                f"    materialized: {materialized}\n"
+                f"... is not accepted. Must be either 'view' or 'incremental'."
+            )
+
+        return model_config
+
+    def _template_dbt_source_cte(
+        self,
+        source_schema: str,
+        source_table: str,
+        incremental_logic: typing.Optional[str] = None,
+    ):
+        if incremental_logic is None:
+            incremental_logic = ""
+        source_cte = (
+            "with\n\n"
+            "source as (\n\n"
+            f"    select *\n\n"
+            f"    from source {{{{ source('{underscore(source_schema)}', '{source_table}') }}}}\n\n"
+            f"    {incremental_logic}\n\n"
+            ")\n\n"
+        )
+
+        return source_cte
+
+    def _template_dbt_doc(
+        self,
+        model_name: str,
+        model_description: str,
+        db_columns: list,
+        cdp_cols: dict,
+        plan_cols: list,
+    ):
+        dbt_doc = copy.deepcopy(dbt_doc_schema)
+        dbt_mdl_doc = copy.deepcopy(dbt_model_schema)
+        dbt_mdl_doc["name"] = model_name
+        dbt_mdl_doc["description"] = model_description
+
+        for column, mapped_columns in cdp_cols.items():
+            if column in db_columns or column in reflekt_columns:
+                for mapped_column in mapped_columns:
+                    if mapped_column["source_name"] is not None:
+                        mdl_col = copy.deepcopy(dbt_column_schema)
+                        mdl_col["name"] = mapped_column["source_name"]
+                        mdl_col["description"] = mapped_column["description"]
+                        dbt_mdl_doc["columns"].append(mdl_col)
+
+        for column in plan_cols:
+            mdl_col = copy.deepcopy(dbt_column_schema)
+            mdl_col["name"] = segment_2_snake(column.name)
+            mdl_col["description"] = column.description
+            dbt_mdl_doc["columns"].append(mdl_col)
+
+        dbt_doc["models"].append(dbt_mdl_doc)
+
+        docs_path = (
+            self.tmp_pkg_dir
+            / "models"
+            / "docs"
+            / f"{self.model_prefix}{underscore(self.plan_name)}__{model_name}.yml"
+        )
+
+        with open(docs_path, "w") as f:
+            yaml.dump(
+                dbt_doc,
+                f,
+                indent=2,
+                width=70,
+                Dumper=ReflektYamlDumper,
+                sort_keys=False,
+                default_flow_style=False,
+                allow_unicode=True,
+                encoding=("utf-8"),
+            )
