@@ -13,7 +13,6 @@ from inflection import titleize, underscore
 from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
-
 from reflekt.avo.plan import AvoPlan
 from reflekt.cli.api_handler import ReflektApiHandler
 from reflekt.logger import logger_config
@@ -330,7 +329,7 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
     reflekt_plan = loader.plan
     logger.info(f"Loaded reflekt tracking plan {plan_name}\n")
     transformer = ReflektTransformer(reflekt_plan, dbt_pkg_dir, pkg_version=version)
-    transformer.build_dbt_package()
+    transformer.build_dbt_package(reflekt_plan=reflekt_plan)
 
 
 @click.option(
