@@ -575,16 +575,9 @@ seg_pages_cols = {
     "context_page_url": [
         {
             "source_name": "context_page_url",
-            "schema_name": "page_url",
+            "schema_name": None,  # page() call automatically collects `url`
             "description": "The URL of the page where the call was invoked.",
-            "sql": """
-            -- CASE statement solves issue where the url column doesn't include query string parameters.
-            case
-                when context_page_url ilike '%?%'
-                    then context_page_url
-                else concat(context_page_url, coalesce(context_page_search, ''))
-            end as page_url
-            """,
+            "sql": None,
         },
         {
             "source_name": None,
@@ -596,33 +589,33 @@ seg_pages_cols = {
     "context_page_path": [
         {
             "source_name": "context_page_path",
-            "schema_name": "page_url_path",
+            "schema_name": None,  # page() call automatically collects `path`
             "description": "The path of the page where the call was invoked.",
-            "sql": "context_page_path as page_url_path",
+            "sql": None,
         }
     ],
     "context_page_title": [
         {
             "source_name": "context_page_title",
-            "schema_name": "page_title",
+            "schema_name": None,  # page() call automatically collects `title`
             "description": "The title of the page where the call was invoked.",
-            "sql": "context_page_title as page_title",
+            "sql": None,
         }
     ],
     "context_page_search": [
         {
             "source_name": "context_page_search",
-            "schema_name": "page_url_query",
+            "schema_name": None,  # page() call automatically collects `search`
             "description": "The the URL search query parameters of the page where the call was invoked.",
-            "sql": "context_page_search as page_url_query",
+            "sql": None,
         }
     ],
     "context_page_referrer": [
         {
             "source_name": "context_page_referrer",
-            "schema_name": "referrer",
+            "schema_name": None,  # page() call automatically collects `referrer`
             "description": "The URL of the page that referred the user to the page where the call was invoked.",
-            "sql": "context_page_referrer as referrer",
+            "sql": None,
         },
         {
             "source_name": None,
