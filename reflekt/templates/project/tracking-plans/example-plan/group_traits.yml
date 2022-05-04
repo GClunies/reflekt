@@ -1,0 +1,12 @@
+# Group traits spec. Modify/add/delete traits below for your tracking needs.
+traits:
+  - name: trait_one
+    description: Example group trait 1
+    type: string
+  - name: trait_two
+    description: Example group trait 2
+    type: boolean
+  - name: trait_three
+    description: Example group trait 3
+    type: number
+    allow_null: true

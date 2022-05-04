@@ -344,6 +344,7 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
 def init(project_dir_str):
     """Create a reflekt project at the provide directory."""
 
+    # TODO - rename example_reflekt_project.yml --> reflekt_project.yml when initializing project  # noqa: E501
     # TODO - update all this logic to match the format in ~/.reflekt/reflekt_config.yml
 
     project_dir = Path(project_dir_str).resolve()
