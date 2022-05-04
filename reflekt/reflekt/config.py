@@ -56,7 +56,7 @@ class ReflektConfig:
         if len(self.warehouse.keys()) > 1:
             raise ReflektConfigError(
                 f"Multiple warehouses defined for "
-                f"`config_profile: {self.config_profile}` in {self.path}"
+                f"`config_profile: {self.config_profile}' in {self.path}"
                 f"\nOnly one warehouse can be defined."
             )
 

@@ -65,7 +65,7 @@ class AvoPlan(object):
             )
         )
         event_file = events_dir / f"{event_file_name}.yml"
-        logger.info(f"Building reflekt event `{event_name}` at {event_file}")
+        logger.info(f"Building reflekt event '{event_name}' at {event_file}")
         event_obj = parse_avo_event(event_json)
         event_obj_with_version = {"version": 1}  # No event versions in Avo. Set to 1
         event_obj_with_version.update(event_obj)

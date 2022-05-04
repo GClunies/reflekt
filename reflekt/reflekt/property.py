@@ -194,10 +194,10 @@ class ReflektProperty(object):
         else:
             raise ReflektValidationError(
                 f"Property name '{self.name}' does not match naming convention"
-                f" defined by `{rule_type} {rule_str}` in reflekt_project.yml "
+                f" defined by '{rule_type} {rule_str}' in reflekt_project.yml "
                 f"\n\nEither: "
                 f"\n    - Rename property to match pattern. OR;"
-                f"\n    - Change `{rule_type} {rule_str}` in reflekt_project.yml."
+                f"\n    - Change '{rule_type} {rule_str}' in reflekt_project.yml."
             )
 
     def validate_property(self):
@@ -206,7 +206,7 @@ class ReflektProperty(object):
         is_valid = validator.validate(self._property_yaml, reflekt_property_schema)
 
         if not is_valid:
-            message = f"for property `{self.name}` - {validator.errors}"
+            message = f"for property '{self.name}' - {validator.errors}"
             raise ReflektValidationError(message)
 
         self._check_property_name()

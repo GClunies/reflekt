@@ -78,7 +78,7 @@ class ReflektPlan(object):
         is_valid = validator.validate(self.plan_yaml_obj, reflekt_plan_schema)
 
         if not is_valid:
-            message = f"For plan `{self.name}` - {validator.errors}"
+            message = f"For plan '{self.name}' - {validator.errors}"
             raise ReflektValidationError(message)
 
         self._check_duplicate_events()

@@ -65,7 +65,7 @@ class ReflektEvent(object):
             if not is_valid:
                 message = (
                     f"for `metadata:` defined in event "
-                    f"`{self.name}` - {validator.errors}"
+                    f"'{self.name}' - {validator.errors}"
                 )
                 raise ReflektValidationError(message)
 
@@ -108,7 +108,7 @@ class ReflektEvent(object):
             pass
         else:
             raise ReflektValidationError(
-                f"Event name '{self.name}' does not match `{rule_str}` "
+                f"Event name '{self.name}' does not match '{rule_str}' "
                 f"defined in reflekt_project.yml"
                 f"\n\nEither: "
                 f"\n    - Rename property to match pattern. OR;"
@@ -148,7 +148,7 @@ class ReflektEvent(object):
         is_valid = validator.validate(self._event_yaml_obj, reflekt_event_schema)
 
         if not is_valid:
-            message = f"for event `{self.name}` - {validator.errors}"
+            message = f"for event '{self.name}' - {validator.errors}"
             raise ReflektValidationError(message)
 
         self._check_event_name()

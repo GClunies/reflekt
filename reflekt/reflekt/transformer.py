@@ -94,10 +94,10 @@ class ReflektTransformer(object):
             raise KeyError(
                 f"Tracking plan '{plan_name}' not found in "
                 f"`plan_db_schemas:` in reflekt_project.yml. Please add "
-                f"corresponding `{plan_name}: <schema>` key value pair."
+                f"corresponding '{plan_name}: <schema>` key value pair."
             )
 
-    def build_cpd_plan(self, plan_type: typing.Optional[str] = None):
+    def build_cdp_plan(self, plan_type: typing.Optional[str] = None):
         if plan_type is None:
             plan_type = self.plan_type
 
@@ -119,9 +119,10 @@ class ReflektTransformer(object):
         segment_payload = copy.deepcopy(segment_payload_schema)
         segment_plan = copy.deepcopy(segment_plan_schema)
         segment_plan["display_name"] = self.plan_name
+        logger.info("")
         logger.info(
-            f"Converting reflekt plan {self.plan_name} to {titleize(self.plan_type)} "
-            f"format"
+            f"Converting reflekt tracking plan '{self.plan_name}'to "
+            f"{titleize(self.plan_type)} format"
         )
 
         if reflekt_plan.events != []:
@@ -163,14 +164,11 @@ class ReflektTransformer(object):
 
     def _build_segment_event(self, reflekt_event: ReflektEvent):
         if reflekt_event.version > 1:
-            version_str = f"(version {reflekt_event.version}) "
+            version_str = f" (version {reflekt_event.version})"
         else:
             version_str = ""
 
-        logger.info(
-            f"Building {reflekt_event.name} {version_str} in "
-            f"{titleize(self.plan_type)} format"
-        )
+        logger.info(f"    Converting '{reflekt_event.name}'{version_str}")
         segment_event = copy.deepcopy(segment_event_schema)
         segment_event["name"] = reflekt_event.name
         segment_event["description"] = reflekt_event.description
@@ -235,7 +233,7 @@ class ReflektTransformer(object):
                     "description"
                 ]
                 segment_item_property["type"] = [reflekt_item_property["type"]]
-                segment_item_property = self._handle_segment_property(
+                segment_item_property = self._parse_reflekt_property(
                     reflekt_item_property, segment_item_property
                 )
 

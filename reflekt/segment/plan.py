@@ -13,7 +13,6 @@ import funcy
 import yaml
 from inflection import dasherize, underscore
 from loguru import logger
-
 from reflekt.logger import logger_config
 from reflekt.reflekt.dumper import ReflektYamlDumper
 from reflekt.segment.parser import parse_segment_event, parse_segment_property
@@ -56,7 +55,6 @@ class SegmentPlan(object):
             if not dir.exists():
                 dir.mkdir()
 
-        logger.info(f"Building reflekt plan at {plan_dir}")
         self._build_reflekt_plan_file(plan_dir)
         traits_json = (
             self.plan_json.get("rules")
@@ -67,7 +65,7 @@ class SegmentPlan(object):
         )
 
         if traits_json:
-            logger.info(f"Building reflekt identify traits at {plan_dir}/identify.yml")
+            logger.info(f"    Writing reflekt identify traits to identify.yml")
             self._build_reflekt_identify_file(plan_dir, traits_json)
 
         group_traits_json = (
@@ -79,7 +77,7 @@ class SegmentPlan(object):
         )
 
         if group_traits_json:
-            logger.info(f"Building reflekt group traits at {plan_dir}/group.yml")
+            logger.info(f"   Writing reflekt group traits to group.yml")
             self._build_reflekt_group_file(plan_dir, group_traits_json)
 
         for event_json in self.plan_json.get("rules", {}).get("events", []):
@@ -106,7 +104,7 @@ class SegmentPlan(object):
             )
         )
         event_file = os.path.join(events_dir, f"{event_file_name}.yml")
-        logger.info(f"Building reflekt event `{event_name}` at {event_file}")
+        logger.info(f"    Writing reflekt event '{event_name}' to {event_file_name}.yml")
         event_obj = parse_segment_event(event_json)
         event_obj_sorted = {"version": event_obj["version"]}
         remainder_dict = funcy.omit(event_obj, "version")

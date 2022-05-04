@@ -85,7 +85,7 @@ class ReflektTransformer(object):
             raise KeyError(
                 f"Tracking plan '{plan_name}' not found in "
                 f"`plan_db_schemas:` in reflekt_project.yml. Please add "
-                f"corresponding `{plan_name}: <schema>` key value pair."
+                f"corresponding '{plan_name}: <schema>` key value pair."
             )
 
     # NOTE - Avo and Iteratively only support `reflekt pull`. Pushing would
