@@ -282,6 +282,7 @@ class ReflektTransformer(object):
 
         return segment_trait
 
+    # TODO - DELETE?
     # def _parse_reflekt_trait(self, reflekt_trait: ReflektTrait, segment_trait: dict):
     #     pass
 
@@ -297,10 +298,7 @@ class ReflektTransformer(object):
     #         updated_segment_trait["pattern"] = reflekt_trait.pattern
     #     elif reflekt_trait.enum is not None:
     #         updated_segment_trait["enum"] = reflekt_trait.enum
-
-    #     # TODO - FIX THIS?!
-    #     # NOTE - reflekt does not support traits with type = array|object
-
+    #
     #     return updated_segment_trait
 
     def build_dbt_package(self, reflekt_plan: ReflektPlan):
@@ -578,17 +576,10 @@ class ReflektTransformer(object):
         dbt_tbl["name"] = table_name
         dbt_tbl["description"] = table_description
 
-        # Occasionally, a column may be found in cdp_cols and plan_cols.
-        # Keep a list of templated columns to ensure no duplicates.
-        templated_columns = []
-
         for column, mapped_columns in cdp_cols.items():
             if column in db_columns or column in reflekt_columns:
                 for mapped_column in mapped_columns:
-                    if (
-                        mapped_column["source_name"] is not None
-                        and mapped_column["schema_name"] not in templated_columns
-                    ):
+                    if mapped_column["source_name"] is not None:
                         logger.info(
                             f"    Adding column {mapped_column['source_name']} to "
                             f"table {table_name}"
@@ -597,18 +588,13 @@ class ReflektTransformer(object):
                         tbl_col["name"] = mapped_column["source_name"]
                         tbl_col["description"] = mapped_column["description"]
                         dbt_tbl["columns"].append(tbl_col)
-                        templated_columns.append(
-                            mapped_column["schema_name"]
-                        )  # 'schema_name" from cdp_cols may overlap with plan_cols
 
         for column in plan_cols:
-            if column.name not in templated_columns:
-                logger.info(f"    Adding column {column.name} to table {table_name}")
-                tbl_col = copy.deepcopy(dbt_column_schema)
-                tbl_col["name"] = segment_2_snake(column.name)
-                tbl_col["description"] = column.description
-                dbt_tbl["columns"].append(tbl_col)
-                templated_columns.append(column.name)
+            logger.info(f"    Adding column {column.name} to table {table_name}")
+            tbl_col = copy.deepcopy(dbt_column_schema)
+            tbl_col["name"] = segment_2_snake(column.name)
+            tbl_col["description"] = column.description
+            dbt_tbl["columns"].append(tbl_col)
 
         dbt_src["sources"][0]["tables"].append(dbt_tbl)
 
@@ -642,17 +628,10 @@ class ReflektTransformer(object):
         logger.info("    Adding renamed CTE to model SQL")
         mdl_sql += "renamed as (\n\n" "    select"
 
-        # Occasionally, a column may be found in cdp_cols and plan_cols.
-        # Keep a list of templated columns to ensure no duplicates.
-        templated_columns = []
-
         for column, mapped_columns in cdp_cols.items():
             if column in db_columns or column in reflekt_columns:
                 for mapped_column in mapped_columns:
-                    if (
-                        mapped_column["schema_name"] is not None
-                        and mapped_column["schema_name"] not in templated_columns
-                    ):
+                    if mapped_column["schema_name"] is not None:
                         logger.info(
                             f"    Adding column {mapped_column['schema_name']} to "
                             f"model SQL"
@@ -664,16 +643,13 @@ class ReflektTransformer(object):
                             .replace("__PLAN_NAME__", self.plan_name)
                         )
                         mdl_sql += "\n        " + col_sql + ","
-                        templated_columns.append(mapped_column["schema_name"])
 
         for column in plan_cols:
-            if column.name not in templated_columns:
-                logger.info(f"    Adding column {column.name} to model SQL")
-                col_sql = segment_2_snake(column.name)
-                mdl_sql += "\n        " + col_sql + ","
-                templated_columns.append(column.name)
+            logger.info(f"    Adding column {column.name} to model SQL")
+            col_sql = segment_2_snake(column.name)
+            mdl_sql += "\n        " + col_sql + ","
 
-        mdl_sql = mdl_sql[:-1]  # remove final trailing comma
+        mdl_sql = mdl_sql[:-1]  # Remove final trailing comma
         # fmt: off
         mdl_sql += (
             "\n\n    from source"
@@ -777,17 +753,10 @@ class ReflektTransformer(object):
         dbt_mdl_doc["name"] = model_name
         dbt_mdl_doc["description"] = model_description
 
-        # Occasionally, a column may be found in cdp_cols and plan_cols.
-        # Keep a list of templated columns to ensure no duplicates.
-        templated_columns = []
-
         for column, mapped_columns in cdp_cols.items():
             if column in db_columns or column in reflekt_columns:
                 for mapped_column in mapped_columns:
-                    if (
-                        mapped_column["schema_name"] is not None
-                        and mapped_column["schema_name"] not in templated_columns
-                    ):
+                    if mapped_column["schema_name"] is not None:
                         logger.info(
                             f"    Adding column {mapped_column['schema_name']} to "
                             f"dbt docs"
@@ -796,16 +765,13 @@ class ReflektTransformer(object):
                         mdl_col["name"] = mapped_column["schema_name"]
                         mdl_col["description"] = mapped_column["description"]
                         dbt_mdl_doc["columns"].append(mdl_col)
-                        templated_columns.append(mapped_column["schema_name"])
 
         for column in plan_cols:
-            if column.name not in templated_columns:
-                logger.info(f"    Adding column {column.name} to dbt docs")
-                mdl_col = copy.deepcopy(dbt_column_schema)
-                mdl_col["name"] = segment_2_snake(column.name)
-                mdl_col["description"] = column.description
-                dbt_mdl_doc["columns"].append(mdl_col)
-                templated_columns.append(column.name)
+            logger.info(f"    Adding column {column.name} to dbt docs")
+            mdl_col = copy.deepcopy(dbt_column_schema)
+            mdl_col["name"] = segment_2_snake(column.name)
+            mdl_col["description"] = column.description
+            dbt_mdl_doc["columns"].append(mdl_col)
 
         dbt_doc["models"].append(dbt_mdl_doc)
 
