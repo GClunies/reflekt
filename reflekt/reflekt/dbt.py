@@ -21,7 +21,7 @@ dbt_table_schema = {
     "columns": [],
 }
 
-dbt_stg_schema = {
+dbt_doc_schema = {
     "version": 2,
     "models": [],
 }
@@ -35,4 +35,11 @@ dbt_model_schema = {
 dbt_column_schema = {
     "name": "",
     "description": "",
+}
+# fmt: on
+
+# OLD
+dbt_stg_schema = {
+    "version": 2,
+    "models": [],
 }

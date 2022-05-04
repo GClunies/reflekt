@@ -248,6 +248,14 @@ class ReflektProject:
                 "\n"
             )
 
+    def _get_metadata_schema(self):
+        if self.project.get("tracking_plans").get("metadata") is not None:
+            self.metadata_schema = (
+                self.project.get("tracking_plans").get("metadata").get("schema")
+            )
+        else:
+            self.metadata_schema = None
+
     def _get_dbt_src_prefix(self):
         try:
             self.src_prefix = self.project["dbt"]["sources"]["prefix"]
@@ -265,34 +273,48 @@ class ReflektProject:
             self.model_prefix = self.project["dbt"]["models"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define `prefix:` for templated dbt staged models in reflekt_project.yml. Example:"  # noqa E501
+                "\n\nMust define `prefix:` for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ndbt:"
                 "\n  sources:"
                 "\n    prefix: src_"
             )
 
-    def _get_dbt_stg_incremental_logic(self):
+    def _get_dbt_model_materialized(self):
         try:
-            self.incremental_logic = self.project["dbt"]["models"]["incremental_logic"]
+            self.materialized = self.project["dbt"]["models"]["materialized"].lower()
+            if self.materialized not in ["view", "incremental"]:
+                raise ReflektProjectError(
+                    f"Invalid materialized config in reflekt_project.yml...\n"
+                    f"    materialized: {self.materialized}\n"
+                    f"... is not accepted. Must be either 'view' or 'incremental'."
+                )
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define incremental logic for staged dbt models in reflekt_project.yml. Example:"  # noqa E501
+                "\n\nMust set `materialized:` for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
                 "\n\n"
                 "\ndbt:"
-                "\n  incremental_logic: |"
-                "\n    {%- if is_incremental() %}"
-                "\n        where event_timestamp >= (select max(event_timestamp)::date from {{ this }})"  # noqa E501
-                "\n    {%- endif %}"
+                "\n  materialized: view  # OR incremental"
             )
 
-    def _get_metadata_schema(self):
-        if self.project.get("tracking_plans").get("metadata") is not None:
-            self.metadata_schema = (
-                self.project.get("tracking_plans").get("metadata").get("schema")
-            )
+    def _get_dbt_model_incremental_logic(self):
+        if self.materialized == "incremental":
+            try:
+                self.incremental_logic = self.project["dbt"]["models"][
+                    "incremental_logic"
+                ]
+            except KeyError:
+                raise ReflektProjectError(
+                    "\n\nWhen `materialized: incremental` in reflekt_project.yml, must define incremental logic for templated dbt models. Example:"  # noqa E501
+                    "\n\n"
+                    "\ndbt:"
+                    "\n  incremental_logic: |"
+                    "\n    {%- if is_incremental() %}"
+                    "\n        where event_timestamp >= (select max(event_timestamp)::date from {{ this }})"  # noqa E501
+                    "\n    {%- endif %}"
+                )
         else:
-            self.metadata_schema = None
+            self.incremental_logic = None
 
     def _get_pkg_db_schemas(self):
         if self.project.get("dbt").get("pkg_db_schemas") is not None:
@@ -315,5 +337,6 @@ class ReflektProject:
         self._get_metadata_schema()
         self._get_dbt_src_prefix()
         self._get_dbt_model_prefix()
-        self._get_dbt_stg_incremental_logic()
+        self._get_dbt_model_materialized()
+        self._get_dbt_model_incremental_logic()
         self._get_pkg_db_schemas()

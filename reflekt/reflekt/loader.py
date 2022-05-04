@@ -56,9 +56,9 @@ class ReflektLoader(object):
             self._plan = ReflektPlan(plan_yaml_obj=yaml_obj, plan_name=self.plan_name)
 
     def _load_events(self, path):
-        for file in Path(path).glob("**/*.yml"):  # Get .yml files in /events
+        for file in sorted(Path(path).glob("**/*.yml")):  # Get .yml files in /events
             logger.info(
-                f"  ...Parsing event file {file.name}",
+                f"    Parsing event file {file.name}",
             )
 
             with open(file, "r") as event_file:

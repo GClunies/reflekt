@@ -73,7 +73,7 @@ class SegmentApi:
         plan_id = self._get_plan_id_from_name(plan_name, name_to_id)
 
         if plan_id is None:
-            raise SegmentApiError(f"Tracking plan `{plan_name}` was not found.")
+            raise SegmentApiError(f"Tracking plan '{plan_name}' was not found.")
         else:
             url, headers = self._setup_url_headers(plan_id=plan_id)
 

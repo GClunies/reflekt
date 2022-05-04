@@ -13,9 +13,8 @@ from inflection import titleize, underscore
 from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
-
 from reflekt.avo.plan import AvoPlan
-from reflekt.cli.handler import ReflektApiHandler
+from reflekt.cli.api_handler import ReflektApiHandler
 from reflekt.logger import logger_config
 from reflekt.reflekt import constants
 from reflekt.reflekt.config import ReflektConfig
@@ -49,13 +48,13 @@ def cli():
 )
 def new(plan_name, plans_dir):
     """Create a new empty tracking plan using provided name."""
-    plan_template_dir = pkg_resources.resource_filename("reflekt", "template/plan/")
+    plan_template_dir = pkg_resources.resource_filename("reflekt", "templates/plan/")
 
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
         plan_dir = Path(plans_dir) / plan_name
 
     try:
-        logger.info(f"Creating new tracking plan `{plan_name}` in `{plan_dir}`")
+        logger.info(f"Creating new tracking plan '{plan_name}' in '{plan_dir}'")
         shutil.copytree(plan_template_dir, plan_dir)
     except FileExistsError:
         logger.error(
@@ -74,7 +73,8 @@ def new(plan_name, plans_dir):
     with open(plan_yml_file, "w") as f:
         yaml.dump(doc, f)
 
-    logger.info(f"Tracking plan `{plan_name}` created successfully!")
+    logger.info("")
+    logger.info(f"[SUCCESS] Created reflekt tracking plan '{plan_name}'")
 
 
 @click.command()
@@ -104,20 +104,17 @@ def pull(plan_name, plans_dir, raw):
     api = ReflektApiHandler().get_api()
     config = ReflektConfig()
     logger.info(
-        f"Fetching tracking plan `{plan_name}` from {titleize(config.plan_type)}"
+        f"Searching {titleize(config.plan_type)} for tracking plan '{plan_name}'"
     )
     plan_json = api.get(plan_name)
+    logger.info(f"Found tracking plan '{plan_name}'")
 
     if raw:
         logger.info(
-            f"Fetched raw tracking plan `{plan_name}` from "
-            f"{titleize(config.plan_type)}\n"
+            f"Displaying raw {titleize(config.plan_type)} tracking plan '{plan_name}'\n"
         )
         click.echo(json.dumps(plan_json, indent=2))
     else:
-        logger.info(
-            f"Fetched tracking plan `{plan_name}` from {titleize(config.plan_type)}"
-        )
         if plans_dir != ReflektProject().project_dir / "tracking-plans":
             plan_dir = Path(plans_dir) / plan_name
 
@@ -133,14 +130,10 @@ def pull(plan_name, plans_dir, raw):
         # elif config.plan_type.lower() == "snowplow":
         #     plan = SnowplowPlan(plan_json)
 
-        logger.info(
-            f"Building {titleize(config.plan_type)} tracking plan "
-            f"`{plan_name}` in reflekt specification at {plan_dir}"
-        )
+        logger.info(f"Building reflekt tracking plan '{plan_name}' at {plan_dir}")
         plan.build_reflekt(plan_dir)
         logger.info(
-            f"SUCCESS - Tracking plan `{plan_name}` built in reflekt "
-            f"specification at {str(plan_dir)}"
+            f"[SUCCESS] reflekt tracking plan '{plan_name}' built at {str(plan_dir)}"
         )
 
 
@@ -176,25 +169,30 @@ def push(plan_name, plans_dir, dry):
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
         plan_dir = Path(plans_dir) / plan_name
 
-    logger.info(f"Loading tracking plan {plan_name} at {str(plan_dir)}")
+    logger.info(f"Loading reflekt tracking plan '{plan_name}' from {str(plan_dir)}")
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
-    logger.info(f"Loaded tracking plan {plan_name}\n")
+    # logger.info(f"Loading complete")
     transformer = ReflektTransformer(reflekt_plan)
     cdp_plan = transformer.build_cdp_plan()
 
     if dry:
         payload = api.sync(plan_name, cdp_plan, dry=True)
         logger.info(
-            f"DRY RUN MODE. The following JSON would be sent to "
-            f"{transformer.plan_type}"
+            f"[DRY RUN] The following JSON would be sent to {transformer.plan_type}"
         )
         click.echo(json.dumps(payload, indent=2))
     else:
-        logger.info(f"Syncing tracking plan {plan_name} to {transformer.plan_type}.")
-        api.sync(plan_name, cdp_plan)
+        logger.info("")
         logger.info(
-            f"DONE. Synced tracking plan {plan_name} to " f"{transformer.plan_type}."
+            f"Syncing converted tracking plan '{plan_name}' to "
+            f"{titleize(transformer.plan_type)}"
+        )
+        api.sync(plan_name, cdp_plan)
+        logger.info("")
+        logger.info(
+            f"[SUCCESS] Synced reflekt tracking plan '{plan_name}' to "
+            f"{titleize(transformer.plan_type)}"
         )
 
 
@@ -220,7 +218,7 @@ def test(plan_name, plans_dir):
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
         plan_dir = Path(plans_dir) / plan_name
 
-    logger.info(f"Testing tracking plan {plan_name} at {str(plan_dir)}")
+    logger.info(f"Testing reflekt tracking plan '{plan_name}' at {str(plan_dir)}")
     loader = ReflektLoader(
         plan_dir=plan_dir,
         plan_name=plan_name,
@@ -232,7 +230,10 @@ def test(plan_name, plans_dir):
             click.echo(error, err=True)
         raise click.Abort()
     else:
-        logger.info(f"PASSED - no errors detected in tracking plan `{plan_name}`")
+        logger.info("")
+        logger.info(
+            f"[PASSED] No errors detected in reflekt tracking plan '{plan_name}'"
+        )
 
 
 @click.option(
@@ -308,8 +309,8 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
             )
             new_dbt_pkg_version = parse_version(new_version_str)
             bump = click.confirm(
-                f"[WARNING] dbt package `reflekt_{underscore(plan_name)}` already exists with version {dbt_pkg_version}.\n"  # noqa: E501
-                f"    Do you want to bump `reflekt_{underscore(plan_name)}` to version {new_dbt_pkg_version} and overwrite?",  # noqa: E501
+                f"[WARNING] dbt package `reflekt_{underscore(plan_name)}' already exists with version {dbt_pkg_version}.\n"  # noqa: E501
+                f"    Do you want to bump `reflekt_{underscore(plan_name)}' to version {new_dbt_pkg_version} and overwrite?",  # noqa: E501
                 default=True,
             )
 
@@ -317,7 +318,7 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
                 version = new_dbt_pkg_version
             else:
                 overwrite = click.confirm(
-                    f"[WARNING] reflekt will overwrite dbt package `reflekt_{underscore(plan_name)}` with version {dbt_pkg_version}.\n"  # noqa: E501
+                    f"[WARNING] reflekt will overwrite dbt package `reflekt_{underscore(plan_name)}' with version {dbt_pkg_version}.\n"  # noqa: E501
                     f"    Do you want to continue?",
                     default=False,
                 )
@@ -330,7 +331,7 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
     reflekt_plan = loader.plan
     logger.info(f"Loaded reflekt tracking plan {plan_name}\n")
     transformer = ReflektTransformer(reflekt_plan, dbt_pkg_dir, pkg_version=version)
-    transformer.build_dbt_package()
+    transformer.build_dbt_package(reflekt_plan=reflekt_plan)
 
 
 @click.option(
@@ -404,23 +405,14 @@ def init(project_dir_str):
 
     if collect_config:
         plan_type_prompt = click.prompt(
-            f"What tool do you use to manage your tracking plan(s)?"
+            f"How do you manage your tracking plans?"
             f"{constants.PLAN_INIT_STRING}"
             f"\nEnter a number",
             type=int,
         )
         plan_type = constants.PLAN_MAP[str(plan_type_prompt)]
         reflekt_config_obj[config_name]["plan_type"] = plan_type
-        cdp_num_prompt = click.prompt(
-            f"Which CDP or Analytics Governance tool do you use?"
-            f"{constants.CDP_INIT_STRING}"
-            f"\nEnter a number",
-            type=int,
-        )
-        cdp = constants.CDP_MAP[str(cdp_num_prompt)]
-        reflekt_config_obj[config_name]["cdp"] = cdp
-
-        if cdp == "segment":
+        if plan_type == "segment":
             workspace_name = click.prompt(
                 "Enter your Segment workspace name. You can find this in your Segment "
                 "account URL (i.e. https://app.segment.com/your-workspace-name/)",
@@ -434,6 +426,16 @@ def init(project_dir_str):
                 hide_input=True,
             )
             reflekt_config_obj[config_name]["access_token"] = access_token
+
+        cdp_num_prompt = click.prompt(
+            f"How do you collect first-party data?"
+            f"{constants.CDP_INIT_STRING}"
+            f"\nEnter a number",
+            type=int,
+        )
+        cdp = constants.CDP_MAP[str(cdp_num_prompt)]
+        reflekt_config_obj[config_name]["cdp"] = cdp
+
         # TODO - Enable support for other CDPs below as developed
         # elif cdp == "rudderstack":
         #     pass
@@ -518,7 +520,7 @@ def init(project_dir_str):
         f"{reflekt_config_path}."
     )
     project_template_dir = pkg_resources.resource_filename(
-        "reflekt", "template/project/"
+        "reflekt", "templates/project/"
     )
     shutil.copytree(project_template_dir, project_dir, dirs_exist_ok=True)
 
@@ -568,4 +570,4 @@ if __name__ == "__main__":
     # pull(["--name", "patty-bar-dev-avo"])
     # push(["--name", "patty-bar-dev-avo"])
     # test(["--name", "patty-bar-dev-avo"])
-    dbt(["--name", "patty-bar-prod-avo"])
+    dbt(["--name", "patty-bar-dev"])

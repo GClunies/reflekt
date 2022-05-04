@@ -12,7 +12,7 @@ PLANS = [
 ]
 
 PLAN_INIT_STRING = (
-    "\n[1] Segment"
+    "\n[1] Segment Protocols"
     "\n[2] Avo"
     # "\n[3] Rudderstack"
     # "\n[4] Snowplow"
