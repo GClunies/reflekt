@@ -43,7 +43,6 @@ class WarehouseConnection:
                     role=self.warehouse.get("snowflake").get("role"),
                     database=self.warehouse.get("snowflake").get("database"),
                     warehouse=self.warehouse.get("snowflake").get("warehouse"),
-                    # schema=self.warehouse.get("snowflake").get("schema"),
                 )
             )
 
@@ -65,5 +64,6 @@ class WarehouseConnection:
                 return columns, error_msg
             except sqlalchemy.exc.ProgrammingError as e:
                 columns = None
-                error_msg = e.orig.args[0]["M"]
+                error_msg = e.orig.msg
+                # error_msg = e.orig.args[0]["M"]  # Redshift?
                 return columns, error_msg

@@ -444,7 +444,7 @@ class ReflektTransformer(object):
                     self.schema, std_segment_table["name"]
                 )
                 if error_msg is not None:
-                    logger.warning(f"Database error: {error_msg}. Skipping...")
+                    # logger.warning(f"SKIPPING - Database error: {error_msg}")
                     self.db_errors.append(error_msg)
                 else:
                     self._template_dbt_table(
@@ -472,7 +472,7 @@ class ReflektTransformer(object):
                     )
 
         for event in reflekt_plan.events:
-            if event.name in ["page viewed", "screen viewed"]:
+            if event.name.lower() in ["page viewed", "screen viewed"]:
                 pass  # Already handled above by std_segment_tables for loop
             else:
                 db_columns, error_msg = self.db_engine.get_columns(
@@ -525,6 +525,20 @@ class ReflektTransformer(object):
                 encoding=("utf-8"),
             )
 
+        db_errors_list = ["    " + error + "\n" for error in self.db_errors]
+        db_errors_str = ""
+
+        for db_error in db_errors_list:
+            db_errors_str += db_error
+
+        if self.db_errors:
+            logger.info("")
+            logger.warning(
+                f"[WARNING] The following database error(s) were encountered "
+                f"while templating the dbt package. NOTE - errors do not prevent "
+                f"templating.\n\n{db_errors_str}"
+            )
+
         logger.info(
             f"Copying dbt package from temporary path "
             f"{self.tmp_pkg_dir} to {self.dbt_pkg_path}"
@@ -534,13 +548,9 @@ class ReflektTransformer(object):
             shutil.rmtree(self.dbt_pkg_path)
 
         shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_path)
-        logger.info(f"SUCCESS - dbt package built at {self.dbt_pkg_path}")
 
-        if self.db_errors:
-            logger.warning(
-                f"The following {len(self.db_errors)} database error(s) were encountered"
-                f" during the dbt package build:\n\n{self.db_errors}"
-            )
+        logger.info("")
+        logger.info(f"[SUCCESS] dbt package templated at: {self.dbt_pkg_path}")
 
     def _template_dbt_source(self, reflekt_plan: ReflektPlan):
         logger.info(f"Initializing template for dbt source {self.schema}")
@@ -562,6 +572,7 @@ class ReflektTransformer(object):
         cdp_cols: dict,
         plan_cols: list,
     ):
+        logger.info("")
         logger.info(f"Templating table {table_name} in dbt source {self.schema}")
         dbt_tbl = copy.deepcopy(dbt_table_schema)
         dbt_tbl["name"] = table_name
@@ -588,7 +599,7 @@ class ReflektTransformer(object):
                         dbt_tbl["columns"].append(tbl_col)
                         templated_columns.append(
                             mapped_column["schema_name"]
-                        )  # Its the 'schema_name" column that will overlap
+                        )  # 'schema_name" from cdp_cols may overlap with plan_cols
 
         for column in plan_cols:
             if column.name not in templated_columns:
@@ -610,11 +621,12 @@ class ReflektTransformer(object):
         cdp_cols: dict,
         plan_cols: list,
     ):
+        logger.info("")
         logger.info(
             f"Templating dbt model "
             f"{self.model_prefix}{underscore(self.plan_name)}__{table_name}.sql"
         )
-        logger.info("    Adding dbt model {{ config(...) }} to model SQL")
+        logger.info("    Adding {{ config(...) }} to model SQL")
         mdl_sql = self._template_dbt_model_config(
             materialized,
             unique_key,
@@ -661,6 +673,15 @@ class ReflektTransformer(object):
                 mdl_sql += "\n        " + col_sql + ","
                 templated_columns.append(column.name)
 
+        mdl_sql = mdl_sql[:-1]  # remove final trailing comma
+        # fmt: off
+        mdl_sql += (
+            "\n\n    from source"
+            "\n\n)"
+            "\n\n"
+            "select * from renamed\n"
+        )
+        # fmt: on
         model_path = (
             self.tmp_pkg_dir
             / "models"
@@ -717,12 +738,20 @@ class ReflektTransformer(object):
     ):
         if incremental_logic is None:
             incremental_logic = ""
+
+        # Format incremental_logic from reflekt_project.yml so it templates
+        # according to dbt-labs style guide https://bit.ly/383kG7l
+        incremental_logic_list = incremental_logic.splitlines()
+        incremental_logic_str = ""
+        for line in incremental_logic_list:
+            incremental_logic_str += f"    {line}\n"
+
         source_cte = (
             "with\n\n"
             "source as (\n\n"
             f"    select *\n\n"
-            f"    from source {{{{ source('{underscore(source_schema)}', '{source_table}') }}}}\n\n"
-            f"    {incremental_logic}\n\n"
+            f"    from source {{{{ source('{underscore(source_schema)}', '{source_table}') }}}}\n"  # noqa: E501
+            f"{incremental_logic_str}\n"
             ")\n\n"
         )
 
@@ -736,6 +765,7 @@ class ReflektTransformer(object):
         cdp_cols: dict,
         plan_cols: list,
     ):
+        logger.info("")
         logger.info(
             f"Templating dbt docs "
             f"{self.model_prefix}{underscore(self.plan_name)}__{model_name}.yml"

@@ -568,4 +568,4 @@ if __name__ == "__main__":
     # pull(["--name", "patty-bar-dev-avo"])
     # push(["--name", "patty-bar-dev-avo"])
     # test(["--name", "patty-bar-dev-avo"])
-    dbt(["--name", "patty-bar-prod-avo"])
+    dbt(["--name", "patty-bar-dev"])
