@@ -30,6 +30,20 @@ reflekt defines tracking plans as `code`. This code powers reflekt's **dbt packa
 
 See the sections below for a full list of [integrations](https://github.com/GClunies/reflekt#integrations) and [commands](https://github.com/GClunies/reflekt#integrations).
 
+## Install
+1. Install `reflekt` with `pip`. Recommend installing in a virtual Python environment.
+   ```bash
+   pip install reflekt
+   ```
+
+2. Create a reflekt project.
+   ```bash
+   reflekt init --project-dir ./my_reflekt_project  # Follow the prompts
+   cd my_reflekt_project                            # Navigate inside project
+   ```
+
+Your reflekt project includes an example tracking plan in the `tracking-plans/` folder.
+
 
 ## Tracking plans as `code`
 Every reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
@@ -127,7 +141,6 @@ dbt:
 
 ```
 </p></details>
-
 <br>
 
 reflekt manages each tracking plan in a directory with corresponding YAML files for your events.
@@ -176,21 +189,6 @@ reflekt manages each tracking plan in a directory with corresponding YAML files 
       required: true
 ```
 </p></details>
-
-
-## Install
-1. Install `reflekt` with `pip`. Recommend installing in a virtual Python environment.
-   ```bash
-   pip install reflekt
-   ```
-
-2. Create a reflekt project.
-   ```bash
-   reflekt init --project-dir ./my_reflekt_project  # Follow the prompts
-   cd my_reflekt_project                            # Navigate inside project
-   ```
-
-Your reflekt project includes an example tracking plan in the `tracking-plans/` folder.
 
 ## Commands
 Create a new tracking plan in the reflekt spec
