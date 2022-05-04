@@ -440,7 +440,6 @@ class ReflektTransformer(object):
                     self.schema, std_segment_table["name"]
                 )
                 if error_msg is not None:
-                    # logger.warning(f"SKIPPING - Database error: {error_msg}")
                     self.db_errors.append(error_msg)
                 else:
                     self._template_dbt_table(
@@ -475,7 +474,6 @@ class ReflektTransformer(object):
                     self.schema, segment_2_snake(event.name)
                 )
                 if error_msg is not None:
-                    logger.warning(f"Database error: {error_msg}. Skipping...")
                     self.db_errors.append(error_msg)
                 else:
                     self._template_dbt_table(
@@ -546,7 +544,7 @@ class ReflektTransformer(object):
         shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_path)
 
         logger.info("")
-        logger.info(f"[SUCCESS] dbt package templated at: {self.dbt_pkg_path}")
+        logger.info(f"[SUCCESS] dbt package built at: {self.dbt_pkg_path}")
 
     def _template_dbt_source(self, reflekt_plan: ReflektPlan):
         logger.info(f"Initializing template for dbt source {self.schema}")
@@ -588,7 +586,9 @@ class ReflektTransformer(object):
                         dbt_tbl["columns"].append(tbl_col)
 
         for column in plan_cols:
-            logger.info(f"    Adding column {column.name} to table {table_name}")
+            logger.info(
+                f"    Adding column {segment_2_snake(column.name)} to table {table_name}"
+            )
             tbl_col = copy.deepcopy(dbt_column_schema)
             tbl_col["name"] = segment_2_snake(column.name)
             tbl_col["description"] = column.description
@@ -643,7 +643,7 @@ class ReflektTransformer(object):
                         mdl_sql += "\n        " + col_sql + ","
 
         for column in plan_cols:
-            logger.info(f"    Adding column {column.name} to model SQL")
+            logger.info(f"    Adding column {segment_2_snake(column.name)} to model SQL")
             col_sql = segment_2_snake(column.name)
             mdl_sql += "\n        " + col_sql + ","
 
@@ -765,7 +765,7 @@ class ReflektTransformer(object):
                         dbt_mdl_doc["columns"].append(mdl_col)
 
         for column in plan_cols:
-            logger.info(f"    Adding column {column.name} to dbt docs")
+            logger.info(f"    Adding column {segment_2_snake(column.name)} to dbt docs")
             mdl_col = copy.deepcopy(dbt_column_schema)
             mdl_col["name"] = segment_2_snake(column.name)
             mdl_col["description"] = column.description

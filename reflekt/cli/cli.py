@@ -73,6 +73,7 @@ def new(plan_name, plans_dir):
     with open(plan_yml_file, "w") as f:
         yaml.dump(doc, f)
 
+    logger.info("")
     logger.info(f"[SUCCESS] Created reflekt tracking plan '{plan_name}'")
 
 

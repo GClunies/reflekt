@@ -64,6 +64,8 @@ class WarehouseConnection:
                 return columns, error_msg
             except sqlalchemy.exc.ProgrammingError as e:
                 columns = None
-                error_msg = e.orig.msg
-                # error_msg = e.orig.args[0]["M"]  # Redshift?
+                if self.warehouse_type == "redshift":
+                    error_msg = e.orig.args[0]["M"]
+                elif self.warehouse_type == "snowflake":
+                    error_msg = e.orig.msg
                 return columns, error_msg
