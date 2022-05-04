@@ -217,7 +217,7 @@ def test(plan_name, plans_dir):
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
         plan_dir = Path(plans_dir) / plan_name
 
-    logger.info(f"Testing tracking plan {plan_name} at {str(plan_dir)}")
+    logger.info(f"Testing reflekt tracking plan '{plan_name}' at {str(plan_dir)}")
     loader = ReflektLoader(
         plan_dir=plan_dir,
         plan_name=plan_name,
@@ -229,6 +229,7 @@ def test(plan_name, plans_dir):
             click.echo(error, err=True)
         raise click.Abort()
     else:
+        logger.info("")
         logger.info(
             f"[PASSED] No errors detected in reflekt tracking plan '{plan_name}'"
         )
