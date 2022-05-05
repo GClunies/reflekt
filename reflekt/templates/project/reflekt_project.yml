@@ -55,7 +55,7 @@ tracking_plans:
   #         - Engineering
   #         - Data
 
-dbt:
+dbt_templater:
   sources:
     prefix: src_reflekt_       # Prefix for templated dbt package sources
 
