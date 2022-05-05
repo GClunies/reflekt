@@ -175,6 +175,35 @@ reflekt manages each tracking plan in a directory with corresponding YAML files 
 ```
 </p></details>
 
+## Commands
+Create a new tracking plan in the reflekt spec
+```zsh
+$ reflekt new --name <plan-name>
+```
+<br>
+
+Get a tracking plan from your CDP or Analytics Governance tool and convert it to YAML in reflekt spec
+```zsh
+$ reflekt pull --name <plan-name>
+```
+<br>
+
+Sync a reflekt tracking plan to your CDP or Analytics Governance tool. reflekt handles the conversion!
+```zsh
+$ reflekt push --name <plan-name>
+```
+<br>
+
+Test a reflekt tracking plan for naming conventions, allowed data types, and expected metadata across all your events. All tests are configured in your `reflect_project.yml`.
+```zsh
+$ reflekt test --name <plan-name>
+```
+
+Build a dbt package with sources, models, and documentation.
+```zsh
+$ reflekt dbt --name <plan-name>
+```
+
 ## Install & Setup
 1. Install `reflekt` with `pip`. Recommend installing in a virtual Python environment.
    ```bash
@@ -234,34 +263,6 @@ Pulling tracking plans from [Avo](https://www.avo.app/) requires additional setu
    ```
 
   Going forward, you will only need to run `reflekt pull --name your-avo-json-source-name>` to get the latest version of your tracking plan from Avo.
-## Commands
-Create a new tracking plan in the reflekt spec
-```zsh
-$ reflekt new --name <plan-name>
-```
-<br>
-
-Get a tracking plan from your CDP or Analytics Governance tool and convert it to YAML in reflekt spec
-```zsh
-$ reflekt pull --name <plan-name>
-```
-<br>
-
-Sync a reflekt tracking plan to your CDP or Analytics Governance tool. reflekt handles the conversion!
-```zsh
-$ reflekt push --name <plan-name>
-```
-<br>
-
-Test a reflekt tracking plan for naming conventions, allowed data types, and expected metadata across all your events. All tests are configured in your `reflect_project.yml`.
-```zsh
-$ reflekt test --name <plan-name>
-```
-
-Build a dbt package with sources, models, and documentation.
-```zsh
-$ reflekt dbt --name <plan-name>
-```
 
 ## Integrations
 ### Customer Data Platforms (CDPs)
