@@ -30,21 +30,6 @@ reflekt defines tracking plans as `code`. This code powers reflekt's **dbt packa
 
 See the sections below for a full list of [integrations](https://github.com/GClunies/reflekt#integrations) and [commands](https://github.com/GClunies/reflekt#integrations).
 
-## Install
-1. Install `reflekt` with `pip`. Recommend installing in a virtual Python environment.
-   ```bash
-   pip install reflekt
-   ```
-
-2. Create a reflekt project.
-   ```bash
-   reflekt init --project-dir ./my_reflekt_project  # Follow the prompts
-   cd my_reflekt_project                            # Navigate inside project
-   ```
-
-Your reflekt project includes an example tracking plan in the `tracking-plans/` folder.
-
-
 ## Tracking plans as `code`
 Every reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
 <br>
@@ -189,6 +174,37 @@ reflekt manages each tracking plan in a directory with corresponding YAML files 
       required: true
 ```
 </p></details>
+
+## Install & Setup
+1. Install `reflekt` with `pip`. Recommend installing in a virtual Python environment.
+   ```bash
+   $ pip install reflekt
+   ```
+
+2. Create a reflekt project.
+   ```bash
+   $ reflekt init --project-dir ./my_reflekt_project  # Follow the prompts
+   $ cd my_reflekt_project                            # Navigate inside project
+   ```
+
+Your reflekt project includes an example tracking plan in the `tracking-plans/` folder.
+
+### Using reflekt with Avo
+When reflekt pulls tracking plans from [Avo](https://www.avo.app/), it leverages the [Avo CLI](https://www.avo.app/docs/implementation/cli) behind the scenes. This adds some additional dependencies and setup steps:
+1. Install node and npm. The [npm docs](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) provide great docs and guidance on this.
+2. Install the Avo CLI and verify installation.
+   ```bash
+   $ npm install -g avo
+   $ avo --version
+     2.0.2
+   ```
+3. Link your Avo Account and verify account
+   ```bash
+   $ avo login
+   $ avo whoami
+     info Logged in as greg@reflekt-ci.com
+   ```
+
 
 ## Commands
 Create a new tracking plan in the reflekt spec
