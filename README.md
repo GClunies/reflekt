@@ -204,7 +204,21 @@ When reflekt pulls tracking plans from [Avo](https://www.avo.app/), it leverages
    $ avo whoami
      info Logged in as greg@reflekt-ci.com
    ```
+4. Configure a JSON source in Avo. You will need to contact Avo support for them to enable this source type.
+5. Create a JSON source in Avo. The name you set for the source will be the plan name reflekt uses.
+6. Add the events from your Avo plan to the Avo JSON source. Be sure to Set the **Programming Language** under the **Avo Functions Setup** tab to `JSON Schema`.
+7. Configure Avo with Reflekt
+   ```bash
+   # From the root of your reflekt project
+   $ cd .reflekt/avo
+   $ avo init
+   $ avo pull --force
+   # When prompted to select a source, select the JSON source name you created
+   # When prompted to select a folder, select the current directory (.)
+   # When prompted to select a filename, type in the JSON source name (casing matters!)
+   ```
 
+   **THE OUT PUT OF THIS WILL BE LIKE...**
 
 ## Commands
 Create a new tracking plan in the reflekt spec
