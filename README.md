@@ -7,7 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 # reflekt
 **reflekt is a continuous integration tool for your tracking plan.** It integrates with your Analytics Governance Tool, Customer Data Platform (CDP), data warehouse, and [dbt](https://www.getdbt.com/).
 
-![reflekt-arch](/docs/reflekt-arch.png)
+![reflekt-arch](/docs/reflekt_architecture.png)
 
 reflekt defines tracking plans as `code`. This code powers reflekt's **dbt package templater**, which parses the tracking plan code and writes a dbt package modeling your first-party data. Every reflekt dbt package includes:
 - dbt [sources](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in your warehouse where the raw event data is stored.
@@ -17,7 +17,7 @@ reflekt defines tracking plans as `code`. This code powers reflekt's **dbt packa
 **reflekt pull & reflekt dbt DEMO GIF HERE**
 
 **With reflekt, you can:**
-- Stop writing models and documentation for each event manually. Template them using
+- Stop manually writing dbt models and documentation for each event you track. Template them using
   ```bash
   reflekt dbt --name my-plan  # Templates reflekt dbt package
   ```
@@ -28,7 +28,7 @@ reflekt defines tracking plans as `code`. This code powers reflekt's **dbt packa
 - Bump your reflekt dbt package version and re-template anytime your tracking plan changes.
 
 
-See the sections below for a full list of [integrations](https://github.com/GClunies/reflekt#integrations) and [commands](https://github.com/GClunies/reflekt#integrations).
+See the list of [commands](https://github.com/GClunies/reflekt#integrations) and [integrations](https://github.com/GClunies/reflekt#integrations) in the sections below.
 
 ## Commands
 Create a new tracking plan in the reflekt spec
