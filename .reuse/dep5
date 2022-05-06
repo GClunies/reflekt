@@ -3,6 +3,10 @@ Upstream-Name: reflekt
 Upstream-Contact: Gregory Clunies <greg@reflekt-ci.com>
 Source: https://github.com/reflekt-ci/reflekt
 
-Files: reflekt/template/*
+Files: reflekt/templates/*
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
+Files: docs/*
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
 License: Apache-2.0

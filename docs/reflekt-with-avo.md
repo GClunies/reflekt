@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 ## Using reflekt with Avo
 Pulling tracking plans from [Avo](https://www.avo.app/) requires additional setup and contacting Avo support:
 1. Contact Avo support and request access to the JSON source.
