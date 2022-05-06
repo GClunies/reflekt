@@ -4,63 +4,50 @@ SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# reflekt
-**reflekt is a continuous integration tool for your tracking plan.** It integrates with your Analytics Governance Tool, Customer Data Platform (CDP), data warehouse, and [dbt](https://www.getdbt.com/).
+# Reflekt
+**Reflekt is a continuous integration tool for your tracking plan.** It integrates with your Analytics Governance Tool, Customer Data Platform (CDP), data warehouse, and [dbt](https://www.getdbt.com/).
 
 ![reflekt-arch](/docs/reflekt_architecture.png)
 
-reflekt defines tracking plans as `code`. This code powers reflekt's **dbt package templater**, which parses the tracking plan code and writes a dbt package modeling your first-party data. Every reflekt dbt package includes:
+Reflekt defines tracking plans as `code`. This code powers Reflekt's **dbt package templater**, which parses the tracking plan code and writes a **dbt package modeling all events in your tracking plan**, ready for use in your dbt project.
+
+Every Reflekt dbt package includes:
 - dbt [sources](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in your warehouse where the raw event data is stored.
-- dbt [models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for every event in your tracking plan. Light transformations are applied to prepare the data for consumption or further modeling.
-- dbt [documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every event in your tracking plan.
+- dbt [models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for every event in your tracking plan. Light transformations are applied to prepare data for consumption and further modeling.
+- dbt [documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every event in your tracking plan. To be consumed by analysts and the business.
 
-**reflekt pull & reflekt dbt DEMO GIF HERE**
-
-**With reflekt, you can:**
-- Stop manually writing dbt models and documentation for each event you track. Template them using
-  ```bash
-  reflekt dbt --name my-plan  # Templates reflekt dbt package
-  ```
-- Test events in your tracking plan for naming conventions, required metadata, etc.
-- Create new tracking plans.
-- Get tracking plans from your Analytics Governance Tool.
-- Sync tracking plan updates to your Analytics Governance Tool.
-- Bump your reflekt dbt package version and re-template anytime your tracking plan changes.
-
-
-See the list of [commands](https://github.com/GClunies/reflekt#integrations) and [integrations](https://github.com/GClunies/reflekt#integrations) in the sections below.
+Your dbt models and documentation should *reflekt* the information you've already defined in your tracking plan.
 
 ## Commands
-Create a new tracking plan in the reflekt spec
-```zsh
-$ reflekt new --name <plan-name>
-```
-<br>
+**With Reflekt, you can**
 
-Get a tracking plan from your CDP or Analytics Governance tool and convert it to YAML in reflekt spec
-```zsh
-$ reflekt pull --name <plan-name>
+Stop manually writing dbt models and documentation for each event you track. Template them using. Bump your Reflekt dbt package version and re-template anytime your tracking plan changes.
+```bash
+$ reflekt dbt --name <plan-name>
 ```
-<br>
 
-Sync a reflekt tracking plan to your CDP or Analytics Governance tool. reflekt handles the conversion!
-```zsh
-$ reflekt push --name <plan-name>
-```
-<br>
-
-Test a reflekt tracking plan for naming conventions, allowed data types, and expected metadata across all your events. All tests are configured in your `reflect_project.yml`.
+Test events and properties in your tracking plan for naming conventions, data types, and expected metadata.
 ```zsh
 $ reflekt test --name <plan-name>
 ```
 
-Build a dbt package with sources, models, and documentation.
-```zsh
-$ reflekt dbt --name <plan-name>
+Create a new tracking plan, defined as code.
+```bash
+$ reflekt new --name <plan-name>
+```
+
+Get tracking plans from your Analytics Governance Tool (Segment Protocols, Avo, others coming soon) and convert it to a Reflekt tracking plan, ready to be templated as a dbt package.
+```bash
+$ reflekt pull --name <plan-name>
+```
+
+Sync your Reflekt tracking plan to your Analytics Governance tool (Segment Protocols, others coming soon). Reflekt handles the conversion!
+```bash
+$ reflekt push --name <plan-name>
 ```
 
 ## Tracking plans as `code`
-Every reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
+Every Reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
 <br>
 
 <details><summary>Example <code>reflekt_project.yml</code> (click to expand)</summary><p>
@@ -157,7 +144,7 @@ dbt:
 </p></details>
 <br>
 
-reflekt manages each tracking plan in a directory with corresponding YAML files for your events.
+Reflekt manages each tracking plan in a directory with corresponding YAML files for your events.
 
 ![my-plan](/docs/my-plan.png)
 
@@ -211,77 +198,40 @@ reflekt manages each tracking plan in a directory with corresponding YAML files 
    $ pip install reflekt
    ```
 
-2. Create a reflekt project.
+2. Create a Reflekt project.
    ```bash
    $ reflekt init --project-dir ./my_reflekt_project  # Follow the prompts
    $ cd my_reflekt_project                            # Navigate inside project
    ```
 
-Your reflekt project includes an example tracking plan in the `tracking-plans/` folder.
+Your Reflekt project includes an example tracking plan in the `tracking-plans/` folder.
 
-### Using reflekt with Avo
-Pulling tracking plans from [Avo](https://www.avo.app/) requires additional setup and contacting Avo support:
-1. Contact Avo support and request access to the JSON source.
-2. Install node and npm. The [npm docs](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) provide great docs and guidance on this.
-3. Install the [Avo CLI](https://www.avo.app/docs/implementation/cli) and verify installation.
-   ```bash
-   $ npm install -g avo
-   $ avo --version
-     2.0.2
-   ```
-4. Link your Avo Account and verify account.
-   ```bash
-   $ avo login
-   $ avo whoami
-     info Logged in as greg@reflekt-ci.com
-   ```
-5. Create a JSON source in Avo.
-   1. Each of your applications (web, iOS, etc.) should have it's own JSON source.
-   2. The JSON source name you set will be used by reflekt as the plan name when running `reflekt pull --name avo-json-source-name`.
-   3. In the Avo source settings, under the **Avo Functions Setup** tab, be sure to set the **Programming Language** to `JSON Schema`.
-6. Add events from your Avo plan to the Avo JSON source. The events should match the events collected on your application.
-7. Configure Avo with Reflekt
-   ```bash
-   # From the root of your reflekt project
-   $ cd .reflekt/avo
-
-   $ avo init
-     success Initialized for workspace patty-bar-dev
-     info Run 'avo pull' to pull analytics wrappers from Avo
-
-   $ avo pull --force
-     info Pulling from branch 'main'
-     info No sources configured.
-     # You will be prompted for the following
-     # Replace the values inside < > below with your own)
-     ? Select a source to set up <select the JSON source you created>
-     ? Select a folder to save the analytics wrapper in <select '.'>
-     ? Select a filename for the analytics wrapper <your-avo-json-source-name.json>
-
-     success Analytics wrapper successfully updated
-     └─ your-avo-json-source-name
-        └─ your-avo-json-source-name.json
-   ```
-
-  Going forward, you will only need to run `reflekt pull --name your-avo-json-source-name>` to get the latest version of your tracking plan from Avo.
+#### reflekt with Avo
+Using Reflekt with Avo is an experimental feature. It requires additional setup and configuration - see the docs on [using reflekt with Avo](docs/reflekt-with-avo.md).
 
 ## Integrations
 ### Customer Data Platforms (CDPs)
-- **Supported**: Segment
-- **Under evaluation**: Rudderstack, Snowplow
+- **Supported**:
+  - Segment
+- **Researching**:
+  - Rudderstack
+  - Snowplow
 
-### Analytics Governance
+### Analytics Governance Tools
 - **Supported**:
   - Segment Protocols
-  - Avo (reflekt pull, reflekt dbt only)
-- **Under evaluation**: Iteratively (reflekt pull, reflekt dbt only), Amplitude Govern (reflekt push only)
+  - Avo (*experimental* - only supports `reflekt pull` and `reflekt dbt`)
+- **Researching**:
+  - Rudderstack Data Governance API
+  - Snowplow Data Structures API
+  - Iteratively (reflekt pull, reflekt dbt only)
 
 ### Transform
 **Supported**: dbt
 
 ### Cloud Warehouses
 - **Supported**: Snowflake, Redshift
-- **Under evaluation**: BigQuery
+- **Researching**: BigQuery
 
 ## Contributing
 Feel free to raise issues and submit PRs.
