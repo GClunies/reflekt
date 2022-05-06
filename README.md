@@ -16,6 +16,8 @@ Every Reflekt dbt package includes:
 - dbt [models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for every event in your tracking plan. Light transformations are applied to prepare data for consumption and further modeling.
 - dbt [documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every event in your tracking plan. To be consumed by analysts and the business.
 
+## [DEMO VIDEO HERE]
+
 Your dbt models and documentation should *reflekt* the information you've already defined in your tracking plan.
 
 ## Commands
