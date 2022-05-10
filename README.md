@@ -9,7 +9,7 @@ SPDX-License-Identifier: Apache-2.0
 
 ![reflekt-arch](/docs/reflekt_architecture.png)
 
-Reflekt defines tracking plans as `code`. This code powers Reflekt's **dbt package templater**, which parses the tracking plan code and writes a **dbt package modeling all events in your tracking plan**, ready for use in your dbt project.
+Reflekt defines your tracking plan as `code`. This code powers Reflekt's **dbt package templater**, which parses your tracking plan code and writes a **dbt package modeling all the events in your tracking plan**, ready for use in your dbt project.
 
 Every Reflekt dbt package includes:
 - dbt [sources](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in your warehouse where the raw event data is stored.
@@ -23,32 +23,33 @@ Your dbt models and documentation should *reflekt* the information you've alread
 ## Commands
 **With Reflekt, you can**
 
-Stop manually writing dbt models and documentation for each event you track. Template them using. Bump your Reflekt dbt package version and re-template anytime your tracking plan changes.
-```bash
-$ reflekt dbt --name <plan-name>
-```
+1. Stop manually writing dbt models and documentation for each event you track. Save your data team time using the Reflekt dbt templater.
+   ```bash
+   $ reflekt dbt --name <plan-name>
+   ```
+   As your tracking plan changes, use the dbt templater to re-template and capture updates/changes. Reflekt will bump the version of your dbt package as it evolves with your tracking plan.
 
-Test events and properties in your tracking plan for naming conventions, data types, and expected metadata.
-```zsh
-$ reflekt test --name <plan-name>
-```
+2. Test the events and properties in your tracking plan for naming conventions, data types, and expected metadata.
+   ```zsh
+   $ reflekt test --name <plan-name>
+   ```
 
-Create a new tracking plan, defined as code.
-```bash
-$ reflekt new --name <plan-name>
-```
+3. Create a new tracking plan, defined as code.
+   ```bash
+   $ reflekt new --name <plan-name>
+   ```
 
-Get tracking plans from your Analytics Governance Tool (Segment Protocols, Avo, others coming soon) and convert it to a Reflekt tracking plan, ready to be templated as a dbt package.
-```bash
-$ reflekt pull --name <plan-name>
-```
+4. Get a tracking plan from your Analytics Governance Tool (Segment Protocols, Avo, others coming soon) and convert it to a Reflekt tracking plan code, ready for templating.
+   ```bash
+   $ reflekt pull --name <plan-name>
+   ```
 
-Sync your Reflekt tracking plan to your Analytics Governance tool (Segment Protocols, others coming soon). Reflekt handles the conversion!
-```bash
-$ reflekt push --name <plan-name>
-```
+5. Sync your Reflekt tracking plan to your Analytics Governance tool (Segment Protocols, others coming soon). Reflekt handles the conversion!
+   ```bash
+   $ reflekt push --name <plan-name>
+   ```
 
-## Tracking plans as `code`
+## Your tracking plan as `code`
 Every Reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
 <br>
 
