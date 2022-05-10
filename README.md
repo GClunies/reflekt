@@ -58,28 +58,25 @@ Every Reflekt project has a `reflekt_project.yml`, which sets project wide confi
 ```yaml
 # reflekt_project.yml
 
-# NOTE - Configs below are required unless flagged with # OPTIONAL comment
+# Configurations are REQUIRED unless flagged by an '# OPTIONAL (optional_config:)' comment
+# Uncomment OPTIONAL configurations to use them
 
 name: default_project
 
 config_profile: default_profile  # Profile defined in reflekt_config.yml
 
-# config_path: /absolute/path/to/reflekt_config.yml  # OPTIONAL
+# OPTIONAL (config_path:)
+# config_path: /absolute/path/to/reflekt_config.yml
 
 tracking_plans:
-  naming:
-    # For `events:` and `properties:` below:
-    #   - Provide one of `casing` or `pattern` (regex).
-    #   - Set whether numbers are allowed in event/property names
+  naming:  # Naming conventions for tracking plans
     events:
       case: title  # One of title|snake|camel
-      # pattern: 'your-regex-here'
       allow_numbers: true
       reserved: []  # Reserved event names (casing matters)
 
     properties:
       case: snake  # One of title|snake|camel
-      # pattern: 'your-regex-here'
       allow_numbers: true
       reserved: [] # Reserved property names (casing matters)
 
@@ -96,50 +93,49 @@ tracking_plans:
       - 'null'  # Specify null type in quotes
 
   plan_db_schemas:
-    # For each reflekt tracking plan, specify schema in database with raw event data.
+    # For each reflekt tracking plan, specify the schema in your data warehouse storing raw data.
     # Replace the example mapping below with your mappings
     example-plan: example_schema
 
-  # OPTIONAL (uncomment `metadata:` block to use)
-  # Define a schema for event metadata, this is tested when running
-  #     `reflekt test --name <plan-name>`
+  # OPTIONAL (metadata:)
+  # Define a validation schema for your metadata. This is tested when running
+  #     reflekt test --name <plan-name>
+  # Uses Cerberus validation rules (https://bit.ly/3vIsAfs) to define schemas.
   metadata:
     schema:
       # Example metadata schema
-      product_owner: John
+      product_owner:
         type: string
         required: true
-      code_owner: Jane
+      code_owner:
         required: true
         type: string
       stakeholders:
         type: string
+        required: false
         allowed:
           - Product
           - Engineering
           - Data
 
-dbt:
+dbt_templater:
   sources:
-    # Prefix for dbt package sources
-    prefix: src_reflekt_
+    prefix: src_reflekt_       # Prefix for templated dbt package sources
 
   models:
-    # Prefix for dbt package staging models & docs
-    prefix: reflekt_
+    prefix: reflekt_           # Prefix for models & docs in templated dbt package
     materialized: incremental  # One of view|incremental
-    # OPTIONAL (Required if `materialized: incremental`)
-    # `incremental_logic:` specifies incremental logic to use when templating dbt models.
-    # This should include the {%- if is_incremental() %} ... {%- endif %} block
-    # Article on dbt incremental logic: https://discourse.getdbt.com/t/on-the-limits-of-incrementality/303
+    # OPTIONAL (incremental_logic:) [REQUIRED if 'materialized: incremental']
+    # Specify the incremental logic to use when templating dbt models.
+    # Must include the {%- if is_incremental() %} ... {%- endif %} block
     incremental_logic: |
       {%- if is_incremental() %}
       where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
       {%- endif %}
 
-  # OPTIONAL
-  # For each reflekt tracking plan, you can specify the schema where dbt pkg
-  # models will be materialized. Uncomment `pkg_db_schemas:` block to use.
+  # OPTIONAL (pkg_db_schemas:)
+  # For each reflekt tracking plan, you can override the schema where the
+  # models in the templated dbt package will be created.
   pkg_db_schemas:
     example-plan: example_schema
 
