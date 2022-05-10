@@ -58,7 +58,7 @@ class ReflektProject:
             self.name = self.project["name"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a project name in reflekt_project.yml. Like so:"
+                "\n\nMust define a project name in reflekt_project.yml. Example:"
                 "\n"
                 "\nname: my_project  # letters, digits, underscores"
                 "\n"
@@ -69,7 +69,7 @@ class ReflektProject:
             self.config_profile = self.project["config_profile"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a config profile in reflekt_project.yml. Like so:"
+                "\n\nMust define a config profile in reflekt_project.yml. Example:"
                 "\n"
                 "\nconfig_profile: my_config_profile  # letters, digits, underscores"
                 "\n"
@@ -94,29 +94,19 @@ class ReflektProject:
         else:
             self.config_path = None
 
-    def _get_events_case_or_pattern(self):
+    def _get_events_case(self):
         self.events_case = (
             self.project.get("tracking_plans").get("naming").get("events").get("case")
         )
-        self.events_pattern = (
-            self.project.get("tracking_plans").get("naming").get("events").get("pattern")
-        )
 
-        if self.events_case is None and self.events_pattern is None:
+        if self.events_case is None:
             raise ReflektProjectError(
-                "\n\nMust define a `case:` or `pattern:` rule for events naming in reflekt_project.yml. Like so:"  # noqa E501
+                "\n\nMust define a `case:` rule for event naming convention in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
                 "\n  naming:"
                 "\n    events:"
                 "\n      case: title  # One of title|snake|camel"
-                "\n"
-                "\nOR (never both)"
-                "\n"
-                "\ntracking_plans:"
-                "\n  naming:"
-                "\n    events:"
-                "\n      pattern: '[A-Z][a-z]'  # regex pattern"
                 "\n"
             )
 
@@ -127,7 +117,7 @@ class ReflektProject:
             ]["allow_numbers"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a `allow_numbers:` rule for events naming in reflekt_project.yml. Like so:"  # noqa E501
+                "\n\nMust define a `allow_numbers:` rule for events naming in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
                 "\n  naming:"
@@ -143,7 +133,7 @@ class ReflektProject:
             ]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a `reserved:` rule for events naming in reflekt_project.yml. Like so:"  # noqa E501
+                "\n\nMust define a `reserved:` rule for events naming in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
                 "\n  naming:"
@@ -152,35 +142,22 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_properties_case_or_pattern(self):
+    def _get_properties_case(self):
         self.properties_case = (
             self.project.get("tracking_plans")
             .get("naming")
             .get("properties")
             .get("case")
         )
-        self.properties_pattern = (
-            self.project.get("tracking_plans")
-            .get("naming")
-            .get("properties")
-            .get("pattern")
-        )
 
-        if self.properties_case is None and self.properties_pattern is None:
+        if self.properties_case is None:
             raise ReflektProjectError(
-                "\n\nMust define a `case:` or `pattern:` rule for properties naming in reflekt_project.yml. Like so:"  # noqa E501
+                "\n\nMust define a `case:` rule for properties naming convention in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
                 "\n  naming:"
                 "\n    properties:"
                 "\n      case: title  # One of title|snake|camel"
-                "\n"
-                "\nOR (never both)"
-                "\n"
-                "\ntracking_plans:"
-                "\n  naming:"
-                "\n    properties:"
-                "\n      pattern: '[A-Z][a-z]'  # regex pattern"
                 "\n"
             )
 
@@ -191,7 +168,7 @@ class ReflektProject:
             ]["allow_numbers"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a `allow_numbers:` rule for properties naming in reflekt_project.yml. Like so:"  # noqa E501
+                "\n\nMust define a `allow_numbers:` rule for properties naming in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
                 "\n  naming:"
@@ -207,7 +184,7 @@ class ReflektProject:
             ]["reserved"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a `reserved:` rule for properties naming in reflekt_project.yml. Like so:"  # noqa E501
+                "\n\nMust define a `reserved:` rule for properties naming in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
                 "\n  naming:"
@@ -328,10 +305,10 @@ class ReflektProject:
         self._get_project_name()
         self._get_config_profile()
         self._get_config_path()
-        self._get_events_case_or_pattern()
+        self._get_events_case()
         self._get_events_allow_numbers()
         self._get_events_reserved()
-        self._get_properties_case_or_pattern()
+        self._get_properties_case()
         self._get_properties_allow_numbers()
         self._get_properties_reserved()
         self._get_data_types()
