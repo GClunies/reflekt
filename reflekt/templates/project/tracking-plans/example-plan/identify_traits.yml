@@ -1,0 +1,12 @@
+# Identify traits spec. Modify/add/delete traits below for your tracking needs.
+traits:
+  - name: trait_one
+    description: Example identify trait 1
+    type: string
+  - name: trait_two
+    description: Example identify trait 2
+    type: boolean
+  - name: trait_three
+    description: Example identify trait 3
+    type: number
+    allow_null: true

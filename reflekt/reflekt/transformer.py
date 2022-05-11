@@ -529,7 +529,7 @@ class ReflektTransformer(object):
             logger.info("")
             logger.warning(
                 f"[WARNING] The following database error(s) were encountered "
-                f"while templating the dbt package. NOTE - errors do not prevent "
+                f"while templating the dbt package. NOTE - these errors do not prevent "
                 f"templating.\n\n{db_errors_str}"
             )
 
@@ -762,6 +762,8 @@ class ReflektTransformer(object):
                         mdl_col = copy.deepcopy(dbt_column_schema)
                         mdl_col["name"] = mapped_column["schema_name"]
                         mdl_col["description"] = mapped_column["description"]
+                        if mapped_column.get("tests") is not None:
+                            mdl_col["tests"] = mapped_column["tests"]
                         dbt_mdl_doc["columns"].append(mdl_col)
 
         for column in plan_cols:

@@ -4,6 +4,7 @@
 
 import json
 import shutil
+from email.policy import default
 from pathlib import Path
 
 import click
@@ -27,6 +28,234 @@ from reflekt.segment.plan import SegmentPlan
 @click.group()
 def cli():
     logger.configure(**logger_config)
+
+
+@click.option(
+    "--project-dir",
+    "project_dir_str",
+    default=".",
+    help="Path where reflekt project will be created. Defaults to current directory.",
+)
+@click.command()
+def init(project_dir_str):
+    """Create a reflekt project at the provide directory."""
+
+    # TODO - rename example_reflekt_project.yml --> reflekt_project.yml when initializing project  # noqa: E501
+    # TODO - update all this logic to match the format in ~/.reflekt/reflekt_config.yml
+
+    project_dir = Path(project_dir_str).resolve()
+    project_name = click.prompt(
+        "Enter your project name (letters, digits, underscore)", type=str
+    )
+    project_yml = project_dir / "reflekt_project.yml"
+    if project_yml.exists():
+        with open(project_yml, "r") as f:
+            reflekt_project_obj = yaml.safe_load(f)
+
+        if reflekt_project_obj["name"] == project_name:
+            logger.error(
+                f"A reflekt project named {project_name} already exists in "
+                f"{Path.cwd()}"
+            )
+            raise click.Abort()
+
+    reflekt_config_path = click.prompt(
+        "Enter the absolute path where reflekt_config.yml will be created for "
+        "use by this reflekt project",
+        type=str,
+        default=str(Path.home() / ".reflekt" / "reflekt_config.yml"),
+    )
+    reflekt_config_path = Path(reflekt_config_path)
+    collect_config = True  # Default to collect config from user
+    config_name = click.prompt(
+        "Enter a config profile name for the reflekt_config.yml", type=str
+    )
+
+    if not reflekt_config_path.exists():
+        reflekt_config_obj = {
+            config_name: {
+                "plan_type": "",
+                "cdp": "",
+                "warehouse": {},
+            }
+        }
+    else:
+        with open(reflekt_config_path, "r") as f:
+            reflekt_config_obj = yaml.safe_load(f)
+
+        if config_name in reflekt_config_obj:
+            logger.error(
+                f"A reflekt config profile named {config_name} already exists in "
+                f"{reflekt_config_path}"
+            )
+            raise click.Abort()
+        else:
+            reflekt_config_obj.update(
+                {
+                    config_name: {
+                        "plan_type": "",
+                        "cdp": "",
+                        "warehouse": {},
+                    }
+                }
+            )
+
+    if collect_config:
+        plan_type_prompt = click.prompt(
+            f"What Analytics Governance tool do you use to manage your tracking plan(s)?"
+            f"{constants.PLAN_INIT_STRING}"
+            f"\nEnter a number",
+            type=int,
+        )
+        plan_type = constants.PLAN_MAP[str(plan_type_prompt)]
+        reflekt_config_obj[config_name]["plan_type"] = plan_type
+
+        if plan_type == "segment":
+            # workspace_name and access_token required for Segment API use
+            workspace_name = click.prompt(
+                "Enter your Segment workspace name. You can find this in your Segment "
+                "account URL (i.e. https://app.segment.com/your-workspace-name/)",
+                type=str,
+            )
+            reflekt_config_obj[config_name]["workspace_name"] = workspace_name
+            access_token = click.prompt(
+                "Enter your Segment Config API access token (To generate a "
+                "token, see Segment's documentation https://segment.com/docs/config-api/authentication/#create-an-access-token)",  # noqa: E501
+                type=str,
+                hide_input=True,
+            )
+            reflekt_config_obj[config_name]["access_token"] = access_token
+
+        elif plan_type == "avo":
+            avo_end_msg = (
+                "You've selected Avo as your Analytics Governance tool which requires "
+                "additional setup steps and contacting Avo support. Please "
+                "see the docs for additional guidance:\n"
+                "    https://github.com/GClunies/reflekt/blob/dev/docs/reflekt-with-avo.md"
+            )
+
+        # TODO - Enable support for other CDPs below as developed
+        # elif plan_type == "rudderstack":
+        #     pass
+        # elif plan_type == "snowplow":
+        #     pass
+        # elif plan_type == "iteratively":
+        #     pass
+
+        cdp_num_prompt = click.prompt(
+            f"How do you collect first-party data?"
+            f"{constants.CDP_INIT_STRING}"
+            f"\nEnter a number",
+            type=int,
+        )
+        cdp = constants.CDP_MAP[str(cdp_num_prompt)]
+        reflekt_config_obj[config_name]["cdp"] = cdp
+        warehouse_num = click.prompt(
+            f"Which data warehouse do you use?"
+            f"{constants.WAREHOUSE_INIT_STRING}"
+            f"\nEnter a number",
+            type=int,
+        )
+        warehouse = constants.WAREHOUSE_MAP[str(warehouse_num)]
+        reflekt_config_obj[config_name]["warehouse"].update({warehouse: {}})
+
+        if warehouse == "snowflake":
+            account = click.prompt("account", type=str)
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+                {"account": account}
+            )
+            user = click.prompt("user", type=str)
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+                {"user": user}
+            )
+            password = click.prompt("password", hide_input=True, type=str)
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+                {"password": password}
+            )
+            role = click.prompt("role", type=str)
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+                {"role": role}
+            )
+            database = click.prompt(
+                "database (where raw event data is stored)", type=str
+            )
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+                {"database": database}
+            )
+            snowflake_warehouse = click.prompt("warehouse", type=str)
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+                {"warehouse": snowflake_warehouse}
+            )
+        elif warehouse == "redshift":
+            host_url = click.prompt(
+                "host_url (hostname.region.redshift.amazonaws.com)", type=str
+            )
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+                {"host_url": host_url}
+            )
+            port = click.prompt("port", default=5439, type=int)
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+                {"port": port}
+            )
+            user = click.prompt("user", type=str)
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+                {"user": user}
+            )
+            password = click.prompt("password", hide_input=True, type=str)
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+                {"password": password}
+            )
+            db_name = click.prompt(
+                "db_name (database where raw event data is stored)",
+                type=str,
+            )
+            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
+                {"db_name": db_name}
+            )
+        # TODO - Enable support for other warehouses below as developed
+        # elif warehouse == "bigquery":
+        #     pass
+
+        with open(reflekt_config_path, "w") as f:
+            yaml.dump(reflekt_config_obj, f, indent=2)
+
+    click.echo(
+        f"Configured to use reflekt config profile '{config_name}' at "
+        f"{reflekt_config_path}."
+    )
+    project_template_dir = pkg_resources.resource_filename(
+        "reflekt", "templates/project/"
+    )
+    shutil.copytree(project_template_dir, project_dir, dirs_exist_ok=True)
+
+    with open(project_yml, "r") as f:
+        project_yml_str = f.read()
+
+    project_yml_str = project_yml_str.replace("default_project", project_name).replace(
+        "default_profile", config_name
+    )
+
+    with open(project_yml, "w") as f:
+        f.write(project_yml_str)
+
+    logger.info(
+        f"Your reflekt project '{project_name}' has been created!"
+        f"\n\nWith reflekt, you can:\n\n"
+        f"    reflekt new --name <plan-name>\n"
+        f"        Create a new tracking plan in reflekt spec (with example YAML files to spec events, user traits, and group traits)\n\n"  # noqa: E501
+        f"    reflekt pull --name <plan-name>\n"
+        f"        Get tracking plan from CDP or Analytics Governance tool and convert it to reflekt spec\n\n"  # noqa: E501
+        f"    reflekt push --name <plan-name>\n"
+        f"        Push reflekt tracking plan to your CDP or Analytics Governance tool. reflekt handles the conversion!\n\n"  # noqa: E501
+        f"    reflekt test --name <plan-name>\n"
+        f"        Test reflekt tracking plan for naming conventions and expected metadata defined in your reflect_project.yml\n\n"  # noqa: E501
+        f"    reflekt dbt --name <plan-name>\n"
+        f"        Build a dbt package with sources/models/documentation that *reflekt* the events in your tracking plan!"  # noqa: E501
+    )
+
+    if plan_type == "avo":
+        logger.info("")
+        logger.info(avo_end_msg)
 
 
 @click.command()
@@ -90,18 +319,27 @@ def new(plan_name, plans_dir):
     required=False,
     default=ReflektProject().project_dir / "tracking-plans",
     help=(
-        "Path where tracking plan will be generated. Defaults to `/tracking-plans` "
+        "Path where tracking plan will be generated. Defaults to '/tracking-plans' "
         "directory in your reflekt project."
     ),
 )
 @click.option(
     "--raw",
     flag_value=True,
-    help="Pull raw tracking plan JSON (not in reflekt schema) from CDP. ",
+    help="Pull raw tracking plan JSON (not in reflekt schema) from CDP.",
 )
-def pull(plan_name, plans_dir, raw):
+@click.option(
+    "--avo-branch",
+    "avo_branch",
+    default=None,
+    help=(
+        "Specify the branch name you want to pull your avo trackign plan from "
+        "(e.g. dev/staging/main)."
+    ),
+)
+def pull(plan_name, plans_dir, raw, avo_branch):
     """Generate tracking plan as code using the reflekt schema."""
-    api = ReflektApiHandler().get_api()
+    api = ReflektApiHandler().get_api(avo_branch=avo_branch)
     config = ReflektConfig()
     logger.info(
         f"Searching {titleize(config.plan_type)} for tracking plan '{plan_name}'"
@@ -332,222 +570,6 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
     logger.info(f"Loaded reflekt tracking plan {plan_name}\n")
     transformer = ReflektTransformer(reflekt_plan, dbt_pkg_dir, pkg_version=version)
     transformer.build_dbt_package(reflekt_plan=reflekt_plan)
-
-
-@click.option(
-    "--project-dir",
-    "project_dir_str",
-    default=".",
-    help="Path where reflekt project will be created. Defaults to current directory.",
-)
-@click.command()
-def init(project_dir_str):
-    """Create a reflekt project at the provide directory."""
-
-    # TODO - update all this logic to match the format in ~/.reflekt/reflekt_config.yml
-
-    project_dir = Path(project_dir_str).resolve()
-    project_name = click.prompt(
-        "Enter your project name (letters, digits, underscore)", type=str
-    )
-    project_yml = project_dir / "reflekt_project.yml"
-    if project_yml.exists():
-        with open(project_yml, "r") as f:
-            reflekt_project_obj = yaml.safe_load(f)
-
-        if reflekt_project_obj["name"] == project_name:
-            logger.error(
-                f"A reflekt project named {project_name} already exists in "
-                f"{Path.cwd()}"
-            )
-            raise click.Abort()
-
-    reflekt_config_path = click.prompt(
-        "Enter the absolute path where reflekt_config.yml will be created for "
-        "use by this reflekt project",
-        type=str,
-        default=str(Path.home() / ".reflekt" / "reflekt_config.yml"),
-    )
-    reflekt_config_path = Path(reflekt_config_path)
-    collect_config = True  # Default to collect config from user
-    config_name = click.prompt(
-        "Enter a config profile name for the reflekt_config.yml", type=str
-    )
-
-    if not reflekt_config_path.exists():
-        reflekt_config_obj = {
-            config_name: {
-                "plan_type": "",
-                "cdp": "",
-                "warehouse": {},
-            }
-        }
-    else:
-        with open(reflekt_config_path, "r") as f:
-            reflekt_config_obj = yaml.safe_load(f)
-
-        if config_name in reflekt_config_obj:
-            logger.error(
-                f"A reflekt config profile named {config_name} already exists in "
-                f"{reflekt_config_path}"
-            )
-            raise click.Abort()
-        else:
-            reflekt_config_obj.update(
-                {
-                    config_name: {
-                        "plan_type": "",
-                        "cdp": "",
-                        "warehouse": {},
-                    }
-                }
-            )
-
-    if collect_config:
-        plan_type_prompt = click.prompt(
-            f"How do you manage your tracking plans?"
-            f"{constants.PLAN_INIT_STRING}"
-            f"\nEnter a number",
-            type=int,
-        )
-        plan_type = constants.PLAN_MAP[str(plan_type_prompt)]
-        reflekt_config_obj[config_name]["plan_type"] = plan_type
-        if plan_type == "segment":
-            workspace_name = click.prompt(
-                "Enter your Segment workspace name. You can find this in your Segment "
-                "account URL (i.e. https://app.segment.com/your-workspace-name/)",
-                type=str,
-            )
-            reflekt_config_obj[config_name]["workspace_name"] = workspace_name
-            access_token = click.prompt(
-                "Enter your Segment Config API access token (To generate a "
-                "token, see Segment's documentation https://segment.com/docs/config-api/authentication/#create-an-access-token)",  # noqa: E501
-                type=str,
-                hide_input=True,
-            )
-            reflekt_config_obj[config_name]["access_token"] = access_token
-
-        cdp_num_prompt = click.prompt(
-            f"How do you collect first-party data?"
-            f"{constants.CDP_INIT_STRING}"
-            f"\nEnter a number",
-            type=int,
-        )
-        cdp = constants.CDP_MAP[str(cdp_num_prompt)]
-        reflekt_config_obj[config_name]["cdp"] = cdp
-
-        # TODO - Enable support for other CDPs below as developed
-        # elif cdp == "rudderstack":
-        #     pass
-        # elif cdp == "snowplow":
-        #     pass
-        # elif cdp == "avo":
-        #     pass
-        # elif cdp == "iteratively":
-        #     pass
-
-        warehouse_num = click.prompt(
-            f"Which data warehouse do you use?"
-            f"{constants.WAREHOUSE_INIT_STRING}"
-            f"\nEnter a number",
-            type=int,
-        )
-        warehouse = constants.WAREHOUSE_MAP[str(warehouse_num)]
-        reflekt_config_obj[config_name]["warehouse"].update({warehouse: {}})
-
-        if warehouse == "snowflake":
-            account = click.prompt("account", type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"account": account}
-            )
-            user = click.prompt("user", type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"user": user}
-            )
-            password = click.prompt("password", hide_input=True, type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"password": password}
-            )
-            role = click.prompt("role", type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"role": role}
-            )
-            database = click.prompt(
-                "database (where raw event data is stored)", type=str
-            )
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"database": database}
-            )
-            snowflake_warehouse = click.prompt("warehouse", type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"warehouse": snowflake_warehouse}
-            )
-        elif warehouse == "redshift":
-            host_url = click.prompt(
-                "host_url (hostname.region.redshift.amazonaws.com)", type=str
-            )
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"host_url": host_url}
-            )
-            port = click.prompt("port", default=5439, type=int)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"port": port}
-            )
-            user = click.prompt("user", type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"user": user}
-            )
-            password = click.prompt("password", hide_input=True, type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"password": password}
-            )
-            db_name = click.prompt(
-                "db_name (database where raw event data is stored)",
-                type=str,
-            )
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"db_name": db_name}
-            )
-        # TODO - Enable support for other warehouses below as developed
-        # elif warehouse == "bigquery":
-        #     pass
-
-        with open(reflekt_config_path, "w") as f:
-            yaml.dump(reflekt_config_obj, f, indent=2)
-
-    click.echo(
-        f"Configured to use reflekt config profile '{config_name}' at "
-        f"{reflekt_config_path}."
-    )
-    project_template_dir = pkg_resources.resource_filename(
-        "reflekt", "templates/project/"
-    )
-    shutil.copytree(project_template_dir, project_dir, dirs_exist_ok=True)
-
-    with open(project_yml, "r") as f:
-        project_yml_str = f.read()
-
-    project_yml_str = project_yml_str.replace("default_project", project_name).replace(
-        "default_profile", config_name
-    )
-
-    with open(project_yml, "w") as f:
-        f.write(project_yml_str)
-
-    logger.info(
-        f"Your reflekt project '{project_name}' has been created!"
-        f"\n\nWith reflekt, you can:\n\n"
-        f"    reflekt new --name <plan-name>\n"
-        f"        Create a new tracking plan in reflekt spec (with example YAML files to spec events, user traits, and group traits)\n\n"  # noqa: E501
-        f"    reflekt pull --name <plan-name>\n"
-        f"        Get tracking plan from CDP or Analytics Governance tool and convert it to reflekt spec\n\n"  # noqa: E501
-        f"    reflekt push --name <plan-name>\n"
-        f"        Push reflekt tracking plan to your CDP or Analytics Governance tool. reflekt handles the conversion!\n\n"  # noqa: E501
-        f"    reflekt test --name <plan-name>\n"
-        f"        Test reflekt tracking plan for naming conventions and expected metadata defined in your reflect_project.yml\n\n"  # noqa: E501
-        f"    reflekt dbt --name <plan-name>\n"
-        f"        Build a dbt package with sources/models/documentation that *reflekt* the events in your tracking plan!"  # noqa: E501
-    )
 
 
 # Add CLI commands to CLI group

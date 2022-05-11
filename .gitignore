@@ -149,5 +149,4 @@ tracking-plans/
 dbt_packages/
 
 # Allow template files in reflekt python package
-!reflekt/template/*
-!reflekt/template/project/.reflekt
+!reflekt/templates/**/*

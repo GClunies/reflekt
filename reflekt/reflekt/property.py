@@ -59,10 +59,6 @@ class ReflektProperty(object):
         return self._property_yaml.get("enum")
 
     @property
-    def pattern(self):
-        return self._property_yaml.get("pattern")
-
-    @property
     def datetime(self):
         return self._property_yaml.get("datetime")
 
@@ -77,15 +73,6 @@ class ReflektProperty(object):
     def _check_description(self):
         if self.description == "":
             message = f"Property {self.name} has no description."
-            raise ReflektValidationError(message)
-
-    def _check_pattern(self):
-        if self.type != "string" and self.pattern:
-            message = (
-                f"Property {self.name} is of type {self.type}. Cannot specify "
-                f"`pattern:` for {self.type} data types. "
-                f"Only for string data types."
-            )
             raise ReflektValidationError(message)
 
     def _check_enum(self):
@@ -157,13 +144,6 @@ class ReflektProperty(object):
         project = ReflektProject()
         case_rule = project.properties_case
         allow_numbers = project.properties_allow_numbers
-        pattern_rule = project.properties_pattern
-
-        if pattern_rule is not None:
-            regex = r"{}".format(pattern_rule)
-            matched = re.match(regex, self.name)
-            is_match = bool(matched)
-            rule_type = "pattern:"
 
         if case_rule is not None:
             if case_rule.lower() == "title":
@@ -196,7 +176,7 @@ class ReflektProperty(object):
                 f"Property name '{self.name}' does not match naming convention"
                 f" defined by '{rule_type} {rule_str}' in reflekt_project.yml "
                 f"\n\nEither: "
-                f"\n    - Rename property to match pattern. OR;"
+                f"\n    - Rename property to match config. OR;"
                 f"\n    - Change '{rule_type} {rule_str}' in reflekt_project.yml."
             )
 
@@ -213,6 +193,5 @@ class ReflektProperty(object):
         self._check_description()
         self._check_enum()
         self._check_datetime()
-        self._check_pattern()
         self._check_array_item_schema()
         self._check_object_properties()

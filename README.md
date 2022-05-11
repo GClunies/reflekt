@@ -4,60 +4,81 @@ SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# reflekt
-reflekt is a command-line interface (CLI) and continuous integration (CI) tool for your tracking plan, defining it as `code`. reflekt uses this codified tracking plan to template a dbt package in which:
-- Every event has a dbt source, pointing to the raw data in your warehouse.
-- Every event has a dbt model.
-- Every event is documented in your dbt docs.
+# Reflekt
+**Reflekt is a command line interface and continuous integration tool for your tracking plan.** It integrates with your Analytics Governance Tool, Customer Data Platform (CDP), data warehouse, and [dbt](https://www.getdbt.com/).
 
-**reflekt dbt DEMO GIF HERE**
+![reflekt-arch](/docs/reflekt_architecture.png)
 
-reflekt integrates with your CDP and Analytics Governance tools to help bring DevOps best practices to how you create, iterate, and manage tracking plans and product analytics.
+Reflekt defines your tracking plan as `code`. This code powers Reflekt's **dbt package templater**, which parses your tracking plan code and writes a **dbt package modeling all the events in your tracking plan**, ready for use in your dbt project.
 
-**reflekt pull DEMO GIF HERE**
+Every Reflekt dbt package includes:
+- dbt [sources](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in your warehouse where the raw event data is stored.
+- dbt [models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for every event in your tracking plan. Light transformations are applied to prepare data for consumption and further modeling.
+- dbt [documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every event in your tracking plan. To be consumed by analysts and the business.
 
-See the sections below for a full list of [integrations](https://github.com/GClunies/reflekt#integrations) and [commands](https://github.com/GClunies/reflekt#integrations).
+## [DEMO VIDEO HERE]
 
+Your dbt models and documentation should *reflekt* the information you've already defined in your tracking plan.
 
-## Tracking plans as `code`
-reflekt tracking plan code is:
-- **Human readable**. No JSON schema here. Using YAML improves readability for technical *and* business users.
-- **Version controlled**. Create branches for dev, staging, and production plans. Submit PRs. Review with your team. Revert when things break.
-- Able to support **Metadata**, customizable for your unique use cases.
-- **Testable**. Naming conventions, prohibited property names, expected metadata, etc. are all testable. You decide when to run tests to suit your CI strategy and tooling.
-- **Extensible**. reflekt integrates with your product analytics tools and data stack (e.g. Segment, Avo, dbt, Amplitude, etc.). Build custom data pipelines and products using reflekt's artifacts.
-- **Modular**. You choose what features to use. Prefer to manage your tracking plan in Segment/Avo/etc? No problem, you can still use reflekt to template your dbt packages.
+## Commands
+**With Reflekt, you can**
 
-Every reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
+1. Stop manually writing dbt models and documentation for each event you track. Save your data team time using the Reflekt dbt templater.
+   ```bash
+   $ reflekt dbt --name <plan-name>
+   ```
+   As your tracking plan changes, use the dbt templater to re-template and capture updates/changes. Reflekt will bump the version of your dbt package as it evolves with your tracking plan.
+
+2. Test the events and properties in your tracking plan for naming conventions, data types, and expected metadata.
+   ```zsh
+   $ reflekt test --name <plan-name>
+   ```
+
+3. Create a new tracking plan, defined as code.
+   ```bash
+   $ reflekt new --name <plan-name>
+   ```
+
+4. Get a tracking plan from your Analytics Governance Tool (Segment Protocols, Avo, others coming soon) and convert it to a Reflekt tracking plan code, ready for templating.
+   ```bash
+   $ reflekt pull --name <plan-name>
+   ```
+
+5. Sync your Reflekt tracking plan to your Analytics Governance tool (Segment Protocols, others coming soon). Reflekt handles the conversion!
+   ```bash
+   $ reflekt push --name <plan-name>
+   ```
+
+## Your tracking plan as `code`
+Every Reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
 <br>
 
-<details><summary><code>reflekt_project.yml</code> (click to expand)</summary><p>
+<details><summary>Example <code>reflekt_project.yml</code> (click to expand)</summary><p>
 
 ```yaml
 # reflekt_project.yml
 
-# NOTE - All configurations in this reflekt_project.yml are REQUIRED unless flagged with an # OPTIONAL comment
+# Configurations are REQUIRED unless flagged by an '# OPTIONAL (optional_config:)' comment
+# Uncomment OPTIONAL configurations to use them
 
-name: project_name  # Defined during `reflekt init`
+name: default_project
 
-config_profile: profile_name  # Defined during `reflekt init`. Must match a profile found in reflekt_config.yml
+config_profile: default_profile  # Profile defined in reflekt_config.yml
+
+# OPTIONAL (config_path:)
+# config_path: /absolute/path/to/reflekt_config.yml
 
 tracking_plans:
-  naming:
-    # For `events:` and `properties:` below:
-    #   - Provide one of `casing` or `pattern` (regex). Not both.
-    #   - Set whether numbers are allowed in event/property names
+  naming:  # Naming conventions for tracking plans
     events:
       case: title  # One of title|snake|camel
-      # pattern: 'your-regex-here'
-      allow_numbers: false
+      allow_numbers: true
       reserved: []  # Reserved event names (casing matters)
 
     properties:
-      case: camel
-      # pattern: 'your-regex-here'
-      allow_numbers: false
-      reserved: []  # Reserved property names (casing matters)
+      case: snake  # One of title|snake|camel
+      allow_numbers: true
+      reserved: [] # Reserved property names (casing matters)
 
   data_types:
     # Specify allowed data types. Available types listed below
@@ -68,66 +89,65 @@ tracking_plans:
       - number
       - object
       - array
+      - any
+      - 'null'  # Specify null type in quotes
 
   plan_db_schemas:
-    # For each reflekt tracking plan, specify schema in database with raw event data.
+    # For each reflekt tracking plan, specify the schema in your data warehouse storing raw data.
     # Replace the example mapping below with your mappings
-    your-plan-name: schema_with_raw_data
+    example-plan: example_schema
 
-  metadata:  # OPTIONAL
-    # Define a schema for event metadata, this is tested when running
-    #     `reflekt test --name <plan-name>`
+  # OPTIONAL (metadata:)
+  # Define a validation schema for your metadata. This is tested when running
+  #     reflekt test --name <plan-name>
+  # Uses Cerberus validation rules (https://bit.ly/3vIsAfs) to define schemas.
+  metadata:
     schema:
+      # Example metadata schema
+      product_owner:
+        type: string
+        required: true
       code_owner:
         required: true
         type: string
-        allowed:
-          - John
-          - Jane
-      product_owner:
-        required: true
+      stakeholders:
         type: string
+        required: false
         allowed:
-          - Jim
-          - Jen
-      priority:
-        required: true
-        type: integer
-        allowed:
-          - 1
-          - 2
+          - Product
+          - Engineering
+          - Data
 
-dbt:
+dbt_templater:
   sources:
-    # Prefix for dbt package source files
-    prefix: src_reflekt_
+    prefix: src_reflekt_       # Prefix for templated dbt package sources
 
   models:
-    # Prefix for dbt package models & docs
-    prefix: reflekt_
-    # Specify incremental logic to use when templating dbt models.
-    # This should include the {%- if is_incremental() %} ... {%- endif %} block
-    # Article on dbt incremental logic: https://discourse.getdbt.com/t/on-the-limits-of-incrementality/303
+    prefix: reflekt_           # Prefix for models & docs in templated dbt package
+    materialized: incremental  # One of view|incremental
+    # OPTIONAL (incremental_logic:) [REQUIRED if 'materialized: incremental']
+    # Specify the incremental logic to use when templating dbt models.
+    # Must include the {%- if is_incremental() %} ... {%- endif %} block
     incremental_logic: |
       {%- if is_incremental() %}
       where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
       {%- endif %}
 
-  pkg_db_schemas:  # OPTIONAL
-    # For each reflekt tracking plan, you may specify a schema in database to materialize dbt pkg models.
-    your-plan-name: analytics  # Or any other schema you want
+  # OPTIONAL (pkg_db_schemas:)
+  # For each reflekt tracking plan, you can override the schema where the
+  # models in the templated dbt package will be created.
+  pkg_db_schemas:
+    example-plan: example_schema
 
 ```
 </p></details>
-
 <br>
 
-reflekt manages each tracking plan in a directory with corresponding YAML files for your events.
+Reflekt manages each tracking plan in a directory with corresponding YAML files for your events.
 
-**SCREEN SHOT GOES HERE OF PLAN FOLDER STRUCTURE**
+![my-plan](/docs/my-plan.png)
 
-An example spec for a `Product Added` event.
-<details><summary><code>product-added.yml</code> (click to expand)</summary><p>
+<details><summary>Example <code>product-added.yml</code> (click to expand)</summary><p>
 
 ```yaml
 # product-added.yml
@@ -171,71 +191,49 @@ An example spec for a `Product Added` event.
 </p></details>
 
 
-## Install
+## Install & Setup
 1. Install `reflekt` with `pip`. Recommend installing in a virtual Python environment.
    ```bash
-   pip install reflekt
+   $ pip install reflekt
    ```
 
-2. Create a reflekt project.
+2. Create a Reflekt project.
    ```bash
-   reflekt init --project-dir ./my_reflekt_project  # Follow the prompts
-   cd my_reflekt_project                            # Navigate inside project
+   $ reflekt init --project-dir ./my_reflekt_project  # Follow the prompts
+   $ cd my_reflekt_project                            # Navigate inside project
    ```
 
-Your reflekt project includes an example tracking plan in the `tracking-plans/` folder.
+Your Reflekt project includes an example tracking plan in the `tracking-plans/` folder.
 
-## Commands
-Create a new tracking plan in the reflekt spec
-```zsh
-$ reflekt new --name <plan-name>
-```
-<br>
-
-Get a tracking plan from your CDP or Analytics Governance tool and convert it to YAML in reflekt spec
-```zsh
-$ reflekt pull --name <plan-name>
-```
-<br>
-
-Sync a reflekt tracking plan to your CDP or Analytics Governance tool. reflekt handles the conversion!
-```zsh
-$ reflekt push --name <plan-name>
-```
-<br>
-
-Test a reflekt tracking plan for naming conventions, allowed data types, and expected metadata across all your events. All tests are configured in your `reflect_project.yml`.
-```zsh
-$ reflekt test --name <plan-name>
-```
-
-Build a dbt package with sources, models, and documentation.
-```zsh
-$ reflekt dbt --name <plan-name>
-```
+#### reflekt with Avo
+Using Reflekt with Avo is an experimental feature. It requires additional setup and configuration - see the docs on [using reflekt with Avo](docs/reflekt-with-avo.md).
 
 ## Integrations
-### CDPs
-- **Supported**: Segment
-- **Under evaluation**: Rudderstack, Snowplow
+### Customer Data Platforms (CDPs)
+- **Supported**:
+  - Segment
+- **Researching**:
+  - Rudderstack
+  - Snowplow
 
-### Analytics Governance
+### Analytics Governance Tools
 - **Supported**:
   - Segment Protocols
-  - Avo (reflekt pull, reflekt dbt only)
-- **Under evaluation**: Iteratively (reflekt pull, reflekt dbt only), Amplitude Govern (reflekt push only)
+  - Avo (*experimental* - only supports `reflekt pull` and `reflekt dbt`)
+- **Researching**:
+  - Rudderstack Data Governance API
+  - Snowplow Data Structures API
+  - Iteratively (reflekt pull, reflekt dbt only)
 
 ### Transform
 **Supported**: dbt
 
 ### Cloud Warehouses
 - **Supported**: Snowflake, Redshift
-- **Under evaluation**: BigQuery
-
-<br>
+- **Researching**: BigQuery
 
 ## Contributing
-Contributions are welcome. Please feel free to raise issues and submit PRs.
+Feel free to raise issues and submit PRs.
 
 #### dev environment
 reflekt uses [poetry](https://python-poetry.org/) for packaging and dependency management. If you use poetry, this repo includes `poetry.lock` and `pyproject.toml` files to help spin up a dev environment. Simply navigate to the root of this repo on your machine and run.

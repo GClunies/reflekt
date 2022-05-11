@@ -134,5 +134,3 @@ dmypy.json
 # reflekt
 avo.json
 reflekt_config.yml
-reflekt_project.yml
-reflekt_project*.yml
