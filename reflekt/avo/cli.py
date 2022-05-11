@@ -5,9 +5,9 @@
 import json
 import shutil
 import subprocess
+import typing
 
 from loguru import logger
-
 from reflekt.avo.errors import AvoCliError
 from reflekt.logger import logger_config
 from reflekt.reflekt.config import ReflektConfig
@@ -15,12 +15,13 @@ from reflekt.reflekt.project import ReflektProject
 
 
 class AvoCli:
-    def __init__(self):
+    def __init__(self, avo_branch: typing.Optional[str] = None):
         self._project = ReflektProject()
         self._config = ReflektConfig()
         self.type = self._config.plan_type
         self.avo_json_source = self._config.avo_json_source
         self.avo_dir = self._project.project_dir / ".reflekt" / "avo"
+        self.avo_branch = avo_branch
         logger.configure(**logger_config)
 
     def get(self, plan_name):
@@ -44,6 +45,27 @@ class AvoCli:
     def _run_avo_pull(self, plan_name):
         logger.info(f"Running `avo pull` to fetch {plan_name} from Avo account.\n")
         avo_executable = shutil.which("avo")
+        # Make sure the correct avo branch is checked out
+        if self.avo_branch is not None:
+            subprocess.call(
+                [
+                    avo_executable,
+                    "checkout",
+                    self.avo_branch,
+                ],
+                cwd=self.avo_dir,
+            )
+        else:
+            subprocess.call(
+                [
+                    avo_executable,
+                    "checkout",
+                    "main",
+                ],
+                cwd=self.avo_dir,
+            )
+
+        # Run avo pull
         subprocess.call(
             [
                 avo_executable,

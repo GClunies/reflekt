@@ -4,6 +4,7 @@
 
 import json
 import shutil
+from email.policy import default
 from pathlib import Path
 
 import click
@@ -101,14 +102,16 @@ def init(project_dir_str):
 
     if collect_config:
         plan_type_prompt = click.prompt(
-            f"How do you manage your tracking plans?"
+            f"What Analytics Governance tool do you use to manage your tracking plan(s)?"
             f"{constants.PLAN_INIT_STRING}"
             f"\nEnter a number",
             type=int,
         )
         plan_type = constants.PLAN_MAP[str(plan_type_prompt)]
         reflekt_config_obj[config_name]["plan_type"] = plan_type
+
         if plan_type == "segment":
+            # workspace_name and access_token required for Segment API use
             workspace_name = click.prompt(
                 "Enter your Segment workspace name. You can find this in your Segment "
                 "account URL (i.e. https://app.segment.com/your-workspace-name/)",
@@ -123,6 +126,22 @@ def init(project_dir_str):
             )
             reflekt_config_obj[config_name]["access_token"] = access_token
 
+        elif plan_type == "avo":
+            avo_end_msg = (
+                "You've selected Avo as your Analytics Governance tool which requires "
+                "additional setup steps and contacting Avo support. Please "
+                "see the docs for additional guidance:\n"
+                "    https://github.com/GClunies/reflekt/blob/dev/docs/reflekt-with-avo.md"
+            )
+
+        # TODO - Enable support for other CDPs below as developed
+        # elif plan_type == "rudderstack":
+        #     pass
+        # elif plan_type == "snowplow":
+        #     pass
+        # elif plan_type == "iteratively":
+        #     pass
+
         cdp_num_prompt = click.prompt(
             f"How do you collect first-party data?"
             f"{constants.CDP_INIT_STRING}"
@@ -131,17 +150,6 @@ def init(project_dir_str):
         )
         cdp = constants.CDP_MAP[str(cdp_num_prompt)]
         reflekt_config_obj[config_name]["cdp"] = cdp
-
-        # TODO - Enable support for other CDPs below as developed
-        # elif cdp == "rudderstack":
-        #     pass
-        # elif cdp == "snowplow":
-        #     pass
-        # elif cdp == "avo":
-        #     pass
-        # elif cdp == "iteratively":
-        #     pass
-
         warehouse_num = click.prompt(
             f"Which data warehouse do you use?"
             f"{constants.WAREHOUSE_INIT_STRING}"
@@ -245,6 +253,10 @@ def init(project_dir_str):
         f"        Build a dbt package with sources/models/documentation that *reflekt* the events in your tracking plan!"  # noqa: E501
     )
 
+    if plan_type == "avo":
+        logger.info("")
+        logger.info(avo_end_msg)
+
 
 @click.command()
 @click.option(
@@ -307,18 +319,27 @@ def new(plan_name, plans_dir):
     required=False,
     default=ReflektProject().project_dir / "tracking-plans",
     help=(
-        "Path where tracking plan will be generated. Defaults to `/tracking-plans` "
+        "Path where tracking plan will be generated. Defaults to '/tracking-plans' "
         "directory in your reflekt project."
     ),
 )
 @click.option(
     "--raw",
     flag_value=True,
-    help="Pull raw tracking plan JSON (not in reflekt schema) from CDP. ",
+    help="Pull raw tracking plan JSON (not in reflekt schema) from CDP.",
 )
-def pull(plan_name, plans_dir, raw):
+@click.option(
+    "--avo-branch",
+    "avo_branch",
+    default=None,
+    help=(
+        "Specify the branch name you want to pull your avo trackign plan from "
+        "(e.g. dev/staging/main)."
+    ),
+)
+def pull(plan_name, plans_dir, raw, avo_branch):
     """Generate tracking plan as code using the reflekt schema."""
-    api = ReflektApiHandler().get_api()
+    api = ReflektApiHandler().get_api(avo_branch=avo_branch)
     config = ReflektConfig()
     logger.info(
         f"Searching {titleize(config.plan_type)} for tracking plan '{plan_name}'"

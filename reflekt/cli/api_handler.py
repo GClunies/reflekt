@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import typing
+
 from reflekt.avo.cli import AvoCli
 from reflekt.reflekt.config import ReflektConfig
 from reflekt.segment.api import SegmentApi
@@ -16,9 +18,11 @@ class ReflektApiHandler:
         self._config = ReflektConfig()
         self.type = self._config.plan_type
 
-    def get_api(self):
+    def get_api(self, avo_branch: typing.Optional[str] = None):
         if self._config.plan_type == "avo":
-            return AvoCli()  # Actually a CLI, use `api` for naming consistency
+            return AvoCli(
+                avo_branch
+            )  # Actually a CLI, but called via get_api for naming consistency
         elif self._config.plan_type == "iteratively":
             pass
         elif self._config.plan_type == "rudderstack":
