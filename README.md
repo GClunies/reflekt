@@ -17,6 +17,15 @@ Every Reflekt dbt package includes:
 - dbt [documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every model in the package. Your analysts and the business always know what your tables and columns mean.
 ## [DEMO VIDEO HERE]
 
+## Why Reflekt?
+- Bet on a warehouse-first approach to product analytics.
+- Your tracking plans is upstream of all products analytics, including dbt. We need great tools to codify these plans and distribute their definition throughout the stack.
+- Your dbt models & docs should perfectly *reflekt* the events specified in your tracking plan.
+- Tracking plan development should *reflekt* software development flows. Branching, version control, ability to roll-back.
+- The context and information in your tracking plan should be available in the
+- Your tracking plans should be *extensible*.
+- You should own the tracking plan in your repo.
+
 ## Getting started
 - [Install & Setup](docs/INSTALL-SETUP.md)
 - [Tracking plans as code](docs/TRACKING-PLANS-AS-CODE.md)
