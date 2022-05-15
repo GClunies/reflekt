@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 ## Install
 Install `reflekt` with `pip`. Recommend installing in a virtual Python environment.
 ```bash

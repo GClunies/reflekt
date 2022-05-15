@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-## Using reflekt with Avo
+# Using reflekt with Avo
 Pulling tracking plans from [Avo](https://www.avo.app/) requires additional setup and contacting Avo support:
 1. Contact Avo support and request access to the JSON source.
 2. Install node and npm. The [npm docs](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) provide great docs and guidance on this.

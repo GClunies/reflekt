@@ -1,6 +1,12 @@
-## Tracking plans as `code`
+<!--
+SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 
-### Project
+SPDX-License-Identifier: Apache-2.0
+-->
+
+# Tracking plans as `code`
+
+## Project
 A Reflekt project is a directory of folders and files that define your tracking plans and any templated dbt packages based on those plans.
 
 Every Reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
@@ -95,7 +101,7 @@ dbt_templater:
 ```
 </p></details>
 
-### Configuration
+## Configuration
 Similar to dbt, Reflekt uses a `reflekt_config.yml` file to specify how Reflekt should connect to your Analytics Governance Tool, CDP, and warehouse.
 
 <details><summary>Example <code>reflekt_config.yml</code> (click to expand)</summary><p>
@@ -117,14 +123,14 @@ my_config:
 ```
 </p></details>
 
-### Tracking plan
+## Tracking plan
 Reflekt manages your tracking plans in the `tracking-plans/` directory of your Reflekt project. Your events, identify traits, and group traits all have corresponding YAML files.
 
 ![my-plan](/docs/my-plan.png)
 
 `plan.yml` holds the plan name (used by the reflekt CLI). You do not need to use/edit `plan.yml`.
 
-### Events
+## Events
 Each event in your tracking plan has its own YAML file, making it easy to manage and update the spec for individual events. Importantly, these YAML files are *human readable*. No incomprehensible JSON here!
 
 <details><summary>Example <code>product-added.yml</code> (click to expand)</summary><p>
@@ -170,9 +176,9 @@ Each event in your tracking plan has its own YAML file, making it easy to manage
 ```
 </p></details>
 
-### Identify traits
+## Identify traits
 
-### Group traits
+## Group traits
 
 
 

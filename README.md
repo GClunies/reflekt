@@ -27,4 +27,4 @@ Every Reflekt dbt package includes:
 If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).
 
 ## Contributing code
-Please feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls) for contributions you would like to propose. Please see the [contributing](docs/CONTRIBUTING.md) docs for development environment details and guidance.
+Please feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls) for contributions you would like to propose. Please see the [contributing](docs/CONTRIBUTING-CODE.md) docs for development environment details and guidance.
