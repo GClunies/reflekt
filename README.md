@@ -9,47 +9,95 @@ SPDX-License-Identifier: Apache-2.0
 
 ![reflekt-arch](/docs/reflekt_architecture.png)
 
-Reflekt defines your tracking plan as `code`. This code powers Reflekt's **dbt package templater**, which parses your tracking plan code and writes a **dbt package modeling all the events in your tracking plan**, ready for use in your dbt project.
+Reflekt defines tracking plans as `code`, powering its **dbt package templater** to write dbt packages modeling **all the events in your tracking plan**.
 
 Every Reflekt dbt package includes:
 - dbt [sources](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in your warehouse where the raw event data is stored.
-- dbt [models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for every event in your tracking plan. Light transformations are applied to prepare data for consumption and further modeling.
-- dbt [documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every event in your tracking plan. To be consumed by analysts and the business.
-
+- dbt [models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for every event in your tracking plan. Reflekt does light transformations so these models are are ready for consumption or further modeling.
+- dbt [documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every model in the package. Your analysts and the business always know what your tables and columns mean.
 ## [DEMO VIDEO HERE]
 
-Your dbt models and documentation should *reflekt* the information you've already defined in your tracking plan.
-
 ## Commands
-**With Reflekt, you can**
-
-1. Stop manually writing dbt models and documentation for each event you track. Save your data team time using the Reflekt dbt templater.
+1. Create a Reflekt project.
    ```bash
-   $ reflekt dbt --name <plan-name>
-   ```
-   As your tracking plan changes, use the dbt templater to re-template and capture updates/changes. Reflekt will bump the version of your dbt package as it evolves with your tracking plan.
-
-2. Test the events and properties in your tracking plan for naming conventions, data types, and expected metadata.
-   ```zsh
-   $ reflekt test --name <plan-name>
+   $ reflekt init --project-dir ./my_reflekt_project  # Follow the prompts
    ```
 
-3. Create a new tracking plan, defined as code.
-   ```bash
-   $ reflekt new --name <plan-name>
-   ```
-
-4. Get a tracking plan from your Analytics Governance Tool (Segment Protocols, Avo, others coming soon) and convert it to a Reflekt tracking plan code, ready for templating.
+2. Get a tracking plan from your Analytics Governance Tool (Segment Protocols, Avo, others coming soon) and convert it to a Reflekt tracking plan code, ready for templating.
    ```bash
    $ reflekt pull --name <plan-name>
    ```
 
-5. Sync your Reflekt tracking plan to your Analytics Governance tool (Segment Protocols, others coming soon). Reflekt handles the conversion!
+3. Use the Reflekt dbt templater to save your data team time. Stop manually writing dbt source, models, and documentation for your event data.
+   ```bash
+   $ reflekt dbt --name <plan-name>
+   ```
+   As your tracking plan changes, re-template to capture updates/changes. Reflekt will bump the version of your dbt package as it evolves with your tracking plan.
+
+4. Sync your Reflekt tracking plan to your Analytics Governance tool (Segment Protocols, others coming soon). Reflekt handles the conversion!
    ```bash
    $ reflekt push --name <plan-name>
    ```
 
-## Your tracking plan as `code`
+5. Test events and properties in your tracking plan for naming conventions, data types, and expected metadata.
+   ```zsh
+   $ reflekt test --name <plan-name>
+   ```
+
+6. Create a new tracking plan, defined as code.
+   ```bash
+   $ reflekt new --name <plan-name>
+   ```
+
+## Tracking plans as `code`
+Reflekt manages each tracking plan in a directory with corresponding YAML files for your events.
+
+![my-plan](/docs/my-plan.png)
+
+<details><summary>Example <code>product-added.yml</code> (click to expand)</summary><p>
+
+```yaml
+# product-added.yml
+- version: 1
+  name: Product Added
+  description: Fired when a user adds a product to their cart.
+  metadata:  # Set event metadata. Configure metadata tests in reflekt_project.yml
+    product_owner: pm-name
+    code_owner: eng-squad-1
+    priority: 1
+  properties:
+    - name: cart_id
+      description: Cart ID to which the product was added to.
+      type: string
+      required: true    # Specify property is required
+    - name: product_id
+      description: Database ID of the product being viewed.
+      type: integer
+      required: true
+    - name: name
+      description: Name of the product.
+      type: string     # Specify property type
+      required: true
+    - name: variant
+      description: Variant of the product (e.g. small, medium, large).
+      type: string
+      enum:            # Enumerated list of allowed values
+        - small
+        - medium
+        - large
+      required: false  # Property is not required
+    - name: price
+      description: Price ($) of the product added to the cart.
+      type: number
+      required: true
+    - name: quantity
+      description: Quantity of the product added to the cart.
+      type: integer
+      required: true
+```
+</p></details>
+<br>
+
 Every Reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
 <br>
 
@@ -141,55 +189,6 @@ dbt_templater:
 
 ```
 </p></details>
-<br>
-
-Reflekt manages each tracking plan in a directory with corresponding YAML files for your events.
-
-![my-plan](/docs/my-plan.png)
-
-<details><summary>Example <code>product-added.yml</code> (click to expand)</summary><p>
-
-```yaml
-# product-added.yml
-- version: 1
-  name: Product Added
-  description: Fired when a user adds a product to their cart.
-  metadata:  # Set event metadata. Configure metadata tests in reflekt_project.yml
-    product_owner: pm-name
-    code_owner: eng-squad-1
-    priority: 1
-  properties:
-    - name: cart_id
-      description: Cart ID to which the product was added to.
-      type: string
-      required: true    # Specify property is required
-    - name: product_id
-      description: Database ID of the product being viewed.
-      type: integer
-      required: true
-    - name: name
-      description: Name of the product.
-      type: string     # Specify property type
-      required: true
-    - name: variant
-      description: Variant of the product (e.g. small, medium, large).
-      type: string
-      enum:            # Enumerated list of allowed values
-        - small
-        - medium
-        - large
-      required: false  # Property is not required
-    - name: price
-      description: Price ($) of the product added to the cart.
-      type: number
-      required: true
-    - name: quantity
-      description: Quantity of the product added to the cart.
-      type: integer
-      required: true
-```
-</p></details>
-
 
 ## Install & Setup
 1. Install `reflekt` with `pip`. Recommend installing in a virtual Python environment.
