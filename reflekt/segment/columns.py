@@ -110,7 +110,7 @@ seg_event_cols = {
             "schema_name": "page_url",
             "description": "The URL of the page where the call was invoked.",
             "sql": """
-            -- CASE statement solves issue where the url column doesn't include query string parameters.
+            -- case statement solves issue where the url column doesn't include query string parameters.
             case
                 when context_page_url ilike '%?%'
                     then context_page_url

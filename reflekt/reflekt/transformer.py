@@ -690,7 +690,7 @@ class ReflektTransformer(object):
                 "{{\n"
                 f"  config(\n"
                 f"    materialized = 'incremental',\n"
-                f"    unique_key = '{id}',\n"
+                f"    unique_key = '{unique_key}',\n"
                 f"    {sort_str}\n"
                 f"  )\n"
                 "}}\n\n"
