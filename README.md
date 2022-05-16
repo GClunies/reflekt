@@ -34,7 +34,7 @@ Defining tracking plans as code should not prohibit use of a SaaS Analytics Gove
 Reflekt is making the following bets about product analytics and the teams doing this work:
 - More explicit tracking. Less implicit tracking.
 - More product analytics powered by the data warehouse and dbt.
-- dbt metrics - imagine defining metrics *in the tracking plan* and having them templated by Reflekt 🤯
+- [dbt metrics](https://docs.getdbt.com/docs/building-a-dbt-project/metrics) and the [metrics layer](https://docs.getdbt.com/docs/dbt-cloud/using-dbt-cloud/cloud-metrics-layer) - imagine defining metrics *in the tracking plan* and having the dbt metric templated by Reflekt 🤯
 
 ## Reporting bugs
 If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).
