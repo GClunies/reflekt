@@ -19,8 +19,8 @@ Every Reflekt dbt package includes:
 
 ## Getting started
 - [Install & Setup](docs/INSTALL-SETUP.md)
-- [Tracking plans as code](docs/TRACKING-PLANS-AS-CODE.md)
-- [Reflekt commands](docs/COMMANDS.md)
+- [Tracking plan as code](docs/TRACKING-PLANS-AS-CODE.md)
+- [Commands](docs/COMMANDS.md)
 - [Integrations](docs/INTEGRATIONS.md) (Analytics Governance Tools, CDPs, warehouses)
 
 ## Beliefs & Bets
