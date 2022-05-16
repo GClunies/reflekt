@@ -24,17 +24,17 @@ Every Reflekt dbt package includes:
 - [Integrations](docs/INTEGRATIONS.md) (Analytics Governance Tools, CDPs, warehouses)
 
 ## Beliefs & Bets
-The core belief of Reflekt is **Tracking plans are the most important artifact in a product analytics stack.** Everything a team builds, collects, and uses - application tracking code, event validation, raw data, dbt models & docs, analyses -  are all dependent on the plan. Tracking plans should be defined as `code` and Tracking plan development should *reflekt* software development. Tracking plans should:
+The core belief of Reflekt is **tracking plans are the most important artifact in a product analytics stack.** Everything a team builds, collects, and uses - application tracking code, event validation, raw data, dbt models & docs, product analytics - are all dependent on the plan. Tracking plans should be defined as `code` and plan development should *reflekt* software development. Tracking plans should:
   - Be version controlled, with branches and environments for different development stages (i.e. dev/staging/prod).
   - Leverage continuous integration to test and deploy plans.
   - Be extensible.
 
-Defining tracking plans as code should not prohibit use of a SaaS Analytics Governance tool. These systems should work in unison.
+Defining tracking plans as code should not prohibit the use of a SaaS Analytics Governance tool. These systems should work in unison.
 
 Reflekt is making the following bets about product analytics and the teams doing this work:
 - More explicit tracking. Less implicit tracking.
 - More product analytics powered by the data warehouse and dbt.
-- [dbt metrics](https://docs.getdbt.com/docs/building-a-dbt-project/metrics) and the [metrics layer](https://docs.getdbt.com/docs/dbt-cloud/using-dbt-cloud/cloud-metrics-layer) - imagine defining metrics *in the tracking plan* and having the dbt metric templated by Reflekt 🤯
+- [dbt metrics](https://docs.getdbt.com/docs/building-a-dbt-project/metrics) and the [metrics layer](https://docs.getdbt.com/docs/dbt-cloud/using-dbt-cloud/cloud-metrics-layer) - imagine defining metrics *in the tracking plan* and having the dbt metric templated by Reflekt 📈🤯📊.
 
 ## Reporting bugs
 If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).
