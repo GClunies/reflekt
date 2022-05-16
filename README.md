@@ -9,7 +9,7 @@ SPDX-License-Identifier: Apache-2.0
 
 ![reflekt-arch](/docs/reflekt_architecture.png)
 
-Reflekt defines tracking plans as `code` (see [docs]((/docs/TRACKING-PLANS-AS-CODE.md))), powering its **dbt package templater** to write dbt packages modeling **all the events in your tracking plan**.
+Reflekt defines tracking plans as `code` (see [docs](/docs/TRACKING-PLANS-AS-CODE.md)), powering its **dbt package templater** to write dbt packages modeling **all the events in your tracking plan**.
 
 Every Reflekt dbt package includes:
 - dbt [sources](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in your warehouse where the raw event data is stored.
