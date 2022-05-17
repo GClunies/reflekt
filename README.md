@@ -31,10 +31,10 @@ The core belief of Reflekt is **tracking plans are the most important artifact i
 
 Defining tracking plans as code should not prohibit the use of a SaaS Analytics Governance tool. These systems should work in unison.
 
-Reflekt is making the following bets about product analytics and the teams doing this work:
+Reflekt also makes the following bets around product analytics trends:
 - More explicit tracking. Less implicit tracking.
-- More product analytics powered by the data warehouse and dbt.
-- [dbt metrics](https://docs.getdbt.com/docs/building-a-dbt-project/metrics) and the [metrics layer](https://docs.getdbt.com/docs/dbt-cloud/using-dbt-cloud/cloud-metrics-layer) - imagine defining metrics *in the tracking plan* and having the dbt metric templated by Reflekt 📈🤯📊.
+- Product analytics will be increasingly powered by the data warehouse and dbt.
+- [dbt metrics](https://docs.getdbt.com/docs/building-a-dbt-project/metrics) and the [metrics layer](https://docs.getdbt.com/docs/dbt-cloud/using-dbt-cloud/cloud-metrics-layer) - what if you defined metrics *in the tracking plan* and Reflekt templated the dbt metrics for you 📈🤯📊.
 
 ## Reporting bugs
 If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).
