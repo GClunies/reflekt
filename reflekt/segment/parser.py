@@ -5,10 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 from loguru import logger
-
 from reflekt.logger import logger_config
-
-logger.configure(**logger_config)
 
 
 # The function parse_segment_property is a derivative work based on the

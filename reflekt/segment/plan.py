@@ -23,7 +23,6 @@ from reflekt.segment.parser import parse_segment_event, parse_segment_property
 # changes are licensed under Apache-2.0.
 class SegmentPlan(object):
     def __init__(self, plan_json):
-        logger.configure(**logger_config)
         self.plan_json = plan_json
 
     @classmethod

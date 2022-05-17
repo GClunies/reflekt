@@ -57,7 +57,6 @@ class ReflektTransformer(object):
         dbt_pkg_dir: typing.Optional[Path] = None,
         pkg_version: typing.Optional[Version] = None,
     ):
-        logger.configure(**logger_config)
         self.reflekt_plan = reflekt_plan
         self.plan_name = str.lower(self.reflekt_plan.name)
         self.dbt_package_schema = self.reflekt_plan.dbt_package_schema

@@ -8,7 +8,6 @@ import shutil
 import yaml
 from inflection import dasherize, underscore
 from loguru import logger
-
 from reflekt.avo.parser import parse_avo_event
 from reflekt.logger import logger_config
 from reflekt.reflekt.dumper import ReflektYamlDumper
@@ -16,7 +15,6 @@ from reflekt.reflekt.dumper import ReflektYamlDumper
 
 class AvoPlan(object):
     def __init__(self, plan_json, plan_name):
-        logger.configure(**logger_config)
         self.plan_json = plan_json
         self.name = plan_name
 

@@ -18,7 +18,6 @@ class WarehouseConnection:
     """
 
     def __init__(self):
-        logger.configure(**logger_config)
         self._config = ReflektConfig()
         self.warehouse = self._config.warehouse
         self.warehouse_type = self._config.warehouse_type

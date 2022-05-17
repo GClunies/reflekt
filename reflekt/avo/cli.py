@@ -47,8 +47,8 @@ class AvoCli:
         avo_executable = shutil.which("avo")
         # Make sure the correct avo branch is checked out
         if self.avo_branch is not None:
-            subprocess.call(
-                [
+            c = subprocess.call(
+                args=[
                     avo_executable,
                     "checkout",
                     self.avo_branch,
@@ -57,7 +57,7 @@ class AvoCli:
             )
         else:
             subprocess.call(
-                [
+                args=[
                     avo_executable,
                     "checkout",
                     "main",
@@ -67,7 +67,7 @@ class AvoCli:
 
         # Run avo pull
         subprocess.call(
-            [
+            args=[
                 avo_executable,
                 "pull",
                 plan_name,

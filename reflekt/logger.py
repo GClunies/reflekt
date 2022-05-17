@@ -4,6 +4,17 @@
 
 import sys
 
+from reflekt.reflekt.project import ReflektProject
+
+if ReflektProject().exists:
+    sink = (
+        str(ReflektProject().project_dir)
+        + "/.reflekt/logs/reflekt_{time:YYYY-MM-DD-HHmmss}.log"
+    )
+else:
+    sink = "./.reflekt/logs/reflekt_{time:YYYY-MM-DD-HHmmss}.log"
+
+
 logger_config = {
     "handlers": [
         {
@@ -11,7 +22,7 @@ logger_config = {
             "format": "{time:HH:mm:ss} {message}",
         },
         {
-            "sink": "./.reflekt/logs/reflekt_{time:YYYY-MM-DD-HHmmss}.log",
+            "sink": sink,
             "serialize": True,
         },
     ],

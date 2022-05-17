@@ -39,10 +39,6 @@ def cli():
 @click.command()
 def init(project_dir_str):
     """Create a reflekt project at the provide directory."""
-
-    # TODO - rename example_reflekt_project.yml --> reflekt_project.yml when initializing project  # noqa: E501
-    # TODO - update all this logic to match the format in ~/.reflekt/reflekt_config.yml
-
     project_dir = Path(project_dir_str).resolve()
     project_name = click.prompt(
         "Enter your project name (letters, digits, underscore)", type=str
@@ -410,7 +406,6 @@ def push(plan_name, plans_dir, dry):
     logger.info(f"Loading reflekt tracking plan '{plan_name}' from {str(plan_dir)}")
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
-    # logger.info(f"Loading complete")
     transformer = ReflektTransformer(reflekt_plan)
     cdp_plan = transformer.build_cdp_plan()
 
@@ -589,7 +584,7 @@ if __name__ == "__main__":
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
-    # pull(["--name", "patty-bar-dev-avo"])
-    # push(["--name", "patty-bar-dev-avo"])
-    # test(["--name", "patty-bar-dev-avo"])
-    dbt(["--name", "patty-bar-dev"])
+    # pull(["--name", "plan-patty-bar-dev-avo"])
+    # push(["--name", "plan-patty-bar-dev-avo"])
+    test(["--name", "plan-patty-bar-dev-avo"])
+    # dbt(["--name", "plan-patty-bar-dev"])

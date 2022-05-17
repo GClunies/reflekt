@@ -21,7 +21,7 @@ Pulling tracking plans from [Avo](https://www.avo.app/) requires additional setu
      info Logged in as greg@reflekt-ci.com
    ```
 5. Create a JSON source in Avo. Each of your applications (web, iOS, etc.) should have a separate JSON source. Note:
-   1. The JSON source name you set in Avo will be used by Reflekt as the plan name when running `reflekt pull --name avo-json-source-name`.
+   1. The name of the JSON source you set in Avo will be used by Reflekt as the plan name when running `reflekt pull --name json-source-name`.
    2. In the Avo source settings, under the **Avo Functions Setup** tab, be sure to set the **Programming Language** to `JSON Schema`.
 6. Add events from your Avo plan to the Avo JSON source. The events should match the events collected on your application. When adding new events to your Avo Plan, make sure to add them to their respective JSON sources.
 7. Configure Avo with Reflekt
