@@ -4,9 +4,6 @@
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
 
-from loguru import logger
-from reflekt.logger import logger_config
-
 
 # The function parse_segment_property is a derivative work based on the
 # function parse_property from project tracking-plan-kit licensed under MIT.
@@ -82,7 +79,7 @@ def parse_segment_property(name, property_json, required=[]):
 
 
 # The function parse_segment_event is a derivative work based on the
-# function parse_eventfrom project tracking-plan-kit licensed under MIT.
+# function parse_event from project tracking-plan-kit licensed under MIT.
 # All changes are licensed under Apache-2.0.
 def parse_segment_event(event_json):
     metadata = event_json.get("rules").get("labels")
@@ -104,7 +101,7 @@ def parse_segment_event(event_json):
         pass
     else:
         for name, prop in sorted(properties.items()):
-            # logger.info(f"Dumping property: {name}")
+            # logger.info(f"   Parsing property: {name}")
             p = parse_segment_property(name, prop, required)
             event_obj_properties.append(p)
 
