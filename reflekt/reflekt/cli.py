@@ -127,7 +127,7 @@ def init(project_dir_str):
                 "You've selected Avo as your Analytics Governance tool which requires "
                 "additional setup steps and contacting Avo support. Please "
                 "see the docs for additional guidance:\n"
-                "    https://github.com/GClunies/reflekt/blob/dev/docs/reflekt-with-avo.md"
+                "    https://github.com/GClunies/reflekt/blob/main/docs/AVO.md"
             )
 
         # TODO - Enable support for other CDPs below as developed
