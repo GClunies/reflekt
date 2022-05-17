@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-## Using reflekt with Avo
+# Using Reflekt with Avo
 Pulling tracking plans from [Avo](https://www.avo.app/) requires additional setup and contacting Avo support:
 1. Contact Avo support and request access to the JSON source.
 2. Install node and npm. The [npm docs](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) provide great docs and guidance on this.
@@ -14,20 +14,19 @@ Pulling tracking plans from [Avo](https://www.avo.app/) requires additional setu
    $ avo --version
      2.0.2
    ```
-4. Link your Avo Account and verify account.
+4. Link and verify your Avo Account.
    ```bash
    $ avo login
    $ avo whoami
      info Logged in as greg@reflekt-ci.com
    ```
-5. Create a JSON source in Avo.
-   1. Each of your applications (web, iOS, etc.) should have it's own JSON source.
-   2. The JSON source name you set will be used by reflekt as the plan name when running `reflekt pull --name avo-json-source-name`.
-   3. In the Avo source settings, under the **Avo Functions Setup** tab, be sure to set the **Programming Language** to `JSON Schema`.
-6. Add events from your Avo plan to the Avo JSON source. The events should match the events collected on your application.
+5. Create a JSON source in Avo. Each of your applications (web, iOS, etc.) should have a separate JSON source. Note:
+   1. The name of the JSON source you set in Avo will be used by Reflekt as the plan name when running `reflekt pull --name json-source-name`.
+   2. In the Avo source settings, under the **Avo Functions Setup** tab, be sure to set the **Programming Language** to `JSON Schema`.
+6. Add events from your Avo plan to the Avo JSON source. The events should match the events collected on your application. When adding new events to your Avo Plan, make sure to add them to their respective JSON sources.
 7. Configure Avo with Reflekt
    ```bash
-   # From the root of your reflekt project
+   # From the root of your Reflekt project
    $ cd .reflekt/avo
 
    $ avo init

@@ -8,7 +8,6 @@ import shutil
 import yaml
 from inflection import dasherize, underscore
 from loguru import logger
-
 from reflekt.avo.parser import parse_avo_event
 from reflekt.logger import logger_config
 from reflekt.reflekt.dumper import ReflektYamlDumper
@@ -16,7 +15,6 @@ from reflekt.reflekt.dumper import ReflektYamlDumper
 
 class AvoPlan(object):
     def __init__(self, plan_json, plan_name):
-        logger.configure(**logger_config)
         self.plan_json = plan_json
         self.name = plan_name
 
@@ -36,12 +34,12 @@ class AvoPlan(object):
         # If plan directory already exists, remove it.
         if plan_dir.is_dir():
             shutil.rmtree(plan_dir)
-        # Re-make directories for reflekt tracking plan(s)
+        # Re-make directories for Reflekt tracking plan(s)
         for dir in [plan_dir, events_dir]:
             if not dir.exists():
                 dir.mkdir()
 
-        logger.info(f"Building reflekt plan at {plan_dir}")
+        logger.info(f"Building Reflekt plan at {plan_dir}")
         self._build_reflekt_plan_file(plan_dir)
 
         for event_json in self.plan_json.get("events", []):
@@ -65,7 +63,7 @@ class AvoPlan(object):
             )
         )
         event_file = events_dir / f"{event_file_name}.yml"
-        logger.info(f"Building reflekt event '{event_name}' at {event_file}")
+        logger.info(f"    Building Reflekt event '{event_name}'")
         event_obj = parse_avo_event(event_json)
         event_obj_with_version = {"version": 1}  # No event versions in Avo. Set to 1
         event_obj_with_version.update(event_obj)

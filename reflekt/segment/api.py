@@ -14,7 +14,6 @@ from reflekt.segment.errors import SegmentApiError
 
 class SegmentApi:
     def __init__(self, workspace_name, access_token):
-        logger.configure(**logger_config)
         self._config = ReflektConfig()
         self.type = self._config.plan_type
         self.workspace_name = workspace_name

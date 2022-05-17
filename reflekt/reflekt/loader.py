@@ -14,9 +14,6 @@ from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.plan import ReflektPlan
 from reflekt.reflekt.project import ReflektProject
 
-# Setup logger
-logger.configure(**logger_config)
-
 
 # The class ReflektLoader is a derivative work based on the class
 # PlanLoader from project tracking-plan-kit licensed under MIT. All

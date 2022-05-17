@@ -16,7 +16,6 @@ from reflekt.reflekt.project import ReflektProject
 class ReflektConfig:
     def __init__(self, raise_config_errors=True):
         if ReflektProject().exists:
-            logger.configure(**logger_config)
             try:
                 self.config_errors = []
                 self.project = ReflektProject()

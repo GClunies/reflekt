@@ -181,7 +181,7 @@ class ReflektProperty(object):
             )
 
     def validate_property(self):
-        """Validate event property against reflekt schema."""
+        """Validate event property against Reflekt schema."""
         validator = Validator(reflekt_property_schema)
         is_valid = validator.validate(self._property_yaml, reflekt_property_schema)
 
