@@ -9,8 +9,8 @@ from tests.fixtures import _build_reflekt_plan_dir
 
 
 # TODO
-#    - Test transform plan from reflekt spec to dbt package
-#    - Test transform plan from reflekt spec to Iglu schema json (wait for Iglu integration)  # noqa: E501
+#    - Test transform plan from Reflekt spec to dbt package
+#    - Test transform plan from Reflekt spec to Iglu schema json (wait for Iglu integration)  # noqa: E501
 def test_reflekt_transformer_segment(tmpdir):
     plan_dir = _build_reflekt_plan_dir(tmpdir)
     loader = ReflektLoader(plan_dir, "test-plan")

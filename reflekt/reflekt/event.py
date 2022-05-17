@@ -9,14 +9,18 @@ from collections import Counter
 
 from cerberus import Validator
 
-from reflekt.reflekt.casing import (CAMEL_CASE_NUMBERS_RE, CAMEL_CASE_RE,
-                                    SNAKE_CASE_NUMBERS_RE, SNAKE_CASE_RE,
-                                    TITLE_CASE_NUMBERS_RE, TITLE_CASE_RE)
+from reflekt.reflekt.casing import (
+    CAMEL_CASE_NUMBERS_RE,
+    CAMEL_CASE_RE,
+    SNAKE_CASE_NUMBERS_RE,
+    SNAKE_CASE_RE,
+    TITLE_CASE_NUMBERS_RE,
+    TITLE_CASE_RE,
+)
 from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.project import ReflektProject
 from reflekt.reflekt.property import ReflektProperty
-from reflekt.reflekt.schema import (reflekt_event_schema,
-                                    reflekt_metadata_schema)
+from reflekt.reflekt.schema import reflekt_event_schema, reflekt_metadata_schema
 
 
 # The class ReflektEvent is a derivative work based on the class
@@ -134,7 +138,7 @@ class ReflektEvent(object):
                 )
 
     def validate_event(self):
-        """Validate event against reflekt schema."""
+        """Validate event against Reflekt schema."""
         validator = Validator(reflekt_event_schema)
         is_valid = validator.validate(self._event_yaml_obj, reflekt_event_schema)
 

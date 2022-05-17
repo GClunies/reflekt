@@ -38,7 +38,7 @@ class ReflektProject:
             return False
 
     def _get_project_root(self, path):
-        """Gets the working tree directory for reflekt project. reflekt project
+        """Gets the working tree directory for Reflekt project. Reflekt project
         must be a in git repo.
         """
         if self._is_git_repo(path):
@@ -47,10 +47,10 @@ class ReflektProject:
         else:
             raise ReflektProjectError(
                 "\n"
-                "\nGit repository not detected. Your reflekt project must be inside a Git repo to function correctly."  # noqa E501
+                "\nGit repository not detected. Your Reflekt project must be inside a Git repo to function correctly."  # noqa E501
                 "\nCreate a git repo by either:"
-                "\n     - Running `git init` at root of your reflekt project."
-                "\n     - Cloning a repo containing an existing reflekt project from GitHub/Gitlab."  # noqa E501
+                "\n     - Running `git init` at root of your Reflekt project."
+                "\n     - Cloning a repo containing an existing Reflekt project from GitHub/Gitlab."  # noqa E501
             )
 
     def _get_project_name(self):
@@ -216,7 +216,7 @@ class ReflektProject:
             self.plan_db_schemas = self.project["tracking_plans"]["plan_db_schemas"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define `plan_db_schemas:` in reflekt_project.yml. Each trackign plan in your reflekt project must"  # noqa E501
+                "\n\nMust define `plan_db_schemas:` in reflekt_project.yml. Each trackign plan in your Reflekt project must"  # noqa E501
                 " be mapped to a corresponding schema in data warehouse where it's raw event data is stored. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"

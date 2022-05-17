@@ -106,7 +106,7 @@ class ReflektTransformer(object):
             return self._build_plan_segment(self.reflekt_plan)
         elif plan_type.lower() == "snowplow":
             return self._build_plan_snowplow(self.reflekt_plan)
-        # `No reflekt push` to Avo or Iteratively. Only `reflekt pull`
+        # `No Reflekt push` to Avo or Iteratively. Only `reflekt pull`
 
     def _build_plan_rudderstack(self):
         pass
@@ -118,9 +118,9 @@ class ReflektTransformer(object):
         segment_payload = copy.deepcopy(segment_payload_schema)
         segment_plan = copy.deepcopy(segment_plan_schema)
         segment_plan["display_name"] = self.plan_name
-        logger.info("")
+        print("")  # Make output nicer
         logger.info(
-            f"Converting reflekt tracking plan '{self.plan_name}'to "
+            f"Converting Reflekt tracking plan '{self.plan_name}'to "
             f"{titleize(self.plan_type)} format"
         )
 
@@ -204,7 +204,7 @@ class ReflektTransformer(object):
         segment_property: dict,
     ):
         # NOTE - ReflektTrait is a child class of ReflektProperty, so this
-        # instance method will parse reflekt properties and traits
+        # instance method will parse Reflekt properties and traits
         updated_segment_property = copy.deepcopy(segment_property)
         if hasattr(reflekt_property, "allow_null") and reflekt_property.allow_null:
             updated_segment_property["type"].append("null")
@@ -300,7 +300,7 @@ class ReflektTransformer(object):
 
     def build_dbt_package(self, reflekt_plan: ReflektPlan):
         logger.info(
-            f"Building reflekt dbt package:\n"
+            f"Building Reflekt dbt package:\n"
             f"\n        Warehouse: {self.warehouse_type}"
             f"\n        CDP: {self.cdp_name}"
             f"\n        Tracking plan: {self.plan_name}"
@@ -356,7 +356,7 @@ class ReflektTransformer(object):
     def _dbt_package_segment(self, reflekt_plan: ReflektPlan):
         self.db_errors = []
 
-        # Setup `Page Viewed` and `Screen Viewed` events, if they exist in reflekt plan
+        # Setup `Page Viewed` and `Screen Viewed` events, if they exist in Reflekt plan
         page_viewed_event = [
             event
             for event in reflekt_plan.events
@@ -525,7 +525,7 @@ class ReflektTransformer(object):
             db_errors_str += db_error
 
         if self.db_errors:
-            logger.info("")
+            print("")  # Make output nicer
             logger.warning(
                 f"[WARNING] The following database error(s) were encountered "
                 f"while templating the dbt package. NOTE - these errors do not prevent "
@@ -542,7 +542,7 @@ class ReflektTransformer(object):
 
         shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_path)
 
-        logger.info("")
+        print("")  # Make output nicer
         logger.info(f"[SUCCESS] dbt package built at: {self.dbt_pkg_path}")
 
     def _template_dbt_source(self, reflekt_plan: ReflektPlan):
@@ -565,7 +565,7 @@ class ReflektTransformer(object):
         cdp_cols: dict,
         plan_cols: list,
     ):
-        logger.info("")
+        print("")  # Make output nicer
         logger.info(f"Templating table {table_name} in dbt source {self.schema}")
         dbt_tbl = copy.deepcopy(dbt_table_schema)
         dbt_tbl["name"] = table_name
@@ -604,7 +604,7 @@ class ReflektTransformer(object):
         cdp_cols: dict,
         plan_cols: list,
     ):
-        logger.info("")
+        print("")  # Make output nicer
         logger.info(
             f"Templating dbt model "
             f"{self.model_prefix}{underscore(self.plan_name)}__{table_name}.sql"
@@ -738,7 +738,7 @@ class ReflektTransformer(object):
         cdp_cols: dict,
         plan_cols: list,
     ):
-        logger.info("")
+        print("")  # Make output nicer
         logger.info(
             f"Templating dbt docs "
             f"{self.model_prefix}{underscore(self.plan_name)}__{model_name}.yml"

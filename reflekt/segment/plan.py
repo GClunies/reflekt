@@ -47,7 +47,7 @@ class SegmentPlan(object):
 
     def build_reflekt(self, plan_dir):
         events_dir = plan_dir / "events"
-        # Always start from a clean reflekt plan
+        # Always start from a clean Reflekt plan
         if plan_dir.is_dir():
             shutil.rmtree(plan_dir)
         for dir in [plan_dir, events_dir]:
@@ -64,7 +64,7 @@ class SegmentPlan(object):
         )
 
         if traits_json:
-            logger.info(f"    Writing reflekt identify traits to identify.yml")
+            logger.info(f"    Writing Reflekt identify traits to identify.yml")
             self._build_reflekt_identify_file(plan_dir, traits_json)
 
         group_traits_json = (
@@ -76,7 +76,7 @@ class SegmentPlan(object):
         )
 
         if group_traits_json:
-            logger.info(f"   Writing reflekt group traits to group.yml")
+            logger.info(f"   Writing Reflekt group traits to group.yml")
             self._build_reflekt_group_file(plan_dir, group_traits_json)
 
         for event_json in self.plan_json.get("rules", {}).get("events", []):
@@ -103,7 +103,7 @@ class SegmentPlan(object):
             )
         )
         event_file = os.path.join(events_dir, f"{event_file_name}.yml")
-        logger.info(f"    Writing reflekt event '{event_name}' to {event_file_name}.yml")
+        logger.info(f"    Writing Reflekt event '{event_name}' to {event_file_name}.yml")
         event_obj = parse_segment_event(event_json)
         event_obj_sorted = {"version": event_obj["version"]}
         remainder_dict = funcy.omit(event_obj, "version")

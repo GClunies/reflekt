@@ -34,11 +34,11 @@ def cli():
     "--project-dir",
     "project_dir_str",
     default=".",
-    help="Path where reflekt project will be created. Defaults to current directory.",
+    help="Path where Reflekt project will be created. Defaults to current directory.",
 )
 @click.command()
 def init(project_dir_str):
-    """Create a reflekt project at the provide directory."""
+    """Create a Reflekt project at the provide directory."""
     project_dir = Path(project_dir_str).resolve()
     project_name = click.prompt(
         "Enter your project name (letters, digits, underscore)", type=str
@@ -50,14 +50,14 @@ def init(project_dir_str):
 
         if reflekt_project_obj["name"] == project_name:
             logger.error(
-                f"A reflekt project named {project_name} already exists in "
+                f"A Reflekt project named {project_name} already exists in "
                 f"{Path.cwd()}"
             )
             raise click.Abort()
 
     reflekt_config_path = click.prompt(
         "Enter the absolute path where reflekt_config.yml will be created for "
-        "use by this reflekt project",
+        "use by this Reflekt project",
         type=str,
         default=str(Path.home() / ".reflekt" / "reflekt_config.yml"),
     )
@@ -81,7 +81,7 @@ def init(project_dir_str):
 
         if config_name in reflekt_config_obj:
             logger.error(
-                f"A reflekt config profile named {config_name} already exists in "
+                f"A Reflekt config profile named {config_name} already exists in "
                 f"{reflekt_config_path}"
             )
             raise click.Abort()
@@ -216,7 +216,7 @@ def init(project_dir_str):
             yaml.dump(reflekt_config_obj, f, indent=2)
 
     click.echo(
-        f"Configured to use reflekt config profile '{config_name}' at "
+        f"Configured to use Reflekt config profile '{config_name}' at "
         f"{reflekt_config_path}."
     )
     project_template_dir = pkg_resources.resource_filename(
@@ -235,22 +235,22 @@ def init(project_dir_str):
         f.write(project_yml_str)
 
     logger.info(
-        f"Your reflekt project '{project_name}' has been created!"
+        f"Your Reflekt project '{project_name}' has been created!"
         f"\n\nWith reflekt, you can:\n\n"
         f"    reflekt new --name <plan-name>\n"
-        f"        Create a new tracking plan in reflekt spec (with example YAML files to spec events, user traits, and group traits)\n\n"  # noqa: E501
+        f"        Create a new tracking plan in Reflekt spec (with example YAML files to spec events, user traits, and group traits)\n\n"  # noqa: E501
         f"    reflekt pull --name <plan-name>\n"
-        f"        Get tracking plan from CDP or Analytics Governance tool and convert it to reflekt spec\n\n"  # noqa: E501
+        f"        Get tracking plan from CDP or Analytics Governance tool and convert it to Reflekt spec\n\n"  # noqa: E501
         f"    reflekt push --name <plan-name>\n"
-        f"        Push reflekt tracking plan to your CDP or Analytics Governance tool. reflekt handles the conversion!\n\n"  # noqa: E501
+        f"        Push Reflekt tracking plan to your CDP or Analytics Governance tool. Reflekt handles the conversion!\n\n"  # noqa: E501
         f"    reflekt test --name <plan-name>\n"
-        f"        Test reflekt tracking plan for naming conventions and expected metadata defined in your reflect_project.yml\n\n"  # noqa: E501
+        f"        Test Reflekt tracking plan for naming conventions and expected metadata defined in your reflect_project.yml\n\n"  # noqa: E501
         f"    reflekt dbt --name <plan-name>\n"
         f"        Build a dbt package with sources/models/documentation that *reflekt* the events in your tracking plan!"  # noqa: E501
     )
 
     if plan_type == "avo":
-        logger.info("")
+        print("")  # Make output nicer
         logger.info(avo_end_msg)
 
 
@@ -268,7 +268,7 @@ def init(project_dir_str):
     default=ReflektProject().project_dir / "tracking-plans",
     help=(
         "Path where tracking plan will be generated. Defaults to "
-        "`/tracking-plans` directory in your reflekt project."
+        "`/tracking-plans` directory in your Reflekt project."
     ),
 )
 def new(plan_name, plans_dir):
@@ -298,8 +298,8 @@ def new(plan_name, plans_dir):
     with open(plan_yml_file, "w") as f:
         yaml.dump(doc, f)
 
-    logger.info("")
-    logger.info(f"[SUCCESS] Created reflekt tracking plan '{plan_name}'")
+    print("")  # Make output nicer
+    logger.info(f"[SUCCESS] Created Reflekt tracking plan '{plan_name}'")
 
 
 @click.command()
@@ -316,13 +316,13 @@ def new(plan_name, plans_dir):
     default=ReflektProject().project_dir / "tracking-plans",
     help=(
         "Path where tracking plan will be generated. Defaults to '/tracking-plans' "
-        "directory in your reflekt project."
+        "directory in your Reflekt project."
     ),
 )
 @click.option(
     "--raw",
     flag_value=True,
-    help="Pull raw tracking plan JSON (not in reflekt schema) from CDP.",
+    help="Pull raw tracking plan JSON (not in Reflekt schema) from CDP.",
 )
 @click.option(
     "--avo-branch",
@@ -334,7 +334,7 @@ def new(plan_name, plans_dir):
     ),
 )
 def pull(plan_name, plans_dir, raw, avo_branch):
-    """Generate tracking plan as code using the reflekt schema."""
+    """Generate tracking plan as code using the Reflekt schema."""
     api = ReflektApiHandler().get_api(avo_branch=avo_branch)
     config = ReflektConfig()
     logger.info(
@@ -364,10 +364,11 @@ def pull(plan_name, plans_dir, raw, avo_branch):
         # elif config.plan_type.lower() == "snowplow":
         #     plan = SnowplowPlan(plan_json)
 
-        logger.info(f"Building reflekt tracking plan '{plan_name}' at {plan_dir}")
+        logger.info(f"Building Reflekt tracking plan '{plan_name}'")
         plan.build_reflekt(plan_dir)
+        print("")  # Make output nicer
         logger.info(
-            f"[SUCCESS] reflekt tracking plan '{plan_name}' built at {str(plan_dir)}"
+            f"[SUCCESS] Reflekt tracking plan '{plan_name}' built at {str(plan_dir)}"
         )
 
 
@@ -385,7 +386,7 @@ def pull(plan_name, plans_dir, raw, avo_branch):
     default=ReflektProject().project_dir / "tracking-plans",
     help=(
         "Path to the directory containing the tracking plan folder. Defaults "
-        "to `/tracking-plans` directory in your reflekt project."
+        "to `/tracking-plans` directory in your Reflekt project."
     ),
 )
 @click.option(
@@ -403,7 +404,7 @@ def push(plan_name, plans_dir, dry):
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
         plan_dir = Path(plans_dir) / plan_name
 
-    logger.info(f"Loading reflekt tracking plan '{plan_name}' from {str(plan_dir)}")
+    logger.info(f"Loading Reflekt tracking plan '{plan_name}' from {str(plan_dir)}")
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
     transformer = ReflektTransformer(reflekt_plan)
@@ -416,15 +417,15 @@ def push(plan_name, plans_dir, dry):
         )
         click.echo(json.dumps(payload, indent=2))
     else:
-        logger.info("")
+        print("")  # Make output nicer
         logger.info(
             f"Syncing converted tracking plan '{plan_name}' to "
             f"{titleize(transformer.plan_type)}"
         )
         api.sync(plan_name, cdp_plan)
-        logger.info("")
+        print("")  # Make output nicer
         logger.info(
-            f"[SUCCESS] Synced reflekt tracking plan '{plan_name}' to "
+            f"[SUCCESS] Synced Reflekt tracking plan '{plan_name}' to "
             f"{titleize(transformer.plan_type)}"
         )
 
@@ -443,7 +444,7 @@ def push(plan_name, plans_dir, dry):
     default=ReflektProject().project_dir / "tracking-plans",
     help=(
         "Path to the directory containing the tracking plan folder. Defaults "
-        "to `/tracking-plans` directory in your reflekt project."
+        "to `/tracking-plans` directory in your Reflekt project."
     ),
 )
 def test(plan_name, plans_dir):
@@ -451,7 +452,7 @@ def test(plan_name, plans_dir):
     if plans_dir != ReflektProject().project_dir / "tracking-plans":
         plan_dir = Path(plans_dir) / plan_name
 
-    logger.info(f"Testing reflekt tracking plan '{plan_name}' at {str(plan_dir)}")
+    logger.info(f"Testing Reflekt tracking plan '{plan_name}' at {str(plan_dir)}")
     loader = ReflektLoader(
         plan_dir=plan_dir,
         plan_name=plan_name,
@@ -463,9 +464,9 @@ def test(plan_name, plans_dir):
             click.echo(error, err=True)
         raise click.Abort()
     else:
-        logger.info("")
+        print("")  # Make output nicer
         logger.info(
-            f"[PASSED] No errors detected in reflekt tracking plan '{plan_name}'"
+            f"[PASSED] No errors detected in Reflekt tracking plan '{plan_name}'"
         )
 
 
@@ -473,7 +474,7 @@ def test(plan_name, plans_dir):
     "--name",
     "plan_name",
     required=True,
-    help="Tracking plan name in your reflekt project.",
+    help="Tracking plan name in your Reflekt project.",
 )
 @click.option(
     "--plans-dir",
@@ -482,7 +483,7 @@ def test(plan_name, plans_dir):
     default=ReflektProject().project_dir / "tracking-plans",
     help=(
         "Path to the directory containing the tracking plan folder. Defaults "
-        "to the `tracking-plans/` directory in your reflekt project."
+        "to the `tracking-plans/` directory in your Reflekt project."
     ),
 )
 @click.option(
@@ -492,7 +493,7 @@ def test(plan_name, plans_dir):
     default=ReflektProject().project_dir / "dbt_packages",
     help=(
         "Path to directory where dbt package will be built. Defaults to the "
-        "`dbt_packages/` directory in your reflekt project."
+        "`dbt_packages/` directory in your Reflekt project."
     ),
 )
 @click.option(
@@ -501,7 +502,7 @@ def test(plan_name, plans_dir):
     required=False,
     default=None,
     help=(
-        "Force reflekt to build or overwrite the dbt package with a specific "
+        "Force Reflekt to build or overwrite the dbt package with a specific "
         "semantic version."
     ),
 )
@@ -551,7 +552,7 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
                 version = new_dbt_pkg_version
             else:
                 overwrite = click.confirm(
-                    f"[WARNING] reflekt will overwrite dbt package `reflekt_{underscore(plan_name)}' with version {dbt_pkg_version}.\n"  # noqa: E501
+                    f"[WARNING] Reflekt will overwrite dbt package `reflekt_{underscore(plan_name)}' with version {dbt_pkg_version}.\n"  # noqa: E501
                     f"    Do you want to continue?",
                     default=False,
                 )
@@ -559,10 +560,10 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
                     raise click.Abort()
                 version = dbt_pkg_version
 
-    logger.info(f"Loading reflekt tracking plan {plan_name} at {str(plan_dir)}")
+    logger.info(f"Loading Reflekt tracking plan {plan_name} at {str(plan_dir)}")
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
-    logger.info(f"Loaded reflekt tracking plan {plan_name}\n")
+    logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
     transformer = ReflektTransformer(reflekt_plan, dbt_pkg_dir, pkg_version=version)
     transformer.build_dbt_package(reflekt_plan=reflekt_plan)
 
