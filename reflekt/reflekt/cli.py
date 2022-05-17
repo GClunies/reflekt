@@ -4,7 +4,6 @@
 
 import json
 import shutil
-from email.policy import default
 from pathlib import Path
 
 import click
@@ -14,10 +13,11 @@ from inflection import titleize, underscore
 from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
+
 from reflekt.avo.plan import AvoPlan
-from reflekt.cli.api_handler import ReflektApiHandler
 from reflekt.logger import logger_config
 from reflekt.reflekt import constants
+from reflekt.reflekt.api_handler import ReflektApiHandler
 from reflekt.reflekt.config import ReflektConfig
 from reflekt.reflekt.loader import ReflektLoader
 from reflekt.reflekt.project import ReflektProject
