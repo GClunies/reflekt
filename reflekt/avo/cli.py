@@ -3,9 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import select
 import shutil
 import subprocess
 import typing
+from subprocess import PIPE, STDOUT, Popen
 
 from loguru import logger
 from reflekt.avo.errors import AvoCliError
@@ -47,7 +49,7 @@ class AvoCli:
         avo_executable = shutil.which("avo")
         # Make sure the correct avo branch is checked out
         if self.avo_branch is not None:
-            checkout_call = subprocess.call(  # noqa: F841
+            subprocess.call(
                 args=[
                     avo_executable,
                     "checkout",
@@ -56,7 +58,7 @@ class AvoCli:
                 cwd=self.avo_dir,
             )
         else:
-            checkout_call = subprocess.call(  # noqa: F841
+            subprocess.call(
                 args=[
                     avo_executable,
                     "checkout",
@@ -66,6 +68,20 @@ class AvoCli:
             )
 
         # Run avo pull
+        # p = subprocess.Popen(
+        #     args=[
+        #         avo_executable,
+        #         "pull",
+        #         plan_name,
+        #         "--force",  # --force flag used in case object type used in plan
+        #     ],
+        #     stdout=subprocess.PIPE,
+        #     stdin=subprocess.PIPE,
+        #     cwd=self.avo_dir,
+        # )
+        # stdout, stderr = p.communicate()
+        # test = 123
+
         pull_call = subprocess.call(  # noqa: F841
             args=[
                 avo_executable,
