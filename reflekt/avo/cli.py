@@ -67,21 +67,6 @@ class AvoCli:
                 cwd=self.avo_dir,
             )
 
-        # Run avo pull
-        # p = subprocess.Popen(
-        #     args=[
-        #         avo_executable,
-        #         "pull",
-        #         plan_name,
-        #         "--force",  # --force flag used in case object type used in plan
-        #     ],
-        #     stdout=subprocess.PIPE,
-        #     stdin=subprocess.PIPE,
-        #     cwd=self.avo_dir,
-        # )
-        # stdout, stderr = p.communicate()
-        # test = 123
-
         pull_call = subprocess.call(  # noqa: F841
             args=[
                 avo_executable,
