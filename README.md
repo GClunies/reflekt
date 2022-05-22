@@ -40,7 +40,7 @@ Feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls) fo
 **Q:** **Do I *have to* use Reflekt to manage my tracking plan(s)? What if I like my analytics governance tool and just want to use the dbt templater?**
 
 **A:** No. Reflekt lets you decide what features you want to use. Here are two examples:
-1. Manage tracking plans in Avo, pull the plans from Avo into your Reflekt Project, and template your dbt packages using `reflekt dbt --name my-plan`.
+1. Manage your tracking plan in Avo, configure a JSON source in Reflekt (one time setup), pull the plan from Avo into your Reflekt Project, and template your dbt packages using `reflekt dbt --name my-plan`. Pull future plan changes and template again as needed.
 2. Manage your tracking plan(s) as code in a Reflekt project, sync changes to Segment Protocols with `reflekt push --name my-plan` so the plan can be used for event validation. Now you can develop your tracking plan code the same way your software engineers develop applications - using pull requests, branches, environments, testing, and CI.
 
 **Q:** **If the tracking plan is `code`, how can a product manager propose changes?**
