@@ -13,7 +13,6 @@ import funcy
 import yaml
 from inflection import dasherize, underscore
 from loguru import logger
-from reflekt.logger import logger_config
 from reflekt.reflekt.dumper import ReflektYamlDumper
 from reflekt.segment.parser import parse_segment_event, parse_segment_property
 

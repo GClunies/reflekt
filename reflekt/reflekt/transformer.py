@@ -13,7 +13,6 @@ from inflection import titleize, underscore
 from loguru import logger
 from packaging.version import Version
 
-from reflekt.logger import logger_config
 from reflekt.reflekt.columns import reflekt_columns
 from reflekt.reflekt.config import ReflektConfig
 from reflekt.reflekt.dbt import (

@@ -9,7 +9,6 @@ from pathlib import Path
 import yaml
 from loguru import logger
 
-from reflekt.logger import logger_config
 from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.plan import ReflektPlan
 from reflekt.reflekt.project import ReflektProject
