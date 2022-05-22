@@ -4,12 +4,14 @@ SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# Tracking plan as `code`
+# Reflekt Project and Tracking Plan code
 
 ## Project
 A Reflekt project is a directory of folders and files that define your tracking plans and any templated dbt packages based on those plans.
 
-Every Reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
+![](reflekt-project-struture.png)
+
+Every Reflekt project has a `reflekt_project.yml`, setting project wide configurations.
 <br>
 
 <details><summary>Example <code>reflekt_project.yml</code> (click to expand)</summary><p>
