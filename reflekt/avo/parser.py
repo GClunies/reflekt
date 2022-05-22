@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from loguru import logger
-
 
 def parse_avo_property(name, property_json, required=[]):
     p_type = property_json.get("type")
