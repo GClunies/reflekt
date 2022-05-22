@@ -13,7 +13,8 @@ Reflekt defines tracking plans as `code`, powering its **dbt package templater**
 - dbt [sources](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in your warehouse where the raw event data is stored.
 - dbt [models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for every event in your tracking plan. These models include light transformations to make your event data ready for consumption or further modeling.
 - dbt [documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every model in the package based on the information in the tracking plan. Analysts and the business always know what your tables and columns mean.
-## DEMO VIDEO HERE
+
+https://user-images.githubusercontent.com/28986302/169673197-f5ae1d60-682d-4c85-ad82-4f7fb31be128.mp4
 
 ## Getting started
 - [Install & Setup](docs/INSTALL-SETUP.md)
