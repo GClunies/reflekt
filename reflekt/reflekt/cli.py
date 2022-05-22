@@ -127,7 +127,7 @@ def init(project_dir_str):
                 "You've selected Avo as your Analytics Governance tool which requires "
                 "additional setup steps and contacting Avo support. Please "
                 "see the docs for additional guidance:\n"
-                "    https://github.com/GClunies/reflekt/blob/dev/docs/reflekt-with-avo.md"
+                "    https://github.com/GClunies/reflekt/blob/main/docs/AVO.md"
             )
 
         # TODO - Enable support for other CDPs below as developed
@@ -585,7 +585,7 @@ if __name__ == "__main__":
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
-    pull(["--name", "plan-patty-bar-dev"])
-    # push(["--name", "plan-patty-bar-dev"])
-    # test(["--name", "plan-patty-bar-dev"])
-    # dbt(["--name", "plan-patty-bar-dev"])
+    pull(["--name", "plan-patty-bar-web"])
+    # push(["--name", "plan-patty-bar-web"])
+    # test(["--name", "plan-patty-bar-web"])
+    # dbt(["--name", "plan-patty-bar-web"])
