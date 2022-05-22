@@ -22,6 +22,8 @@ https://user-images.githubusercontent.com/28986302/169673197-f5ae1d60-682d-4c85-
 - [Commands](docs/COMMANDS.md)
 - [Integrations](docs/INTEGRATIONS.md) (Analytics Governance Tools, CDPs, warehouses)
 
+---
+
 ### Motivations
 I built Reflekt to:
 - Automate writing dbt sources, models, and documentation for event data. We know we *should* do this, but doing it for all events (sometimes 100s) can be daunting, time consuming, and boring.
