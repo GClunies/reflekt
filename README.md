@@ -18,17 +18,15 @@ In addition to the dbt package templater, Reflekt can also manage tracking plans
 - Pull tracking plans from your analytics governance tools, converting them to code.
 - Push changes to your tracking plan code back to your analytics governance tools, Reflekt handles the conversion.
 - Create new tracking plans defined as code.
-- Tests your tracking plan code for naming conventions and required metadata. You define the rules in your `reflekt_project.yml`.
+- Test tracking plan code for naming conventions and required metadata. You define the rules in your `reflekt_project.yml`.
 - Makes your tracking plan an *extensible* artifact that you can build off of, similar to dbt's `manifest.json`.
-
-## Demo
-
-https://user-images.githubusercontent.com/28986302/169673197-f5ae1d60-682d-4c85-ad82-4f7fb31be128.mp4
 
 ## Getting started
 - [Install & Setup](docs/INSTALL-SETUP.md)
-- [Reflekt Project and Tracking Plan code](docs/TRACKING-PLANS-AS-CODE.md)
+- [The Reflekt Project and Tracking Plans as `code`](docs/TRACKING-PLANS-AS-CODE.md)
 - [Commands](docs/COMMANDS.md)
+
+https://user-images.githubusercontent.com/28986302/169673197-f5ae1d60-682d-4c85-ad82-4f7fb31be128.mp4
 
 ## Reporting bugs
 If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).
