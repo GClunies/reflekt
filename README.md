@@ -23,7 +23,7 @@ Reflekt can also be used to manage tracking plans:
 
 ## Getting started
 - [Install & Setup](docs/INSTALL-SETUP.md)
-- [The Reflekt Project and Tracking Plans as `code`](docs/TRACKING-PLANS-AS-CODE.md)
+- [Reflekt Projects and Tracking Plans as `code`](docs/TRACKING-PLANS-AS-CODE.md)
 - [Commands](docs/COMMANDS.md)
 
 https://user-images.githubusercontent.com/28986302/169673197-f5ae1d60-682d-4c85-ad82-4f7fb31be128.mp4
