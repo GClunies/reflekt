@@ -29,7 +29,7 @@ Reflekt can also be used to manage tracking plans:
 https://user-images.githubusercontent.com/28986302/169673197-f5ae1d60-682d-4c85-ad82-4f7fb31be128.mp4
 
 ## FAQ
-**Q:** **Do I *have to* use Reflekt to manage my tracking plan(s)? What if I like my analytics governance tool and just want to use the dbt templater?**
+**Q:** **Do I have to use Reflekt to manage my tracking plan(s)? What if I like my analytics governance tool and just want to use the dbt templater?**
 
 **A:** Reflekt lets you decide what features you want to use. Here are two examples:
 1. Manage your tracking plan in Avo, pull the plan from Avo into your Reflekt Project, and template your dbt packages using `reflekt dbt --name my-plan`. Pull plan changes from Avo and template again as needed.
@@ -37,7 +37,7 @@ https://user-images.githubusercontent.com/28986302/169673197-f5ae1d60-682d-4c85-
 
 **Q:** **If the tracking plan is `code`, how can a product manager, marketer, etc. propose changes?**
 
-**A:** The *assumption* here is that code is only for engineers - we strongly disagree! *Anyone* can learn how Reflekt defines tracking plans as code, which is designed to be *human-readable*. Plans are defined in a `tracking-plans/` folder with each event defined using a simple YAML file.
+**A:** This question assumes code is only for engineers - we strongly disagree! *Anyone* can learn how Reflekt defines tracking plans as code, which is why the code is designed to be *human-readable*. In Reflekt, tracking plans are defined in a `tracking-plans/` folder with each event defined using a simple YAML file.
 
 <details><summary><strong>example-event.yml</strong> (click to expand)</summary><p>
 
