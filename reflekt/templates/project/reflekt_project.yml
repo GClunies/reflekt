@@ -55,23 +55,23 @@ tracking_plans:
   #         - Engineering
   #         - Data
 
-dbt_templater:
-  sources:
-    prefix: src_reflekt_       # Prefix for templated dbt package sources
+dbt:
+  templater:
+    sources:
+      prefix: src_reflekt_       # Prefix for templated dbt package sources
 
-  models:
-    prefix: reflekt_           # Prefix for models & docs in templated dbt package
-    materialized: incremental  # One of view|incremental
-    # OPTIONAL (incremental_logic:) [REQUIRED if 'materialized: incremental']
-    # Specify the incremental logic to use when templating dbt models.
-    # Must include the {%- if is_incremental() %} ... {%- endif %} block
-    incremental_logic: |
-      {%- if is_incremental() %}
-      where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
-      {%- endif %}
+    models:
+      prefix: reflekt_           # Prefix for models & docs in templated dbt package
+      materialized: incremental  # One of view|incremental
+      # OPTIONAL (incremental_logic:) [REQUIRED if 'materialized: incremental']
+      # Specify the incremental logic to use when templating dbt models.
+      # Must include the {%- if is_incremental() %} ... {%- endif %} block
+      incremental_logic: |
+        {%- if is_incremental() %}
+        where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
+        {%- endif %}
 
-  # OPTIONAL (pkg_db_schemas:)
-  # For each reflekt tracking plan, you can override the schema where the
-  # models in the templated dbt package will be created.
-  # pkg_db_schemas:
-  #   example-plan: example_schema
+    # OPTIONAL (packages:)
+    # For each tracking plan, specify schema where models in Reflekt dbt package will be materialized.
+    # packages:
+    #   example-plan: example_schema
