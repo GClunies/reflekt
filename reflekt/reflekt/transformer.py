@@ -278,8 +278,9 @@ class ReflektTransformer(object):
             f"\n        tracking plan: {self.plan_name}"
             f"\n        warehouse: {self.warehouse_type}"
             f"\n        schema: {self.schema}"
-            f"\n        dbt pkg name: {self.dbt_pkg_path}\n"
-            f"\n        dbt pkg path: {self.dbt_pkg_path}\n"
+            f"\n        dbt package name: {self.dbt_package_name}"
+            f"\n        dbt package version: {self.pkg_version}"
+            f"\n        dbt package path: {self.dbt_pkg_path}\n"
         )
 
         if self.tmp_pkg_dir.exists():
@@ -562,9 +563,7 @@ class ReflektTransformer(object):
                         dbt_tbl["columns"].append(tbl_col)
 
         for column in plan_cols:
-            logger.info(
-                f"    Adding column {segment_2_snake(column.name)} to table {table_name}"
-            )
+            logger.info(f"    Adding column {segment_2_snake(column.name)} to table")
             tbl_col = copy.deepcopy(dbt_column_schema)
             tbl_col["name"] = segment_2_snake(column.name)
             tbl_col["description"] = column.description
@@ -743,7 +742,7 @@ class ReflektTransformer(object):
                         dbt_mdl_doc["columns"].append(mdl_col)
 
         for column in plan_cols:
-            logger.info(f"    Adding column {segment_2_snake(column.name)} to dbt docs")
+            logger.info(f"    Adding column {segment_2_snake(column.name)} to docs")
             mdl_col = copy.deepcopy(dbt_column_schema)
             mdl_col["name"] = segment_2_snake(column.name)
             mdl_col["description"] = column.description

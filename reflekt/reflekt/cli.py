@@ -14,6 +14,7 @@ from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
 
+from reflekt import reflekt
 from reflekt.avo.plan import AvoPlan
 from reflekt.logger import logger_config
 from reflekt.reflekt import constants
@@ -428,62 +429,58 @@ def test(plan_name):
 )
 @click.option(
     "--force-version",
-    "force_version_str",
+    "force_version",
     required=False,
-    default=None,
     help=(
         "Force Reflekt to build or overwrite the dbt package with a specific "
         "semantic version."
     ),
 )
 @click.command()
-def dbt(plan_name, force_version_str):
+def dbt(plan_name, force_version):
     """Build dbt package with sources, models, and docs based on tracking plan."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     dbt_pkgs_dir = ReflektProject().project_dir / "dbt_packages"
+    logger.info(f"Loading Reflekt tracking plan {plan_name} at {str(plan_dir)}")
+    loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
+    reflekt_plan = loader.plan
+    logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
+    plan_schemas = reflekt_plan.plan_schemas
+    plural = ""
+    dbt_project_dict = {}
 
-    # TODO - check --force-version works
-    if force_version_str is not None:
-        try:
-            version = parse_version(force_version_str)
-        except InvalidVersion:
-            logger.error(
-                f"[ERROR] Invalid semantic version provided: {force_version_str}"
-            )
-            raise click.Abort()
+    if isinstance(plan_schemas, list):
+        logger.info(
+            f"Multiple warehouse schemas mapped to {plan_name}. See "
+            f"'plan_schemas:' in reflekt_project.yml. "
+            f"This is typically done when one tracking plan is used for multiple "
+            f"applications, but with each application sending data to their own "
+            f"warehouse schema.\n\n"
+            f"Reflekt will template a separate dbt package for each schema.\n"
+        )
     else:
-        logger.info(f"Loading Reflekt tracking plan {plan_name} at {str(plan_dir)}")
-        loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
-        reflekt_plan = loader.plan
-        logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
+        plan_schemas = [plan_schemas]  # If string, convert to list
 
-        # TODO - move this to a separate function later. Likely in Plan class.
+    if force_version:
         try:
-            plan_schemas = ReflektProject().plan_schemas[plan_name]
-        except KeyError:
-            raise KeyError(
-                f"Tracking plan '{plan_name}' not found in "
-                f"`plan_db_schemas:` in reflekt_project.yml. Please add "
-                f"corresponding '{plan_name}: <schema>` key value pair."
-            )
-
-        plural = ""
-        dbt_project_dict = {}
-
-        if isinstance(plan_schemas, list):
-            logger.info(
-                f"Multiple warehouse schemas mapped to {plan_name}. See "
-                f"'plan_schemas:' in reflekt_project.yml. "
-                f"This is typically done when one tracking plan is used for multiple "
-                f"applications, but with each application sending data to their own "
-                f"warehouse schema.\n\n"
-                f"Reflekt will template a separate dbt package for each schema.\n"
-            )
-        else:
-            plan_schemas = [plan_schemas]  # Convert to single element list
+            version = parse_version(force_version)
+        except InvalidVersion:
+            logger.error(f"[ERROR] Invalid semantic version provided: {force_version}")
+            raise click.Abort()
 
         for schema in plan_schemas:
-            pkg_name = f"reflekt_{schema}"  # TODO pass directly to the Transformer class
+            pkg_name = f"reflekt_{schema}"
+            transformer = ReflektTransformer(
+                reflekt_plan=reflekt_plan,
+                schema=schema,
+                dbt_package_name=pkg_name,
+                pkg_version=version,
+            )
+            transformer.build_dbt_package()
+
+    else:
+        for schema in plan_schemas:
+            pkg_name = f"reflekt_{schema}"
             dbt_project_yml_path = dbt_pkgs_dir / pkg_name / "dbt_project.yml"
 
             if not dbt_project_yml_path.exists():
@@ -539,14 +536,14 @@ def dbt(plan_name, force_version_str):
                 print("")  # Newline in terminal
                 version = dbt_pkg_version
 
-        for schema in plan_schemas:
-            transformer = ReflektTransformer(
-                reflekt_plan=reflekt_plan,
-                schema=schema,
-                dbt_package_name=pkg_name,
-                pkg_version=version,
-            )
-            transformer.build_dbt_package()
+    for schema in plan_schemas:
+        transformer = ReflektTransformer(
+            reflekt_plan=reflekt_plan,
+            schema=schema,
+            dbt_package_name=pkg_name,
+            pkg_version=version,
+        )
+        transformer.build_dbt_package()
 
 
 # Add CLI commands to CLI group
