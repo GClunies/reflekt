@@ -9,7 +9,6 @@ from pathlib import Path
 import yaml
 from loguru import logger
 
-from reflekt.logger import logger_config
 from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.plan import ReflektPlan
 from reflekt.reflekt.project import ReflektProject
@@ -26,8 +25,8 @@ class ReflektLoader(object):
                 self.plan_name = plan_name
                 self._load_plan_file(plan_dir / "plan.yml")
                 self._load_events(plan_dir / "events")
-                self._load_identify_traits(plan_dir / "identify_traits.yml")
-                self._load_group_traits(plan_dir / "group_traits.yml")
+                self._load_identify_traits(plan_dir / "identify-traits.yml")
+                self._load_group_traits(plan_dir / "group-traits.yml")
                 self._plan.validate_plan()
             except ReflektValidationError as error:
                 if raise_validation_errors:

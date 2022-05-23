@@ -29,6 +29,25 @@ class ReflektProject:
                 else:
                     self._project_errors.append(err)
 
+    def validate_project(self):
+        self._get_project_name()
+        self._get_config_profile()
+        self._get_config_path()
+        self._get_events_case()
+        self._get_events_allow_numbers()
+        self._get_events_reserved()
+        self._get_properties_case()
+        self._get_properties_allow_numbers()
+        self._get_properties_reserved()
+        self._get_data_types()
+        self._get_plan_schemas()
+        self._get_metadata_schema()
+        self._get_dbt_src_prefix()
+        self._get_dbt_model_prefix()
+        self._get_dbt_model_materialized()
+        self._get_dbt_model_incremental_logic()
+        self._get_pkg_schemas()
+
     def _is_git_repo(self, path):
         """Checks if the directory is a git repo. Returns True if it is, else False"""
         try:
@@ -48,9 +67,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "\n"
                 "\nGit repository not detected. Your Reflekt project must be inside a Git repo to function correctly."  # noqa E501
-                "\nCreate a git repo by either:"
-                "\n     - Running `git init` at root of your Reflekt project."
-                "\n     - Cloning a repo containing an existing Reflekt project from GitHub/Gitlab."  # noqa E501
+                "\nYou can create a git repo by running 'git init' at the root of your Reflekt project."  # noqa E501
             )
 
     def _get_project_name(self):
@@ -211,16 +228,16 @@ class ReflektProject:
                 "\nAvailable data types are: ['string', 'integer', 'boolean', 'number', 'object', 'array', 'any']"  # noqa E501
             )
 
-    def _get_plan_db_schemas(self):
+    def _get_plan_schemas(self):
         try:
-            self.plan_db_schemas = self.project["tracking_plans"]["plan_db_schemas"]
+            self.plan_schemas = self.project["tracking_plans"]["plan_schemas"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define `plan_db_schemas:` in reflekt_project.yml. Each trackign plan in your Reflekt project must"  # noqa E501
+                "\n\nMust define `plan_schemas:` in reflekt_project.yml. Each tracking plan in your Reflekt project must"  # noqa E501
                 " be mapped to a corresponding schema in data warehouse where it's raw event data is stored. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
-                "\n  plan_db_schemas:"
+                "\n  plan_schemas:"
                 "\n    plan-name: schema_name"
                 "\n"
             )
@@ -235,7 +252,7 @@ class ReflektProject:
 
     def _get_dbt_src_prefix(self):
         try:
-            self.src_prefix = self.project["dbt_templater"]["sources"]["prefix"]
+            self.src_prefix = self.project["dbt"]["templater"]["sources"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
                 "\n\nMust define `prefix:` for templated dbt sources in reflekt_project.yml. Example:"  # noqa E501
@@ -247,7 +264,7 @@ class ReflektProject:
 
     def _get_dbt_model_prefix(self):
         try:
-            self.model_prefix = self.project["dbt_templater"]["models"]["prefix"]
+            self.model_prefix = self.project["dbt"]["templater"]["models"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
                 "\n\nMust define `prefix:` for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
@@ -259,7 +276,7 @@ class ReflektProject:
 
     def _get_dbt_model_materialized(self):
         try:
-            self.materialized = self.project["dbt_templater"]["models"][
+            self.materialized = self.project["dbt"]["templater"]["models"][
                 "materialized"
             ].lower()
             if self.materialized not in ["view", "incremental"]:
@@ -279,7 +296,7 @@ class ReflektProject:
     def _get_dbt_model_incremental_logic(self):
         if self.materialized == "incremental":
             try:
-                self.incremental_logic = self.project["dbt_templater"]["models"][
+                self.incremental_logic = self.project["dbt"]["templater"]["models"][
                     "incremental_logic"
                 ]
             except KeyError:
@@ -295,27 +312,10 @@ class ReflektProject:
         else:
             self.incremental_logic = None
 
-    def _get_pkg_db_schemas(self):
-        if self.project.get("dbt_templater").get("pkg_db_schemas") is not None:
-            self.pkg_db_schemas = self.project.get("dbt_templater").get("pkg_db_schemas")
+    def _get_pkg_schemas(self):
+        if self.project.get("dbt").get("templater").get("package_schemas") is not None:
+            self.pkg_schemas = (
+                self.project.get("dbt").get("templater").get("package_schemas")
+            )
         else:
-            self.pkg_db_schemas = None
-
-    def validate_project(self):
-        self._get_project_name()
-        self._get_config_profile()
-        self._get_config_path()
-        self._get_events_case()
-        self._get_events_allow_numbers()
-        self._get_events_reserved()
-        self._get_properties_case()
-        self._get_properties_allow_numbers()
-        self._get_properties_reserved()
-        self._get_data_types()
-        self._get_plan_db_schemas()
-        self._get_metadata_schema()
-        self._get_dbt_src_prefix()
-        self._get_dbt_model_prefix()
-        self._get_dbt_model_materialized()
-        self._get_dbt_model_incremental_logic()
-        self._get_pkg_db_schemas()
+            self.pkg_schemas = None

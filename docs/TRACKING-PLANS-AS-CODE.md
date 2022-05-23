@@ -4,12 +4,14 @@ SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# Tracking plan as `code`
+# Reflekt Project and Tracking Plan code
 
 ## Project
 A Reflekt project is a directory of folders and files that define your tracking plans and any templated dbt packages based on those plans.
 
-Every Reflekt project has a `reflekt_project.yml`, which sets project wide configurations.
+![](reflekt-project-struture.png)
+
+Every Reflekt project has a `reflekt_project.yml`, setting project wide configurations.
 <br>
 
 <details><summary>Example <code>reflekt_project.yml</code> (click to expand)</summary><p>
@@ -51,7 +53,7 @@ tracking_plans:
       - any
       - 'null'  # Specify null type in quotes
 
-  plan_db_schemas:
+  plan_schemas:
     # For each reflekt tracking plan, specify the schema in your data warehouse storing raw data.
     # Replace the example mapping below with your mappings
     example-plan: example_schema
@@ -77,26 +79,26 @@ tracking_plans:
           - Engineering
           - Data
 
-dbt_templater:
-  sources:
-    prefix: src_reflekt_       # Prefix for templated dbt package sources
+dbt:
+  templater:
+    sources:
+      prefix: src_reflekt_       # Prefix for templated dbt package sources
 
-  models:
-    prefix: reflekt_           # Prefix for models & docs in templated dbt package
-    materialized: incremental  # One of view|incremental
-    # OPTIONAL (incremental_logic:) [REQUIRED if 'materialized: incremental']
-    # Specify the incremental logic to use when templating dbt models.
-    # Must include the {%- if is_incremental() %} ... {%- endif %} block
-    incremental_logic: |
-      {%- if is_incremental() %}
-      where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
-      {%- endif %}
+    models:
+      prefix: reflekt_           # Prefix for models & docs in templated dbt package
+      materialized: incremental  # One of view|incremental
+      # OPTIONAL (incremental_logic:) [REQUIRED if 'materialized: incremental']
+      # Specify the incremental logic to use when templating dbt models.
+      # Must include the {%- if is_incremental() %} ... {%- endif %} block
+      incremental_logic: |
+        {%- if is_incremental() %}
+        where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
+        {%- endif %}
 
-  # OPTIONAL (pkg_db_schemas:)
-  # For each reflekt tracking plan, you can override the schema where the
-  # models in the templated dbt package will be created.
-  pkg_db_schemas:
-    example-plan: example_schema
+    # OPTIONAL (package_schemas:)
+    # For each tracking plan, specify schema where models in Reflekt dbt package will be materialized.
+    # package_schemas:
+    #   example-plan: example_schema
 
 ```
 </p></details>

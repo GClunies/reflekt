@@ -3,11 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import select
 import shutil
 import subprocess
 import typing
-from subprocess import PIPE, STDOUT, Popen
 
 from loguru import logger
 from reflekt.avo.errors import AvoCliError
@@ -27,16 +25,16 @@ class AvoCli:
         logger.configure(**logger_config)
 
     def get(self, plan_name):
-        plan_db_schemas = self._project.plan_db_schemas
+        plan_schemas = self._project.plan_schemas
         avo_json_file = self.avo_dir / f"{plan_name}.json"
 
         if not avo_json_file.exists():
             avo_json_file.touch()
             avo_json_file.write_text("{}")
 
-        if plan_name not in plan_db_schemas:
+        if plan_name not in plan_schemas:
             raise AvoCliError(
-                f"Plan {plan_name} not found in `plan_db_schemas:` in "
+                f"Plan {plan_name} not found in `plan_schemas:` in "
                 f"{self._project.project_dir}/reflekt_project.yml"
             )
         else:
@@ -45,14 +43,18 @@ class AvoCli:
                 return json.load(f)
 
     def _run_avo_pull(self, plan_name):
-        logger.info(f"Running `avo pull` to fetch {plan_name} from Avo account.\n")
+        logger.info(f"Fetching plan {plan_name} from Avo.\n")
         avo_executable = shutil.which("avo")
-        # Make sure the correct avo branch is checked out
+
+        # Use the provided --avo-branch argument if one was provided
         if self.avo_branch is not None:
             subprocess.call(
                 args=[
                     avo_executable,
-                    "checkout",
+                    "pull",
+                    plan_name,
+                    "--force",  # --force flag used in case object type used in plan
+                    "--branch",
                     self.avo_branch,
                 ],
                 cwd=self.avo_dir,
@@ -61,19 +63,11 @@ class AvoCli:
             subprocess.call(
                 args=[
                     avo_executable,
-                    "checkout",
-                    "main",
+                    "pull",
+                    plan_name,
+                    "--force",  # --force flag used in case object type used in plan
                 ],
                 cwd=self.avo_dir,
             )
 
-        pull_call = subprocess.call(  # noqa: F841
-            args=[
-                avo_executable,
-                "pull",
-                plan_name,
-                "--force",  # --force flag used in case object type used in plan
-            ],
-            cwd=self.avo_dir,
-        )
         print("")  # Make output look nicer

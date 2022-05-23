@@ -26,15 +26,28 @@ class ReflektPlan(object):
             self._project = ReflektProject()
             self.plan_yaml_obj = plan_yaml_obj
             self.name = plan_name
+            self.plan_schemas = self._get_plan_schemas(self.name)
             self.dbt_package_schema = self._get_dbt_package_schema()
             self.events = []
             self.identify_traits = []
             self.group_traits = []
 
+    def _get_plan_schemas(self, plan_name):
+        try:
+            plan_schemas = self._project.plan_schemas[plan_name]
+        except KeyError:
+            raise KeyError(
+                f"Tracking plan '{plan_name}' not found in "
+                f"`plan_db_schemas:` in reflekt_project.yml. Please add "
+                f"corresponding '{plan_name}: <schema>` key value pair."
+            )
+
+        return plan_schemas
+
     def _get_dbt_package_schema(self):
-        if self._project.pkg_db_schemas is not None:
-            if self.name in self._project.pkg_db_schemas:
-                return self._project.pkg_db_schemas[self.name]
+        if self._project.pkg_schemas is not None:
+            if self.name in self._project.pkg_schemas:
+                return self._project.pkg_schemas[self.name]
         else:
             return None
 

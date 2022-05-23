@@ -218,7 +218,7 @@ enum:
 allow_null: true
 """
 
-# Can't mix integer type with enum
+# Can't mix integer type with pattern
 REFLEKT_PROPERTY_BAD_PATTERN = """
 name: property_one
 description: A test property.
@@ -254,10 +254,10 @@ def _create_reflekt_event(tmp_dir, event_fixture=REFLEKT_EVENT):
 
 
 def _create_reflekt_identify(tmp_dir, identify_fixture=REFLEKT_IDENTIFY):
-    r_identify = tmp_dir / "identify_traits.yml"
+    r_identify = tmp_dir / "identify-traits.yml"
     r_identify.write(identify_fixture)
 
 
 def _create_reflekt_group(tmp_dir, group_fixture=REFLEKT_GROUP):
-    r_group = tmp_dir / "group_traits.yml"
+    r_group = tmp_dir / "group-traits.yml"
     r_group.write(group_fixture)

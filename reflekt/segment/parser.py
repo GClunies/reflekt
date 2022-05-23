@@ -47,7 +47,7 @@ def parse_segment_property(name, property_json, required=[]):
     # https://realpython.com/python-recursion/
     if p["type"] == "array":
         # If a schema for items in the array has been defined in the
-        # trackign plan, get the schema.
+        # tracking plan, get the schema.
         if "items" in property_json.keys():
             array_props = []
             reqd_array_props = property_json.get("items").get("required")

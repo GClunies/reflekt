@@ -5,9 +5,7 @@
 from pathlib import Path
 
 import yaml
-from loguru import logger
 
-from reflekt.logger import logger_config
 from reflekt.reflekt.constants import WAREHOUSES
 from reflekt.reflekt.errors import ReflektConfigError
 from reflekt.reflekt.project import ReflektProject
