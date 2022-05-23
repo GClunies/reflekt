@@ -4,13 +4,12 @@
 
 import json
 import shutil
-from email.policy import default
 from pathlib import Path
 
 import click
 import pkg_resources
 import yaml
-from inflection import titleize, underscore
+from inflection import titleize
 from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
