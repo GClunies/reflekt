@@ -28,12 +28,6 @@ Reflekt can also be used to manage tracking plans:
 
 https://user-images.githubusercontent.com/28986302/169673197-f5ae1d60-682d-4c85-ad82-4f7fb31be128.mp4
 
-## Reporting bugs
-If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).
-
-## Contributing code
-Feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls) for contributions you would like to propose. See the [contributing](docs/CONTRIBUTING-CODE.md) docs for development environment details and guidance.
-
 ## FAQ
 **Q:** **Do I *have to* use Reflekt to manage my tracking plan(s)? What if I like my analytics governance tool and just want to use the dbt templater?**
 
@@ -113,7 +107,13 @@ The core belief of Reflekt is **the tracking plan is the most important artifact
 - Leverage continuous integration to test and deploy changes to plans, events, and properties.
 
 ## Bets
-In developing Reflekt, I am betting on the following trends and developments:
+Reflekt is betting on the following trends in the product analytics space:
 - More explicit tracking. Less implicit tracking.
 - Product analytics increasingly powered by the data warehouse and dbt.
 - dbt [metrics](https://docs.getdbt.com/docs/building-a-dbt-project/metrics) / [metrics layer](https://docs.getdbt.com/docs/dbt-cloud/using-dbt-cloud/cloud-metrics-layer) - imagine defining metrics in the tracking plan and Reflekt templating them in dbt for you. 📈
+
+## Reporting bugs
+If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).
+
+## Contributing code
+Feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls) for contributions you would like to propose. See the [contributing](docs/CONTRIBUTING-CODE.md) docs for development environment details and guidance.
