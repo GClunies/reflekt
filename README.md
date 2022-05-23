@@ -14,7 +14,7 @@ Reflekt integrates with your analytics governance tool (e.g. [Segment Protocols]
 
 ![reflekt-arch](/docs/reflekt_architecture.png)
 
-In addition to the dbt package templater, Reflekt can also manage tracking plans:
+Reflekt can also manage tracking plans:
 - Pull tracking plans from your analytics governance tools, converting them to code.
 - Push changes to your tracking plan code back to your analytics governance tools, Reflekt handles the conversion.
 - Create new tracking plans defined as code.
