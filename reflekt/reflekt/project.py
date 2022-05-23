@@ -67,9 +67,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "\n"
                 "\nGit repository not detected. Your Reflekt project must be inside a Git repo to function correctly."  # noqa E501
-                "\nCreate a git repo by either:"
-                "\n     - Running `git init` at root of your Reflekt project."
-                "\n     - Cloning a repo containing an existing Reflekt project from GitHub/Gitlab."  # noqa E501
+                "\nYou can create a git repo by running 'git init' at the root of your Reflekt project."  # noqa E501
             )
 
     def _get_project_name(self):

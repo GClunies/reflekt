@@ -306,10 +306,7 @@ def new(plan_name):
     "--avo-branch",
     "avo_branch",
     default=None,
-    help=(
-        "Specify the branch name you want to pull your avo trackign plan from "
-        "(e.g. dev/staging/main)."
-    ),
+    help=("Specify the branch name you want to pull your Avo tracking plan from."),
 )
 def pull(plan_name, plans_dir, raw, avo_branch):
     """Generate tracking plan as code using the Reflekt schema."""
@@ -449,7 +446,6 @@ def dbt(plan_name, force_version_str):
     if force_version_str is not None:
         try:
             version = parse_version(force_version_str)
-            overwrite = True
         except InvalidVersion:
             logger.error(
                 f"[ERROR] Invalid semantic version provided: {force_version_str}"
@@ -460,9 +456,21 @@ def dbt(plan_name, force_version_str):
         loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
         reflekt_plan = loader.plan
         logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
-        schemas = ReflektProject().plan_schemas[plan_name]
 
-        if isinstance(schemas, list):
+        # TODO - move this to a separate function later. Likely in Plan class.
+        try:
+            plan_schemas = ReflektProject().plan_schemas[plan_name]
+        except KeyError:
+            raise KeyError(
+                f"Tracking plan '{plan_name}' not found in "
+                f"`plan_db_schemas:` in reflekt_project.yml. Please add "
+                f"corresponding '{plan_name}: <schema>` key value pair."
+            )
+
+        plural = ""
+        dbt_project_dict = {}
+
+        if isinstance(plan_schemas, list):
             logger.info(
                 f"Multiple warehouse schemas mapped to {plan_name}. See "
                 f"'plan_schemas:' in reflekt_project.yml. "
@@ -472,16 +480,10 @@ def dbt(plan_name, force_version_str):
                 f"Reflekt will template a separate dbt package for each schema.\n"
             )
         else:
-            schemas = [schemas]  # Convert to single element list
+            plan_schemas = [plan_schemas]  # Convert to single element list
 
-        dbt_project_dict = {}
-
-        for schema in schemas:
-            pkg_name = f"reflekt_{schema}"
-            # 1. Find any existing projects
-            # 2. If found, warn user and provide options:
-            #      - Bump plan to version XX, OR
-            #      - Overwrite existing versions
+        for schema in plan_schemas:
+            pkg_name = f"reflekt_{schema}"  # TODO pass directly to the Transformer class
             dbt_project_yml_path = dbt_pkgs_dir / pkg_name / "dbt_project.yml"
 
             if not dbt_project_yml_path.exists():
@@ -506,15 +508,15 @@ def dbt(plan_name, force_version_str):
                     }
                 )
 
-        plural = ""
         if len(dbt_project_dict) > 0:
             plural = "s"
             logger.info(f"[WARNING] Existing dbt package{plural} found:")
 
             for pkg_name, sub_dict in dbt_project_dict.items():
                 logger.info(
-                    f"    - {pkg_name}, current version: {sub_dict['version']}, "
-                    f"bumped version: {sub_dict['bumped_version']}"
+                    f"    - Package name: {pkg_name}, "
+                    f"Current version: {sub_dict['version']}, "
+                    f"Bumped version: {sub_dict['bumped_version']}"
                 )
 
             bump = click.confirm(
@@ -526,20 +528,22 @@ def dbt(plan_name, force_version_str):
                 version = new_dbt_pkg_version
             else:
                 overwrite = click.confirm(
-                    f"[WARNING] Reflekt will overwrite dbt package{plural}.\n"  # noqa: E501
+                    f"[WARNING] Reflekt will overwrite current version of dbt package{plural}.\n"  # noqa: E501
                     f"    Do you want to continue?",
                     default=False,
                 )
+
                 if not overwrite:
                     raise click.Abort()
+
                 print("")  # Newline in terminal
                 version = dbt_pkg_version
 
-        for schema in schemas:
+        for schema in plan_schemas:
             transformer = ReflektTransformer(
                 reflekt_plan=reflekt_plan,
                 schema=schema,
-                dbt_pkgs_dir=dbt_pkgs_dir,
+                dbt_package_name=pkg_name,
                 pkg_version=version,
             )
             transformer.build_dbt_package()

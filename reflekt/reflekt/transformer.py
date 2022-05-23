@@ -53,8 +53,8 @@ class ReflektTransformer(object):
     def __init__(
         self,
         reflekt_plan: ReflektPlan,
-        schema: str,
-        dbt_pkgs_dir: typing.Optional[Path] = None,
+        schema: typing.Optional[str] = None,
+        dbt_package_name: typing.Optional[str] = None,
         pkg_version: typing.Optional[Version] = None,
     ):
         self.reflekt_plan = reflekt_plan
@@ -65,36 +65,25 @@ class ReflektTransformer(object):
         self.plan_type = self.reflekt_config.plan_type
         self.warehouse = self.reflekt_config.warehouse
         self.warehouse_type = self.reflekt_config.warehouse_type
-        if dbt_pkgs_dir is not None:
+        if schema is not None:
             self.schema = schema
             self.reflekt_project = ReflektProject()
             self.project_dir = self.reflekt_project.project_dir
-            self.dbt_package_name = f"reflekt_{self.schema}"
+            self.dbt_package_name = dbt_package_name
             self.tmp_pkg_dir = (
                 self.project_dir / ".reflekt" / "tmp" / self.dbt_package_name
             )
-            self.dbt_pkg_path = dbt_pkgs_dir / self.dbt_package_name
+            self.dbt_pkgs_dir = self.project_dir / "dbt_packages"
+            self.dbt_pkg_path = self.dbt_pkgs_dir / self.dbt_package_name
             self.pkg_template = pkg_resources.resource_filename(
                 "reflekt", "templates/dbt/"
             )
             self.pkg_version = pkg_version
             self.db_engine = WarehouseConnection()
-            # self.plan_db_schemas = self.reflekt_project.plan_db_schemas
             self.src_prefix = self.reflekt_project.src_prefix
             self.model_prefix = self.reflekt_project.model_prefix
             self.materialized = self.reflekt_project.materialized
             self.incremental_logic = self.reflekt_project.incremental_logic
-
-    # def _get_plan_db_schema(self, plan_name: str):
-    #     try:
-    #         return self.plan_db_schemas[plan_name]
-
-    #     except KeyError:
-    #         raise KeyError(
-    #             f"Tracking plan '{plan_name}' not found in "
-    #             f"`plan_db_schemas:` in reflekt_project.yml. Please add "
-    #             f"corresponding '{plan_name}: <schema>` key value pair."
-    #         )
 
     def build_cdp_plan(self, plan_type: typing.Optional[str] = None):
         if plan_type is None:
@@ -106,7 +95,7 @@ class ReflektTransformer(object):
             return self._build_plan_segment(self.reflekt_plan)
         elif plan_type.lower() == "snowplow":
             return self._build_plan_snowplow(self.reflekt_plan)
-        # `No Reflekt push` to Avo or Iteratively. Only `reflekt pull`
+        # 'reflekt push' not supported for Avo or Iteratively.
 
     def _build_plan_rudderstack(self):
         pass
