@@ -32,9 +32,9 @@ class ReflektPlan(object):
             self.group_traits = []
 
     def _get_dbt_package_schema(self):
-        if self._project.pkg_db_schemas is not None:
-            if self.name in self._project.pkg_db_schemas:
-                return self._project.pkg_db_schemas[self.name]
+        if self._project.pkg_schemas is not None:
+            if self.name in self._project.pkg_schemas:
+                return self._project.pkg_schemas[self.name]
         else:
             return None
 

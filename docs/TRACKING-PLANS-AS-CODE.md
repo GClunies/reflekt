@@ -53,7 +53,7 @@ tracking_plans:
       - any
       - 'null'  # Specify null type in quotes
 
-  plan_db_schemas:
+  plan_schemas:
     # For each reflekt tracking plan, specify the schema in your data warehouse storing raw data.
     # Replace the example mapping below with your mappings
     example-plan: example_schema
@@ -95,9 +95,9 @@ dbt:
         where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
         {%- endif %}
 
-    # OPTIONAL (packages:)
+    # OPTIONAL (package_schemas:)
     # For each tracking plan, specify schema where models in Reflekt dbt package will be materialized.
-    # packages:
+    # package_schemas:
     #   example-plan: example_schema
 
 ```

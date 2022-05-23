@@ -218,7 +218,7 @@ enum:
 allow_null: true
 """
 
-# Can't mix integer type with enum
+# Can't mix integer type with pattern
 REFLEKT_PROPERTY_BAD_PATTERN = """
 name: property_one
 description: A test property.

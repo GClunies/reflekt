@@ -29,6 +29,25 @@ class ReflektProject:
                 else:
                     self._project_errors.append(err)
 
+    def validate_project(self):
+        self._get_project_name()
+        self._get_config_profile()
+        self._get_config_path()
+        self._get_events_case()
+        self._get_events_allow_numbers()
+        self._get_events_reserved()
+        self._get_properties_case()
+        self._get_properties_allow_numbers()
+        self._get_properties_reserved()
+        self._get_data_types()
+        self._get_plan_schemas()
+        self._get_metadata_schema()
+        self._get_dbt_src_prefix()
+        self._get_dbt_model_prefix()
+        self._get_dbt_model_materialized()
+        self._get_dbt_model_incremental_logic()
+        self._get_pkg_schemas()
+
     def _is_git_repo(self, path):
         """Checks if the directory is a git repo. Returns True if it is, else False"""
         try:
@@ -211,16 +230,16 @@ class ReflektProject:
                 "\nAvailable data types are: ['string', 'integer', 'boolean', 'number', 'object', 'array', 'any']"  # noqa E501
             )
 
-    def _get_plan_db_schemas(self):
+    def _get_plan_schemas(self):
         try:
-            self.plan_db_schemas = self.project["tracking_plans"]["plan_db_schemas"]
+            self.plan_schemas = self.project["tracking_plans"]["plan_schemas"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define `plan_db_schemas:` in reflekt_project.yml. Each trackign plan in your Reflekt project must"  # noqa E501
+                "\n\nMust define `plan_schemas:` in reflekt_project.yml. Each tracking plan in your Reflekt project must"  # noqa E501
                 " be mapped to a corresponding schema in data warehouse where it's raw event data is stored. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
-                "\n  plan_db_schemas:"
+                "\n  plan_schemas:"
                 "\n    plan-name: schema_name"
                 "\n"
             )
@@ -295,29 +314,10 @@ class ReflektProject:
         else:
             self.incremental_logic = None
 
-    def _get_pkg_db_schemas(self):
-        if self.project.get("dbt").get("templater").get("packages") is not None:
-            self.pkg_db_schemas = (
-                self.project.get("dbt").get("templater").get("packages")
+    def _get_pkg_schemas(self):
+        if self.project.get("dbt").get("templater").get("package_schemas") is not None:
+            self.pkg_schemas = (
+                self.project.get("dbt").get("templater").get("package_schemas")
             )
         else:
-            self.pkg_db_schemas = None
-
-    def validate_project(self):
-        self._get_project_name()
-        self._get_config_profile()
-        self._get_config_path()
-        self._get_events_case()
-        self._get_events_allow_numbers()
-        self._get_events_reserved()
-        self._get_properties_case()
-        self._get_properties_allow_numbers()
-        self._get_properties_reserved()
-        self._get_data_types()
-        self._get_plan_db_schemas()
-        self._get_metadata_schema()
-        self._get_dbt_src_prefix()
-        self._get_dbt_model_prefix()
-        self._get_dbt_model_materialized()
-        self._get_dbt_model_incremental_logic()
-        self._get_pkg_db_schemas()
+            self.pkg_schemas = None

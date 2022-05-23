@@ -4,6 +4,7 @@
 
 import json
 import shutil
+from email.policy import default
 from pathlib import Path
 
 import click
@@ -338,7 +339,7 @@ def pull(plan_name, plans_dir, raw, avo_branch):
     api = ReflektApiHandler().get_api(avo_branch=avo_branch)
     config = ReflektConfig()
     logger.info(
-        f"Searching {titleize(config.plan_type)} for tracking plan '{plan_name}'"
+        f"Searching {titleize(config.plan_type)} for tracking plan '{plan_name}'."
     )
     plan_json = api.get(plan_name)
     logger.info(f"Found tracking plan '{plan_name}'")
@@ -515,6 +516,7 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
     if dbt_dir != ReflektProject().project_dir / "dbt_packages":
         dbt_pkg_dir = Path(dbt_dir).resolve()
 
+    # TODO - check --force-version works
     if force_version_str is not None:
         try:
             version = parse_version(force_version_str)
@@ -524,27 +526,70 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
                 f"[ERROR] Invalid semantic version provided: {force_version_str}"
             )
             raise click.Abort()
-
     else:
-        dbt_project_yml_path = (
-            dbt_pkg_dir / f"reflekt_{underscore(plan_name)}" / "dbt_project.yml"
-        )
-        if not dbt_project_yml_path.exists():
-            version = parse_version("0.1.0")
-        else:
-            with dbt_project_yml_path.open() as f:
-                dbt_project_yml_path = yaml.safe_load(f)
+        logger.info(f"Loading Reflekt tracking plan {plan_name} at {str(plan_dir)}")
+        loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
+        reflekt_plan = loader.plan
+        logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
+        schemas = ReflektProject().plan_schemas[plan_name]
 
-            dbt_pkg_version = parse_version(dbt_project_yml_path["version"])
-            new_version_str = (
-                f"{dbt_pkg_version.major}."
-                f"{dbt_pkg_version.minor + 1}."
-                f"{dbt_pkg_version.micro}"
+        if isinstance(schemas, list):
+            logger.info(
+                f"Multiple warehouse schemas mapped to {plan_name}. See "
+                f"'plan_schemas:' in reflekt_project.yml. "
+                f"This is typically done when one tracking plan is used for multiple "
+                f"applications, but with each application sending data to their own "
+                f"warehouse schema.\n\n"
+                f"Reflekt will template a separate dbt package for each schema.\n"
             )
-            new_dbt_pkg_version = parse_version(new_version_str)
+        else:
+            schemas = [schemas]  # Convert to single element list
+
+        dbt_project_dict = {}
+
+        for schema in schemas:
+            pkg_name = f"reflekt_{schema}"
+            # 1. Find any existing projects
+            # 2. If found, warn user and provide options:
+            #      - Bump plan to version XX, OR
+            #      - Overwrite existing versions
+            dbt_project_yml_path = dbt_pkg_dir / pkg_name / "dbt_project.yml"
+
+            if not dbt_project_yml_path.exists():
+                version = parse_version("0.1.0")
+            else:
+                with dbt_project_yml_path.open() as f:
+                    dbt_project_yml_path = yaml.safe_load(f)
+
+                dbt_pkg_version = parse_version(dbt_project_yml_path["version"])
+                new_version_str = (
+                    f"{dbt_pkg_version.major}."
+                    f"{dbt_pkg_version.minor + 1}."
+                    f"{dbt_pkg_version.micro}"
+                )
+                new_dbt_pkg_version = parse_version(new_version_str)
+                dbt_project_dict.update(
+                    {
+                        pkg_name: {
+                            "version": str(dbt_pkg_version),
+                            "bumped_version": new_version_str,
+                        }
+                    }
+                )
+
+        plural = ""
+        if len(dbt_project_dict) > 0:
+            plural = "s"
+            logger.info(f"[WARNING] Existing dbt package{plural} found:")
+
+            for pkg_name, sub_dict in dbt_project_dict.items():
+                logger.info(
+                    f"    - {pkg_name}, current version: {sub_dict['version']}, "
+                    f"bumped version: {sub_dict['bumped_version']}"
+                )
+
             bump = click.confirm(
-                f"[WARNING] dbt package `reflekt_{underscore(plan_name)}' already exists with version {dbt_pkg_version}.\n"  # noqa: E501
-                f"    Do you want to bump `reflekt_{underscore(plan_name)}' to version {new_dbt_pkg_version} and overwrite?",  # noqa: E501
+                f"Do you want to bump the dbt package version{plural}?",
                 default=True,
             )
 
@@ -552,20 +597,23 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
                 version = new_dbt_pkg_version
             else:
                 overwrite = click.confirm(
-                    f"[WARNING] Reflekt will overwrite dbt package `reflekt_{underscore(plan_name)}' with version {dbt_pkg_version}.\n"  # noqa: E501
+                    f"[WARNING] Reflekt will overwrite dbt package{plural}.\n"  # noqa: E501
                     f"    Do you want to continue?",
                     default=False,
                 )
                 if not overwrite:
                     raise click.Abort()
+                print("")  # Newline in terminal
                 version = dbt_pkg_version
 
-    logger.info(f"Loading Reflekt tracking plan {plan_name} at {str(plan_dir)}")
-    loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
-    reflekt_plan = loader.plan
-    logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
-    transformer = ReflektTransformer(reflekt_plan, dbt_pkg_dir, pkg_version=version)
-    transformer.build_dbt_package(reflekt_plan=reflekt_plan)
+        for schema in schemas:
+            transformer = ReflektTransformer(
+                reflekt_plan=reflekt_plan,
+                schema=schema,
+                dbt_pkg_dir=dbt_pkg_dir,
+                pkg_version=version,
+            )
+            transformer.build_dbt_package()
 
 
 # Add CLI commands to CLI group
@@ -585,7 +633,7 @@ if __name__ == "__main__":
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
-    pull(["--name", "plan-patty-bar-web"])
-    # push(["--name", "plan-patty-bar-web"])
-    # test(["--name", "plan-patty-bar-web"])
-    # dbt(["--name", "plan-patty-bar-web"])
+    # pull(["--name", "patty-bar"])
+    # push(["--name", "patty-bar"])
+    # test(["--name", "patty-bar"])
+    dbt(["--name", "patty-bar"])

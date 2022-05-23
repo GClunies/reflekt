@@ -53,6 +53,7 @@ class ReflektTransformer(object):
     def __init__(
         self,
         reflekt_plan: ReflektPlan,
+        schema: str,
         dbt_pkg_dir: typing.Optional[Path] = None,
         pkg_version: typing.Optional[Version] = None,
     ):
@@ -65,9 +66,10 @@ class ReflektTransformer(object):
         self.warehouse = self.reflekt_config.warehouse
         self.warehouse_type = self.reflekt_config.warehouse_type
         if dbt_pkg_dir is not None:
+            self.schema = schema
             self.reflekt_project = ReflektProject()
             self.project_dir = self.reflekt_project.project_dir
-            self.dbt_package_name = f"reflekt_{underscore(self.reflekt_plan.name)}"
+            self.dbt_package_name = f"reflekt_{self.schema}"
             self.tmp_pkg_dir = (
                 self.project_dir / ".reflekt" / "tmp" / self.dbt_package_name
             )
@@ -77,23 +79,22 @@ class ReflektTransformer(object):
             )
             self.pkg_version = pkg_version
             self.db_engine = WarehouseConnection()
-            self.plan_db_schemas = self.reflekt_project.plan_db_schemas
-            self.schema = self._get_plan_db_schema(self.plan_name)
+            # self.plan_db_schemas = self.reflekt_project.plan_db_schemas
             self.src_prefix = self.reflekt_project.src_prefix
             self.model_prefix = self.reflekt_project.model_prefix
             self.materialized = self.reflekt_project.materialized
             self.incremental_logic = self.reflekt_project.incremental_logic
 
-    def _get_plan_db_schema(self, plan_name: str):
-        try:
-            return self.plan_db_schemas[plan_name]
+    # def _get_plan_db_schema(self, plan_name: str):
+    #     try:
+    #         return self.plan_db_schemas[plan_name]
 
-        except KeyError:
-            raise KeyError(
-                f"Tracking plan '{plan_name}' not found in "
-                f"`plan_db_schemas:` in reflekt_project.yml. Please add "
-                f"corresponding '{plan_name}: <schema>` key value pair."
-            )
+    #     except KeyError:
+    #         raise KeyError(
+    #             f"Tracking plan '{plan_name}' not found in "
+    #             f"`plan_db_schemas:` in reflekt_project.yml. Please add "
+    #             f"corresponding '{plan_name}: <schema>` key value pair."
+    #         )
 
     def build_cdp_plan(self, plan_type: typing.Optional[str] = None):
         if plan_type is None:
@@ -278,31 +279,17 @@ class ReflektTransformer(object):
 
         return segment_trait
 
-    # TODO - DELETE?
-    # def _parse_reflekt_trait(self, reflekt_trait: ReflektTrait, segment_trait: dict):
-    #     pass
-
-    # def _parse_reflekt_trait(self, reflekt_trait: ReflektTrait, segment_trait: dict):
-    #     updated_segment_trait = copy.deepcopy(segment_trait)
-    #     if reflekt_trait.allow_null:
-    #         updated_segment_trait["type"].append("null")
-    #     elif reflekt_trait.type == "any":
-    #         # If data type is 'any', delete type key. Otherwise, triggers
-    #         # 'invalid argument' from Segment API
-    #         updated_segment_trait.pop("type", None)
-    #     elif reflekt_trait.pattern is not None:
-    #         updated_segment_trait["pattern"] = reflekt_trait.pattern
-    #     elif reflekt_trait.enum is not None:
-    #         updated_segment_trait["enum"] = reflekt_trait.enum
-    #
-    #     return updated_segment_trait
-
-    def build_dbt_package(self, reflekt_plan: ReflektPlan):
+    def build_dbt_package(
+        self,
+    ):
         logger.info(
-            f"Building Reflekt dbt package:\n"
-            f"\n        Warehouse: {self.warehouse_type}"
-            f"\n        CDP: {self.cdp_name}"
-            f"\n        Tracking plan: {self.plan_name}"
+            f"Building Reflekt dbt package:"
+            f"\n        cdp: {self.cdp_name}"
+            f"\n        analytics governance tool: {self.plan_type}"
+            f"\n        tracking plan: {self.plan_name}"
+            f"\n        warehouse: {self.warehouse_type}"
+            f"\n        schema: {self.schema}"
+            f"\n        dbt pkg name: {self.dbt_pkg_path}\n"
             f"\n        dbt pkg path: {self.dbt_pkg_path}\n"
         )
 
@@ -499,9 +486,7 @@ class ReflektTransformer(object):
                     )
 
         dbt_src_path = (
-            self.tmp_pkg_dir
-            / "models"
-            / f"{self.src_prefix}{underscore(self.plan_name)}.yml"
+            self.tmp_pkg_dir / "models" / f"{self.src_prefix}{self.schema}.yml"
         )
 
         with open(dbt_src_path, "w") as f:
@@ -543,6 +528,7 @@ class ReflektTransformer(object):
 
         print("")  # Make output nicer
         logger.info(f"[SUCCESS] dbt package built at: {self.dbt_pkg_path}")
+        print("")  # Cleanup stdout
 
     def _template_dbt_source(self, reflekt_plan: ReflektPlan):
         logger.info(f"Initializing template for dbt source {self.schema}")
@@ -565,7 +551,7 @@ class ReflektTransformer(object):
         plan_cols: list,
     ):
         print("")  # Make output nicer
-        logger.info(f"Templating table {table_name} in dbt source {self.schema}")
+        logger.info(f"Templating table '{table_name}' in dbt source {self.schema}")
         dbt_tbl = copy.deepcopy(dbt_table_schema)
         dbt_tbl["name"] = table_name
         dbt_tbl["description"] = table_description
@@ -606,7 +592,7 @@ class ReflektTransformer(object):
         print("")  # Make output nicer
         logger.info(
             f"Templating dbt model "
-            f"{self.model_prefix}{underscore(self.plan_name)}__{table_name}.sql"
+            f"{self.model_prefix}{self.schema}__{table_name}.sql"
         )
         logger.info("    Adding {{ config(...) }} to model SQL")
         mdl_sql = self._template_dbt_model_config(
@@ -657,7 +643,7 @@ class ReflektTransformer(object):
         model_path = (
             self.tmp_pkg_dir
             / "models"
-            / f"{self.model_prefix}{underscore(self.plan_name)}__{table_name}.sql"
+            / f"{self.model_prefix}{self.schema}__{table_name}.sql"
         )
 
         with open(model_path, "w") as f:
@@ -740,9 +726,9 @@ class ReflektTransformer(object):
         print("")  # Make output nicer
         logger.info(
             f"Templating dbt docs "
-            f"{self.model_prefix}{underscore(self.plan_name)}__{model_name}.yml"
+            f"{self.model_prefix}{self.schema}__{model_name}.yml"
             f" for model "
-            f"{self.model_prefix}{underscore(self.plan_name)}__{model_name}.sql"
+            f"{self.model_prefix}{self.schema}__{model_name}.sql"
         )
         dbt_doc = copy.deepcopy(dbt_doc_schema)
         dbt_mdl_doc = copy.deepcopy(dbt_model_schema)
@@ -776,8 +762,7 @@ class ReflektTransformer(object):
         docs_path = (
             self.tmp_pkg_dir
             / "models"
-            / "docs"
-            / f"{self.model_prefix}{underscore(self.plan_name)}__{model_name}.yml"
+            / f"{self.model_prefix}{self.schema}__{model_name}.yml"
         )
 
         with open(docs_path, "w") as f:
