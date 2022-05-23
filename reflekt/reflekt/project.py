@@ -235,7 +235,7 @@ class ReflektProject:
 
     def _get_dbt_src_prefix(self):
         try:
-            self.src_prefix = self.project["dbt_templater"]["sources"]["prefix"]
+            self.src_prefix = self.project["dbt"]["templater"]["sources"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
                 "\n\nMust define `prefix:` for templated dbt sources in reflekt_project.yml. Example:"  # noqa E501
@@ -247,7 +247,7 @@ class ReflektProject:
 
     def _get_dbt_model_prefix(self):
         try:
-            self.model_prefix = self.project["dbt_templater"]["models"]["prefix"]
+            self.model_prefix = self.project["dbt"]["templater"]["models"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
                 "\n\nMust define `prefix:` for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
@@ -259,7 +259,7 @@ class ReflektProject:
 
     def _get_dbt_model_materialized(self):
         try:
-            self.materialized = self.project["dbt_templater"]["models"][
+            self.materialized = self.project["dbt"]["templater"]["models"][
                 "materialized"
             ].lower()
             if self.materialized not in ["view", "incremental"]:
@@ -279,7 +279,7 @@ class ReflektProject:
     def _get_dbt_model_incremental_logic(self):
         if self.materialized == "incremental":
             try:
-                self.incremental_logic = self.project["dbt_templater"]["models"][
+                self.incremental_logic = self.project["dbt"]["templater"]["models"][
                     "incremental_logic"
                 ]
             except KeyError:
@@ -296,8 +296,10 @@ class ReflektProject:
             self.incremental_logic = None
 
     def _get_pkg_db_schemas(self):
-        if self.project.get("dbt_templater").get("pkg_db_schemas") is not None:
-            self.pkg_db_schemas = self.project.get("dbt_templater").get("pkg_db_schemas")
+        if self.project.get("dbt").get("templater").get("packages") is not None:
+            self.pkg_db_schemas = (
+                self.project.get("dbt").get("templater").get("packages")
+            )
         else:
             self.pkg_db_schemas = None
 
