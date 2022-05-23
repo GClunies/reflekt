@@ -128,7 +128,7 @@ my_config:
 ## Tracking plan
 Reflekt manages your tracking plans in the `tracking-plans/` directory of your Reflekt project. Your events, identify traits, and group traits all have corresponding YAML files.
 
-![my-plan](/docs/my-plan.png)
+![my-plan-example](/docs/my-plan-example.png)
 
 `plan.yml` holds the plan name (used by the reflekt CLI). You do not need to use/edit `plan.yml`.
 

@@ -14,7 +14,7 @@ Reflekt integrates with your analytics governance tool (e.g. [Segment Protocols]
 
 ![reflekt-arch](/docs/reflekt_architecture.png)
 
-Reflekt can also manage tracking plans:
+Reflekt can also be used to manage tracking plans:
 - Pull tracking plans from your analytics governance tools, converting them to code.
 - Push changes to your tracking plan code back to your analytics governance tools, Reflekt handles the conversion.
 - Create new tracking plans defined as code.
@@ -37,15 +37,15 @@ Feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls) fo
 ## FAQ
 **Q:** **Do I *have to* use Reflekt to manage my tracking plan(s)? What if I like my analytics governance tool and just want to use the dbt templater?**
 
-**A:** No. Reflekt lets you decide what features you want to use. Here are two examples:
-1. Manage your tracking plan in Avo, configure a JSON source in Reflekt (one time setup), pull the plan from Avo into your Reflekt Project, and template your dbt packages using `reflekt dbt --name my-plan`. Pull future plan changes and template again as needed.
+**A:** Reflekt lets you decide what features you want to use. Here are two examples:
+1. Manage your tracking plan in Avo, pull the plan from Avo into your Reflekt Project, and template your dbt packages using `reflekt dbt --name my-plan`. Pull plan changes from Avo and template again as needed.
 2. Manage your tracking plan(s) as code in a Reflekt project, sync changes to Segment Protocols with `reflekt push --name my-plan` so the plan can be used for event validation. Now you can develop your tracking plan code the same way your software engineers develop applications - using pull requests, branches, environments, testing, and CI.
 
-**Q:** **If the tracking plan is `code`, how can a product managers, marketers, etc. propose changes?**
+**Q:** **If the tracking plan is `code`, how can a product manager, marketer, etc. propose changes?**
 
-**A:** The *assumption* here is that code is only for engineers - we strongly disagree! *Anyone* can learn how Reflekt defines tracking plans as code. That's why it's designed to be *human-readable*. Plans are defined in a `tracking-plans/` folder with each event defined using a simple YAML file.
+**A:** The *assumption* here is that code is only for engineers - we strongly disagree! *Anyone* can learn how Reflekt defines tracking plans as code, which is designed to be *human-readable*. Plans are defined in a `tracking-plans/` folder with each event defined using a simple YAML file.
 
-<details><summary><strong>example_event.yml</strong> (click to expand)</summary><p>
+<details><summary><strong>example-event.yml</strong> (click to expand)</summary><p>
 
 ```yaml
 # Example 'Product Added' event
@@ -89,7 +89,7 @@ Feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls) fo
 </p></details>
 <br>
 
-![](docs/my-plan.png)
+![my-plan-example](docs/my-plan-example.png)
 
 With this simple structure and file format, anyone can be taught to make changes to the tracking code and submit a PR using GitHub's web interface. No terminal or IDE required!
 
