@@ -261,22 +261,10 @@ def init(project_dir_str):
     required=True,
     help="Name of the tracking plan you want to create.",
 )
-@click.option(
-    "--plans-dir",
-    "plans_dir",
-    required=False,
-    default=ReflektProject().project_dir / "tracking-plans",
-    help=(
-        "Path where tracking plan will be generated. Defaults to "
-        "`/tracking-plans` directory in your Reflekt project."
-    ),
-)
-def new(plan_name, plans_dir):
+def new(plan_name):
     """Create a new empty tracking plan using provided name."""
     plan_template_dir = pkg_resources.resource_filename("reflekt", "templates/plan/")
-
-    if plans_dir != ReflektProject().project_dir / "tracking-plans":
-        plan_dir = Path(plans_dir) / plan_name
+    plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
 
     try:
         logger.info(f"Creating new tracking plan '{plan_name}' in '{plan_dir}'")
@@ -310,16 +298,6 @@ def new(plan_name, plans_dir):
     help="Tracking plan name in CDP or Analytics Governance tool.",
 )
 @click.option(
-    "--plans-dir",
-    "plans_dir",
-    required=False,
-    default=ReflektProject().project_dir / "tracking-plans",
-    help=(
-        "Path where tracking plan will be generated. Defaults to '/tracking-plans' "
-        "directory in your Reflekt project."
-    ),
-)
-@click.option(
     "--raw",
     flag_value=True,
     help="Pull raw tracking plan JSON (not in Reflekt schema) from CDP.",
@@ -349,8 +327,7 @@ def pull(plan_name, plans_dir, raw, avo_branch):
         )
         click.echo(json.dumps(plan_json, indent=2))
     else:
-        if plans_dir != ReflektProject().project_dir / "tracking-plans":
-            plan_dir = Path(plans_dir) / plan_name
+        plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
 
         if api.type.lower() == "avo":
             plan = AvoPlan(plan_json, plan_name)
@@ -380,16 +357,6 @@ def pull(plan_name, plans_dir, raw, avo_branch):
     help="Tracking plan name in CDP or Analytics Governance tool.",
 )
 @click.option(
-    "--plans-dir",
-    "plans_dir",
-    required=False,
-    default=ReflektProject().project_dir / "tracking-plans",
-    help=(
-        "Path to the directory containing the tracking plan folder. Defaults "
-        "to `/tracking-plans` directory in your Reflekt project."
-    ),
-)
-@click.option(
     "--dry",
     is_flag=True,
     help="Output JSON to be synced, without actually syncing it.",
@@ -401,9 +368,7 @@ def push(plan_name, plans_dir, dry):
         logger.error(f"`reflekt push` not supported for {titleize(api.type)}.")
         raise click.Abort()
 
-    if plans_dir != ReflektProject().project_dir / "tracking-plans":
-        plan_dir = Path(plans_dir) / plan_name
-
+    plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Loading Reflekt tracking plan '{plan_name}' from {str(plan_dir)}")
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
@@ -437,21 +402,9 @@ def push(plan_name, plans_dir, dry):
     required=True,
     help="Tracking plan name in CDP or Analytics Governance tool.",
 )
-@click.option(
-    "--plans-dir",
-    "plans_dir",
-    required=False,
-    default=ReflektProject().project_dir / "tracking-plans",
-    help=(
-        "Path to the directory containing the tracking plan folder. Defaults "
-        "to `/tracking-plans` directory in your Reflekt project."
-    ),
-)
-def test(plan_name, plans_dir):
+def test(plan_name):
     """Test tracking plan schema for naming, data types, and metadata."""
-    if plans_dir != ReflektProject().project_dir / "tracking-plans":
-        plan_dir = Path(plans_dir) / plan_name
-
+    plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Testing Reflekt tracking plan '{plan_name}' at {str(plan_dir)}")
     loader = ReflektLoader(
         plan_dir=plan_dir,
@@ -477,26 +430,6 @@ def test(plan_name, plans_dir):
     help="Tracking plan name in your Reflekt project.",
 )
 @click.option(
-    "--plans-dir",
-    "plans_dir",
-    required=False,
-    default=ReflektProject().project_dir / "tracking-plans",
-    help=(
-        "Path to the directory containing the tracking plan folder. Defaults "
-        "to the `tracking-plans/` directory in your Reflekt project."
-    ),
-)
-@click.option(
-    "--dbt-dir",
-    "dbt_dir",
-    required=False,
-    default=ReflektProject().project_dir / "dbt_packages",
-    help=(
-        "Path to directory where dbt package will be built. Defaults to the "
-        "`dbt_packages/` directory in your Reflekt project."
-    ),
-)
-@click.option(
     "--force-version",
     "force_version_str",
     required=False,
@@ -507,13 +440,10 @@ def test(plan_name, plans_dir):
     ),
 )
 @click.command()
-def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
+def dbt(plan_name, force_version_str):
     """Build dbt package with sources, models, and docs based on tracking plan."""
-    if plans_dir != ReflektProject().project_dir / "tracking-plans":
-        plan_dir = Path(plans_dir).resolve() / plan_name
-
-    if dbt_dir != ReflektProject().project_dir / "dbt_packages":
-        dbt_pkg_dir = Path(dbt_dir).resolve()
+    plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
+    dbt_pkgs_dir = ReflektProject().project_dir / "dbt_packages"
 
     # TODO - check --force-version works
     if force_version_str is not None:
@@ -552,7 +482,7 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
             # 2. If found, warn user and provide options:
             #      - Bump plan to version XX, OR
             #      - Overwrite existing versions
-            dbt_project_yml_path = dbt_pkg_dir / pkg_name / "dbt_project.yml"
+            dbt_project_yml_path = dbt_pkgs_dir / pkg_name / "dbt_project.yml"
 
             if not dbt_project_yml_path.exists():
                 version = parse_version("0.1.0")
@@ -609,7 +539,7 @@ def dbt(plan_name, plans_dir, dbt_dir, force_version_str):
             transformer = ReflektTransformer(
                 reflekt_plan=reflekt_plan,
                 schema=schema,
-                dbt_pkg_dir=dbt_pkg_dir,
+                dbt_pkgs_dir=dbt_pkgs_dir,
                 pkg_version=version,
             )
             transformer.build_dbt_package()

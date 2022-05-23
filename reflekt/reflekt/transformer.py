@@ -54,7 +54,7 @@ class ReflektTransformer(object):
         self,
         reflekt_plan: ReflektPlan,
         schema: str,
-        dbt_pkg_dir: typing.Optional[Path] = None,
+        dbt_pkgs_dir: typing.Optional[Path] = None,
         pkg_version: typing.Optional[Version] = None,
     ):
         self.reflekt_plan = reflekt_plan
@@ -65,7 +65,7 @@ class ReflektTransformer(object):
         self.plan_type = self.reflekt_config.plan_type
         self.warehouse = self.reflekt_config.warehouse
         self.warehouse_type = self.reflekt_config.warehouse_type
-        if dbt_pkg_dir is not None:
+        if dbt_pkgs_dir is not None:
             self.schema = schema
             self.reflekt_project = ReflektProject()
             self.project_dir = self.reflekt_project.project_dir
@@ -73,7 +73,7 @@ class ReflektTransformer(object):
             self.tmp_pkg_dir = (
                 self.project_dir / ".reflekt" / "tmp" / self.dbt_package_name
             )
-            self.dbt_pkg_path = dbt_pkg_dir / self.dbt_package_name
+            self.dbt_pkg_path = dbt_pkgs_dir / self.dbt_package_name
             self.pkg_template = pkg_resources.resource_filename(
                 "reflekt", "templates/dbt/"
             )
@@ -527,7 +527,10 @@ class ReflektTransformer(object):
         shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_path)
 
         print("")  # Make output nicer
-        logger.info(f"[SUCCESS] dbt package built at: {self.dbt_pkg_path}")
+        logger.info(
+            f"[SUCCESS] Created Reflekt dbt package '{self.dbt_package_name}' "
+            f"at: {self.dbt_pkg_path}"
+        )
         print("")  # Cleanup stdout
 
     def _template_dbt_source(self, reflekt_plan: ReflektPlan):
