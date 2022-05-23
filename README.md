@@ -87,7 +87,6 @@ Feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls) fo
       required: true
 ```
 </p></details>
-<br>
 
 ![my-plan-example](docs/my-plan-example.png)
 
