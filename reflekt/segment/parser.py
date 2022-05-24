@@ -8,7 +8,7 @@
 # The function parse_segment_property is a derivative work based on the
 # function parse_property from project tracking-plan-kit licensed under MIT.
 # All changes are licensed under Apache-2.0.
-def parse_segment_property(name, property_json, required=[]):
+def parse_segment_property(name: str, property_json: dict, required: list = []):
     p_types = property_json.get("type")
     if not isinstance(p_types, (list,)):
         p_types = [p_types]  # If p_types is not list, make it one
@@ -81,7 +81,7 @@ def parse_segment_property(name, property_json, required=[]):
 # The function parse_segment_event is a derivative work based on the
 # function parse_event from project tracking-plan-kit licensed under MIT.
 # All changes are licensed under Apache-2.0.
-def parse_segment_event(event_json):
+def parse_segment_event(event_json: dict):
     metadata = event_json.get("rules").get("labels")
     event_obj = {
         "name": event_json.get("name"),

@@ -4,6 +4,7 @@
 
 import json
 import shutil
+from pathlib import Path
 
 import yaml
 from inflection import dasherize, underscore
@@ -13,22 +14,22 @@ from reflekt.reflekt.dumper import ReflektYamlDumper
 
 
 class AvoPlan(object):
-    def __init__(self, plan_json, plan_name):
+    def __init__(self, plan_json: dict, plan_name: str):
         self.plan_json = plan_json
         self.name = plan_name
 
     @classmethod
-    def parse_string(cls, json_string):
+    def parse_string(cls, json_string: str):
         parsed_json = json.loads(json_string)
         return cls(parsed_json)
 
     @classmethod
-    def parse_file(cls, json_file_path):
+    def parse_file(cls, json_file_path: Path):
         with open(json_file_path, "r") as f:
             contents = f.read()
         return cls.parse_string(contents)
 
-    def build_reflekt(self, plan_dir):
+    def build_reflekt(self, plan_dir: Path):
         events_dir = plan_dir / "events"
         # If plan directory already exists, remove it.
         if plan_dir.is_dir():
@@ -44,13 +45,13 @@ class AvoPlan(object):
         for event_json in self.plan_json.get("events", []):
             self._build_reflekt_event_file(events_dir, event_json)
 
-    def _build_reflekt_plan_file(self, plan_dir):
+    def _build_reflekt_plan_file(self, plan_dir: Path):
         plan_file = plan_dir / "plan.yml"
         plan_obj = {"name": self.name}
         with open(plan_file, "w") as f:
             yaml.dump(plan_obj, f)
 
-    def _build_reflekt_event_file(self, events_dir, event_json):
+    def _build_reflekt_event_file(self, events_dir: Path, event_json: dict):
         event_name = event_json.get("name")
         event_file_name = dasherize(
             underscore(

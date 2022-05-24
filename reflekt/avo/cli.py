@@ -24,7 +24,7 @@ class AvoCli:
         self.avo_branch = avo_branch
         logger.configure(**logger_config)
 
-    def get(self, plan_name):
+    def get(self, plan_name: str):
         plan_schemas = self._project.plan_schemas
         avo_json_file = self.avo_dir / f"{plan_name}.json"
 
@@ -42,7 +42,7 @@ class AvoCli:
             with open(avo_json_file) as f:
                 return json.load(f)
 
-    def _run_avo_pull(self, plan_name):
+    def _run_avo_pull(self, plan_name: str):
         logger.info(f"Fetching plan {plan_name} from Avo.\n")
         avo_executable = shutil.which("avo")
 

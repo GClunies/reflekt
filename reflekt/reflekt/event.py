@@ -27,7 +27,7 @@ from reflekt.reflekt.schema import reflekt_event_schema, reflekt_metadata_schema
 # YamlEvent from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektEvent(object):
-    def __init__(self, event_yaml_obj):
+    def __init__(self, event_yaml_obj: dict):
         if ReflektProject().exists:
             self._event_yaml_obj = event_yaml_obj
             self._properties = [

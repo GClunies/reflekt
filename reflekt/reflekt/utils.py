@@ -5,7 +5,7 @@
 import re
 
 
-def segment_2_snake(in_str):
+def segment_2_snake(in_str: str):
     """Converts a planCase/PlanCase/PLanCase string to snake_case. Inserts
     underscore only where casing switches from lower to UPPER, lower() entire
     string, replace period with with underscore, replace space with underscore.

@@ -20,7 +20,7 @@ from reflekt.reflekt.schema import reflekt_plan_schema
 # YamlTrackingPlan from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektPlan(object):
-    def __init__(self, plan_yaml_obj, plan_name):
+    def __init__(self, plan_yaml_obj: dict, plan_name: str):
         if ReflektProject().exists:
             self._config = ReflektConfig()
             self._project = ReflektProject()
@@ -32,7 +32,7 @@ class ReflektPlan(object):
             self.identify_traits = []
             self.group_traits = []
 
-    def _get_plan_schemas(self, plan_name):
+    def _get_plan_schemas(self, plan_name: str):
         try:
             plan_schemas = self._project.plan_schemas[plan_name]
         except KeyError:
@@ -51,15 +51,15 @@ class ReflektPlan(object):
         else:
             return None
 
-    def add_event(self, event_yaml_obj):
+    def add_event(self, event_yaml_obj: dict):
         event = ReflektEvent(event_yaml_obj)
         self.events.append(event)
 
-    def add_identify_trait(self, trait_yaml):
+    def add_identify_trait(self, trait_yaml: dict):
         trait_property = ReflektProperty(trait_yaml)
         self.identify_traits.append(trait_property)
 
-    def add_group_trait(self, trait_yaml):
+    def add_group_trait(self, trait_yaml: dict):
         trait_property = ReflektProperty(trait_yaml)
         self.group_traits.append(trait_property)
 
