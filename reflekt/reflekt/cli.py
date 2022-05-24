@@ -309,7 +309,7 @@ def new(plan_name):
     default=None,
     help=("Specify the branch name you want to pull your Avo tracking plan from."),
 )
-def pull(plan_name, plans_dir, raw, avo_branch):
+def pull(plan_name, raw, avo_branch):
     """Generate tracking plan as code using the Reflekt schema."""
     api = ReflektApiHandler().get_api(avo_branch=avo_branch)
     config = ReflektConfig()
@@ -359,7 +359,7 @@ def pull(plan_name, plans_dir, raw, avo_branch):
     is_flag=True,
     help="Output JSON to be synced, without actually syncing it.",
 )
-def push(plan_name, plans_dir, dry):
+def push(plan_name, dry):
     """Sync tracking plan to CDP or Analytics Governance tool."""
     api = ReflektApiHandler().get_api()
     if api.type.lower() in ["avo", "iteratively"]:
@@ -451,7 +451,7 @@ def dbt(plan_name, force_version):
 
     if isinstance(plan_schemas, list):
         logger.info(
-            f"Multiple warehouse schemas mapped to {plan_name}. See "
+            f"[WARNING] Multiple warehouse schemas mapped to {plan_name}. See "
             f"'plan_schemas:' in reflekt_project.yml. "
             f"This is typically done when one tracking plan is used for multiple "
             f"applications, but with each application sending data to their own "
