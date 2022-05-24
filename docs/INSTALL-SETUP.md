@@ -28,7 +28,7 @@ $ cd path/to/reflekt-project
 $ reflekt init --project-dir .  # Follow the prompts
 ```
 
-3. Configure your Reflekt project. See the docs on [Reflekt Projects and Tracking Plans as `code`](TRACKING-PLANS-AS-CODE.md) for guidance on configuration. If you are using Avo, see the [Reflekt + Avo]() section below.
+3. Configure your Reflekt project. See the docs on [Reflekt Projects and Tracking Plans as `code`](TRACKING-PLANS-AS-CODE.md) for guidance on configuration. If you are using Avo, see the [Reflekt + Avo](https://github.com/GClunies/reflekt/blob/main/docs/INSTALL-SETUP.md#reflekt--avo) section below.
 
 4. You are ready to start using Reflekt! See the docs on Reflekt [commands](docs/COMMANDS.md).
 
