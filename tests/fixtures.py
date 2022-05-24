@@ -70,10 +70,6 @@ REFLEKT_EVENT = """
         - one
         - two
     - name: property_ten
-      description: A string property (with pattern rule).
-      type: string
-      pattern: '[A-Z]'
-    - name: property_eleven
       description: A string property.
       type: string
       required: true
@@ -139,10 +135,6 @@ REFLEKT_EVENT_BAD = """
         - one
         - two
     - name: property_ten
-      description: A string property (with pattern rule).
-      type: string
-      pattern: '[A-Z]'
-    - name: property_eleven
       description: A string property.
       type: string
       required: true
@@ -216,14 +208,6 @@ enum:
   - two
   - three
 allow_null: true
-"""
-
-# Can't mix integer type with pattern
-REFLEKT_PROPERTY_BAD_PATTERN = """
-name: property_one
-description: A test property.
-type: integer
-pattern: '[A-Z]'
 """
 
 
