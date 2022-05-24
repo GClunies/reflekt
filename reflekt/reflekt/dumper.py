@@ -8,7 +8,7 @@ import yaml
 class ReflektYamlDumper(yaml.Dumper):
     """Custom YAML dumper class. Indents list object for readability."""
 
-    def increase_indent(self, flow=False, indentless=False):
+    def increase_indent(self, flow: bool = False, indentless: bool = False):
         return super(ReflektYamlDumper, self).increase_indent(flow, False)
 
     # Don't use YAML anchors/aliases

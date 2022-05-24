@@ -11,7 +11,7 @@ from reflekt.reflekt.errors import ReflektProjectError
 
 
 class ReflektProject:
-    def __init__(self, raise_project_errors=True):
+    def __init__(self, raise_project_errors: bool = True):
         self._project_errors = []
         self.project_dir = self._get_project_root(Path.cwd())
         self.project_yml = self.project_dir / "reflekt_project.yml"
@@ -48,7 +48,7 @@ class ReflektProject:
         self._get_dbt_model_incremental_logic()
         self._get_pkg_schemas()
 
-    def _is_git_repo(self, path):
+    def _is_git_repo(self, path: Path):
         """Checks if the directory is a git repo. Returns True if it is, else False"""
         try:
             _ = Repo(path).git_dir
@@ -56,7 +56,7 @@ class ReflektProject:
         except InvalidGitRepositoryError:
             return False
 
-    def _get_project_root(self, path):
+    def _get_project_root(self, path: Path):
         """Gets the working tree directory for Reflekt project. Reflekt project
         must be a in git repo.
         """

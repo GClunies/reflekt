@@ -18,7 +18,9 @@ from reflekt.reflekt.project import ReflektProject
 # PlanLoader from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektLoader(object):
-    def __init__(self, plan_dir, plan_name, raise_validation_errors=True):
+    def __init__(
+        self, plan_dir: Path, plan_name: str, raise_validation_errors: bool = True
+    ):
         self._validation_errors = []
         if ReflektProject().exists:
             try:
@@ -46,12 +48,12 @@ class ReflektLoader(object):
     def validation_errors(self):
         return self._validation_errors
 
-    def _load_plan_file(self, path):
+    def _load_plan_file(self, path: Path):
         with open(path, "r") as plan_file:
             yaml_obj = yaml.safe_load(plan_file)
             self._plan = ReflektPlan(plan_yaml_obj=yaml_obj, plan_name=self.plan_name)
 
-    def _load_events(self, path):
+    def _load_events(self, path: Path):
         for file in sorted(Path(path).glob("**/*.yml")):  # Get .yml files in /events
             logger.info(
                 f"    Parsing event file {file.name}",
@@ -62,7 +64,7 @@ class ReflektLoader(object):
                 for event_version in yaml_event_obj:
                     self.plan.add_event(event_version)
 
-    def _load_identify_traits(self, path):
+    def _load_identify_traits(self, path: Path):
         if not path.exists():
             return
 

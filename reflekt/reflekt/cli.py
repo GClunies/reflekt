@@ -38,7 +38,7 @@ def cli():
     help="Path where Reflekt project will be created. Defaults to current directory.",
 )
 @click.command()
-def init(project_dir_str):
+def init(project_dir_str: str):
     """Create a Reflekt project at the provide directory."""
     project_dir = Path(project_dir_str).resolve()
     project_name = click.prompt(
@@ -239,19 +239,19 @@ def init(project_dir_str):
         f"Your Reflekt project '{project_name}' has been created!"
         f"\n\nWith reflekt, you can:\n\n"
         f"    reflekt new --name <plan-name>\n"
-        f"        Create a new tracking plan in Reflekt spec (with example YAML files to spec events, user traits, and group traits)\n\n"  # noqa: E501
+        f"        Create a new tracking plan, defined as code.\n\n"  # noqa: E501
         f"    reflekt pull --name <plan-name>\n"
-        f"        Get tracking plan from CDP or Analytics Governance tool and convert it to Reflekt spec\n\n"  # noqa: E501
+        f"        Get tracking plan from Analytics Governance tool and convert it to code.\n\n"  # noqa: E501
         f"    reflekt push --name <plan-name>\n"
-        f"        Push Reflekt tracking plan to your CDP or Analytics Governance tool. Reflekt handles the conversion!\n\n"  # noqa: E501
+        f"        Sync tracking plan code to Analytics Governance tool. Reflekt handles conversion.\n\n"  # noqa: E501
         f"    reflekt test --name <plan-name>\n"
-        f"        Test Reflekt tracking plan for naming conventions and expected metadata defined in your reflect_project.yml\n\n"  # noqa: E501
+        f"        Test tracking plan code for naming and metadata conventions (defined in reflect_project.yml).\n\n"  # noqa: E501
         f"    reflekt dbt --name <plan-name>\n"
-        f"        Build a dbt package with sources/models/documentation that *reflekt* the events in your tracking plan!"  # noqa: E501
+        f"        Template dbt package with sources, models, and docs for all events in tracking plan."  # noqa: E501
     )
 
     if plan_type == "avo":
-        print("")  # Make output nicer
+        print("")  # Terminal newline
         logger.info(avo_end_msg)
 
 
@@ -262,7 +262,7 @@ def init(project_dir_str):
     required=True,
     help="Name of the tracking plan you want to create.",
 )
-def new(plan_name):
+def new(plan_name: str):
     """Create a new empty tracking plan using provided name."""
     plan_template_dir = pkg_resources.resource_filename("reflekt", "templates/plan/")
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
@@ -287,7 +287,7 @@ def new(plan_name):
     with open(plan_yml_file, "w") as f:
         yaml.dump(doc, f)
 
-    print("")  # Make output nicer
+    print("")  # Terminal newline
     logger.info(f"[SUCCESS] Created Reflekt tracking plan '{plan_name}'")
 
 
@@ -309,7 +309,7 @@ def new(plan_name):
     default=None,
     help=("Specify the branch name you want to pull your Avo tracking plan from."),
 )
-def pull(plan_name, raw, avo_branch):
+def pull(plan_name: str, raw: bool, avo_branch: str):
     """Generate tracking plan as code using the Reflekt schema."""
     api = ReflektApiHandler().get_api(avo_branch=avo_branch)
     config = ReflektConfig()
@@ -341,7 +341,7 @@ def pull(plan_name, raw, avo_branch):
 
         logger.info(f"Building Reflekt tracking plan '{plan_name}'")
         plan.build_reflekt(plan_dir)
-        print("")  # Make output nicer
+        print("")  # Terminal newline
         logger.info(
             f"[SUCCESS] Reflekt tracking plan '{plan_name}' built at {str(plan_dir)}"
         )
@@ -380,13 +380,13 @@ def push(plan_name, dry):
         )
         click.echo(json.dumps(payload, indent=2))
     else:
-        print("")  # Make output nicer
+        print("")  # Terminal newline
         logger.info(
             f"Syncing converted tracking plan '{plan_name}' to "
             f"{titleize(transformer.plan_type)}"
         )
         api.sync(plan_name, cdp_plan)
-        print("")  # Make output nicer
+        print("")  # Terminal newline
         logger.info(
             f"[SUCCESS] Synced Reflekt tracking plan '{plan_name}' to "
             f"{titleize(transformer.plan_type)}"
@@ -400,7 +400,7 @@ def push(plan_name, dry):
     required=True,
     help="Tracking plan name in CDP or Analytics Governance tool.",
 )
-def test(plan_name):
+def test(plan_name: str):
     """Test tracking plan schema for naming, data types, and metadata."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Testing Reflekt tracking plan '{plan_name}' at {str(plan_dir)}")
@@ -415,7 +415,7 @@ def test(plan_name):
             click.echo(error, err=True)
         raise click.Abort()
     else:
-        print("")  # Make output nicer
+        print("")  # Terminal newline
         logger.info(
             f"[PASSED] No errors detected in Reflekt tracking plan '{plan_name}'"
         )

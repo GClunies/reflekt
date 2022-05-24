@@ -9,6 +9,7 @@ class AmplitudeApi:
     Taxonomy API. In particular, the ability to update Event properties in
     Amplitude to ensure they are consistent with the tracking plan.
 
-    Amplitude docs: https://developers.amplitude.com/docs/taxonomy-api#update-an-event-property
+    Amplitude docs:
+    https://developers.amplitude.com/docs/taxonomy-api#update-an-event-property
     """
     # fmt: on

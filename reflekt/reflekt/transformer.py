@@ -107,7 +107,7 @@ class ReflektTransformer(object):
         segment_payload = copy.deepcopy(segment_payload_schema)
         segment_plan = copy.deepcopy(segment_plan_schema)
         segment_plan["display_name"] = self.plan_name
-        print("")  # Make output nicer
+        print("")  # Terminal newline
         logger.info(
             f"Converting Reflekt tracking plan '{self.plan_name}'to "
             f"{titleize(self.plan_type)} format"
@@ -499,7 +499,7 @@ class ReflektTransformer(object):
             db_errors_str += db_error
 
         if self.db_errors:
-            print("")  # Make output nicer
+            print("")  # Terminal newline
             logger.warning(
                 f"[WARNING] The following database error(s) were encountered "
                 f"while templating the dbt package. NOTE - these errors do not prevent "
@@ -516,7 +516,7 @@ class ReflektTransformer(object):
 
         shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_path)
 
-        print("")  # Make output nicer
+        print("")  # Terminal newline
         logger.info(
             f"[SUCCESS] Created Reflekt dbt package '{self.dbt_package_name}' "
             f"at: {self.dbt_pkg_path}"
@@ -543,7 +543,7 @@ class ReflektTransformer(object):
         cdp_cols: dict,
         plan_cols: list,
     ):
-        print("")  # Make output nicer
+        print("")  # Terminal newline
         logger.info(f"Templating table '{table_name}' in dbt source {self.schema}")
         dbt_tbl = copy.deepcopy(dbt_table_schema)
         dbt_tbl["name"] = table_name
@@ -580,7 +580,7 @@ class ReflektTransformer(object):
         cdp_cols: dict,
         plan_cols: list,
     ):
-        print("")  # Make output nicer
+        print("")  # Terminal newline
         logger.info(
             f"Templating dbt model "
             f"{self.model_prefix}{self.schema}__{table_name}.sql"
@@ -714,7 +714,7 @@ class ReflektTransformer(object):
         cdp_cols: dict,
         plan_cols: list,
     ):
-        print("")  # Make output nicer
+        print("")  # Terminal newline
         logger.info(
             f"Templating dbt docs "
             f"{self.model_prefix}{self.schema}__{model_name}.yml"

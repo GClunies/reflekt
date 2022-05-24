@@ -29,7 +29,7 @@ from reflekt.reflekt.schema import (
 # YamlProperty from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektProperty(object):
-    def __init__(self, property_yaml):
+    def __init__(self, property_yaml: dict):
         if ReflektProject().exists:
             self._property_yaml = property_yaml
             self.validate_property()

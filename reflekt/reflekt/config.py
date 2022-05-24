@@ -12,7 +12,7 @@ from reflekt.reflekt.project import ReflektProject
 
 
 class ReflektConfig:
-    def __init__(self, raise_config_errors=True):
+    def __init__(self, raise_config_errors: bool = True):
         if ReflektProject().exists:
             try:
                 self.config_errors = []

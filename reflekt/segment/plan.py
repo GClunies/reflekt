@@ -21,17 +21,17 @@ from reflekt.segment.parser import parse_segment_event, parse_segment_property
 # JsonTrackingPlan from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class SegmentPlan(object):
-    def __init__(self, plan_json):
+    def __init__(self, plan_json: dict):
         self.plan_json = plan_json
 
     @classmethod
-    def parse_string(cls, json_string):
+    def parse_string(cls, json_string: str):
         parsed_json = json.loads(json_string)
         plan = cls(parsed_json)
         return plan
 
     @classmethod
-    def parse_file(cls, json_file_path):
+    def parse_file(cls, json_file_path: Path):
         with open(json_file_path, "r") as f:
             contents = f.read()
         return cls.parse_string(contents)
@@ -44,7 +44,7 @@ class SegmentPlan(object):
     def name(self):
         return self.plan_json.get("name")
 
-    def build_reflekt(self, plan_dir):
+    def build_reflekt(self, plan_dir: Path):
         events_dir = plan_dir / "events"
         # Always start from a clean Reflekt plan
         if plan_dir.is_dir():
@@ -81,8 +81,8 @@ class SegmentPlan(object):
         for event_json in self.plan_json.get("rules", {}).get("events", []):
             self._build_reflekt_event_file(events_dir, event_json)
 
-    def _build_reflekt_plan_file(self, plan_dir):
-        plan_file = os.path.join(plan_dir, "plan.yml")
+    def _build_reflekt_plan_file(self, plan_dir: Path):
+        plan_file = plan_dir / "plan.yml"
         plan_obj = {
             "name": self.display_name
         }  # Segment refers to the plan name as the `display_name` in their API
@@ -90,7 +90,7 @@ class SegmentPlan(object):
         with open(plan_file, "w") as f:
             yaml.dump(plan_obj, f)
 
-    def _build_reflekt_event_file(self, events_dir, event_json):
+    def _build_reflekt_event_file(self, events_dir: Path, event_json: dict):
         event_name = event_json.get("name")
         event_file_name = dasherize(
             underscore(
@@ -101,7 +101,7 @@ class SegmentPlan(object):
                 .replace("/", "")  # Remove slashes
             )
         )
-        event_file = os.path.join(events_dir, f"{event_file_name}.yml")
+        event_file = events_dir / f"{event_file_name}.yml"
         logger.info(f"    Writing Reflekt event '{event_name}' to {event_file_name}.yml")
         event_obj = parse_segment_event(event_json)
         event_obj_sorted = {"version": event_obj["version"]}
@@ -137,7 +137,7 @@ class SegmentPlan(object):
                     encoding=("utf-8"),
                 )
 
-    def _build_reflekt_identify_file(self, plan_dir, traits_json):
+    def _build_reflekt_identify_file(self, plan_dir: Path, traits_json: dict):
         traits = [
             parse_segment_property(name, prop_json)
             for (name, prop_json) in traits_json.items()
@@ -158,7 +158,7 @@ class SegmentPlan(object):
                 encoding=("utf-8"),
             )
 
-    def _build_reflekt_group_file(self, plan_dir, group_traits_json):
+    def _build_reflekt_group_file(self, plan_dir: Path, group_traits_json: dict):
         traits = [
             parse_segment_property(name, prop_json)
             for (name, prop_json) in group_traits_json.items()
