@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 import re
+from typing import Optional
 
 from cerberus import Validator
 
@@ -29,53 +30,53 @@ from reflekt.reflekt.schema import (
 # YamlProperty from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektProperty(object):
-    def __init__(self, property_yaml: dict):
+    def __init__(self, property_yaml: dict) -> None:
         if ReflektProject().exists:
             self._property_yaml = property_yaml
             self.validate_property()
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._property_yaml.get("name")
 
     @property
-    def description(self):
+    def description(self) -> str:
         return self._property_yaml.get("description")
 
     @property
-    def type(self):
+    def type(self) -> str:
         return self._property_yaml.get("type")
 
     @property
-    def required(self):
+    def required(self) -> bool:
         return self._property_yaml.get("required", False)
 
     @property
-    def allow_null(self):
+    def allow_null(self) -> bool:
         return self._property_yaml.get("allow_null", False)
 
     @property
-    def enum(self):
+    def enum(self) -> str:
         return self._property_yaml.get("enum")
 
     @property
-    def datetime(self):
+    def datetime(self) -> Optional[bool]:
         return self._property_yaml.get("datetime")
 
     @property
-    def array_item_schema(self):
+    def array_item_schema(self) -> Optional[dict]:
         return self._property_yaml.get("array_item_schema")
 
     @property
-    def object_properties(self):
+    def object_properties(self) -> Optional[dict]:
         return self._property_yaml.get("object_properties")
 
-    def _check_description(self):
+    def _check_description(self) -> None:
         if self.description == "":
             message = f"Property {self.name} has no description."
             raise ReflektValidationError(message)
 
-    def _check_enum(self):
+    def _check_enum(self) -> None:
         if self.type != "string" and self.enum:
             message = (
                 f"Property {self.name} is of type {self.type}. Cannot specify "
@@ -84,7 +85,7 @@ class ReflektProperty(object):
             )
             raise ReflektValidationError(message)
 
-    def _check_datetime(self):
+    def _check_datetime(self) -> None:
         if self.type != "string" and self.datetime:
             message = (
                 f"Property {self.name} is of type {self.type}. Cannot specify "
@@ -93,7 +94,7 @@ class ReflektProperty(object):
             )
             raise ReflektValidationError(message)
 
-    def _check_array_item_schema(self):
+    def _check_array_item_schema(self) -> None:
         if self.array_item_schema:
             for array_item in self.array_item_schema:
                 validator = Validator(reflekt_item_schema)
@@ -116,7 +117,7 @@ class ReflektProperty(object):
             )
             raise ReflektValidationError(message)
 
-    def _check_object_properties(self):
+    def _check_object_properties(self) -> None:
         if self.object_properties:
             for object_property in self.object_properties:
                 validator = Validator(reflekt_nested_property_schema)
@@ -140,7 +141,7 @@ class ReflektProperty(object):
             )
             raise ReflektValidationError(message)
 
-    def _check_property_name(self):
+    def _check_property_name(self) -> None:
         project = ReflektProject()
         case_rule = project.properties_case
         allow_numbers = project.properties_allow_numbers
@@ -180,7 +181,7 @@ class ReflektProperty(object):
                 f"\n    - Change '{rule_type} {rule_str}' in reflekt_project.yml."
             )
 
-    def validate_property(self):
+    def validate_property(self) -> None:
         """Validate event property against Reflekt schema."""
         validator = Validator(reflekt_property_schema)
         is_valid = validator.validate(self._property_yaml, reflekt_property_schema)

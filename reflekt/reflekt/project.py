@@ -11,7 +11,7 @@ from reflekt.reflekt.errors import ReflektProjectError
 
 
 class ReflektProject:
-    def __init__(self, raise_project_errors: bool = True):
+    def __init__(self, raise_project_errors: bool = True) -> None:
         self._project_errors = []
         self.project_dir = self._get_project_root(Path.cwd())
         self.project_yml = self.project_dir / "reflekt_project.yml"
@@ -48,7 +48,7 @@ class ReflektProject:
         self._get_dbt_model_incremental_logic()
         self._get_pkg_schemas()
 
-    def _is_git_repo(self, path: Path):
+    def _is_git_repo(self, path: Path) -> bool:
         """Checks if the directory is a git repo. Returns True if it is, else False"""
         try:
             _ = Repo(path).git_dir
@@ -56,7 +56,7 @@ class ReflektProject:
         except InvalidGitRepositoryError:
             return False
 
-    def _get_project_root(self, path: Path):
+    def _get_project_root(self, path: Path) -> Path:
         """Gets the working tree directory for Reflekt project. Reflekt project
         must be a in git repo.
         """
@@ -70,7 +70,7 @@ class ReflektProject:
                 "\nYou can create a git repo by running 'git init' at the root of your Reflekt project."  # noqa E501
             )
 
-    def _get_project_name(self):
+    def _get_project_name(self) -> None:
         try:
             self.name = self.project["name"]
         except KeyError:
@@ -81,7 +81,7 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_config_profile(self):
+    def _get_config_profile(self) -> None:
         try:
             self.config_profile = self.project["config_profile"]
         except KeyError:
@@ -92,7 +92,7 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_config_path(self):
+    def _get_config_path(self) -> None:
         config_path_check = self.project.get("config_path")
 
         if config_path_check is not None:
@@ -111,7 +111,7 @@ class ReflektProject:
         else:
             self.config_path = None
 
-    def _get_events_case(self):
+    def _get_events_case(self) -> None:
         self.events_case = (
             self.project.get("tracking_plans").get("naming").get("events").get("case")
         )
@@ -127,7 +127,7 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_events_allow_numbers(self):
+    def _get_events_allow_numbers(self) -> None:
         try:
             self.events_allow_numbers = self.project["tracking_plans"]["naming"][
                 "events"
@@ -143,7 +143,7 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_events_reserved(self):
+    def _get_events_reserved(self) -> None:
         try:
             self.events_reserved = self.project["tracking_plans"]["naming"]["events"][
                 "reserved"
@@ -159,7 +159,7 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_properties_case(self):
+    def _get_properties_case(self) -> None:
         self.properties_case = (
             self.project.get("tracking_plans")
             .get("naming")
@@ -178,7 +178,7 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_properties_allow_numbers(self):
+    def _get_properties_allow_numbers(self) -> None:
         try:
             self.properties_allow_numbers = self.project["tracking_plans"]["naming"][
                 "properties"
@@ -194,7 +194,7 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_properties_reserved(self):
+    def _get_properties_reserved(self) -> None:
         try:
             self.properties_reserved = self.project["tracking_plans"]["naming"][
                 "properties"
@@ -210,7 +210,7 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_data_types(self):
+    def _get_data_types(self) -> None:
         try:
             self.data_types = self.project["tracking_plans"]["data_types"]["allowed"]
         except KeyError:
@@ -228,7 +228,7 @@ class ReflektProject:
                 "\nAvailable data types are: ['string', 'integer', 'boolean', 'number', 'object', 'array', 'any']"  # noqa E501
             )
 
-    def _get_plan_schemas(self):
+    def _get_plan_schemas(self) -> None:
         try:
             self.plan_schemas = self.project["tracking_plans"]["plan_schemas"]
         except KeyError:
@@ -242,7 +242,7 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_metadata_schema(self):
+    def _get_metadata_schema(self) -> None:
         if self.project.get("tracking_plans").get("metadata") is not None:
             self.metadata_schema = (
                 self.project.get("tracking_plans").get("metadata").get("schema")
@@ -250,7 +250,7 @@ class ReflektProject:
         else:
             self.metadata_schema = None
 
-    def _get_dbt_src_prefix(self):
+    def _get_dbt_src_prefix(self) -> None:
         try:
             self.src_prefix = self.project["dbt"]["templater"]["sources"]["prefix"]
         except KeyError:
@@ -262,7 +262,7 @@ class ReflektProject:
                 "\n    prefix: src_"
             )
 
-    def _get_dbt_model_prefix(self):
+    def _get_dbt_model_prefix(self) -> None:
         try:
             self.model_prefix = self.project["dbt"]["templater"]["models"]["prefix"]
         except KeyError:
@@ -274,7 +274,7 @@ class ReflektProject:
                 "\n    prefix: src_"
             )
 
-    def _get_dbt_model_materialized(self):
+    def _get_dbt_model_materialized(self) -> None:
         try:
             self.materialized = self.project["dbt"]["templater"]["models"][
                 "materialized"
@@ -293,7 +293,7 @@ class ReflektProject:
                 "\n  materialized: view  # OR incremental"
             )
 
-    def _get_dbt_model_incremental_logic(self):
+    def _get_dbt_model_incremental_logic(self) -> None:
         if self.materialized == "incremental":
             try:
                 self.incremental_logic = self.project["dbt"]["templater"]["models"][
@@ -312,7 +312,7 @@ class ReflektProject:
         else:
             self.incremental_logic = None
 
-    def _get_pkg_schemas(self):
+    def _get_pkg_schemas(self) -> None:
         if self.project.get("dbt").get("templater").get("package_schemas") is not None:
             self.pkg_schemas = (
                 self.project.get("dbt").get("templater").get("package_schemas")

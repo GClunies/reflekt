@@ -14,7 +14,6 @@ from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
 
-from reflekt import reflekt
 from reflekt.avo.plan import AvoPlan
 from reflekt.logger import logger_config
 from reflekt.reflekt import constants
@@ -38,7 +37,7 @@ def cli():
     help="Path where Reflekt project will be created. Defaults to current directory.",
 )
 @click.command()
-def init(project_dir_str: str):
+def init(project_dir_str: str) -> None:
     """Create a Reflekt project at the provide directory."""
     project_dir = Path(project_dir_str).resolve()
     project_name = click.prompt(
@@ -262,7 +261,7 @@ def init(project_dir_str: str):
     required=True,
     help="Name of the tracking plan you want to create.",
 )
-def new(plan_name: str):
+def new(plan_name: str) -> None:
     """Create a new empty tracking plan using provided name."""
     plan_template_dir = pkg_resources.resource_filename("reflekt", "templates/plan/")
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
@@ -309,7 +308,7 @@ def new(plan_name: str):
     default=None,
     help=("Specify the branch name you want to pull your Avo tracking plan from."),
 )
-def pull(plan_name: str, raw: bool, avo_branch: str):
+def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
     """Generate tracking plan as code using the Reflekt schema."""
     api = ReflektApiHandler().get_api(avo_branch=avo_branch)
     config = ReflektConfig()
@@ -359,7 +358,7 @@ def pull(plan_name: str, raw: bool, avo_branch: str):
     is_flag=True,
     help="Output JSON to be synced, without actually syncing it.",
 )
-def push(plan_name, dry):
+def push(plan_name, dry) -> None:
     """Sync tracking plan to CDP or Analytics Governance tool."""
     api = ReflektApiHandler().get_api()
     if api.type.lower() in ["avo", "iteratively"]:
@@ -400,7 +399,7 @@ def push(plan_name, dry):
     required=True,
     help="Tracking plan name in CDP or Analytics Governance tool.",
 )
-def test(plan_name: str):
+def test(plan_name: str) -> None:
     """Test tracking plan schema for naming, data types, and metadata."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Testing Reflekt tracking plan '{plan_name}' at {str(plan_dir)}")
@@ -437,7 +436,7 @@ def test(plan_name: str):
     ),
 )
 @click.command()
-def dbt(plan_name, force_version):
+def dbt(plan_name, force_version) -> None:
     """Build dbt package with sources, models, and docs based on tracking plan."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     dbt_pkgs_dir = ReflektProject().project_dir / "dbt_packages"
@@ -449,7 +448,7 @@ def dbt(plan_name, force_version):
     plural = ""
     dbt_project_dict = {}
 
-    if isinstance(plan_schemas, list):
+    if len(plan_schemas) > 1:
         logger.info(
             f"[WARNING] Multiple warehouse schemas mapped to {plan_name}. See "
             f"'plan_schemas:' in reflekt_project.yml. "
@@ -458,8 +457,6 @@ def dbt(plan_name, force_version):
             f"warehouse schema.\n\n"
             f"Reflekt will template a separate dbt package for each schema.\n"
         )
-    else:
-        plan_schemas = [plan_schemas]  # If string, convert to list
 
     if force_version:
         try:

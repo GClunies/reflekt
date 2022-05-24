@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from typing import Optional, Tuple
+
 import sqlalchemy
 from snowflake.sqlalchemy import URL as snow_url
 from sqlalchemy.engine.url import URL as redshift_url
@@ -15,7 +17,7 @@ class WarehouseConnection:
     reflekt_config.yml
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._config = ReflektConfig()
         self.warehouse = self._config.warehouse
         self.warehouse_type = self._config.warehouse_type
@@ -48,7 +50,9 @@ class WarehouseConnection:
                 f"Invalid warehouse type specified in {self._config.path}"
             )
 
-    def get_columns(self, schema: str, table_name: str):
+    def get_columns(
+        self, schema: str, table_name: str
+    ) -> Tuple[Optional[list], Optional[str]]:
         with self.engine.connect() as conn:
             try:
                 conn.detach()

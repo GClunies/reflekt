@@ -20,7 +20,7 @@ from reflekt.reflekt.project import ReflektProject
 class ReflektLoader(object):
     def __init__(
         self, plan_dir: Path, plan_name: str, raise_validation_errors: bool = True
-    ):
+    ) -> None:
         self._validation_errors = []
         if ReflektProject().exists:
             try:
@@ -41,19 +41,19 @@ class ReflektLoader(object):
         return self._plan
 
     @property
-    def has_validation_errors(self):
+    def has_validation_errors(self) -> int:
         return len(self._validation_errors) > 0
 
     @property
-    def validation_errors(self):
+    def validation_errors(self) -> list:
         return self._validation_errors
 
-    def _load_plan_file(self, path: Path):
+    def _load_plan_file(self, path: Path) -> None:
         with open(path, "r") as plan_file:
             yaml_obj = yaml.safe_load(plan_file)
             self._plan = ReflektPlan(plan_yaml_obj=yaml_obj, plan_name=self.plan_name)
 
-    def _load_events(self, path: Path):
+    def _load_events(self, path: Path) -> None:
         for file in sorted(Path(path).glob("**/*.yml")):  # Get .yml files in /events
             logger.info(
                 f"    Parsing event file {file.name}",
@@ -64,7 +64,7 @@ class ReflektLoader(object):
                 for event_version in yaml_event_obj:
                     self.plan.add_event(event_version)
 
-    def _load_identify_traits(self, path: Path):
+    def _load_identify_traits(self, path: Path) -> None:
         if not path.exists():
             return
 
@@ -73,7 +73,7 @@ class ReflektLoader(object):
             for trait in yaml_obj.get("traits", []):
                 self.plan.add_identify_trait(trait)
 
-    def _load_group_traits(self, path):
+    def _load_group_traits(self, path) -> None:
         if not path.exists():
             return
 

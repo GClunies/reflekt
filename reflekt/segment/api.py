@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import typing
+from typing import Optional
 
 import requests
 from reflekt.reflekt.config import ReflektConfig
@@ -42,7 +42,7 @@ class SegmentApi:
         except KeyError:
             return None
 
-    def _setup_url_headers(self, plan_id: typing.Optional[str] = None):
+    def _setup_url_headers(self, plan_id: Optional[str] = None):
         if plan_id is None:
             url = self.base_url
         else:

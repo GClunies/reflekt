@@ -5,7 +5,7 @@
 import json
 import shutil
 import subprocess
-import typing
+from typing import Optional
 
 from loguru import logger
 from reflekt.avo.errors import AvoCliError
@@ -15,7 +15,7 @@ from reflekt.reflekt.project import ReflektProject
 
 
 class AvoCli:
-    def __init__(self, avo_branch: typing.Optional[str] = None):
+    def __init__(self, avo_branch: Optional[str] = None) -> None:
         self._project = ReflektProject()
         self._config = ReflektConfig()
         self.type = self._config.plan_type
@@ -24,7 +24,7 @@ class AvoCli:
         self.avo_branch = avo_branch
         logger.configure(**logger_config)
 
-    def get(self, plan_name: str):
+    def get(self, plan_name: str) -> None:
         plan_schemas = self._project.plan_schemas
         avo_json_file = self.avo_dir / f"{plan_name}.json"
 
@@ -42,7 +42,7 @@ class AvoCli:
             with open(avo_json_file) as f:
                 return json.load(f)
 
-    def _run_avo_pull(self, plan_name: str):
+    def _run_avo_pull(self, plan_name: str) -> None:
         logger.info(f"Fetching plan {plan_name} from Avo.\n")
         avo_executable = shutil.which("avo")
 

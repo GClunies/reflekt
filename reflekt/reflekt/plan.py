@@ -4,7 +4,7 @@
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
 
-from typing import Counter
+from typing import Counter, Optional
 
 from cerberus import Validator
 
@@ -20,7 +20,7 @@ from reflekt.reflekt.schema import reflekt_plan_schema
 # YamlTrackingPlan from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektPlan(object):
-    def __init__(self, plan_yaml_obj: dict, plan_name: str):
+    def __init__(self, plan_yaml_obj: dict, plan_name: str) -> None:
         if ReflektProject().exists:
             self._config = ReflektConfig()
             self._project = ReflektProject()
@@ -32,9 +32,10 @@ class ReflektPlan(object):
             self.identify_traits = []
             self.group_traits = []
 
-    def _get_plan_schemas(self, plan_name: str):
+    def _get_plan_schemas(self, plan_name: str) -> list:
         try:
-            plan_schemas = self._project.plan_schemas[plan_name]
+            plan_schemas = list(self._project.plan_schemas[plan_name])
+            return plan_schemas
         except KeyError:
             raise KeyError(
                 f"Tracking plan '{plan_name}' not found in "
@@ -42,28 +43,24 @@ class ReflektPlan(object):
                 f"corresponding '{plan_name}: <schema>` key value pair."
             )
 
-        return plan_schemas
-
-    def _get_dbt_package_schema(self):
+    def _get_dbt_package_schema(self) -> Optional[str]:
         if self._project.pkg_schemas is not None:
             if self.name in self._project.pkg_schemas:
                 return self._project.pkg_schemas[self.name]
-        else:
-            return None
 
-    def add_event(self, event_yaml_obj: dict):
+    def add_event(self, event_yaml_obj: dict) -> None:
         event = ReflektEvent(event_yaml_obj)
         self.events.append(event)
 
-    def add_identify_trait(self, trait_yaml: dict):
+    def add_identify_trait(self, trait_yaml: dict) -> None:
         trait_property = ReflektProperty(trait_yaml)
         self.identify_traits.append(trait_property)
 
-    def add_group_trait(self, trait_yaml: dict):
+    def add_group_trait(self, trait_yaml: dict) -> None:
         trait_property = ReflektProperty(trait_yaml)
         self.group_traits.append(trait_property)
 
-    def _check_duplicate_events(self):
+    def _check_duplicate_events(self) -> None:
         event_ids = map(lambda e: e.name + str(e.version), self.events)
         counts = Counter(event_ids)
         duplicates = {k: v for (k, v) in counts.items() if v > 1}
@@ -74,7 +71,7 @@ class ReflektPlan(object):
                 f"Duplicate events found. Events: {duplicate_names}"
             )
 
-    def _check_reserved_event_names(self):
+    def _check_reserved_event_names(self) -> None:
         if len(self.events) == 0:
             return
 
@@ -86,7 +83,7 @@ class ReflektPlan(object):
                     f"Event name '{event_name}' is reserved and cannot be " f"used."
                 )
 
-    def validate_plan(self):
+    def validate_plan(self) -> None:
         validator = Validator(reflekt_plan_schema)
         is_valid = validator.validate(self.plan_yaml_obj, reflekt_plan_schema)
 

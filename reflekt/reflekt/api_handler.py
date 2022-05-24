@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import typing
+from typing import Optional
 
 from reflekt.avo.cli import AvoCli
 from reflekt.reflekt.config import ReflektConfig
@@ -14,11 +14,11 @@ class ReflektApiHandler:
     pulling or pushing tracking plans using `reflekt pull` and `reflekt push`
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._config = ReflektConfig()
         self.type = self._config.plan_type
 
-    def get_api(self, avo_branch: typing.Optional[str] = None):
+    def get_api(self, avo_branch: Optional[str] = None):
         if self._config.plan_type == "avo":
             return AvoCli(
                 avo_branch

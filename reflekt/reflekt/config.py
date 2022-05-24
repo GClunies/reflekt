@@ -12,7 +12,7 @@ from reflekt.reflekt.project import ReflektProject
 
 
 class ReflektConfig:
-    def __init__(self, raise_config_errors: bool = True):
+    def __init__(self, raise_config_errors: bool = True) -> None:
         if ReflektProject().exists:
             try:
                 self.config_errors = []
@@ -39,7 +39,7 @@ class ReflektConfig:
                 else:
                     self.config_errors.append(error)
 
-    def _get_config(self):
+    def _get_config(self) -> dict:
         try:
             with open(self.path) as f:
                 config_yml = yaml.safe_load(f)
@@ -49,7 +49,7 @@ class ReflektConfig:
                 f"\nNo config file found at: {self.path}\nPlease create one."
             )
 
-    def _get_warehouse_type(self):
+    def _get_warehouse_type(self) -> str:
         if len(self.warehouse.keys()) > 1:
             raise ReflektConfigError(
                 f"Multiple warehouses defined for "

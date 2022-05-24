@@ -27,7 +27,7 @@ from reflekt.reflekt.schema import reflekt_event_schema, reflekt_metadata_schema
 # YamlEvent from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektEvent(object):
-    def __init__(self, event_yaml_obj: dict):
+    def __init__(self, event_yaml_obj: dict) -> None:
         if ReflektProject().exists:
             self._event_yaml_obj = event_yaml_obj
             self._properties = [
@@ -58,7 +58,7 @@ class ReflektEvent(object):
             ReflektProperty(property) for property in self._event_yaml_obj["properties"]
         ]
 
-    def _check_event_metadata(self):
+    def _check_event_metadata(self) -> None:
         if self.metadata:
             validator = Validator(reflekt_metadata_schema)
             is_valid = validator.validate(self.metadata, reflekt_metadata_schema)
@@ -69,7 +69,7 @@ class ReflektEvent(object):
                 )
                 raise ReflektValidationError(message)
 
-    def _check_event_name(self):
+    def _check_event_name(self) -> None:
         project = ReflektProject()
         case_rule = project.events_case
         allow_numbers = project.events_allow_numbers
@@ -110,7 +110,7 @@ class ReflektEvent(object):
                 f"\n    - Change '{rule_type} {rule_str}' in reflekt_project.yml."
             )
 
-    def _check_duplicate_properties(self):
+    def _check_duplicate_properties(self) -> None:
         if len(self.properties) == 0:
             return
 
@@ -125,7 +125,7 @@ class ReflektEvent(object):
                 f"Properties: {duplicate_names}"
             )
 
-    def _check_reserved_property_names(self):
+    def _check_reserved_property_names(self) -> None:
         if len(self.properties) == 0:
             return
 
@@ -137,7 +137,7 @@ class ReflektEvent(object):
                     f"Property name '{prop_name}' is reserved and cannot be used"
                 )
 
-    def validate_event(self):
+    def validate_event(self) -> None:
         """Validate event against Reflekt schema."""
         validator = Validator(reflekt_event_schema)
         is_valid = validator.validate(self._event_yaml_obj, reflekt_event_schema)
