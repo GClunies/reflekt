@@ -537,6 +537,7 @@ def dbt(plan_name, force_version):
                 version = dbt_pkg_version
 
     for schema in plan_schemas:
+        pkg_name = f"reflekt_{schema}"
         transformer = ReflektTransformer(
             reflekt_plan=reflekt_plan,
             schema=schema,
