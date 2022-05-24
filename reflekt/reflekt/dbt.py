@@ -37,9 +37,3 @@ dbt_column_schema = {
     "description": "",
 }
 # fmt: on
-
-# OLD
-dbt_stg_schema = {
-    "version": 2,
-    "models": [],
-}

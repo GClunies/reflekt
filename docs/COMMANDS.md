@@ -5,6 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt Commands
+**NOTE: Reflekt can only be run from the root of a Reflekt project.**
+
 1. Create a Reflekt project.
    ```bash
    $ reflekt init --project-dir ./my_reflekt_project  # Follow the prompts

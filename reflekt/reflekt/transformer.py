@@ -4,8 +4,7 @@
 
 import copy
 import shutil
-import typing
-from pathlib import Path
+from typing import Optional, Union
 
 import pkg_resources
 import yaml
@@ -53,10 +52,10 @@ class ReflektTransformer(object):
     def __init__(
         self,
         reflekt_plan: ReflektPlan,
-        schema: typing.Optional[str] = None,
-        dbt_package_name: typing.Optional[str] = None,
-        pkg_version: typing.Optional[Version] = None,
-    ):
+        schema: Optional[str] = None,
+        dbt_package_name: Optional[str] = None,
+        pkg_version: Optional[Version] = None,
+    ) -> None:
         self.reflekt_plan = reflekt_plan
         self.plan_name = str.lower(self.reflekt_plan.name)
         self.dbt_package_schema = self.reflekt_plan.dbt_package_schema
@@ -85,7 +84,7 @@ class ReflektTransformer(object):
             self.materialized = self.reflekt_project.materialized
             self.incremental_logic = self.reflekt_project.incremental_logic
 
-    def build_cdp_plan(self, plan_type: typing.Optional[str] = None):
+    def build_cdp_plan(self, plan_type: Optional[str] = None) -> None:
         if plan_type is None:
             plan_type = self.plan_type
 
@@ -103,7 +102,7 @@ class ReflektTransformer(object):
     def _build_plan_snowplow(self):
         pass
 
-    def _build_plan_segment(self, reflekt_plan: ReflektPlan):
+    def _build_plan_segment(self, reflekt_plan: ReflektPlan) -> dict:
         segment_payload = copy.deepcopy(segment_payload_schema)
         segment_plan = copy.deepcopy(segment_plan_schema)
         segment_plan["display_name"] = self.plan_name
@@ -150,7 +149,7 @@ class ReflektTransformer(object):
 
         return segment_payload
 
-    def _build_segment_event(self, reflekt_event: ReflektEvent):
+    def _build_segment_event(self, reflekt_event: ReflektEvent) -> dict:
         if reflekt_event.version > 1:
             version_str = f" (version {reflekt_event.version})"
         else:
@@ -177,7 +176,7 @@ class ReflektTransformer(object):
 
         return segment_event
 
-    def _build_segment_property(self, reflekt_property: ReflektProperty):
+    def _build_segment_property(self, reflekt_property: ReflektProperty) -> dict:
         segment_property = copy.deepcopy(segment_property_schema)
         segment_property["description"] = reflekt_property.description
         segment_property["type"] = [reflekt_property.type]
@@ -189,9 +188,9 @@ class ReflektTransformer(object):
 
     def _parse_reflekt_property(
         self,
-        reflekt_property: typing.Union[ReflektProperty, ReflektTrait],
+        reflekt_property: Union[ReflektProperty, ReflektTrait],
         segment_property: dict,
-    ):
+    ) -> dict:
         # NOTE - ReflektTrait is a child class of ReflektProperty, so this
         # instance method will parse Reflekt properties and traits
         updated_segment_property = copy.deepcopy(segment_property)
@@ -259,7 +258,7 @@ class ReflektTransformer(object):
 
         return updated_segment_property
 
-    def _build_segment_trait(self, reflekt_trait: ReflektTrait):
+    def _build_segment_trait(self, reflekt_trait: ReflektTrait) -> dict:
         segment_trait = copy.deepcopy(segment_property_schema)
         segment_trait["description"] = reflekt_trait.description
         segment_trait["type"] = [reflekt_trait.type]
@@ -268,9 +267,7 @@ class ReflektTransformer(object):
 
         return segment_trait
 
-    def build_dbt_package(
-        self,
-    ):
+    def build_dbt_package(self) -> None:
         logger.info(
             f"Building Reflekt dbt package:"
             f"\n        cdp: {self.cdp_name}"
@@ -329,7 +326,7 @@ class ReflektTransformer(object):
     def _dbt_package_snowplow(self):
         pass
 
-    def _dbt_package_segment(self, reflekt_plan: ReflektPlan):
+    def _dbt_package_segment(self, reflekt_plan: ReflektPlan) -> None:
         self.db_errors = []
 
         # Setup `Page Viewed` and `Screen Viewed` events, if they exist in Reflekt plan
@@ -523,7 +520,7 @@ class ReflektTransformer(object):
         )
         print("")  # Cleanup stdout
 
-    def _template_dbt_source(self, reflekt_plan: ReflektPlan):
+    def _template_dbt_source(self, reflekt_plan: ReflektPlan) -> dict:
         logger.info(f"Initializing template for dbt source {self.schema}")
         dbt_src = copy.deepcopy(dbt_src_schema)
         dbt_src["sources"][0]["name"] = self.schema
@@ -542,7 +539,7 @@ class ReflektTransformer(object):
         db_columns: list,
         cdp_cols: dict,
         plan_cols: list,
-    ):
+    ) -> None:
         print("")  # Terminal newline
         logger.info(f"Templating table '{table_name}' in dbt source {self.schema}")
         dbt_tbl = copy.deepcopy(dbt_table_schema)
@@ -579,7 +576,7 @@ class ReflektTransformer(object):
         db_columns: list,
         cdp_cols: dict,
         plan_cols: list,
-    ):
+    ) -> None:
         print("")  # Terminal newline
         logger.info(
             f"Templating dbt model "
@@ -645,7 +642,7 @@ class ReflektTransformer(object):
         materialized: str,
         unique_key: str,
         warehouse_type: str,
-    ):
+    ) -> str:
         if materialized == "view":
             # fmt: off
             model_config = (
@@ -683,8 +680,8 @@ class ReflektTransformer(object):
         self,
         source_schema: str,
         source_table: str,
-        incremental_logic: typing.Optional[str] = None,
-    ):
+        incremental_logic: Optional[str] = None,
+    ) -> str:
         if incremental_logic is None:
             incremental_logic = ""
 
@@ -713,7 +710,7 @@ class ReflektTransformer(object):
         db_columns: list,
         cdp_cols: dict,
         plan_cols: list,
-    ):
+    ) -> None:
         print("")  # Terminal newline
         logger.info(
             f"Templating dbt docs "

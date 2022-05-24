@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-def parse_avo_property(name: str, property_json: dict, required: list = []):
+def parse_avo_property(name: str, property_json: dict, required: list = []) -> dict:
     p_type = property_json.get("type")
     p = {
         "name": name,
@@ -41,7 +41,7 @@ def parse_avo_property(name: str, property_json: dict, required: list = []):
         return p
 
 
-def parse_avo_event(event_json: dict):
+def parse_avo_event(event_json: dict) -> dict:
     tags = event_json.get("tags")
     metadata = {tag.split(":")[0]: tag.split(":")[1].replace(" ", "") for tag in tags}
     event_obj = {
