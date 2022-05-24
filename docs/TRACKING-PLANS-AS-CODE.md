@@ -133,7 +133,7 @@ Reflekt manages your tracking plans in the `tracking-plans/` directory of your R
 `plan.yml` holds the plan name (used by the reflekt CLI). You do not need to use/edit `plan.yml`.
 
 ## Events
-Each event in your tracking plan has its own YAML file, making it easy to manage and update the spec for individual events. Importantly, these YAML files are *human readable*. No incomprehensible JSON here!
+Each event in your tracking plan has its own YAML file, making it easy to manage and update. Importantly, these YAML files are *human readable*. No incomprehensible JSON here!
 
 <details><summary>Example <code>product-added.yml</code> (click to expand)</summary><p>
 
@@ -179,8 +179,37 @@ Each event in your tracking plan has its own YAML file, making it easy to manage
 </p></details>
 
 ## Identify traits
+Like events, identify calls and their user traits are specified in a YAML file.
+
+<details><summary>Example <code>identify-traits.yml</code> (click to expand)</summary><p>
+
+```yaml
+# product-added.yml
+traits:
+  - name: email
+    description: The user's email address.
+    type: string
+    required: true
+  - name: address
+    description: The user's mailing address.
+    type: string
+```
+</p></details>
 
 ## Group traits
+You guessed it, group calls and their group traits are specified in a YAML file too.
 
+<details><summary>Example <code>group-traits.yml</code> (click to expand)</summary><p>
 
-
+```yaml
+# product-added.yml
+traits:
+  - name: account_name
+    description: The account name.
+    type: string
+    required: true
+  - name: is_paying
+    description: Does the account pay us?
+    type: boolean
+```
+</p></details>
