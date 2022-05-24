@@ -88,7 +88,7 @@ With this simple structure and file format, anyone can be taught to make changes
 
 **Q:** **What analytics governance tools does Reflekt support?**
 
-**A:** Reflekt currently supports [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/).
+**A:** Reflekt currently supports [Segment Protocols](https://segment.com/docs/protocols/) and [Avo](https://www.avo.app/).
 
 **Q:** **What customer data platforms (CDPs) does Reflekt support?**
 
@@ -106,8 +106,7 @@ The core belief of Reflekt is **the tracking plan is the most important artifact
 - Support user-defined metadata (e.g. a "code owner" for each event).
 - Leverage continuous integration to test and deploy changes to plans, events, and properties.
 
-## Bets
-Reflekt is betting on the following trends in the product analytics space:
+In addition to the beliefs above, Reflekt is betting on the following trends in the product analytics space:
 - More explicit tracking. Less implicit tracking.
 - Product analytics increasingly powered by the data warehouse and dbt.
 - dbt [metrics](https://docs.getdbt.com/docs/building-a-dbt-project/metrics) / [metrics layer](https://docs.getdbt.com/docs/dbt-cloud/using-dbt-cloud/cloud-metrics-layer) - imagine defining metrics in the tracking plan and Reflekt templating them in dbt for you. 📈

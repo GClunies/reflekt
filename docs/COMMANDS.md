@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# Commands
+# Reflekt Commands
 1. Create a Reflekt project.
    ```bash
    $ reflekt init --project-dir ./my_reflekt_project  # Follow the prompts
@@ -15,16 +15,16 @@ SPDX-License-Identifier: Apache-2.0
    $ reflekt pull --name <plan-name>
    ```
 
-3. Use the Reflekt dbt templater to save your data team time. Stop manually writing dbt source, models, and documentation for your event data.
+3. Use the Reflekt dbt templater to save your data team time. As your tracking plan changes, re-template to model the changes. Reflekt will bump the version of your dbt package as it evolves with your tracking plan.
    ```bash
    $ reflekt dbt --name <plan-name>
    ```
-   As your tracking plan changes, re-template to capture updates/changes. Reflekt will bump the version of your dbt package as it evolves with your tracking plan.
 
-4. Sync your Reflekt tracking plan to your Analytics Governance tool (Segment Protocols, others coming soon). Reflekt handles the conversion!
+4. Sync your Reflekt tracking plan to your Analytics Governance tool. Reflekt handles the conversion!
    ```bash
    $ reflekt push --name <plan-name>
    ```
+   **NOTE** - `reflekt push` does not support Avo. If you use Avo, we recommend managing your plan there and using `reflekt pull` and `reflekt dbt` to pull your plans and template your dbt models as needed.
 
 5. Test events and properties in your tracking plan for naming conventions, data types, and expected metadata.
    ```zsh
