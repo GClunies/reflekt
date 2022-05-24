@@ -5,6 +5,7 @@
 
 from reflekt.reflekt.loader import ReflektLoader
 from reflekt.reflekt.transformer import ReflektTransformer
+
 from tests.fixtures import _build_reflekt_plan_dir
 
 
@@ -134,13 +135,6 @@ def test_reflekt_transformer_segment(tmpdir):
     assert segment_plan_event_props["property_nine"]["type"] == ["string"]
     assert segment_plan_event_props["property_nine"]["enum"] == ["one", "two"]
     assert (
-        segment_plan_event_props["property_ten"]["description"]
-        == "A string property (with pattern rule)."
+        segment_plan_event_props["property_ten"]["description"] == "A string property."
     )
-    assert segment_plan_event_props["property_ten"]["type"] == ["string"]
-    assert segment_plan_event_props["property_ten"]["pattern"] == "[A-Z]"
-    assert (
-        segment_plan_event_props["property_eleven"]["description"]
-        == "A string property."
-    )
-    assert segment_plan_event_props["property_eleven"]["type"] == ["string", "null"]
+    assert segment_plan_event_props["property_ten"]["type"] == ["string", "null"]

@@ -4,13 +4,12 @@
 
 import pytest
 import yaml
-
 from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.property import ReflektProperty
+
 from tests.fixtures import (
     REFLEKT_PROPERTY,
     REFLEKT_PROPERTY_BAD,
-    REFLEKT_PROPERTY_BAD_PATTERN,
 )
 
 
@@ -36,14 +35,6 @@ def test_default_property_values():
 
     assert property.required is False
     assert property.allow_null is False
-
-
-def test_validate_pattern_on_string_type():
-    property_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_BAD_PATTERN)
-
-    with pytest.raises(ReflektValidationError):
-        # ReflektEvent runs validate_event() when initialized
-        ReflektProperty(property_yaml_obj)
 
 
 def test_valid_type():
