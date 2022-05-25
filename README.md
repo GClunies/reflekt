@@ -12,7 +12,7 @@ Reflekt is a command line tool that connects to your analytics governance tool (
 
 Reflekt integrates with your analytics governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)), customer data platform (e.g. [Segment](https://segment.com/)), data warehouse, and [dbt](https://www.getdbt.com/).
 
-![reflekt-arch](/docs/reflekt_architecture.png)
+![reflekt-arch](/docs/reflekt-arch-flow.jpg)
 
 Reflekt can also be used to manage tracking plans:
 - Pull tracking plans from your analytics governance tools, converting them to code.
