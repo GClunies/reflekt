@@ -436,7 +436,7 @@ def test(plan_name: str) -> None:
     "--raw-schema",
     "raw_schema",
     required=False,
-    help="The schema in which Reflekt will search for raw event data to template.",
+    help="Schema in which Reflekt will search for raw event data to template.",
 )
 @click.command()
 def dbt(plan_name, force_version, raw_schema) -> None:
