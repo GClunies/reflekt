@@ -430,13 +430,16 @@ def test(plan_name: str) -> None:
     "--force-version",
     "force_version",
     required=False,
-    help=(
-        "Force Reflekt to build or overwrite the dbt package with a specific "
-        "semantic version."
-    ),
+    help="Force Reflekt to template the dbt package with a specific semantic version.",
+)
+@click.option(
+    "--raw-schema",
+    "raw_schema",
+    required=False,
+    help="The schema in which Reflekt will search for raw event data to template.",
 )
 @click.command()
-def dbt(plan_name, force_version) -> None:
+def dbt(plan_name, force_version, raw_schema) -> None:
     """Build dbt package with sources, models, and docs based on tracking plan."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     dbt_pkgs_dir = ReflektProject().project_dir / "dbt_packages"
@@ -445,6 +448,10 @@ def dbt(plan_name, force_version) -> None:
     reflekt_plan = loader.plan
     logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
     plan_schemas = reflekt_plan.plan_schemas
+
+    if raw_schema:
+        plan_schemas = [raw_schema]
+
     plural = ""
     dbt_project_dict = {}
 
