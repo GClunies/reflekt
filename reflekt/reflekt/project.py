@@ -48,22 +48,12 @@ class ReflektProject:
         self._get_dbt_model_incremental_logic()
         self._get_pkg_schemas()
 
-    def _is_git_repo(self, path: Path) -> bool:
-        """Checks if the directory is a git repo. Returns True if it is, else False"""
-        try:
-            _ = Repo(path).git_dir
-            return True
-        except InvalidGitRepositoryError:
-            return False
-
     def _get_project_root(self, path: Path) -> Path:
-        """Gets the working tree directory for Reflekt project. Reflekt project
-        must be a in git repo.
-        """
-        if self._is_git_repo(path):
-            repo = Repo(path, search_parent_directories=True)
-            return Path(repo.working_tree_dir)
-        else:
+        try:
+            git_repo = Repo(path, search_parent_directories=True)
+            git_root = git_repo.git.rev_parse("--show-toplevel")
+            return Path(git_root)
+        except InvalidGitRepositoryError:
             raise ReflektProjectError(
                 "\n"
                 "\nGit repository not detected. Your Reflekt project must be inside a Git repo to function correctly."  # noqa E501

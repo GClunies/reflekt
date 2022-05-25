@@ -570,5 +570,5 @@ if __name__ == "__main__":
     # test(["--name", "tracking-plan-example"])
     # pull(["--name", "patty-bar"])
     # push(["--name", "patty-bar"])
-    # test(["--name", "patty-bar"])
-    dbt(["--name", "patty-bar"])
+    test(["--name", "patty-bar"])
+    # dbt(["--name", "patty-bar"])
