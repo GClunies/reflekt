@@ -19,7 +19,8 @@ Reflekt can also be used to manage tracking plans:
 - Push changes to your tracking plan code back to your analytics governance tools, Reflekt handles the conversion.
 - Create new tracking plans defined as code.
 - Test tracking plan code for naming conventions and required metadata. You define the rules in your `reflekt_project.yml`.
-- Makes your tracking plan an *extensible* artifact that you can build off of, similar to dbt's `manifest.json`.
+
+By defining your tracking plan as code, Reflekt makes it an *extensible* artifact that you can build off of, similar to dbt's `manifest.json`.
 
 ## Getting started
 - [Install & Setup](docs/INSTALL-SETUP.md)
