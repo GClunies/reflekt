@@ -4,13 +4,10 @@
 
 import pytest
 import yaml
+
 from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.property import ReflektProperty
-
-from tests.fixtures import (
-    REFLEKT_PROPERTY,
-    REFLEKT_PROPERTY_BAD,
-)
+from tests.fixtures import REFLEKT_PROPERTY, REFLEKT_PROPERTY_BAD
 
 
 def test_reflekt_property():

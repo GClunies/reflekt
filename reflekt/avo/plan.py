@@ -9,6 +9,7 @@ from pathlib import Path
 import yaml
 from inflection import dasherize, underscore
 from loguru import logger
+
 from reflekt.avo.parser import parse_avo_event
 from reflekt.reflekt.dumper import ReflektYamlDumper
 

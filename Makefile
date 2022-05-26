@@ -5,12 +5,12 @@
 .PHONY: format
 format:
 	@autoflake --remove-all-unused-imports --remove-unused-variables --ignore-init-module-imports --recursive --in-place .
-	@isort -rc .
+	@isort .
 	@black .
 
 .PHONY: lint
 lint:
-	@flake8 .
+	@flake8 ./reflekt ./tests
 	@black --check .
 
 .PHONY: type-check

@@ -5,7 +5,6 @@
 # SPDX-License-Identifier: MIT
 
 import json
-import os
 import shutil
 from pathlib import Path
 
@@ -13,6 +12,7 @@ import funcy
 import yaml
 from inflection import dasherize, underscore
 from loguru import logger
+
 from reflekt.reflekt.dumper import ReflektYamlDumper
 from reflekt.segment.parser import parse_segment_event, parse_segment_property
 
@@ -63,7 +63,7 @@ class SegmentPlan(object):
         )
 
         if traits_json:
-            logger.info(f"    Writing Reflekt identify traits to identify.yml")
+            logger.info("    Writing Reflekt identify traits to identify.yml")
             self._build_reflekt_identify_file(plan_dir, traits_json)
 
         group_traits_json = (
@@ -75,7 +75,7 @@ class SegmentPlan(object):
         )
 
         if group_traits_json:
-            logger.info(f"   Writing Reflekt group traits to group.yml")
+            logger.info("   Writing Reflekt group traits to group.yml")
             self._build_reflekt_group_file(plan_dir, group_traits_json)
 
         for event_json in self.plan_json.get("rules", {}).get("events", []):
