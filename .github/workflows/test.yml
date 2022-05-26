@@ -1,5 +1,5 @@
 name: Test Python Package
-on: push
+on: pull_request
 
 jobs:
   lint:
@@ -69,6 +69,9 @@ jobs:
 
       - name: Install Reflekt
         run: poetry install --no-interaction
+
+      - name: Show working directory
+        run: pwd
 
       - name: Inject test reflekt_project.yml and reflekt_config.yml
         run: |
