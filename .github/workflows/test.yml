@@ -1,4 +1,5 @@
 name: Test Python Package
+
 on: pull_request
 
 jobs:
@@ -9,7 +10,6 @@ jobs:
         os: ['ubuntu-latest']
         python-version: ['3.8']
     runs-on: ${{ matrix.os }}
-
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -40,7 +40,6 @@ jobs:
         os: ['ubuntu-latest']
         python-version: ['3.7', '3.8', '3.9', '3.10']
     runs-on: ${{ matrix.os }}
-
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
@@ -75,6 +74,7 @@ jobs:
 
       - name: Inject test reflekt_project.yml and reflekt_config.yml
         run: |
+          mkdir .reflekt
           echo "${{ secrets.TESTS_REFLEKT_CONFIG_YML }}" > /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/.reflekt/reflekt_config.yml
           echo "${{ secrets.TESTS_REFLEKT_PROJECT_YML }}" > /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/reflekt_project.yml
 
