@@ -142,7 +142,7 @@ dmypy.json
 # reflekt
 .reflekt/
 avo.json
-reflekt_config.yml
+*reflekt_config*.yml
 reflekt_project.yml
 *reflekt_project*.yml
 tracking-plans/
