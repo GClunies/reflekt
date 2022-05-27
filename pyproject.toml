@@ -4,7 +4,7 @@
 
 [tool.poetry]
 name = "reflekt"
-version = "0.1.0"
+version = "0.1.1"
 description = "reflekt is a command-line interface (CLI) and continuous integration (CI) tool for your tracking plan."
 authors = ["Greg Clunies <greg.clunies@gmail.com>"]
 license = "Apache-2.0"
