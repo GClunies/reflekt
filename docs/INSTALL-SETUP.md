@@ -4,13 +4,20 @@ SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-## Install
+# Install
 Install `reflekt` with `pip`. Installing in a virtual Python environment is recommended.
 ```bash
 $ pip install reflekt
 ```
+# Setup
 
-## Setup
+## Demo: Creating a Reflekt project
+Gives you a quick sense of how to setup a Reflekt project.
+
+https://user-images.githubusercontent.com/28986302/170632029-d2c06c38-c76d-4d93-9dbb-7c8a842f8792.mp4
+
+## Step-by-step guide
+The exact setup steps.
 1. Create a git repo or clone one from GitHub.
 ```bash
 # Option 1: Create a Git repo locally
@@ -32,7 +39,8 @@ $ reflekt init --project-dir .  # Follow the prompts
 
 4. You are ready to start using Reflekt! See the docs on Reflekt [commands](docs/COMMANDS.md).
 
-## Reflekt + Avo
+### Reflekt + Avo
+
 Configuring Reflekt with [Avo](https://www.avo.app/) requires some additional setup and contacting Avo support (they're super helpful!). But don't worry, you only need to do this once! Here are the steps:
 
 1. Contact Avo support and request access to the JSON source.
