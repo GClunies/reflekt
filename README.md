@@ -5,7 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt
-Reflekt is a command line tool that connects to your analytics governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)) and defines your tracking plan as `code`. Reflekt uses this code to template **dbt packages modeling and documenting all the events in your tracking plan**, including:
+Reflekt is a command line tool that connects to your analytics governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)) and defines your tracking plans as `code`. Reflekt uses this code to template **dbt packages modeling and documenting all the events in your tracking plan**, including:
 - dbt [sources](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in your warehouse storing the raw event data.
 - dbt [models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for each event in your tracking plan. Light transformations make your event data ready for consumption or further modeling.
 - dbt [documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every model in the package, pulling information directly from the tracking plan. Your data team and the business always know what your tables and columns mean.
