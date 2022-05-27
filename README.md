@@ -27,7 +27,7 @@ By defining your tracking plan as code, Reflekt makes it an *extensible* artifac
 - [Reflekt Projects and Tracking Plans as `code`](docs/TRACKING-PLANS-AS-CODE.md)
 - [Commands](docs/COMMANDS.md)
 
-https://user-images.githubusercontent.com/28986302/169673197-f5ae1d60-682d-4c85-ad82-4f7fb31be128.mp4
+https://user-images.githubusercontent.com/28986302/170630561-4cd53cc7-cf1d-4a13-8e58-8ce4daf20793.mp4
 
 ## FAQ
 **Q:** **Do I have to use Reflekt to manage my tracking plan(s)? What if I like my analytics governance tool and just want to use the dbt templater?**
