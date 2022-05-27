@@ -26,6 +26,7 @@ By defining your tracking plan as code, Reflekt makes it an *extensible* artifac
 - [Install & Setup](docs/INSTALL-SETUP.md)
 - [Reflekt Projects and Tracking Plans as `code`](docs/TRACKING-PLANS-AS-CODE.md)
 - [Commands](docs/COMMANDS.md)
+- [Example Reflekt project](https://github.com/GClunies/patty-bar-reflekt) (used in the demo below)
 
 https://user-images.githubusercontent.com/28986302/170630561-4cd53cc7-cf1d-4a13-8e58-8ce4daf20793.mp4
 
