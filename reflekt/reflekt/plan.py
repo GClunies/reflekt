@@ -4,7 +4,7 @@
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
 
-from typing import Counter, Optional
+from typing import Counter
 
 from cerberus import Validator
 
