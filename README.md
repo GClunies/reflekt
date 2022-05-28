@@ -16,7 +16,7 @@ Reflekt integrates with your analytics governance tool (e.g. [Segment Protocols]
 
 By defining your tracking plan as code, Reflekt makes it an *extensible artifact* that you can build off of, similar to dbt's `manifest.json`.
 
-For Segment Protocols users, Reflekt can also help manage your tracking plans using software engineering principles - version control, development branches, pull requests & reviews, and CI/CD.
+For Segment Protocols users, Reflekt also helps manage your tracking plans using software engineering principles - version control, development branches, pull requests & reviews, and CI/CD.
 - Pull tracking plans from your analytics governance tools, converting them to code.
 - Push changes to your tracking plan code back to your analytics governance tools, Reflekt handles the conversion.
 - Create new tracking plans defined as code.
@@ -99,19 +99,6 @@ With this simple structure and file format, anyone can be taught to make changes
 **Q:** **What data warehouses does Reflekt support?**
 
 **A:** Reflekt currently works with [Snowflake](https://www.snowflake.com/) and [Redshift](https://aws.amazon.com/redshift/).
-
-## Beliefs
-The core belief of Reflekt is **the tracking plan is the most important artifact in a product analytics stack.** Without one, product and data teams can easily find themselves lost. How the tracking code is instrumented, event validation, raw data, transformed data, documentation, and the insights from you analysis - are all dependent on the tracking plan. Tracking plans should be:
-- Able to be represented as `code`. This does not prevent the use of SaaS analytics governance tools. These tools should work in unison.
-- Version controlled, with branches and environments for different development stages (i.e. dev/staging/prod).
-- Extensible (e.g. Reflekt's dbt templater), powering integrations with other tools in the stack.
-- Support user-defined metadata (e.g. a "code owner" for each event).
-- Leverage continuous integration to test and deploy changes to plans, events, and properties.
-
-In addition to the beliefs above, Reflekt is betting on the following trends in the product analytics space:
-- More explicit tracking. Less implicit tracking.
-- Product analytics increasingly powered by the data warehouse and dbt.
-- dbt [metrics](https://docs.getdbt.com/docs/building-a-dbt-project/metrics) / [metrics layer](https://docs.getdbt.com/docs/dbt-cloud/using-dbt-cloud/cloud-metrics-layer) - imagine defining metrics in the tracking plan and Reflekt templating them in dbt for you. 📈
 
 ## Reporting bugs
 If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).
