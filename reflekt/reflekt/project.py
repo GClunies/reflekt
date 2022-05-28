@@ -46,7 +46,6 @@ class ReflektProject:
         self._get_dbt_model_prefix()
         self._get_dbt_model_materialized()
         self._get_dbt_model_incremental_logic()
-        self._get_pkg_schemas()
 
     def _get_project_root(self, path: Path) -> Path:
         try:
@@ -301,11 +300,3 @@ class ReflektProject:
                 )
         else:
             self.incremental_logic = None
-
-    def _get_pkg_schemas(self) -> None:
-        if self.project.get("dbt").get("templater").get("package_schemas") is not None:
-            self.pkg_schemas = (
-                self.project.get("dbt").get("templater").get("package_schemas")
-            )
-        else:
-            self.pkg_schemas = None

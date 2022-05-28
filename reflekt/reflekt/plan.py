@@ -27,14 +27,15 @@ class ReflektPlan(object):
             self.plan_yaml_obj = plan_yaml_obj
             self.name = plan_name
             self.plan_schemas = self._get_plan_schemas(self.name)
-            self.dbt_package_schema = self._get_dbt_package_schema()
             self.events = []
             self.identify_traits = []
             self.group_traits = []
 
     def _get_plan_schemas(self, plan_name: str) -> list:
         try:
-            plan_schemas = list(self._project.plan_schemas[plan_name])
+            plan_schemas = self._project.plan_schemas[plan_name]
+            if isinstance(plan_schemas, str):
+                plan_schemas = [plan_schemas]
             return plan_schemas
         except KeyError:
             raise KeyError(
@@ -42,11 +43,6 @@ class ReflektPlan(object):
                 f"`plan_db_schemas:` in reflekt_project.yml. Please add "
                 f"corresponding '{plan_name}: <schema>` key value pair."
             )
-
-    def _get_dbt_package_schema(self) -> Optional[str]:
-        if self._project.pkg_schemas is not None:
-            if self.name in self._project.pkg_schemas:
-                return self._project.pkg_schemas[self.name]
 
     def add_event(self, event_yaml_obj: dict) -> None:
         event = ReflektEvent(event_yaml_obj)

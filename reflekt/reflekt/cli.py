@@ -457,10 +457,10 @@ def dbt(plan_name, force_version, raw_schema) -> None:
 
     if len(plan_schemas) > 1:
         logger.info(
-            f"[WARNING] Multiple warehouse schemas mapped to {plan_name}. See "
-            f"'plan_schemas:' in reflekt_project.yml. "
+            f"[INFO] Multiple warehouse schemas mapped to {plan_name}. See "
+            f"'plan_schemas:' in reflekt_project.yml.\n\n"
             f"This is typically done when one tracking plan is used for multiple "
-            f"applications, but with each application sending data to their own "
+            f"applications, with each application sending data to their own "
             f"warehouse schema.\n\n"
             f"Reflekt will template a separate dbt package for each schema.\n"
         )
@@ -570,5 +570,5 @@ if __name__ == "__main__":
     # test(["--name", "tracking-plan-example"])
     # pull(["--name", "patty-bar"])
     # push(["--name", "patty-bar"])
-    test(["--name", "patty-bar"])
-    # dbt(["--name", "patty-bar"])
+    # test(["--name", "patty-bar"])
+    dbt(["--name", "patty-bar"])
