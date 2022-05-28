@@ -14,13 +14,13 @@ Reflekt integrates with your analytics governance tool (e.g. [Segment Protocols]
 
 ![reflekt-arch](/docs/reflekt-arch-flow.jpg)
 
-Reflekt can also be used to manage tracking plans:
+By defining your tracking plan as code, Reflekt makes it an *extensible artifact* that you can build off of, similar to dbt's `manifest.json`.
+
+For Segment Protocols users, Reflekt can also help manage your tracking plans using software engineering principles - version control, development branches, pull requests & reviews, and CI/CD.
 - Pull tracking plans from your analytics governance tools, converting them to code.
 - Push changes to your tracking plan code back to your analytics governance tools, Reflekt handles the conversion.
 - Create new tracking plans defined as code.
 - Test tracking plan code for naming conventions and required metadata. You define the rules in your `reflekt_project.yml`.
-
-By defining your tracking plan as code, Reflekt makes it an *extensible* artifact that you can build off of, similar to dbt's `manifest.json`.
 
 ## Getting started
 - [Install & Setup](docs/INSTALL-SETUP.md)
@@ -39,7 +39,7 @@ https://user-images.githubusercontent.com/28986302/170630561-4cd53cc7-cf1d-4a13-
 
 **Q:** **If the tracking plan is `code`, how can a product manager, marketer, etc. propose changes?**
 
-**A:** This question assumes code is only for engineers - we strongly disagree! *Anyone* can learn how Reflekt defines tracking plans as code, which is why the code is designed to be *human-readable*. In Reflekt, tracking plans are defined in a `tracking-plans/` folder with each event defined using a simple YAML file.
+**A:** This question assumes code is only for engineers - we strongly disagree! *Anyone* can learn how Reflekt defines a tracking plan as code, which is why the code is designed to be *human-readable*. In Reflekt, tracking plans are defined in a `tracking-plans/` folder with each event defined using a simple YAML file.
 
 <details><summary><strong>example-event.yml</strong> (click to expand)</summary><p>
 
@@ -56,19 +56,19 @@ https://user-images.githubusercontent.com/28986302/170630561-4cd53cc7-cf1d-4a13-
     - name: cart_id
       description: Cart ID to which the product was added to.
       type: string
-      required: true    # Specify property is required
+      required: true    # Specify a property is required
     - name: product_id
       description: Database ID of the product being viewed.
       type: integer
       required: true
     - name: name
       description: Name of the product.
-      type: string     # Specify property type
+      type: string     # Specify property data type
       required: true
     - name: variant
       description: Variant of the product (e.g. small, medium, large).
       type: string
-      enum:            # Enumerated list of allowed values
+      enum:            # List of allowed values
         - small
         - medium
         - large
