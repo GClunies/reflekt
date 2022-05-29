@@ -39,22 +39,22 @@ REFLEKT_EVENT = """
       description: An array property with nested items.
       type: array
       array_item_schema:
-        - name: nested_property_2
+        - name: nested_property_two
           description: The 2nd nested property.
           type: string
           required: true
-        - name: nested_property_1
+        - name: nested_property_one
           description: The 1st nested property.
           type: string
     - name: property_seven
       description: An object property.
       type: object
       object_properties:
-        - name: key_1
+        - name: key_one
           description: The 1st key in the object dictionary.
           type: string
           required: true
-        - name: key_2
+        - name: key_two
           description: The 2nd key in the object dictionary.
           type: number
     - name: property_eight
@@ -104,22 +104,22 @@ REFLEKT_EVENT_BAD = """
       description: An array property with nested items.
       type: array
       array_item_schema:
-        - name: nested_property_2
+        - name: nested_property_two
           description: The 2nd nested property.
           type: string
           required: true
-        - name: nested_property_1
+        - name: nested_property_one
           description: The 1st nested property.
           type: string
     - name: property_seven
       description: An object property.
       type: object
       object_properties:
-        - name: key_1
+        - name: key_one
           description: The 1st key in the object dictionary.
           type: string
           required: true
-        - name: key_2
+        - name: key_two
           description: The 2nd key in the object dictionary.
           type: number
     - name: property_eight
@@ -161,17 +161,17 @@ REFLEKT_EVENT_DUPLICATE_PROPS = """
 
 REFLEKT_IDENTIFY = """
 traits:
-  - name: user_trait_1
+  - name: user_trait_one
     description: A user trait.
     type: string
-  - name: user_trait_2
+  - name: user_trait_two
     description: Another user trait.
     type: boolean
-  - name: user_trait_3
+  - name: user_trait_three
     description: One more user trait.
     type: number
     allow_null: true
-  - name: user_trait_4
+  - name: user_trait_four
     description: An object user trait.
     type: object
 """

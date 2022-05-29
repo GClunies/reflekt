@@ -447,6 +447,7 @@ def dbt(plan_name, force_version, warehouse_schema) -> None:
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
     logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
+    warehouse_database = reflekt_plan.warehouse_database
     warehouse_schemas = reflekt_plan.warehouse_schemas
 
     if warehouse_schema:
@@ -476,6 +477,7 @@ def dbt(plan_name, force_version, warehouse_schema) -> None:
             pkg_name = f"reflekt_{schema}"
             transformer = ReflektTransformer(
                 reflekt_plan=reflekt_plan,
+                database=warehouse_database,
                 schema=schema,
                 dbt_package_name=pkg_name,
                 pkg_version=version,
@@ -544,6 +546,7 @@ def dbt(plan_name, force_version, warehouse_schema) -> None:
         pkg_name = f"reflekt_{schema}"
         transformer = ReflektTransformer(
             reflekt_plan=reflekt_plan,
+            database=warehouse_database,
             schema=schema,
             dbt_package_name=pkg_name,
             pkg_version=version,

@@ -26,10 +26,24 @@ class ReflektPlan(object):
             self._project = ReflektProject()
             self.plan_yaml_obj = plan_yaml_obj
             self.name = plan_name
+            self.warehouse_database = self._get_warehouse_database(self.name)
             self.warehouse_schemas = self._get_warehouse_schemas(self.name)
             self.events = []
             self.identify_traits = []
             self.group_traits = []
+
+    def _get_warehouse_database(self, plan_name: str) -> list:
+        try:
+            warehouse_database = self._project.warehouse_database[plan_name]
+            return warehouse_database
+        except KeyError:
+            raise KeyError(
+                f"Tracking plan '{plan_name}' not found under...\n\n"
+                f"    warehouse:\n"
+                f"      database:\n\n"
+                f"... in reflekt_project.yml. See docs in Reflekt GitHub repo "
+                f"(https://github.com/GClunies/reflekt) on how to specify."
+            )
 
     def _get_warehouse_schemas(self, plan_name: str) -> list:
         try:
@@ -39,9 +53,11 @@ class ReflektPlan(object):
             return warehouse_schemas
         except KeyError:
             raise KeyError(
-                f"Tracking plan '{plan_name}' not found in "
-                f"`plan_db_schemas:` in reflekt_project.yml. Please add "
-                f"corresponding '{plan_name}: <schema>` key value pair."
+                f"Tracking plan '{plan_name}' not found under...\n\n"
+                f"    warehouse:\n"
+                f"      schema:\n\n"
+                f"... in reflekt_project.yml. See docs in Reflekt GitHub repo "
+                f"(https://github.com/GClunies/reflekt) on how to specify."
             )
 
     def add_event(self, event_yaml_obj: dict) -> None:

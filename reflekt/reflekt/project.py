@@ -40,6 +40,7 @@ class ReflektProject:
         self._get_properties_allow_numbers()
         self._get_properties_reserved()
         self._get_data_types()
+        self._get_warehouse_database()
         self._get_warehouse_schemas()
         self._get_expected_metadata_schema()
         self._get_dbt_src_prefix()
@@ -212,17 +213,39 @@ class ReflektProject:
                 "\nSee docs in Reflekt Github repo for available data types"
             )
 
-    def _get_warehouse_schemas(self) -> None:
+    def _get_warehouse_database(self) -> None:
         try:
-            self.warehouse_schemas = self.project["tracking_plans"]["warehouse_schemas"]
+            self.warehouse_database = self.project["tracking_plans"]["warehouse"][
+                "database"
+            ]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define 'warehouse_schemas:' in reflekt_project.yml. Each tracking plan in your Reflekt project must"  # noqa E501
-                " be mapped to a corresponding schema in data warehouse where it's raw event data is stored. Example:"  # noqa E501
+                "\n\nMust define a database for each tracking plan in "
+                "reflekt_project.yml where Reflekt should search for corresponding raw "
+                "event tables. Example:"
                 "\n"
                 "\ntracking_plans:"
-                "\n  warehouse_schemas:"
-                "\n    plan-name: schema_name"
+                "\n  warehouse:"
+                "\n    schema:"
+                "\n      plan-name: database_name"
+                "\n"
+            )
+
+    def _get_warehouse_schemas(self) -> None:
+        try:
+            self.warehouse_schemas = self.project["tracking_plans"]["warehouse"][
+                "schema"
+            ]
+        except KeyError:
+            raise ReflektProjectError(
+                "\n\nMust define schema(s) for each tracking plan in "
+                "reflekt_project.yml where Reflekt should search for corresponding raw "
+                "event data is stored. Example:"
+                "\n"
+                "\ntracking_plans:"
+                "\n  warehouse:"
+                "\n    schema:"
+                "\n      plan-name: schema_name  # string or list of schemas"
                 "\n"
             )
 

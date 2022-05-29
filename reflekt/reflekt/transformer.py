@@ -52,6 +52,7 @@ class ReflektTransformer(object):
     def __init__(
         self,
         reflekt_plan: ReflektPlan,
+        database: Optional[str] = None,
         schema: Optional[str] = None,
         dbt_package_name: Optional[str] = None,
         pkg_version: Optional[Version] = None,
@@ -63,7 +64,8 @@ class ReflektTransformer(object):
         self.plan_type = self.reflekt_config.plan_type
         self.warehouse = self.reflekt_config.warehouse
         self.warehouse_type = self.reflekt_config.warehouse_type
-        if schema is not None:
+        if database is not None:
+            self.database = database
             self.schema = schema
             self.reflekt_project = ReflektProject()
             self.project_dir = self.reflekt_project.project_dir
@@ -348,42 +350,42 @@ class ReflektTransformer(object):
         std_segment_tables = [
             {
                 "name": "identifies",
-                "description": f"A table with identify() calls fired on {reflekt_plan.name}.",  # noqa: E501
+                "description": "A table with identify() calls.",  # noqa: E501
                 "unique_key": "identify_id",
                 "cdp_cols": seg_identify_cols,
                 "plan_cols": [],
             },
             {
                 "name": "users",
-                "description": f"A table with the latest traits for users identified on {reflekt_plan.name}.",  # noqa: E501
+                "description": "A table with the latest traits for users.",  # noqa: E501
                 "unique_key": "user_id",
                 "cdp_cols": seg_users_cols,
                 "plan_cols": [],
             },
             {
                 "name": "groups",
-                "description": f"A table with group() calls fired on {reflekt_plan.name}.",  # noqa: E501
+                "description": "A table with group() calls.",  # noqa: E501
                 "unique_key": "group_id",
                 "cdp_cols": seg_groups_cols,
                 "plan_cols": [],
             },
             {
                 "name": "pages",
-                "description": f"A table with page() calls fired on {reflekt_plan.name}.",  # noqa: E501
+                "description": "A table with page() calls.",  # noqa: E501
                 "unique_key": "page_id",
                 "cdp_cols": seg_pages_cols,
                 "plan_cols": page_viewed_props,
             },
             {
                 "name": "screens",
-                "description": f"A table with screen() calls fired on {reflekt_plan.name}.",  # noqa: E501
+                "description": "A table with screen() calls.",  # noqa: E501
                 "unique_key": "screen_id",
                 "cdp_cols": seg_screens_cols,
                 "plan_cols": screen_viewed_props,
             },
             {
                 "name": "tracks",
-                "description": f"A table with track() event calls fired on {reflekt_plan.name}.",  # noqa: E501
+                "description": "A table with track() event calls.",  # noqa: E501
                 "unique_key": "event_id",
                 "cdp_cols": seg_tracks_cols,
                 "plan_cols": [],
@@ -520,6 +522,7 @@ class ReflektTransformer(object):
         logger.info(f"Initializing template for dbt source {self.schema}")
         dbt_src = copy.deepcopy(dbt_src_schema)
         dbt_src["sources"][0]["name"] = self.schema
+        dbt_src["sources"][0]["database"] = self.database
         dbt_src["sources"][0]["description"] = (
             f"Schema in {titleize(self.warehouse_type)} where data for the "
             f"{reflekt_plan.name} {titleize(self.cdp_name)} source is stored."
