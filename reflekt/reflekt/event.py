@@ -20,7 +20,7 @@ from reflekt.reflekt.casing import (
 from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.project import ReflektProject
 from reflekt.reflekt.property import ReflektProperty
-from reflekt.reflekt.schema import reflekt_event_schema, reflekt_metadata_schema
+from reflekt.reflekt.schema import reflekt_event_schema, reflekt_expected_metadata_schema
 
 
 # The class ReflektEvent is a derivative work based on the class
@@ -60,8 +60,10 @@ class ReflektEvent(object):
 
     def _check_event_metadata(self) -> None:
         if self.metadata:
-            validator = Validator(reflekt_metadata_schema)
-            is_valid = validator.validate(self.metadata, reflekt_metadata_schema)
+            validator = Validator(reflekt_expected_metadata_schema)
+            is_valid = validator.validate(
+                self.metadata, reflekt_expected_metadata_schema
+            )
             if not is_valid:
                 message = (
                     f"for `metadata:` defined in event "
@@ -150,5 +152,5 @@ class ReflektEvent(object):
         self._check_duplicate_properties()
         self._check_reserved_property_names()
 
-        if reflekt_metadata_schema is not None:
+        if reflekt_expected_metadata_schema is not None:
             self._check_event_metadata()

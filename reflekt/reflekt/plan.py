@@ -26,17 +26,17 @@ class ReflektPlan(object):
             self._project = ReflektProject()
             self.plan_yaml_obj = plan_yaml_obj
             self.name = plan_name
-            self.plan_schemas = self._get_plan_schemas(self.name)
+            self.warehouse_schemas = self._get_warehouse_schemas(self.name)
             self.events = []
             self.identify_traits = []
             self.group_traits = []
 
-    def _get_plan_schemas(self, plan_name: str) -> list:
+    def _get_warehouse_schemas(self, plan_name: str) -> list:
         try:
-            plan_schemas = self._project.plan_schemas[plan_name]
-            if isinstance(plan_schemas, str):
-                plan_schemas = [plan_schemas]
-            return plan_schemas
+            warehouse_schemas = self._project.warehouse_schemas[plan_name]
+            if isinstance(warehouse_schemas, str):
+                warehouse_schemas = [warehouse_schemas]
+            return warehouse_schemas
         except KeyError:
             raise KeyError(
                 f"Tracking plan '{plan_name}' not found in "

@@ -40,8 +40,8 @@ class ReflektProject:
         self._get_properties_allow_numbers()
         self._get_properties_reserved()
         self._get_data_types()
-        self._get_plan_schemas()
-        self._get_metadata_schema()
+        self._get_warehouse_schemas()
+        self._get_expected_metadata_schema()
         self._get_dbt_src_prefix()
         self._get_dbt_model_prefix()
         self._get_dbt_model_materialized()
@@ -89,162 +89,160 @@ class ReflektProject:
 
             if not self.config_path.exists():
                 raise ReflektProjectError(
-                    f"\n\nOptional `config_path:` {str(self.config_path)} in reflekt_project.yml does not exist!"  # noqa E501
+                    f"\n\nOptional 'config_path:' {str(self.config_path)} in reflekt_project.yml does not exist!"  # noqa E501
                 )
 
             if not self.config_path.is_absolute():
                 raise ReflektProjectError(
                     f"\n\n"
-                    f"Optional `config_path:` {str(self.config_path)} in reflekt_project.yml must be an absolute path!"  # noqa E501
+                    f"Optional 'config_path:' {str(self.config_path)} in reflekt_project.yml must be an absolute path!"  # noqa E501
                 )
         else:
             self.config_path = None
 
     def _get_events_case(self) -> None:
-        self.events_case = (
-            self.project.get("tracking_plans").get("naming").get("events").get("case")
-        )
-
-        if self.events_case is None:
+        try:
+            self.events_case = self.project["tracking_plans"]["events"]["naming"]["case"]
+        except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a `case:` rule for event naming convention in reflekt_project.yml. Example:"  # noqa E501
+                "\n\nMust define a 'case:' rule for event naming convention in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
-                "\n  naming:"
-                "\n    events:"
+                "\n  events:"
+                "\n    naming:"
                 "\n      case: title  # One of title|snake|camel"
                 "\n"
             )
 
     def _get_events_allow_numbers(self) -> None:
         try:
-            self.events_allow_numbers = self.project["tracking_plans"]["naming"][
-                "events"
+            self.events_allow_numbers = self.project["tracking_plans"]["events"][
+                "naming"
             ]["allow_numbers"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a `allow_numbers:` rule for events naming in reflekt_project.yml. Example:"  # noqa E501
+                "\n\nMust define an 'allow_numbers:' rule for events naming in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
-                "\n  naming:"
-                "\n    events:"
-                "\n      allow_numbers: true  # Or false"
+                "\n  events:"
+                "\n    naming:"
+                "\n      allow_numbers: true  # true|false"
                 "\n"
             )
 
     def _get_events_reserved(self) -> None:
         try:
-            self.events_reserved = self.project["tracking_plans"]["naming"]["events"][
+            self.events_reserved = self.project["tracking_plans"]["events"]["naming"][
                 "reserved"
             ]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a `reserved:` rule for events naming in reflekt_project.yml. Example:"  # noqa E501
+                "\n\nMust define a 'reserved:' rule for events naming in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
-                "\n  naming:"
-                "\n    events:"
-                "\n      reserved: ['My Reserved Event']  # List event names. Can be an empty list!"  # noqa E501
+                "\n  events:"
+                "\n    naming:"
+                "\n      reserved: ['My Reserved Event']  # List (can be empty)"  # noqa E501
                 "\n"
             )
 
     def _get_properties_case(self) -> None:
-        self.properties_case = (
-            self.project.get("tracking_plans")
-            .get("naming")
-            .get("properties")
-            .get("case")
-        )
-
-        if self.properties_case is None:
+        try:
+            self.properties_case = self.project["tracking_plans"]["properties"][
+                "naming"
+            ]["case"]
+        except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a `case:` rule for properties naming convention in reflekt_project.yml. Example:"  # noqa E501
+                "\n\nMust define a 'case:' rule for properties naming convention in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
-                "\n  naming:"
-                "\n    properties:"
+                "\n  properties:"
+                "\n    naming:"
                 "\n      case: title  # One of title|snake|camel"
                 "\n"
             )
 
     def _get_properties_allow_numbers(self) -> None:
         try:
-            self.properties_allow_numbers = self.project["tracking_plans"]["naming"][
-                "properties"
+            self.properties_allow_numbers = self.project["tracking_plans"]["properties"][
+                "naming"
             ]["allow_numbers"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a `allow_numbers:` rule for properties naming in reflekt_project.yml. Example:"  # noqa E501
+                "\n\nMust define an 'allow_numbers:' rule for properties naming in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
-                "\n  naming:"
-                "\n    properties:"
-                "\n      allow_numbers: true  # Or false"
+                "\n  properties:"
+                "\n    naming:"
+                "\n      allow_numbers: true  # true|false"
                 "\n"
             )
 
     def _get_properties_reserved(self) -> None:
         try:
-            self.properties_reserved = self.project["tracking_plans"]["naming"][
-                "properties"
+            self.properties_reserved = self.project["tracking_plans"]["properties"][
+                "naming"
             ]["reserved"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a `reserved:` rule for properties naming in reflekt_project.yml. Example:"  # noqa E501
+                "\n\nMust define a 'reserved:' rule for properties naming in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
-                "\n  naming:"
-                "\n    properties:"
-                "\n      reserved: ['my_reserved_property']  # List properties names. Can be an empty list!"  # noqa E501
+                "\n  properties:"
+                "\n    naming:"
+                "\n      reserved: ['my_reserved_property']  # List (can be empty)"  # noqa E501
                 "\n"
             )
 
     def _get_data_types(self) -> None:
         try:
-            self.data_types = self.project["tracking_plans"]["data_types"]["allowed"]
+            self.data_types = self.project["tracking_plans"]["properties"]["data_types"]
         except KeyError:
             raise ReflektProjectError(
                 "\n\nMust define allowed data types for event properties in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
-                "\n  data_types:"
-                "\n    allowed:"
+                "\n  properties:"
+                "\n    data_types:"
                 "\n      - list"
                 "\n      - data"
                 "\n      - types"
                 "\n      - here"
                 "\n"
-                "\nAvailable data types are: ['string', 'integer', 'boolean', 'number', 'object', 'array', 'any']"  # noqa E501
+                "\nSee docs in Reflekt Github repo for available data types"
             )
 
-    def _get_plan_schemas(self) -> None:
+    def _get_warehouse_schemas(self) -> None:
         try:
-            self.plan_schemas = self.project["tracking_plans"]["plan_schemas"]
+            self.warehouse_schemas = self.project["tracking_plans"]["warehouse_schemas"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define `plan_schemas:` in reflekt_project.yml. Each tracking plan in your Reflekt project must"  # noqa E501
+                "\n\nMust define 'warehouse_schemas:' in reflekt_project.yml. Each tracking plan in your Reflekt project must"  # noqa E501
                 " be mapped to a corresponding schema in data warehouse where it's raw event data is stored. Example:"  # noqa E501
                 "\n"
                 "\ntracking_plans:"
-                "\n  plan_schemas:"
+                "\n  warehouse_schemas:"
                 "\n    plan-name: schema_name"
                 "\n"
             )
 
-    def _get_metadata_schema(self) -> None:
-        if self.project.get("tracking_plans").get("metadata") is not None:
-            self.metadata_schema = (
-                self.project.get("tracking_plans").get("metadata").get("schema")
+    def _get_expected_metadata_schema(self) -> None:
+        if (
+            self.project.get("tracking_plans").get("events").get("expected_metadata")
+            is not None
+        ):
+            self.expected_metadata_schema = (
+                self.project.get("tracking_plans").get("events").get("expected_metadata")
             )
         else:
-            self.metadata_schema = None
+            self.expected_metadata_schema = None
 
     def _get_dbt_src_prefix(self) -> None:
         try:
             self.src_prefix = self.project["dbt"]["templater"]["sources"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define `prefix:` for templated dbt sources in reflekt_project.yml. Example:"  # noqa E501
+                "\n\nMust define 'prefix:' for templated dbt sources in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ndbt:"
                 "\n  sources:"
@@ -256,7 +254,7 @@ class ReflektProject:
             self.model_prefix = self.project["dbt"]["templater"]["models"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define `prefix:` for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
+                "\n\nMust define 'prefix:' for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ndbt:"
                 "\n  sources:"
@@ -276,7 +274,7 @@ class ReflektProject:
                 )
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust set `materialized:` for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
+                "\n\nMust set 'materialized:' for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
                 "\n\n"
                 "\ndbt:"
                 "\n  materialized: view  # OR incremental"
@@ -290,7 +288,7 @@ class ReflektProject:
                 ]
             except KeyError:
                 raise ReflektProjectError(
-                    "\n\nWhen `materialized: incremental` in reflekt_project.yml, must define incremental logic for templated dbt models. Example:"  # noqa E501
+                    "\n\nWhen 'materialized: incremental' in reflekt_project.yml, must define incremental logic for templated dbt models. Example:"  # noqa E501
                     "\n\n"
                     "\ndbt:"
                     "\n  incremental_logic: |"

@@ -447,18 +447,18 @@ def dbt(plan_name, force_version, raw_schema) -> None:
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
     logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
-    plan_schemas = reflekt_plan.plan_schemas
+    warehouse_schemas = reflekt_plan.warehouse_schemas
 
     if raw_schema:
-        plan_schemas = [raw_schema]
+        warehouse_schemas = [raw_schema]
 
     plural = ""
     dbt_project_dict = {}
 
-    if len(plan_schemas) > 1:
+    if len(warehouse_schemas) > 1:
         logger.info(
             f"[INFO] Multiple warehouse schemas mapped to {plan_name}. See "
-            f"'plan_schemas:' in reflekt_project.yml.\n\n"
+            f"'warehouse_schemas:' in reflekt_project.yml.\n\n"
             f"This is typically done when one tracking plan is used for multiple "
             f"applications, with each application sending data to their own "
             f"warehouse schema.\n\n"
@@ -472,7 +472,7 @@ def dbt(plan_name, force_version, raw_schema) -> None:
             logger.error(f"[ERROR] Invalid semantic version provided: {force_version}")
             raise click.Abort()
 
-        for schema in plan_schemas:
+        for schema in warehouse_schemas:
             pkg_name = f"reflekt_{schema}"
             transformer = ReflektTransformer(
                 reflekt_plan=reflekt_plan,
@@ -483,7 +483,7 @@ def dbt(plan_name, force_version, raw_schema) -> None:
             transformer.build_dbt_package()
 
     else:
-        for schema in plan_schemas:
+        for schema in warehouse_schemas:
             pkg_name = f"reflekt_{schema}"
             dbt_project_yml_path = dbt_pkgs_dir / pkg_name / "dbt_project.yml"
 
@@ -540,7 +540,7 @@ def dbt(plan_name, force_version, raw_schema) -> None:
                 print("")  # Newline in terminal
                 version = dbt_pkg_version
 
-    for schema in plan_schemas:
+    for schema in warehouse_schemas:
         pkg_name = f"reflekt_{schema}"
         transformer = ReflektTransformer(
             reflekt_plan=reflekt_plan,
