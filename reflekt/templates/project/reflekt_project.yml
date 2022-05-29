@@ -9,19 +9,44 @@ config_profile: default_profile  # Profile defined in reflekt_config.yml
 # config_path: /absolute/path/to/reflekt_config.yml  # OPTIONAL
 
 tracking_plans:
-  naming:                     # Naming conventions for tracking plans
-    events:
-      case: title             # title|snake|camel
-      allow_numbers: false    # Allow numbers in event names
-      reserved: []            # Reserved event names (casing matters)
+  warehouse_schemas:
+    # For each tracking plan, specify the schema(s) in data warehouse where
+    # Reflekt should look for raw event data. This can be a single schema
+    # (e.g. plan-name: schema_name) or a list of schemas (e.g. plan-name: ['schema_one', 'schema_two']).
+    # Schema names are used by Reflekt to build dbt package folder and file
+    # names when templating dbt packages (e.g. reflekt_schema_name__event_name.sql).
+    example-plan: example_schema
 
-    properties:
-      case: snake             # title|snake|camel
-      allow_numbers: false    # Allow numbers in property names
-      reserved: []            # Reserved property names (casing matters)
+  events:
+    naming:
+      case: title  # One of title|snake|camel
+      allow_numbers: false
+      reserved: []  # Reserved event names (casing matters)
 
-  data_types: # Specify allowed data types. Available types listed below
-    allowed:
+    # OPTIONAL (expected_metadata:)
+    # Define a schema for expected event metadata. Tested when running:
+    #     reflekt test --name <plan-name>
+    # expected_metadata:
+    #   code_owner:
+    #     required: true
+    #     type: string
+    #     allowed:
+    #       - Jane
+    #       - John
+    #   stakeholder:
+    #     type: string
+    #     allowed:
+    #       - Product
+    #       - Marketing
+    #       - Sales
+
+  properties:
+    naming:
+      case: snake  # One of title|snake|camel
+      allow_numbers: false
+      reserved: [] # Reserved property names (casing matters)
+
+    data_types: # Allowed property data types. Available types listed below
       - string
       - integer
       - boolean
@@ -31,30 +56,6 @@ tracking_plans:
       - any
       - 'null'  # Specify null type in quotes
 
-  warehouse_schemas:
-    # For each reflekt tracking plan, specify schema in database with raw event data.
-    # Replace the example mapping below with your mappings
-    example-plan: example_schema
-
-  # OPTIONAL (metadata:)
-  # Define a validation schema for your metadata. This is tested when running
-  #     reflekt test --name <plan-name>
-  # Uses Cerberus validation rules (https://bit.ly/3vIsAfs) to define schemas.
-  # metadata:
-  #   schema:
-  #     code_owner:
-  #       required: true
-  #       type: string
-  #       allowed:
-  #         - Jane
-  #         - John
-  #     stakeholder:
-  #       type: string
-  #       allowed:
-  #         - Product
-  #         - Engineering
-  #         - Data
-
 dbt:
   templater:
     sources:
@@ -62,16 +63,11 @@ dbt:
 
     models:
       prefix: reflekt_           # Prefix for models & docs in templated dbt package
-      materialized: incremental  # One of view|incremental
+      materialized: view  # view|incremental
       # OPTIONAL (incremental_logic:) [REQUIRED if 'materialized: incremental']
       # Specify the incremental logic to use when templating dbt models.
-      # Must include the {%- if is_incremental() %} ... {%- endif %} block
-      incremental_logic: |
-        {%- if is_incremental() %}
-        where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
-        {%- endif %}
-
-    # OPTIONAL (package_schemas:)
-    # For each tracking plan, specify schema where models in Reflekt dbt package will be materialized.
-    # package_schemas:
-    #   example-plan: example_schema
+      # Must include {%- if is_incremental() %} ... {%- endif %} block
+      # incremental_logic: |
+      #   {%- if is_incremental() %}
+      #   where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
+      #   {%- endif %}
