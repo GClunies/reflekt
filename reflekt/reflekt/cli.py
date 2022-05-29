@@ -6,7 +6,6 @@ import json
 import shutil
 from asyncio import subprocess
 from pathlib import Path
-from venv import create
 
 import click
 import pkg_resources
@@ -18,7 +17,7 @@ from packaging.version import parse as parse_version
 
 from reflekt.avo.plan import AvoPlan
 from reflekt.logger import logger_config
-from reflekt.reflekt import constants, project
+from reflekt.reflekt import constants
 from reflekt.reflekt.api_handler import ReflektApiHandler
 from reflekt.reflekt.config import ReflektConfig
 from reflekt.reflekt.loader import ReflektLoader
