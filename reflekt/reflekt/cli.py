@@ -4,7 +4,9 @@
 
 import json
 import shutil
+from asyncio import subprocess
 from pathlib import Path
+from venv import create
 
 import click
 import pkg_resources
@@ -16,7 +18,7 @@ from packaging.version import parse as parse_version
 
 from reflekt.avo.plan import AvoPlan
 from reflekt.logger import logger_config
-from reflekt.reflekt import constants
+from reflekt.reflekt import constants, project
 from reflekt.reflekt.api_handler import ReflektApiHandler
 from reflekt.reflekt.config import ReflektConfig
 from reflekt.reflekt.loader import ReflektLoader
@@ -441,8 +443,9 @@ def test(plan_name: str) -> None:
 @click.command()
 def dbt(plan_name, force_version, warehouse_schema) -> None:
     """Build dbt package with sources, models, and docs based on tracking plan."""
-    plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
-    dbt_pkgs_dir = ReflektProject().project_dir / "dbt_packages"
+    project_dir = ReflektProject().project_dir
+    plan_dir = project_dir / "tracking-plans" / plan_name
+    dbt_pkgs_dir = project_dir / "dbt_packages"
     logger.info(f"Loading Reflekt tracking plan {plan_name} at {str(plan_dir)}")
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
@@ -552,6 +555,28 @@ def dbt(plan_name, force_version, warehouse_schema) -> None:
             pkg_version=version,
         )
         transformer.build_dbt_package()
+
+    create_tag = click.confirm(
+        f"Would you like to create a Git tag to easily reference Reflekt dbt package "
+        f"{pkg_name} (version: {str(version)}) in your dbt project?",
+        default=False,
+    )
+
+    if create_tag:
+        tag = click.prompt(
+            "Tag",
+            type=str,
+            default=f"v{str(version)}_{pkg_name}",
+        )
+        git_executable = shutil.which("git")
+        subprocess.call(
+            args=[
+                git_executable,
+                "tag",
+                tag,
+            ],
+            cwd=project_dir,
+        )
 
 
 # Add CLI commands to CLI group
