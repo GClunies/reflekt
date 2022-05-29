@@ -433,13 +433,13 @@ def test(plan_name: str) -> None:
     help="Force Reflekt to template the dbt package with a specific semantic version.",
 )
 @click.option(
-    "--raw-schema",
-    "raw_schema",
+    "--warehouse-schema",
+    "warehouse_schema",
     required=False,
     help="Schema in which Reflekt will search for raw event data to template.",
 )
 @click.command()
-def dbt(plan_name, force_version, raw_schema) -> None:
+def dbt(plan_name, force_version, warehouse_schema) -> None:
     """Build dbt package with sources, models, and docs based on tracking plan."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     dbt_pkgs_dir = ReflektProject().project_dir / "dbt_packages"
@@ -449,8 +449,8 @@ def dbt(plan_name, force_version, raw_schema) -> None:
     logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
     warehouse_schemas = reflekt_plan.warehouse_schemas
 
-    if raw_schema:
-        warehouse_schemas = [raw_schema]
+    if warehouse_schema:
+        warehouse_schemas = [warehouse_schema]
 
     plural = ""
     dbt_project_dict = {}
@@ -571,4 +571,4 @@ if __name__ == "__main__":
     # pull(["--name", "patty-bar"])
     # push(["--name", "patty-bar"])
     # test(["--name", "patty-bar"])
-    dbt(["--name", "patty-bar"])
+    dbt(["--name", "patty-bar", "--warehouse-schema", "patty_bar_web"])

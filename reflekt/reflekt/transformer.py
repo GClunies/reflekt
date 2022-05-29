@@ -412,9 +412,9 @@ class ReflektTransformer(object):
                         dbt_src=dbt_src,
                         table_name=table_name,
                         table_description=std_segment_table["description"],
-                        db_columns=db_columns,
-                        cdp_cols=std_segment_table["cdp_cols"],
-                        plan_cols=std_segment_table["plan_cols"],
+                        # db_columns=db_columns,
+                        # cdp_cols=std_segment_table["cdp_cols"],
+                        # plan_cols=std_segment_table["plan_cols"],
                     )
                     self._template_dbt_model(
                         materialized=self.materialized,
@@ -448,9 +448,9 @@ class ReflektTransformer(object):
                         dbt_src=dbt_src,
                         table_name=table_name,
                         table_description=event.description,
-                        db_columns=db_columns,
-                        cdp_cols=seg_event_cols,
-                        plan_cols=event.properties,
+                        # db_columns=db_columns,
+                        # cdp_cols=seg_event_cols,
+                        # plan_cols=event.properties,
                     )
                     self._template_dbt_model(
                         materialized=self.materialized,
@@ -532,9 +532,9 @@ class ReflektTransformer(object):
         dbt_src: dict,
         table_name: str,
         table_description: str,
-        db_columns: list,
-        cdp_cols: dict,
-        plan_cols: list,
+        # db_columns: list,
+        # cdp_cols: dict,
+        # plan_cols: list,
     ) -> None:
         print("")  # Terminal newline
         logger.info(f"Templating table '{table_name}' in dbt source {self.schema}")
@@ -542,25 +542,25 @@ class ReflektTransformer(object):
         dbt_tbl["name"] = table_name
         dbt_tbl["description"] = table_description
 
-        for column, mapped_columns in cdp_cols.items():
-            if column in db_columns or column in reflekt_columns:
-                for mapped_column in mapped_columns:
-                    if mapped_column["source_name"] is not None:
-                        logger.info(
-                            f"    Adding column {mapped_column['source_name']} to "
-                            f"table {table_name}"
-                        )
-                        tbl_col = copy.deepcopy(dbt_column_schema)
-                        tbl_col["name"] = mapped_column["source_name"]
-                        tbl_col["description"] = mapped_column["description"]
-                        dbt_tbl["columns"].append(tbl_col)
+        # for column, mapped_columns in cdp_cols.items():
+        #     if column in db_columns or column in reflekt_columns:
+        #         for mapped_column in mapped_columns:
+        #             if mapped_column["source_name"] is not None:
+        #                 logger.info(
+        #                     f"    Adding column {mapped_column['source_name']} to "
+        #                     f"table {table_name}"
+        #                 )
+        #                 tbl_col = copy.deepcopy(dbt_column_schema)
+        #                 tbl_col["name"] = mapped_column["source_name"]
+        #                 tbl_col["description"] = mapped_column["description"]
+        #                 dbt_tbl["columns"].append(tbl_col)
 
-        for column in plan_cols:
-            logger.info(f"    Adding column {segment_2_snake(column.name)} to table")
-            tbl_col = copy.deepcopy(dbt_column_schema)
-            tbl_col["name"] = segment_2_snake(column.name)
-            tbl_col["description"] = column.description
-            dbt_tbl["columns"].append(tbl_col)
+        # for column in plan_cols:
+        #     logger.info(f"    Adding column {segment_2_snake(column.name)} to table")
+        #     tbl_col = copy.deepcopy(dbt_column_schema)
+        #     tbl_col["name"] = segment_2_snake(column.name)
+        #     tbl_col["description"] = column.description
+        #     dbt_tbl["columns"].append(tbl_col)
 
         dbt_src["sources"][0]["tables"].append(dbt_tbl)
 
@@ -599,7 +599,7 @@ class ReflektTransformer(object):
                 for mapped_column in mapped_columns:
                     if mapped_column["schema_name"] is not None:
                         logger.info(
-                            f"    Adding column {mapped_column['schema_name']} to "
+                            f"    Adding column '{mapped_column['schema_name']}' to "
                             f"model SQL"
                         )
                         col_sql = (
@@ -611,7 +611,9 @@ class ReflektTransformer(object):
                         mdl_sql += "\n        " + col_sql + ","
 
         for column in plan_cols:
-            logger.info(f"    Adding column {segment_2_snake(column.name)} to model SQL")
+            logger.info(
+                f"    Adding column '{segment_2_snake(column.name)}' to model SQL"
+            )
             col_sql = segment_2_snake(column.name)
             mdl_sql += "\n        " + col_sql + ","
 
@@ -710,9 +712,9 @@ class ReflektTransformer(object):
         print("")  # Terminal newline
         logger.info(
             f"Templating dbt docs "
-            f"{self.model_prefix}{self.schema}__{model_name}.yml"
+            f"{model_name}.yml"
             f" for model "
-            f"{self.model_prefix}{self.schema}__{model_name}.sql"
+            f"{model_name}.sql"
         )
         dbt_doc = copy.deepcopy(dbt_doc_schema)
         dbt_mdl_doc = copy.deepcopy(dbt_model_schema)
@@ -724,7 +726,7 @@ class ReflektTransformer(object):
                 for mapped_column in mapped_columns:
                     if mapped_column["schema_name"] is not None:
                         logger.info(
-                            f"    Adding column {mapped_column['schema_name']} to "
+                            f"    Adding column '{mapped_column['schema_name']}' to "
                             f"dbt docs"
                         )
                         mdl_col = copy.deepcopy(dbt_column_schema)
@@ -735,7 +737,7 @@ class ReflektTransformer(object):
                         dbt_mdl_doc["columns"].append(mdl_col)
 
         for column in plan_cols:
-            logger.info(f"    Adding column {segment_2_snake(column.name)} to docs")
+            logger.info(f"    Adding column '{segment_2_snake(column.name)}' to docs")
             mdl_col = copy.deepcopy(dbt_column_schema)
             mdl_col["name"] = segment_2_snake(column.name)
             mdl_col["description"] = column.description
