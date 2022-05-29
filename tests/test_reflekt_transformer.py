@@ -5,12 +5,10 @@
 
 from reflekt.reflekt.loader import ReflektLoader
 from reflekt.reflekt.transformer import ReflektTransformer
+
 from tests.fixtures import _build_reflekt_plan_dir
 
 
-# TODO
-#    - Test transform plan from Reflekt spec to dbt package
-#    - Test transform plan from Reflekt spec to Iglu schema json (wait for Iglu integration)  # noqa: E501
 def test_reflekt_transformer_segment(tmpdir):
     plan_dir = _build_reflekt_plan_dir(tmpdir)
     loader = ReflektLoader(plan_dir, "test-plan")
@@ -32,23 +30,25 @@ def test_reflekt_transformer_segment(tmpdir):
     ]
 
     assert segment_plan_name == "test-plan"
-    assert segment_plan_identify_traits["user_trait_1"]["description"] == "A user trait."
-    assert segment_plan_identify_traits["user_trait_1"]["type"] == ["string"]
     assert (
-        segment_plan_identify_traits["user_trait_2"]["description"]
+        segment_plan_identify_traits["user_trait_one"]["description"] == "A user trait."
+    )
+    assert segment_plan_identify_traits["user_trait_one"]["type"] == ["string"]
+    assert (
+        segment_plan_identify_traits["user_trait_two"]["description"]
         == "Another user trait."
     )
-    assert segment_plan_identify_traits["user_trait_2"]["type"] == ["boolean"]
+    assert segment_plan_identify_traits["user_trait_two"]["type"] == ["boolean"]
     assert (
-        segment_plan_identify_traits["user_trait_3"]["description"]
+        segment_plan_identify_traits["user_trait_three"]["description"]
         == "One more user trait."
     )
-    assert segment_plan_identify_traits["user_trait_3"]["type"] == ["number", "null"]
+    assert segment_plan_identify_traits["user_trait_three"]["type"] == ["number", "null"]
     assert (
-        segment_plan_identify_traits["user_trait_4"]["description"]
+        segment_plan_identify_traits["user_trait_four"]["description"]
         == "An object user trait."
     )
-    assert segment_plan_identify_traits["user_trait_4"]["type"] == ["object"]
+    assert segment_plan_identify_traits["user_trait_four"]["type"] == ["object"]
 
     assert segment_plan_group_traits["group_trait_one"]["description"] == "A group trait"
     assert segment_plan_group_traits["group_trait_two"]["type"] == ["string"]
@@ -84,21 +84,21 @@ def test_reflekt_transformer_segment(tmpdir):
     assert segment_plan_event_props["property_six"]["items"]["type"] == "object"
     assert (
         segment_plan_event_props["property_six"]["items"]["properties"][
-            "nested_property_1"
+            "nested_property_one"
         ]["description"]
         == "The 1st nested property."
     )
     assert segment_plan_event_props["property_six"]["items"]["properties"][
-        "nested_property_1"
+        "nested_property_one"
     ]["type"] == ["string"]
     assert (
         segment_plan_event_props["property_six"]["items"]["properties"][
-            "nested_property_2"
+            "nested_property_two"
         ]["description"]
         == "The 2nd nested property."
     )
     assert segment_plan_event_props["property_six"]["items"]["properties"][
-        "nested_property_2"
+        "nested_property_two"
     ]["type"] == ["string"]
     assert (
         segment_plan_event_props["property_seven"]["description"]
@@ -106,19 +106,23 @@ def test_reflekt_transformer_segment(tmpdir):
     )
     assert segment_plan_event_props["property_seven"]["type"] == ["object"]
     assert (
-        segment_plan_event_props["property_seven"]["properties"]["key_1"]["description"]
+        segment_plan_event_props["property_seven"]["properties"]["key_one"][
+            "description"
+        ]
         == "The 1st key in the object dictionary."
     )
     assert (
-        segment_plan_event_props["property_seven"]["properties"]["key_1"]["type"]
+        segment_plan_event_props["property_seven"]["properties"]["key_one"]["type"]
         == "string"
     )
     assert (
-        segment_plan_event_props["property_seven"]["properties"]["key_2"]["description"]
+        segment_plan_event_props["property_seven"]["properties"]["key_two"][
+            "description"
+        ]
         == "The 2nd key in the object dictionary."
     )
     assert (
-        segment_plan_event_props["property_seven"]["properties"]["key_2"]["type"]
+        segment_plan_event_props["property_seven"]["properties"]["key_two"]["type"]
         == "number"
     )
     assert (

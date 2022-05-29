@@ -4,7 +4,7 @@
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
 
-from typing import Counter, Optional
+from typing import Counter
 
 from cerberus import Validator
 
@@ -26,27 +26,39 @@ class ReflektPlan(object):
             self._project = ReflektProject()
             self.plan_yaml_obj = plan_yaml_obj
             self.name = plan_name
-            self.plan_schemas = self._get_plan_schemas(self.name)
-            self.dbt_package_schema = self._get_dbt_package_schema()
+            self.warehouse_database = self._get_warehouse_database(self.name)
+            self.warehouse_schemas = self._get_warehouse_schemas(self.name)
             self.events = []
             self.identify_traits = []
             self.group_traits = []
 
-    def _get_plan_schemas(self, plan_name: str) -> list:
+    def _get_warehouse_database(self, plan_name: str) -> list:
         try:
-            plan_schemas = list(self._project.plan_schemas[plan_name])
-            return plan_schemas
+            warehouse_database = self._project.warehouse_database[plan_name]
+            return warehouse_database
         except KeyError:
             raise KeyError(
-                f"Tracking plan '{plan_name}' not found in "
-                f"`plan_db_schemas:` in reflekt_project.yml. Please add "
-                f"corresponding '{plan_name}: <schema>` key value pair."
+                f"Tracking plan '{plan_name}' not found under...\n\n"
+                f"    warehouse:\n"
+                f"      database:\n\n"
+                f"... in reflekt_project.yml. See docs in Reflekt GitHub repo "
+                f"(https://github.com/GClunies/reflekt) on how to specify."
             )
 
-    def _get_dbt_package_schema(self) -> Optional[str]:
-        if self._project.pkg_schemas is not None:
-            if self.name in self._project.pkg_schemas:
-                return self._project.pkg_schemas[self.name]
+    def _get_warehouse_schemas(self, plan_name: str) -> list:
+        try:
+            warehouse_schemas = self._project.warehouse_schemas[plan_name]
+            if isinstance(warehouse_schemas, str):
+                warehouse_schemas = [warehouse_schemas]
+            return warehouse_schemas
+        except KeyError:
+            raise KeyError(
+                f"Tracking plan '{plan_name}' not found under...\n\n"
+                f"    warehouse:\n"
+                f"      schema:\n\n"
+                f"... in reflekt_project.yml. See docs in Reflekt GitHub repo "
+                f"(https://github.com/GClunies/reflekt) on how to specify."
+            )
 
     def add_event(self, event_yaml_obj: dict) -> None:
         event = ReflektEvent(event_yaml_obj)

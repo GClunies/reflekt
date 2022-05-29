@@ -4,6 +4,7 @@
 
 import json
 import shutil
+from asyncio import subprocess
 from pathlib import Path
 
 import click
@@ -433,34 +434,36 @@ def test(plan_name: str) -> None:
     help="Force Reflekt to template the dbt package with a specific semantic version.",
 )
 @click.option(
-    "--raw-schema",
-    "raw_schema",
+    "--warehouse-schema",
+    "warehouse_schema",
     required=False,
     help="Schema in which Reflekt will search for raw event data to template.",
 )
 @click.command()
-def dbt(plan_name, force_version, raw_schema) -> None:
+def dbt(plan_name, force_version, warehouse_schema) -> None:
     """Build dbt package with sources, models, and docs based on tracking plan."""
-    plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
-    dbt_pkgs_dir = ReflektProject().project_dir / "dbt_packages"
+    project_dir = ReflektProject().project_dir
+    plan_dir = project_dir / "tracking-plans" / plan_name
+    dbt_pkgs_dir = project_dir / "dbt_packages"
     logger.info(f"Loading Reflekt tracking plan {plan_name} at {str(plan_dir)}")
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
     logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
-    plan_schemas = reflekt_plan.plan_schemas
+    warehouse_database = reflekt_plan.warehouse_database
+    warehouse_schemas = reflekt_plan.warehouse_schemas
 
-    if raw_schema:
-        plan_schemas = [raw_schema]
+    if warehouse_schema:
+        warehouse_schemas = [warehouse_schema]
 
     plural = ""
     dbt_project_dict = {}
 
-    if len(plan_schemas) > 1:
+    if len(warehouse_schemas) > 1:
         logger.info(
-            f"[WARNING] Multiple warehouse schemas mapped to {plan_name}. See "
-            f"'plan_schemas:' in reflekt_project.yml. "
+            f"[INFO] Multiple warehouse schemas mapped to {plan_name}. See "
+            f"'warehouse_schemas:' in reflekt_project.yml.\n\n"
             f"This is typically done when one tracking plan is used for multiple "
-            f"applications, but with each application sending data to their own "
+            f"applications, with each application sending data to their own "
             f"warehouse schema.\n\n"
             f"Reflekt will template a separate dbt package for each schema.\n"
         )
@@ -472,10 +475,11 @@ def dbt(plan_name, force_version, raw_schema) -> None:
             logger.error(f"[ERROR] Invalid semantic version provided: {force_version}")
             raise click.Abort()
 
-        for schema in plan_schemas:
+        for schema in warehouse_schemas:
             pkg_name = f"reflekt_{schema}"
             transformer = ReflektTransformer(
                 reflekt_plan=reflekt_plan,
+                database=warehouse_database,
                 schema=schema,
                 dbt_package_name=pkg_name,
                 pkg_version=version,
@@ -483,7 +487,7 @@ def dbt(plan_name, force_version, raw_schema) -> None:
             transformer.build_dbt_package()
 
     else:
-        for schema in plan_schemas:
+        for schema in warehouse_schemas:
             pkg_name = f"reflekt_{schema}"
             dbt_project_yml_path = dbt_pkgs_dir / pkg_name / "dbt_project.yml"
 
@@ -540,15 +544,38 @@ def dbt(plan_name, force_version, raw_schema) -> None:
                 print("")  # Newline in terminal
                 version = dbt_pkg_version
 
-    for schema in plan_schemas:
+    for schema in warehouse_schemas:
         pkg_name = f"reflekt_{schema}"
         transformer = ReflektTransformer(
             reflekt_plan=reflekt_plan,
+            database=warehouse_database,
             schema=schema,
             dbt_package_name=pkg_name,
             pkg_version=version,
         )
         transformer.build_dbt_package()
+
+    create_tag = click.confirm(
+        f"Would you like to create a Git tag to easily reference Reflekt dbt package "
+        f"{pkg_name} (version: {str(version)}) in your dbt project?",
+        default=False,
+    )
+
+    if create_tag:
+        tag = click.prompt(
+            "Tag",
+            type=str,
+            default=f"v{str(version)}_{pkg_name}",
+        )
+        git_executable = shutil.which("git")
+        subprocess.call(
+            args=[
+                git_executable,
+                "tag",
+                tag,
+            ],
+            cwd=project_dir,
+        )
 
 
 # Add CLI commands to CLI group
@@ -570,5 +597,5 @@ if __name__ == "__main__":
     # test(["--name", "tracking-plan-example"])
     # pull(["--name", "patty-bar"])
     # push(["--name", "patty-bar"])
-    test(["--name", "patty-bar"])
-    # dbt(["--name", "patty-bar"])
+    # test(["--name", "patty-bar"])
+    dbt(["--name", "patty-bar", "--warehouse-schema", "patty_bar_web"])

@@ -8,7 +8,6 @@ import subprocess
 from typing import Optional
 
 from loguru import logger
-
 from reflekt.avo.errors import AvoCliError
 from reflekt.logger import logger_config
 from reflekt.reflekt.config import ReflektConfig
@@ -26,16 +25,16 @@ class AvoCli:
         logger.configure(**logger_config)
 
     def get(self, plan_name: str) -> None:
-        plan_schemas = self._project.plan_schemas
+        warehouse_schemas = self._project.warehouse_schemas
         avo_json_file = self.avo_dir / f"{plan_name}.json"
 
         if not avo_json_file.exists():
             avo_json_file.touch()
             avo_json_file.write_text("{}")
 
-        if plan_name not in plan_schemas:
+        if plan_name not in warehouse_schemas:
             raise AvoCliError(
-                f"Plan {plan_name} not found in `plan_schemas:` in "
+                f"Plan {plan_name} not found in `warehouse_schemas:` in "
                 f"{self._project.project_dir}/reflekt_project.yml"
             )
         else:

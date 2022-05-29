@@ -53,7 +53,7 @@ tracking_plans:
       - any
       - 'null'  # Specify null type in quotes
 
-  plan_schemas:
+  warehouse_schemas:
     # For each reflekt tracking plan, specify the schema in your data warehouse storing raw data.
     # Replace the example mapping below with your mappings
     example-plan: example_schema

@@ -9,6 +9,7 @@ dbt_src_schema = {
     "sources": [
         {
             "name": "",
+            "database": "",
             "description": "",
             "tables": []
         }
@@ -18,7 +19,7 @@ dbt_src_schema = {
 dbt_table_schema = {
     "name": "",
     "description": "",
-    "columns": [],
+    # "columns": [],
 }
 
 dbt_doc_schema = {

@@ -5,21 +5,6 @@
 from reflekt.reflekt.project import ReflektProject
 
 # fmt: off
-# TODO - How should these be enforced? These collide with standard tracker properties.
-prohibited_properties = [
-    "anonymousId",
-    "messageId",
-    "receivedAt",
-    "sentAt",
-    "timestamp",
-    "type",
-    "userId",
-    "version",
-    "pageId",
-    "screenId",
-    "eventId",
-]
-
 reflekt_plan_schema = {
     "name": {"required": True, "type": "string"},
     "dbt_pkg_schema": {"required": False, "type": "string"},
@@ -78,14 +63,14 @@ if reflekt_project.exists:
         "datetime": {"required": False, "type": "boolean"},
     }
 
-    if reflekt_project.metadata_schema is not None:
-        reflekt_metadata_schema = reflekt_project.metadata_schema
+    if reflekt_project.expected_metadata_schema is not None:
+        reflekt_expected_metadata_schema = reflekt_project.expected_metadata_schema
 
     else:
-        reflekt_metadata_schema = None
+        reflekt_expected_metadata_schema = None
 
 else:  # These are just dummy objects to prevent import side-effects
-    reflekt_metadata_schema = {}
+    reflekt_expected_metadata_schema = {}
     reflekt_property_schema = {}
     reflekt_item_schema = {}
     reflekt_nested_property_schema = {}
