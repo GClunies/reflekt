@@ -42,9 +42,9 @@ By defining tracking plans as code, they can be developed and managed using soft
 - Allow teams to assess how tracking plan changes will affect downstream dbt models.
 
 ### Reflekt + Avo
-[Avo](https://www.avo.app/) uses branches, environments, and naming conventions to manage tracking plans, bringing a workflow similar to software engineering into their web based UI. For Avo users, **we recommend continuing to manage tracking plans in Avo, then connecting a Reflekt project to Avo** (see our docs on [Connecting Reflekt + Avo](DOCUMENTATION.md/#connecting-reflekt--avo)).
+[Avo](https://www.avo.app/) uses branches, environments, and naming conventions to manage tracking plans, bringing a workflow similar to software engineering into their web based UI.
 
-With this setup, you can:
+**For Avo users, we recommend continuing to manage tracking plans in Avo, then connecting a Reflekt project to Avo** (see docs on [Connecting Reflekt + Avo](DOCUMENTATION.md/#connecting-reflekt--avo)). With this setup, you can:
 - Pull the tracking plan from Avo as it changes (can specify Avo branch) into Reflekt.
   ```bash
   $ reflekt pull --name my-plan --avo-branch staging
@@ -73,9 +73,9 @@ With this setup, you can:
 In the example above, Reflekt know's about Avo's staging branch and the staging schema in the data warehouse, allowing you to assess how tracking plan changes will affect dependent dbt models ***before pushing tracking changes to production.***
 
 ### Reflekt + Segment Protocols
-[Segment Protocols](https://segment.com/docs/protocols/) lets you manage tracking plans within your Segment account. While Segment does not use branches and environments, it does have an extensive API which Reflekt leverages. For Segment Protocols users, **we recommend managing your tracking plans as `code` in a GitHub repository containing your Reflekt project.**
+[Segment Protocols](https://segment.com/docs/protocols/) lets you manage tracking plans within your Segment account. While Segment does not use branches and environments, it does have an extensive API which Reflekt leverages.
 
-With this setup, you can:
+**For Segment Protocols users, we recommend managing your tracking plans as `code` in a GitHub repository containing your Reflekt project.** With this setup, you can:
 - Make changes to a tracking plan (e.g. add new event) by changing the tracking plan code.
   ```yaml
   # Adding a new event is easy!

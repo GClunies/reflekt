@@ -51,7 +51,7 @@ You've created your first Reflekt project! You can configure your Reflekt projec
 
 
 ### Connecting Reflekt + Avo
-Connecting Reflekt with [Avo](https://www.avo.app/) requires some additional steps. Don't worry, you only need to do this once and is well worth it! Here are the exact steps:
+Connecting Reflekt with [Avo](https://www.avo.app/) requires some additional steps. Don't worry, you only need to do this once! Here are the exact steps:
 
 1. Contact Avo using their chat support and request access to the JSON source. They are very responsive!
 2. Install Node (recommend using [`nvm`](https://github.com/nvm-sh/nvm)) and Node package manager (`npm`). This follows guidance found in the [npm docs](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
