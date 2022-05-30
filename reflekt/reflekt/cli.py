@@ -403,7 +403,7 @@ def push(plan_name, dry) -> None:
 def test(plan_name: str) -> None:
     """Test tracking plan schema for naming, data types, and metadata."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
-    logger.info(f"Testing Reflekt tracking plan '{plan_name}' at {str(plan_dir)}")
+    logger.info(f"Testing Reflekt tracking plan '{plan_name}'")
     loader = ReflektLoader(
         plan_dir=plan_dir,
         plan_name=plan_name,

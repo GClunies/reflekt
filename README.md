@@ -5,33 +5,36 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt
-Reflekt is a command line tool that connects to your analytics governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)) and defines your tracking plans as `code`. Reflekt uses this code to template **dbt packages modeling and documenting all the events in your tracking plan**, including:
-- dbt [sources](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in your warehouse storing the raw event data.
-- dbt [models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for each event in your tracking plan. Light transformations make your event data ready for consumption or further modeling.
-- dbt [documentation](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every model in the package, pulling information directly from the tracking plan. Your data team and the business always know what your tables and columns mean.
+Reflekt is a command line tool (CLI) allowing users to automagically template a dbt package modeling and documenting all the events from a tracking plan in their Analytics Governance tool. Each Reflekt dbt package includes:
+- A dbt [source](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in the warehouse where raw event data is loaded.
+- A dbt [model](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for each event in the tracking plan. Ready for consumption or further modeling.
+- A dbt [doc](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) entry for every model in the package, pulling information directly from the tracking plan. Your data team and the business always know what your tables and columns mean.
 
-Reflekt integrates with your analytics governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)), customer data platform (e.g. [Segment](https://segment.com/)), data warehouse, and [dbt](https://www.getdbt.com/).
+Reflekt integrates with you Analytics Governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)), Customer Data Platform (e.g. [Segment](https://segment.com/)), cloud data warehouse (e.g. [Snowflake](https://www.snowflake.com/)), and [dbt](https://www.getdbt.com/).
 
 ![reflekt-arch](/docs/reflekt-arch-flow.jpg)
 
-By defining your tracking plan as code, Reflekt makes it an *extensible artifact* that you can build off of, similar to dbt's `manifest.json`.
+Reflekt's dbt package templater is powered by its ability to define tracking plans as `code`, making them an *extensible artifact*, similar to how many tools use dbt's `manifest.json` to power their functionality.
 
-For Segment Protocols users, Reflekt also helps manage your tracking plans using software engineering principles - version control, development branches, pull requests & reviews, and CI/CD.
-- Pull tracking plans from your analytics governance tools, converting them to code.
-- Push changes to your tracking plan code back to your analytics governance tools, Reflekt handles the conversion.
-- Create new tracking plans defined as code.
-- Test tracking plan code for naming conventions and required metadata. You define the rules in your `reflekt_project.yml`.
+**!!! DEMO VIDEO GOES HERE !!!**
 
-## Getting started
-- [Install & Setup](docs/INSTALL-SETUP.md)
-- [Reflekt Projects and Tracking Plans as `code`](docs/TRACKING-PLANS-AS-CODE.md)
-- [Commands](docs/COMMANDS.md)
-- [Example Reflekt project](https://github.com/GClunies/patty-bar-reflekt) (used in the demo below)
+By defining tracking plans as code, they can be developed and managed using software engineer principles (version control, development branches, pull requests & reviews, and CI/CD). This is particularly useful for [Segment Protocols](https://segment.com/docs/protocols/) users. With Reflekt, you can:
+- Pull a tracking plan from your Analytics Governance tool, converting it to code.
+- Push changes to tracking plan code back to your Analytics Governance Tool, Reflekt handles the conversion.
+- Create a new tracking plan defined as code.
+- Test tracking plan code for naming conventions and required metadata. All defined by rules in your `reflekt_project.yml`.
 
-https://user-images.githubusercontent.com/28986302/170630561-4cd53cc7-cf1d-4a13-8e58-8ce4daf20793.mp4
+## Getting Started
+- [Documentation](docs/DOCUMENTATION.md)
+  - [Install](docs/DOCUMENTATION.md/#install)
+  - [Setup](docs/DOCUMENTATION.md/#setup)
+  - [Commands](docs/DOCUMENTATION.md/#commands)
+  - [Reflekt project configuration](docs/DOCUMENTATION.md/#project-configuration)
+  - [Tracking plans as `code`](docs/DOCUMENTATION.md/#tracking-plans-as-code)
+- [Example Reflekt project](https://github.com/GClunies/patty-bar-reflekt) (used in demo above)
 
 ## FAQ
-**Q:** **Do I have to use Reflekt to manage my tracking plan(s)? What if I like my analytics governance tool and just want to use the dbt templater?**
+**Q:** **Do I have to use Reflekt to manage my tracking plan(s)? What if I like my Analytics Governance tool and just want to use the dbt templater?**
 
 **A:** Reflekt lets you decide what features you want to use. Here are two examples:
 1. Manage your tracking plan in Avo, pull the plan from Avo into your Reflekt Project, and template your dbt packages using `reflekt dbt --name my-plan`. Pull plan changes from Avo and template again as needed.
