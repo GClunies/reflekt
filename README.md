@@ -115,4 +115,9 @@ With this simple structure and file format, anyone can be taught to make changes
 If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).
 
 ## Contributing code
-Feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls) for contributions you would like to propose. See the [contributing](docs/CONTRIBUTING-CODE.md) docs for development environment details and guidance.
+Feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls) for contributions you would like to propose.
+
+#### Development environment
+reflekt uses [poetry](https://python-poetry.org/) for packaging and dependency management. If you use poetry, this repo includes `poetry.lock` and `pyproject.toml` files to help spin up a dev environment. Simply navigate to the root of this repo on your machine and run.
+
+If you prefer to use another solution (e.g. pipenv, venv, conda) for packaging and dependency management, a `requirements-dev.txt` is included in this repo as well.
