@@ -12,7 +12,7 @@ Reflekt is a command line tool (CLI) allowing users to automagically template a 
 
 Reflekt integrates with you Analytics Governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)), Customer Data Platform (e.g. [Segment](https://segment.com/)), cloud data warehouse (e.g. [Snowflake](https://www.snowflake.com/)), and [dbt](https://www.getdbt.com/).
 
-![reflekt-arch](/docs/reflekt-arch-flow.jpg)
+![reflekt-architecture](/docs/reflekt-arch-flow.jpg)
 
 Reflekt's dbt package templater is powered by its ability to define tracking plans as `code`, making them an *extensible artifact*, similar to how many tools use dbt's `manifest.json` to power their functionality.
 
