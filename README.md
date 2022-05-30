@@ -25,7 +25,7 @@ By defining tracking plans as code, they can be developed and managed using soft
 - Test tracking plan code for naming conventions and required metadata. All defined by rules in your `reflekt_project.yml`.
 
 ## Getting Started
-- [Reflekt Docs](docs/DOCUMENTATION.md/#reflekt-docs)
+- [Docs](docs/DOCUMENTATION.md/#docs)
   - [Install](docs/DOCUMENTATION.md/#install)
   - [Setup](docs/DOCUMENTATION.md/#setup)
   - [Commands](docs/DOCUMENTATION.md/#commands)
