@@ -6,47 +6,56 @@ name: default_project
 config_profile: default_profile  # Profile defined in reflekt_config.yml
 
 # OPTIONAL (config_path:)
-# config_path: /absolute/path/to/reflekt_config.yml  # OPTIONAL
+# config_path: /absolute/path/to/reflekt_config.yml
 
 tracking_plans:
-  warehouse_schemas:
-    # For each tracking plan, specify the schema(s) in data warehouse where
-    # Reflekt should look for raw event data. This can be a single schema
-    # (e.g. plan-name: schema_name) or a list of schemas (e.g. plan-name: ['schema_one', 'schema_two']).
-    # Schema names are used by Reflekt to build dbt package folder and file
-    # names when templating dbt packages (e.g. reflekt_schema_name__event_name.sql).
-    example-plan: example_schema
+  # For each tracking plan in your Reflekt project, specify the warehouse and
+  # schema(s) where Reflekt should search for corresponding event data.
+  warehouse:
+    database:
+      example-plan: example_database
+    schema:
+      # When templating dbt packages, Reflekt uses schemas in folder and file
+      # names (e.g. reflekt_schema_name__event_name.sql)
+      example-plan: example_schema
 
   events:
     naming:
-      case: title  # One of title|snake|camel
-      allow_numbers: false
-      reserved: []  # Reserved event names (casing matters)
+      case: title           # One of title|snake|camel
+      allow_numbers: false  # true|false
+      reserved: []          # Reserved event names (casing matters)
 
     # OPTIONAL (expected_metadata:)
     # Define a schema for expected event metadata. Tested when running:
     #     reflekt test --name <plan-name>
+    # See example metadata schema below.
     # expected_metadata:
+    #   product_owner:
+    #     type: string
+    #     required: true
+    #     allowed:
+    #       - Maura
+    #       - Greg
     #   code_owner:
     #     required: true
     #     type: string
     #     allowed:
-    #       - Jane
-    #       - John
-    #   stakeholder:
+    #       - Maura
+    #       - Greg
+    #   stakeholders:
     #     type: string
     #     allowed:
     #       - Product
-    #       - Marketing
-    #       - Sales
+    #       - Engineering
+    #       - Data
 
   properties:
     naming:
-      case: snake  # One of title|snake|camel
-      allow_numbers: false
-      reserved: [] # Reserved property names (casing matters)
+      case: snake           # One of title|snake|camel
+      allow_numbers: false  # true|false
+      reserved: []          # Reserved property names (casing matters)
 
-    data_types: # Allowed property data types. Available types listed below
+    data_types: # Specify allowed data types. Available types listed below
       - string
       - integer
       - boolean

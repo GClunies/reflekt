@@ -3,79 +3,88 @@ Documentation to get you started using Reflekt and setting up you project. Where
 
 - [Reflekt Docs](#reflekt-docs)
   - [Install](#install)
-  - [Setup](#setup)
-    - [Connecting Reflekt + Avo](#connecting-reflekt--avo)
-  - [Commands](#commands)
+  - [Setup a Reflekt project](#setup-a-reflekt-project)
+    - [Connect Reflekt + Segment Protocols](#connect-reflekt--segment-protocols)
+    - [Connect Reflekt + Avo](#connect-reflekt--avo)
   - [Project configuration](#project-configuration)
     - [Project structure](#project-structure)
     - [Reflekt project](#reflekt-project)
     - [Reflekt profile](#reflekt-profile)
   - [Tracking plans as `code`](#tracking-plans-as-code)
     - [Events](#events)
-      - [Event metadata](#event-metadata)
-      - [Event properties](#event-properties)
-  - [Identify traits](#identify-traits)
-  - [Group traits](#group-traits)
-  - [Testing & CI](#testing--ci)
+      - [Metadata](#metadata)
+      - [Properties](#properties)
+    - [Identify traits](#identify-traits)
+    - [Group traits](#group-traits)
+  - [Commands](#commands)
+    - [`reflekt --help`](#reflekt---help)
+    - [`reflekt init`](#reflekt-init)
+    - [`reflekt new`](#reflekt-new)
+    - [`reflekt pull`](#reflekt-pull)
+    - [`reflekt push`](#reflekt-push)
+    - [`reflekt test`](#reflekt-test)
+    - [`reflekt dbt`](#reflekt-dbt)
+    - [Feature compatibility](#feature-compatibility)
 
 ## Install
 Install Reflekt with `pip`. Installing in a virtual Python environment is recommended.
 ```bash
-$ pip install reflekt
+pip install reflekt
 ```
 
-## Setup
-A step-by-step guide to create your first Reflekt project.
+## Setup a Reflekt project
 
-1. Create a git repo or clone one from GitHub.
+1. Create a Git repo or clone an empty one you've created in GitHub.
 ```bash
 # Option 1: Create a Git repo locally
-$ mkdir path/to/reflekt-project  # Make a new directory
-$ cd path/to/reflekt-project     # Navigate inside directory
-$ git init                       # Initialize Git repo
+mkdir path/to/reflekt-project  # Make a new directory
+cd path/to/reflekt-project     # Navigate inside directory
+git init                       # Initialize Git repo
 
 # Option 2: Clone a Git repo from GitHub
-$ git clone https://github.com/user/reflekt-project.git
+git clone https://github.com/user/reflekt-project.git
 ```
 
 2. Initialize a new Reflekt project.
 ```bash
 # Navigate inside repo
-$ cd path/to/reflekt-project
+cd path/to/reflekt-project
 
 # Initialize new Reflekt project and create profile in reflekt_config.yml
-$ reflekt init --project-dir .
+reflekt init --project-dir .
 ```
 
-You've created your first Reflekt project! You can configure your Reflekt project in the `reflekt_project.yml`. See the [Project configs](https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configs) docs for details and guidance.
+You've created your first Reflekt project!
 
+### Connect Reflekt + Segment Protocols
+I've you've run `reflekt init` as shown in the docs above, you are ready to go!
 
-### Connecting Reflekt + Avo
+### Connect Reflekt + Avo
 Connecting Reflekt with [Avo](https://www.avo.app/) requires some additional steps. Don't worry, you only need to do this once! Here are the exact steps:
 
 1. Contact Avo using their chat support and request access to the JSON source. They are very responsive!
 2. Install Node (recommend using [`nvm`](https://github.com/nvm-sh/nvm)) and Node package manager (`npm`). This follows guidance found in the [npm docs](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
    ```bash
    # Install Node version manager
-   $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-   $ nvm version  # Outputs Node.js version
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+   nvm version  # Outputs Node.js version
    v17.8.0
 
    # Install Node package manager
-   $ npm install -g npm
-   $ npm -v  # Output npm version
+   npm install -g npm
+   npm -v  # Output npm version
    8.11.0
    ```
 3. Install the [Avo CLI](https://www.avo.app/docs/implementation/cli) using `npm`.
    ```bash
-   $ npm install -g avo  # Install Avo CLI
-   $ avo --version       # Verify install
+   npm install -g avo  # Install Avo CLI
+   avo --version       # Verify install
      2.0.2
    ```
 4. Link your Avo Account to the Avo CLI.
    ```bash
-   $ avo login   # Link Avo account
-   $ avo whoami  # Verify account link
+   avo login   # Link Avo account
+   avo whoami  # Verify account link
      info Logged in as you@somewhere.com
    ```
 5. In a web browser, login to your Avo account and create a JSON Source. The name of the JSON source will be used by Reflekt as the tracking plan name. In the example below, you would pull your tracking plan from Avo by running `reflekt pull --name my-plan`.
@@ -94,13 +103,13 @@ Connecting Reflekt with [Avo](https://www.avo.app/) requires some additional ste
 7. In your Reflekt project, configure Avo with Reflekt
    ```bash
    # From the root of your Reflekt project
-   $ cd .reflekt/avo
+   cd .reflekt/avo
 
-   $ avo init
+   avo init
      success Initialized for workspace your-avo-workspace-name
      info Run 'avo pull' to pull analytics wrappers from Avo
 
-   $ avo pull --force
+   avo pull --force
      info Pulling from branch 'main'
      info No sources configured.
      # You will be prompted for the following
@@ -119,39 +128,6 @@ Connecting Reflekt with [Avo](https://www.avo.app/) requires some additional ste
 
 8. Configure your Reflekt project in the `reflekt_project.yml`. See the [Project configs](https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configs) docs.
 
-## Commands
-
-1. Create a Reflekt project.
-   ```bash
-   $ reflekt init --project-dir ./my_reflekt_project  # Follow the prompts
-   ```
-
-2. Get a tracking plan from your Analytics Governance Tool (Segment Protocols, Avo, others coming soon) and convert it to a Reflekt tracking plan code, ready for templating.
-   ```bash
-   $ reflekt pull --name <plan-name>
-   ```
-
-3. Use the Reflekt dbt templater to save your data team time. As your tracking plan changes, re-template to model the changes. Reflekt will bump the version of your dbt package as it evolves with your tracking plan.
-   ```bash
-   $ reflekt dbt --name <plan-name>
-   ```
-
-4. Sync your Reflekt tracking plan to your Analytics Governance tool. Reflekt handles the conversion!
-   ```bash
-   $ reflekt push --name <plan-name>
-   ```
-   **NOTE**: `reflekt push` does not support Avo. If you use Avo, we recommend managing your plan there and using `reflekt pull` and `reflekt dbt` to pull your plans and template your dbt models as needed.
-
-5. Test events and properties in your tracking plan for naming conventions, data types, and expected metadata.
-   ```zsh
-   $ reflekt test --name <plan-name>
-   ```
-
-6. Create a new tracking plan, defined as code.
-   ```bash
-   $ reflekt new --name <plan-name>
-   ```
-
 ## Project configuration
 
 ### Project structure
@@ -160,10 +136,10 @@ A Reflekt project is a directory of folders and files that define your tracking 
 ![reflekt-project-structure](reflekt-project-structure.png)
 
 ### Reflekt project
-Every Reflekt project has a `reflekt_project.yml`, setting project wide configurations. Expand the example `reflekt_project.yml`  to see the available parameters and their explanations.
+Every Reflekt project has a `reflekt_project.yml`, setting project wide configurations. See the example below to see the available parameters and their descriptions.
 
 ```yaml
-# reflekt_project.yml
+# Example reflekt_project.yml
 
 # Configurations are REQUIRED unless flagged by an '# OPTIONAL (optional_config:)' comment
 # Uncomment OPTIONAL configurations to use them
@@ -242,10 +218,11 @@ dbt:
 ```
 
 ### Reflekt profile
-Similar to dbt's `profiles.yml`, Reflekt uses a `reflekt_config.yml` file with profiles containing connection configurations for your Analytics Governance Tool, CDP, and warehouse. Profiles are configured when you run `reflekt init` to first create your Reflekt project. Two example profiles are provided below.
+Similar to dbt's `profiles.yml`, the `reflekt_config.yml` holds profiles used by your Reflekt project to connect and integrate with your Analytics Governance Tool, CDP, and data warehouse. Profiles are configured when you run `reflekt init` to first create your Reflekt project. Two example profiles are provided below.
 
 ```yaml
-# NOTE: Can have more than one profile in your reflekt_config.yml
+# Example reflekt_config.yml
+# Can have more than one profile in reflekt_config.yml
 # to support multiple Reflekt projects
 
 # Example One
@@ -283,21 +260,32 @@ example_profile_two:
 ```
 
 ## Tracking plans as `code`
-Reflekt manages tracking plans in a `tracking-plans/` directory of the Reflekt project. Your events, identify traits, and group traits all have corresponding YAML files. These YAML files are designed to be ***human-readable*** so that users less comfortable with code can still read and learn to contribute to the code.
+Tracking plans are managed in a `tracking-plans/` directory of the Reflekt project. Events, identify traits, and group traits all have corresponding YAML files. These YAML files are designed to be ***human-readable*** so that users less comfortable with code can still read and learn to contribute to the code.
 
-![my-plan-example](/docs/my-plan-example.png)
+![my-plan-example](/docs/my-plan.png)
 
 ### Events
 Each event in your tracking plan has its own YAML file, making it easy to manage and update.
 
-<details><summary>Example <code>product-added.yml</code> (click to expand)</summary><p>
+#### Metadata
+Event metadata is defined under the `metadata:` config (see example `Product Added` event below). It can be used to tag events with metadata not included when an event fires on your application or servers. Metadata can be whatever you want! Some example use cases are:
+- Event `product_owner` (who needs to know if something is wrong)
+- Event `code_owner` (who you will fix the code)
+- event `priority` (how urgently should we fix an issue?)
+
+Reflekt automatically pulls metadata down from your Analytics Governance tool when running `reflekt pull --name my-plan` using the following logic:
+- Segment Protocols -> Event "labels" are converted to `metadata:`
+- Avo -> Event "tags" are converted to `metadata:`
+
+#### Properties
+Event properties are defined under the `properties:` config (see example `Product Added` event below) down from your Analytics Governance tool when running `reflekt pull`.
 
 ```yaml
-# product-added.yml
+# Example: product-added.yml
 - version: 1
   name: Product Added
   description: Fired when a user adds a product to their cart.
-  metadata:  # Set event metadata. Configure metadata tests in reflekt_project.yml
+  metadata:  # Event metadata
     product_owner: pm-name
     code_owner: eng-squad-1
     priority: 1
@@ -331,28 +319,12 @@ Each event in your tracking plan has its own YAML file, making it easy to manage
       type: integer
       required: true
 ```
-</p></details>
 
-#### Event metadata
-Event metadata, defined using the `metadata:` config (see example event above), can be used to tag events with information not available in the event data itself. Metadata can be whatever you want! Some example use cases are:
-- Event `product_owner` (who needs to know if something is wrong)
-- Event `code_owner` (who you will fix the code)
-- event `priority` (how urgently should we fix an issue?)
-
-Reflekt automatically pulls metadata down from your Analytics Governance tool when running `reflekt pull --name my-plan` using the following logic:
-- Segment Protocols -> Segment event "labels" converted to `metadata:`
-- Avo -> Avo event "tags" converted to `metadata:`
-
-#### Event properties
-Reflekt automatically pulls event properties (see example event above) down from your Analytics Governance tool when running `reflekt pull --name my-plan`.
-
-## Identify traits
-Like events, identify calls and their user traits are specified in a YAML file.
-
-<details><summary>Example <code>identify-traits.yml</code> (click to expand)</summary><p>
+### Identify traits
+User traits are defined in a YAML file under a `traits:` config.
 
 ```yaml
-# product-added.yml
+# identify-traits.yml
 traits:
   - name: email
     description: The user's email address.
@@ -364,13 +336,11 @@ traits:
 ```
 </p></details>
 
-## Group traits
-You guessed it, group calls and their group traits are specified in a YAML file too.
-
-<details><summary>Example <code>group-traits.yml</code> (click to expand)</summary><p>
+### Group traits
+Group traits are defined in a YAML file under a `traits:` config.
 
 ```yaml
-# product-added.yml
+# group-traits.yml
 traits:
   - name: account_name
     description: The account name.
@@ -380,28 +350,237 @@ traits:
     description: Does the account pay us?
     type: boolean
 ```
-</p></details>
 
-## Testing & CI
-Reflekt allows users to test that the events in their tracking plan code validate against the naming conventions and expected metadata defined in the `reflekt_project.yml`.
+## Commands
 
-This feature is particularly helpful to [Segment Protocols](https://segment.com/docs/protocols/) users who use Reflekt to manage their tracking plan as `code` in a GitHub repo, syncing with Segment as plan changes are merged to the `main` branch.
-
-When a pull request is opened, a CI suite could be triggered to run:
-```
-$ reflekt test --plan my-plan
-21:24:07 Testing Reflekt tracking plan 'my-plan'
-21:24:07     Parsing event file account-created.yml
-21:24:07     Parsing event file account-deleted.yml
-21:24:07     Parsing event file checkout-step-viewed.yml
-21:24:08     Parsing event file order-completed.yml
-21:24:10     Parsing event file page-viewed.yml
-21:24:12     Parsing event file product-added.yml
-
-21:24:14 [PASSED] No errors detected in Reflekt tracking plan 'my-plan'
-```
-
-Then, when the pull request and plan changes are merged to the `main` branch, the CI suite can sync changes to Segment.
+### `reflekt --help`
+Show a list of available Reflekt commands.
 ```bash
-$ reflekt push --name my-plan  # Syncs to Segment!
+reflekt --help
+Usage: reflekt [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  dbt   Build dbt package with sources, models, and docs based on...
+  init  Create a Reflekt project at the provide directory.
+  new   Create a new empty tracking plan using provided name.
+  pull  Generate tracking plan as code using the Reflekt schema.
+  push  Sync tracking plan to CDP or Analytics Governance tool.
+  test  Test tracking plan schema for naming, data types, and metadata.
 ```
+
+The `--help` flag can also be used with each Reflekt commands. For example:
+```bash
+reflekt dbt --help
+Usage: reflekt dbt [OPTIONS]
+
+  Build dbt package with sources, models, and docs based on tracking plan.
+
+Options:
+  --warehouse-schema TEXT  Schema in which Reflekt will search for raw event
+                           data to template.
+  --force-version TEXT     Force Reflekt to template the dbt package with a
+                           specific semantic version.
+  --name TEXT              Tracking plan name in your Reflekt project.
+                           [required]
+  --help                   Show this message and exit
+```
+
+
+### `reflekt init`
+Initialize a new Reflekt project.
+```bash
+reflekt init --project-dir .  # Create Reflekt project in current folder
+
+Enter your project name (letters, digits, underscore): test_project
+...
+# Follow the prompts. Creates Reflekt project and reflekt_config.yml
+...
+11:43:26 Your Reflekt project 'test_project' has been created!
+
+With reflekt, you can:
+
+    reflekt new --name <plan-name>
+        Create a new tracking plan, defined as code.
+
+    reflekt pull --name <plan-name>
+        Get tracking plan from Analytics Governance tool and convert it to code.
+
+    reflekt push --name <plan-name>
+        Sync tracking plan code to Analytics Governance tool. Reflekt handles conversion.
+
+    reflekt test --name <plan-name>
+        Test tracking plan code for naming and metadata conventions (defined in reflect_project.yml).
+
+    reflekt dbt --name <plan-name>
+        Template dbt package with sources, models, and docs for all events in tracking plan.
+```
+
+### `reflekt new`
+Create a new tracking plan, defined as code.
+```bash
+reflekt new --name my-plan
+11:58:16 Creating new tracking plan 'my-plan' in '/Users/my_user/path-to/reflekt-project-repo/tracking-plans/my-plan'
+
+11:58:16 [SUCCESS] Created Reflekt tracking plan 'my-plan'
+```
+
+### `reflekt pull`
+Fetch a tracking plan from Analytics Governance tool.
+```bash
+reflekt pull --name my-plan
+12:20:52 Searching Segment for tracking plan 'my-plan'.
+12:20:53 Found tracking plan 'my-plan'
+12:20:53 Building Reflekt tracking plan 'my-plan'
+12:20:53     Building Reflekt event 'Account Created'
+12:20:53     Building Reflekt event 'Account Deleted'
+12:20:53     Building Reflekt event 'Checkout Step Viewed'
+12:20:53     Building Reflekt event 'Product Added'
+12:20:53     Building Reflekt event 'Order Completed'
+12:20:53     Building Reflekt event 'Page Viewed'
+
+12:20:53 [SUCCESS] Reflekt tracking plan 'my-plan' built at /Users/gclunies/Repos/reflekt/tracking-plans/my-plan
+```
+
+### `reflekt push`
+Sync a tracking plan code to an Analytics Governance tool.
+```bash
+reflekt push --name my-plan
+12:32:09 Loading Reflekt tracking plan 'my-plan'
+12:32:09     Parsing event file account-created.yml
+12:32:11     Parsing event file account-deleted.yml
+12:32:12     Parsing event file checkout-step-viewed.yml
+12:32:13     Parsing event file product-added.yml
+12:32:15     Parsing event file order-completed.yml
+12:32:16     Parsing event file page-viewed.yml
+
+12:32:17 Converting Reflekt tracking plan 'tracking-plan-example'to Segment format
+12:32:18     Converting 'Account Created'
+12:32:18     Converting 'Account Deleted'
+12:32:18     Converting 'Checkout Step Viewed'
+12:32:18     Converting 'Product Added'
+12:32:18     Converting 'Order Completed'
+12:32:19     Converting 'Page Viewed'
+
+12:32:20 Syncing converted tracking plan 'tracking-plan-example' to Segment
+
+12:32:21 [SUCCESS] Synced Reflekt tracking plan 'my-plan' to Segment
+```
+
+### `reflekt test`
+Test tracking plan events, properties, and metadata against rules defined in `reflekt_project.yml`. See the [Reflekt project](#reflekt-project) docs for details on defining naming conventions and expected metadata.
+```bash
+reflekt push --name my-plan
+12:37:36 Loading Reflekt tracking plan 'my-plan'
+12:37:36     Parsing event file account-created.yml
+12:37:37     Parsing event file account-deleted.yml
+12:37:37     Parsing event file checkout-step-viewed.yml
+12:37:37     Parsing event file product-added.yml
+12:37:39     Parsing event file order-completed.yml
+12:37:40     Parsing event file page-viewed.yml
+
+12:38:28 [PASSED] No errors detected in Reflekt tracking plan 'my-plan'
+```
+
+### `reflekt dbt`
+Template a dbt package modeling and documenting all the events in a tracking plan.
+```bash
+reflekt dbt --name my-plan
+
+12:47:10 Building Reflekt dbt package:
+        cdp: segment
+        analytics governance tool: avo
+        tracking plan: my-plan
+        warehouse: snowflake
+        schema: patty_bar_web_staging
+        dbt package name: reflekt_patty_bar_web_staging
+        dbt package version: 0.1.0
+        dbt package path: /Users/gclunies/Repos/reflekt/dbt_packages/reflekt_patty_bar_web_staging
+
+12:46:52 Initializing template for dbt source patty_bar_web_staging
+
+12:46:56 Templating table 'pages' in dbt source patty_bar_web_staging
+
+12:46:56 Templating dbt model reflekt_patty_bar_web_staging__pages.sql
+12:46:56     Adding {{ config(...) }} to model SQL
+12:46:56     Adding source CTE to model SQL
+12:46:56     Adding renamed CTE to model SQL
+12:46:56     Adding column 'page_id' to model SQL
+12:46:56     Adding column 'source_schema' to model SQL
+12:46:56     Adding column 'source_table' to model SQL
+12:46:56     Adding column 'tracking_plan' to model SQL
+12:46:56     Adding column 'page_name' to model SQL
+12:46:56     Adding column 'library_name' to model SQL
+12:46:56     Adding column 'library_version' to model SQL
+12:46:56     Adding column 'sent_at_tstamp' to model SQL
+12:46:56     Adding column 'received_at_tstamp' to model SQL
+12:46:56     Adding column 'tstamp' to model SQL
+12:46:56     Adding column 'anonymous_id' to model SQL
+12:46:56     Adding column 'user_id' to model SQL
+12:46:56     Adding column 'page_url_host' to model SQL
+12:46:56     Adding column 'referrer_host' to model SQL
+12:46:56     Adding column 'ip' to model SQL
+12:46:56     Adding column 'user_agent' to model SQL
+12:46:56     Adding column 'device' to model SQL
+12:46:56     Adding column 'path' to model SQL
+12:46:56     Adding column 'product_type' to model SQL
+12:46:56     Adding column 'referrer' to model SQL
+12:46:56     Adding column 'search' to model SQL
+12:46:56     Adding column 'title' to model SQL
+12:46:56     Adding column 'url' to model SQL
+
+12:46:56 Templating dbt docs reflekt_patty_bar_web_staging__pages.yml for model reflekt_patty_bar_web_staging__pages.sql
+12:46:56     Adding column 'page_id' to dbt docs
+12:46:56     Adding column 'source_schema' to dbt docs
+12:46:56     Adding column 'source_table' to dbt docs
+12:46:56     Adding column 'tracking_plan' to dbt docs
+12:46:56     Adding column 'page_name' to dbt docs
+12:46:56     Adding column 'library_name' to dbt docs
+12:46:56     Adding column 'library_version' to dbt docs
+12:46:56     Adding column 'sent_at_tstamp' to dbt docs
+12:46:56     Adding column 'received_at_tstamp' to dbt docs
+12:46:56     Adding column 'tstamp' to dbt docs
+12:46:56     Adding column 'anonymous_id' to dbt docs
+12:46:56     Adding column 'user_id' to dbt docs
+12:46:56     Adding column 'page_url_host' to dbt docs
+12:46:56     Adding column 'referrer_host' to dbt docs
+12:46:56     Adding column 'ip' to dbt docs
+12:46:56     Adding column 'user_agent' to dbt docs
+12:46:56     Adding column 'device' to dbt docs
+12:46:56     Adding column 'path' to docs
+12:46:56     Adding column 'product_type' to docs
+12:46:56     Adding column 'referrer' to docs
+12:46:56     Adding column 'search' to docs
+12:46:56     Adding column 'title' to docs
+12:46:56     Adding column 'url' to docs
+
+...
+...
+...
+# More output to stdout for each model
+...
+...
+...
+
+12:47:23 [SUCCESS] Created Reflekt dbt package 'reflekt_patty_bar_web_staging' at: /Users/gclunies/Repos/reflekt/dbt_packages/reflekt_patty_bar_web_staging
+
+Would you like to create a Git tag to easily reference Reflekt dbt package reflekt_patty_bar_web_staging (version: 0.1.0) in your dbt project? [y/N]: N
+```
+
+### Feature compatibility
+Reflekt does not support the `init`, `new`, or `push` commands when connected to Avo. There are two reasons for this:
+1. Avo does not support pushing tracking plans back to Avo via the Avo CLI, which Reflekt uses in the background.
+2. We think it's better for Avo users to manage their tracking plan in Avo since it already embraces software engineering workflows in its web base UI.
+
+See the table below for command compatibility details.
+
+| Command      | Avo | Segment Protocols |
+|--------------|:-----:|:-------------------:|
+| reflekt init |  ❌   |         ✅          |
+| reflekt new  |  ❌   |         ✅          |
+| reflekt pull |  ✅   |         ✅          |
+| reflekt push |  ❌   |         ✅          |
+| reflekt test |  ✅   |         ✅          |
+| reflekt dbt  |  ✅   |         ✅          |

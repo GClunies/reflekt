@@ -218,7 +218,7 @@ def init(project_dir_str: str) -> None:
 
     click.echo(
         f"Configured to use Reflekt config profile '{config_name}' at "
-        f"{reflekt_config_path}."
+        f"{reflekt_config_path}"
     )
     project_template_dir = pkg_resources.resource_filename(
         "reflekt", "templates/project/"
@@ -279,7 +279,7 @@ def new(plan_name: str) -> None:
 
     plan_yml_file = plan_dir / "plan.yml"
 
-    with open(plan_yml_file, "w") as f:
+    with open(plan_yml_file, "r") as f:
         doc = yaml.safe_load(f)
 
     doc["display_name"] = plan_name
@@ -314,7 +314,7 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
     api = ReflektApiHandler().get_api(avo_branch=avo_branch)
     config = ReflektConfig()
     logger.info(
-        f"Searching {titleize(config.plan_type)} for tracking plan '{plan_name}'."
+        f"Searching {titleize(config.plan_type)} for tracking plan '{plan_name}'"
     )
     plan_json = api.get(plan_name)
     logger.info(f"Found tracking plan '{plan_name}'")
@@ -367,7 +367,7 @@ def push(plan_name, dry) -> None:
         raise click.Abort()
 
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
-    logger.info(f"Loading Reflekt tracking plan '{plan_name}' from {str(plan_dir)}")
+    logger.info(f"Loading Reflekt tracking plan '{plan_name}'")
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
     transformer = ReflektTransformer(reflekt_plan)
@@ -445,7 +445,7 @@ def dbt(plan_name, force_version, warehouse_schema) -> None:
     project_dir = ReflektProject().project_dir
     plan_dir = project_dir / "tracking-plans" / plan_name
     dbt_pkgs_dir = project_dir / "dbt_packages"
-    logger.info(f"Loading Reflekt tracking plan {plan_name} at {str(plan_dir)}")
+    logger.info(f"Loading Reflekt tracking plan {plan_name}")
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
     reflekt_plan = loader.plan
     logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")

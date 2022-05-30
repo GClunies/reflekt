@@ -149,3 +149,4 @@ dbt_packages/
 
 # Allow template files in reflekt python package
 !reflekt/templates/**/*
+!reflekt/templates/project/reflekt_project.yml
