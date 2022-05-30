@@ -99,7 +99,7 @@ By defining tracking plans as code, they can be developed and managed using soft
 
 With this simple structure and file format, anyone can be taught to make changes to the tracking code and submit a PR using GitHub's web interface. No terminal or IDE required!
 
-**Q:** **What analytics governance tools does Reflekt support?**
+**Q:** **What Analytics Governance tools does Reflekt support?**
 
 **A:** Reflekt currently supports [Segment Protocols](https://segment.com/docs/protocols/) and [Avo](https://www.avo.app/).
 
