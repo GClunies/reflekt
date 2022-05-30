@@ -18,7 +18,7 @@ Reflekt's dbt package templater is powered by its ability to define tracking pla
 
 **!!! DEMO VIDEO GOES HERE !!!**
 
-By defining tracking plans as code, they can be developed and managed using software engineer principles (version control, development branches, pull requests, reviews, and CI/CD). This is particularly useful for [Segment Protocols](https://segment.com/docs/protocols/) users. With Reflekt, you can:
+By defining tracking plans as code, they can be developed and managed using software engineer principles (version control, development branches, pull requests, reviews, and CI/CD). This is particularly useful for [Segment Protocols](https://segment.com/docs/protocols/) users who lack this functionality. With Reflekt, you can:
 - Pull a tracking plan from your Analytics Governance tool, converting it to code.
 - Push changes to tracking plan code back to your Analytics Governance Tool, Reflekt handles the conversion.
 - Create a new tracking plan defined as code.
