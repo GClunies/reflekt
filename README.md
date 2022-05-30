@@ -28,6 +28,7 @@ By defining tracking plans as code, they can be developed and managed using soft
 - [Docs](docs/DOCUMENTATION.md/#docs)
   - [Install](docs/DOCUMENTATION.md/#install)
   - [Setup](docs/DOCUMENTATION.md/#setup)
+    - [Setting up Reflekt with Avo](docs/DOCUMENTATION.md/#setting-up-reflekt-with-avo)
   - [Commands](docs/DOCUMENTATION.md/#commands)
   - [Reflekt project configuration](docs/DOCUMENTATION.md/#project-configuration)
   - [Tracking plans as `code`](docs/DOCUMENTATION.md/#tracking-plans-as-code)
@@ -37,8 +38,8 @@ By defining tracking plans as code, they can be developed and managed using soft
 **Q:** **Do I have to use Reflekt to manage my tracking plan(s)? What if I like my Analytics Governance tool and just want to use the dbt templater?**
 
 **A:** Reflekt lets you decide what features you want to use. Here are two examples:
-1. Manage your tracking plan in Avo, pull the plan from Avo into your Reflekt Project, and template your dbt packages using `reflekt dbt --name my-plan`. Pull plan changes from Avo and template again as needed.
-2. Manage your tracking plan(s) as code in a Reflekt project, sync changes to Segment Protocols with `reflekt push --name my-plan` so the plan can be used for event validation. Now you can develop your tracking plan code the same way your software engineers develop applications - using pull requests, branches, environments, testing, and CI.
+1. Manage your tracking plan in Avo, pull the plan from Avo into your Reflekt Project, and template dbt packages using `reflekt dbt --name my-plan`. Pull plan changes from Avo and template again as needed.
+2. Manage your tracking plan(s) as code in a Reflekt project, sync changes to Segment Protocols with `reflekt push --name my-plan` so the plan can be used for event validation. Develop and manage plans using software engineer principles (version control, development branches, pull requests & reviews, and CI/CD). Template dbt packages using `reflekt dbt --name my-plan`. Pull plan changes from Avo and template again as needed.
 
 **Q:** **If the tracking plan is `code`, how can a product manager, marketer, etc. propose changes?**
 
