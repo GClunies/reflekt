@@ -1,7 +1,7 @@
-# Reflekt documentation
+# Reflekt Docs
 Documentation to get you started using Reflekt and setting up you project. Where possible, demo videos are included in addition to the written docs.
 
-- [Reflekt documentation](#reflekt-documentation)
+- [Reflekt Docs](#reflekt-docs)
   - [Install](#install)
   - [Setup](#setup)
     - [Setting up Reflekt with Avo](#setting-up-reflekt-with-avo)
