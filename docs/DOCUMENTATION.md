@@ -1,10 +1,10 @@
-# Docs
+# Reflekt Docs
 Documentation to get you started using Reflekt and setting up you project. Where possible, demo videos are included in addition to the written docs.
 
-- [Docs](#docs)
+- [Reflekt Docs](#reflekt-docs)
   - [Install](#install)
   - [Setup](#setup)
-    - [Setting up Reflekt with Avo](#setting-up-reflekt-with-avo)
+    - [Connecting Reflekt + Avo](#connecting-reflekt--avo)
   - [Commands](#commands)
   - [Project configuration](#project-configuration)
     - [Project structure](#project-structure)
@@ -40,15 +40,17 @@ $ git clone https://github.com/user/reflekt-project.git
 
 2. Initialize a new Reflekt project.
 ```bash
-$ cd path/to/reflekt-project    # Navigate inside repo
-$ reflekt init --project-dir .  # Follow the prompts
+# Navigate inside repo
+$ cd path/to/reflekt-project
+
+# Initialize new Reflekt project and create profile in reflekt_config.yml
+$ reflekt init --project-dir .
 ```
 
-You've created your first Reflekt project!
+You've created your first Reflekt project! You can configure your Reflekt project in the `reflekt_project.yml`. See the [Project configs](https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configs) docs for details and guidance.
 
-1. Configure your Reflekt project in the `reflekt_project.yml`. See the [Project configs](https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configs) docs.
 
-### Setting up Reflekt with Avo
+### Connecting Reflekt + Avo
 Connecting Reflekt with [Avo](https://www.avo.app/) requires some additional steps. Don't worry, you only need to do this once and is well worth it! Here are the exact steps:
 
 1. Contact Avo using their chat support and request access to the JSON source. They are very responsive!

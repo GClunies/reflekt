@@ -5,7 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt
-Reflekt is a command line tool (CLI) allowing users to automagically template a dbt package modeling and documenting all the events in a tracking plan from their Analytics Governance tool. These dbt packages can be easily consumed in a dbt project. Each Reflekt dbt package includes:
+Reflekt is a command line tool (CLI) allowing users to **automagically template dbt packages modeling and documenting all the events in tracking plans from their Analytics Governance tool,** which can be easily consumed by a dbt project. Each Reflekt dbt package includes:
 - A dbt [source](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in the warehouse where raw event data is loaded.
 - A dbt [model](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for each event in the tracking plan. Ready for consumption or further modeling.
 - A dbt [doc](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) entry for every model in the package, pulling information directly from the tracking plan. Your dbt docs *reflekt* your tracking plan. The data team and the business always know what your tables and columns mean.
@@ -25,91 +25,153 @@ By defining tracking plans as code, they can be developed and managed using soft
 - Test tracking plan code for naming conventions and required metadata. All defined by rules in your `reflekt_project.yml`.
 
 ## Getting Started
-- [Docs](docs/DOCUMENTATION.md/#docs)
+- [Docs](docs/DOCUMENTATION.md/#reflekt-docs)
   - [Install](docs/DOCUMENTATION.md/#install)
   - [Setup](docs/DOCUMENTATION.md/#setup)
-    - [Setting up Reflekt with Avo](docs/DOCUMENTATION.md/#setting-up-reflekt-with-avo)
+    - [Connecting Reflekt + Avo](docs/DOCUMENTATION.md/#connecting-reflekt--avo)
   - [Commands](docs/DOCUMENTATION.md/#commands)
   - [Reflekt project configuration](docs/DOCUMENTATION.md/#project-configuration)
   - [Tracking plans as `code`](docs/DOCUMENTATION.md/#tracking-plans-as-code)
 - [Example Reflekt project](https://github.com/GClunies/patty-bar-reflekt) (used in demo above)
 
-## FAQ
-**Q:** **Do I have to use Reflekt to manage my tracking plan(s)? What if I like my Analytics Governance tool and just want to use the dbt templater?**
+## Using Reflekt
 
-**A:** Reflekt lets you decide what features you want to use. Here are two examples:
-1. Manage your tracking plan in Avo using their branches and environments framework:
-   - Pull the plan from Avo into your Reflekt Project with `reflekt pull --name my-plan`.
-   - Template dbt packages with `reflekt dbt --name my-plan`. Reference packages in your dbt project.
-   - Pull plan changes from Avo and template again as needed using Reflekt.
-2. Manage your tracking plan(s) as code in a Reflekt project. Develop and manage plans using software engineer principles (version control, development branches, pull requests & reviews, and CI/CD)
-   - Make changes to the tracking plan by changing the tracking plan `code` in Reflekt project repo.
-   - Open pull requests in GitHub. Request reviews from team members, debate and collaborate. Run a CI suite using `reflekt test --name my-plan` to test naming conventions and expected metadata.
-   - On merge to `main` branch in GitHub, sync changes to Segment Protocols with `reflekt push --name my-plan`.
-   - Template dbt packages with `reflekt dbt --name my-plan`. Reference packages in your dbt project.
+**Reflekt exists to:**
+- Save data teams time by templating dbt packages modeling all events in the tracking plan.
+- Increase the use of software engineering workflows for tracking plan management.
+- Allow teams to assess how tracking plan changes will affect downstream dbt models.
 
-**Q:** **If the tracking plan is `code`, how can a product manager, marketer, etc. propose changes?**
+### Reflekt + Avo
+[Avo](https://www.avo.app/) uses branches, environments, and naming conventions to manage tracking plans, bringing a workflow similar to software engineering into their web based UI. For Avo users, **we recommend continuing to manage tracking plans in Avo, then connecting a Reflekt project to Avo** (see our docs on [Connecting Reflekt + Avo](DOCUMENTATION.md/#connecting-reflekt--avo)).
 
-**A:** This question assumes code is only for engineers - we strongly disagree! *Anyone* can learn how Reflekt defines a tracking plan as code, which is why the code is designed to be *human-readable*. In Reflekt, tracking plans are defined in a `tracking-plans/` folder with each event defined using a simple YAML file.
+With this setup, you can:
+- Pull the tracking plan from Avo as it changes (can specify Avo branch) into Reflekt.
+  ```bash
+  $ reflekt pull --name my-plan --avo-branch staging
+  ```
+  This creates a copy of the plan as code in the Reflekt project, to be used by Reflekt's dbt templater.
 
-<details><summary><strong>example-event.yml</strong> (click to expand)</summary><p>
+- Template a dbt package modeling and documenting all the events in the tracking plan. You can tell Reflekt to template based on data in specified schema (configure available schemas for plans in `reflekt_project.yml`).
+  ```bash
+  $ reflekt dbt --name my-plan --warehouse-schema my_app_staging
+  ```
 
-```yaml
-# Example 'Product Added' event
-- version: 1
-  name: Product Added
-  description: Fired when a user adds a product to their cart.
-  metadata:  # Set event metadata. Configure metadata tests in reflekt_project.yml
-    product_owner: pm-name
-    code_owner: eng-squad-1
-    priority: 1
+- Open a GitHub pull request with new/updated Reflekt dbt package. Get reviews from team members. Merge to main branch when approved.
+
+- Reference Reflekt dbt packages in your dbt project.
+  ```yaml
+  # packages.yml in dbt project
+  packages:
+  - package: dbt-labs/dbt_utils
+    version: 0.8.5
+
+  - git: "https://github.com/my-github-user/reflekt-project-repo"
+    subdirectory: "dbt_packages/reflekt_my_app_staging"
+    revision: v0.1.0__reflekt_my_app_staging  # Git tag or full commit
+  ```
+
+In the example above, Reflekt know's about Avo's staging branch and the staging schema in the data warehouse, allowing you to assess how tracking plan changes will affect dependent dbt models ***before pushing tracking changes to production.***
+
+### Reflekt + Segment Protocols
+[Segment Protocols](https://segment.com/docs/protocols/) lets you manage tracking plans within your Segment account. While Segment does not use branches and environments, it does have an extensive API which Reflekt leverages. For Segment Protocols users, **we recommend managing your tracking plans as `code` in a GitHub repository containing your Reflekt project.**
+
+With this setup, you can:
+- Make changes to a tracking plan (e.g. add new event) by changing the tracking plan code.
+  ```yaml
+  # Adding a new event is easy!
+  version: 1
+  name: Example Event
+  description: This is an example event.
+  metadata:
+    code_owner: me
   properties:
-    - name: cart_id
-      description: Cart ID to which the product was added to.
-      type: string
-      required: true    # Specify a property is required
-    - name: product_id
-      description: Database ID of the product being viewed.
-      type: integer
-      required: true
-    - name: name
-      description: Name of the product.
-      type: string     # Specify property data type
-      required: true
-    - name: variant
-      description: Variant of the product (e.g. small, medium, large).
-      type: string
-      enum:            # List of allowed values
-        - small
-        - medium
-        - large
-      required: false  # Property is not required
-    - name: price
-      description: Price ($) of the product added to the cart.
-      type: number
-      required: true
-    - name: quantity
-      description: Quantity of the product added to the cart.
-      type: integer
-      required: true
-```
-</p></details>
+    name: example_property
+    description: This is an example property.
+    type: string
+    required: true
+  ```
+- Template a dbt package modeling and documenting all the events in the tracking plan.
+  ```bash
+  $ reflekt dbt --name my-plan --warehouse-schema my_app
+  ```
+- Open pull requests in GitHub. Request reviews from team members, debate, and collaborate.
+- Pull requests could trigger a CI suite in GitHub Actions that test tracking plans for naming conventions and expected metadata.
+  <details><summary><strong>example-test-plans.yml</strong> (click to expand)</summary><p>
 
-![my-plan-example](docs/my-plan-example.png)
+  ```yaml
+  # test-plans.yml
+  name: Test Tracking Plans
+  on: pull_request
 
-With this simple structure and file format, anyone can be taught to make changes to the tracking code and submit a PR using GitHub's web interface. No terminal or IDE required!
+  jobs:
+    test:
+      name: Test Tracking Plans
+      strategy:
+        fail-fast: false
+        matrix:
+          os: ['ubuntu-latest']
+          python-version: ['3.9']
+      runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Install Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python: ${{ matrix.python-version }}
+      - name: Install Reflekt
+        run: |
+          pip install reflekt
+      - name: Run reflekt test
+        run: |
+          reflekt test --name my-plan
+  ```
+  </p></details>
 
-**Q:** **What analytics governance tools does Reflekt support?**
+- On merge to main branch in GitHub, sync changes to Segment Protocols using a GitHub Action.
+  <details><summary><strong>example-sync-plans.yml</strong> (click to expand)</summary><p>
 
-**A:** Reflekt currently supports [Segment Protocols](https://segment.com/docs/protocols/) and [Avo](https://www.avo.app/).
+  ```yaml
+  # sync-plans.yml
+  name: Sync Tracking Plans
+  on: pull_request
 
-**Q:** **What customer data platforms (CDPs) does Reflekt support?**
+  jobs:
+    test:
+      name: Sync Tracking Plans
+      strategy:
+        fail-fast: false
+        matrix:
+          os: ['ubuntu-latest']
+          python-version: ['3.9']
+      runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+      - name: Install Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python: ${{ matrix.python-version }}
+      - name: Install Reflekt
+        run: |
+          pip install reflekt
+      - name: Run reflekt test
+        run: |
+          reflekt push --name my-plan
+  ```
+  </p></details>
 
-**A:** Reflekt currently supports data collected using [Segment](https://segment.com/). Support for [Rudderstack](https://www.rudderstack.com/) is being investigated.
+- Reference Reflekt dbt packages in your dbt project.
+  ```yaml
+  # packages.yml in dbt project
+  packages:
+  - package: dbt-labs/dbt_utils
+    version: 0.8.5
 
-**Q:** **What data warehouses does Reflekt support?**
-
-**A:** Reflekt currently works with [Snowflake](https://www.snowflake.com/) and [Redshift](https://aws.amazon.com/redshift/).
+  - git: "https://github.com/my-github-user/reflekt-project-repo"
+    subdirectory: "dbt_packages/reflekt_my_app"
+    revision: v0.1.0__reflekt_my_app  # Git tag or full commit
+  ```
 
 ## Reporting bugs
 If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).
