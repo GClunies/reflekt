@@ -5,7 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt
-Reflekt is a command line tool (CLI) allowing users to automagically template a dbt package modeling and documenting all the events from a tracking plan in their Analytics Governance tool. Each Reflekt dbt package includes:
+Reflekt is a command line tool (CLI) allowing users to automagically template a dbt package modeling and documenting all the events in a tracking plan from their Analytics Governance tool. These dbt packages can be easily consumed in your dbt project. Each Reflekt dbt package includes:
 - A dbt [source](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in the warehouse where raw event data is loaded.
 - A dbt [model](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for each event in the tracking plan. Ready for consumption or further modeling.
 - A dbt [doc](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) entry for every model in the package, pulling information directly from the tracking plan. Your data team and the business always know what your tables and columns mean.
@@ -38,8 +38,15 @@ By defining tracking plans as code, they can be developed and managed using soft
 **Q:** **Do I have to use Reflekt to manage my tracking plan(s)? What if I like my Analytics Governance tool and just want to use the dbt templater?**
 
 **A:** Reflekt lets you decide what features you want to use. Here are two examples:
-1. Manage your tracking plan in Avo, pull the plan from Avo into your Reflekt Project, and template dbt packages using `reflekt dbt --name my-plan`. Pull plan changes from Avo and template again as needed.
-2. Manage your tracking plan(s) as code in a Reflekt project, sync changes to Segment Protocols with `reflekt push --name my-plan` so the plan can be used for event validation. Develop and manage plans using software engineer principles (version control, development branches, pull requests & reviews, and CI/CD). Template dbt packages using `reflekt dbt --name my-plan`. Pull plan changes from Avo and template again as needed.
+1. Manage your tracking plan in Avo using their branches and environments framework:
+   - Pull the plan from Avo into your Reflekt Project with `reflekt pull --name my-plan`.
+   - Template dbt packages with `reflekt dbt --name my-plan`. Reference packages in your dbt project.
+   - Pull plan changes from Avo and template again as needed using Reflekt.
+2. Manage your tracking plan(s) as code in a Reflekt project. Develop and manage plans using software engineer principles (version control, development branches, pull requests & reviews, and CI/CD)
+   - Make changes to the tracking plan by changing the tracking plan `code` in Reflekt project repo.
+   - Open pull requests in GitHub. Request reviews from team members, debate and collaborate. Run a CI suite using `reflekt test --name my-plan` to test naming conventions and expected metadata.
+   - On merge to `main` branch in GitHub, sync changes to Segment Protocols with `reflekt push --name my-plan`.
+   - Template dbt packages with `reflekt dbt --name my-plan`. Reference packages in your dbt project.
 
 **Q:** **If the tracking plan is `code`, how can a product manager, marketer, etc. propose changes?**
 
