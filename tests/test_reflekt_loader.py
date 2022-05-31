@@ -4,11 +4,11 @@
 
 import pytest
 import yaml
-
 from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.event import ReflektEvent
 from reflekt.reflekt.loader import ReflektLoader
 from reflekt.reflekt.plan import ReflektPlan
+
 from tests.fixtures import (
     REFLEKT_EVENT,
     REFLEKT_EVENT_BAD,
@@ -61,12 +61,3 @@ def test_loader_validation(tmpdir):
 
     with pytest.raises(ReflektValidationError):
         ReflektLoader(plan_dir, "test-plan")
-
-
-def test_loader_collect_validation_errors(tmpdir):
-    # Create tracking plan with bad event (missing required name)
-    plan_dir = _build_reflekt_plan_dir(tmpdir, event_fixture=REFLEKT_EVENT_BAD)
-    loader = ReflektLoader(plan_dir, "test-plan", raise_validation_errors=False)
-
-    assert loader.has_validation_errors
-    assert len(loader.validation_errors) == 1
