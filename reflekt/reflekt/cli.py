@@ -404,21 +404,22 @@ def test(plan_name: str) -> None:
     """Test tracking plan schema for naming, data types, and metadata."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Testing Reflekt tracking plan '{plan_name}'")
-    loader = ReflektLoader(
-        plan_dir=plan_dir,
-        plan_name=plan_name,
-        raise_validation_errors=False,  # Raise errors after tests run (if any)
-    )
 
-    if loader.has_validation_errors:
-        for error in loader.validation_errors:
-            click.echo(error, err=True)
-        raise click.Abort()
-    else:
-        print("")  # Terminal newline
-        logger.info(
-            f"[PASSED] No errors detected in Reflekt tracking plan '{plan_name}'"
-        )
+    # Initialize ReflektLoader() always runs checks. Simple, but inelegant.
+    ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
+
+    # if loader.has_validation_errors:
+    #     for error in loader.validation_errors:
+    #         logger.error("[FAILED] The following test failures were encountered: ")
+    #         click.echo(error, err=True)
+    #         click.echo()
+    #     click.echo()
+    #     raise click.Abort()
+    # else:
+    #     print("")  # Terminal newline
+    #     logger.info(
+    #         f"[PASSED] No errors detected in Reflekt tracking plan '{plan_name}'"
+    #     )
 
 
 @click.option(
@@ -594,8 +595,8 @@ if __name__ == "__main__":
     # new(["--project-dir", "test-plan"])
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
-    # test(["--name", "tracking-plan-example"])
+    test(["--name", "tracking-plan-example"])
     # pull(["--name", "patty-bar"])
     # push(["--name", "patty-bar"])
     # test(["--name", "patty-bar"])
-    dbt(["--name", "patty-bar", "--warehouse-schema", "patty_bar_web"])
+    # dbt(["--name", "patty-bar", "--warehouse-schema", "patty_bar_web"])

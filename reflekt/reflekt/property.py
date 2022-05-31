@@ -5,18 +5,17 @@
 # SPDX-License-Identifier: MIT
 
 import re
-from typing import Optional
 
 from cerberus import Validator
 
-from reflekt.reflekt.casing import (CAMEL_CASE_NUMBERS_RE, CAMEL_CASE_RE,
-                                    SNAKE_CASE_NUMBERS_RE, SNAKE_CASE_RE,
-                                    TITLE_CASE_NUMBERS_RE, TITLE_CASE_RE)
+from reflekt.reflekt.casing import CAMEL_CASE_RE, SNAKE_CASE_RE, TITLE_CASE_RE
 from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.schema import (reflekt_item_schema,
-                                    reflekt_nested_property_schema,
-                                    reflekt_property_schema)
+from reflekt.reflekt.schema import (
+    reflekt_item_schema,
+    reflekt_nested_property_schema,
+    reflekt_property_schema,
+)
 
 
 # The class ReflektProperty is a derivative work based on the class
@@ -25,44 +24,18 @@ from reflekt.reflekt.schema import (reflekt_item_schema,
 class ReflektProperty(object):
     def __init__(self, property_yaml: dict) -> None:
         if ReflektProject().exists:
+            self._project = ReflektProject()
             self._property_yaml = property_yaml
+            self.name = self._property_yaml.get("name")
+            self.description = self._property_yaml.get("description")
+            self.type = self._property_yaml.get("type")
+            self.required = self._property_yaml.get("required", False)
+            self.allow_null = self._property_yaml.get("allow_null", False)
+            self.enum = self._property_yaml.get("enum")
+            self.datetime = self._property_yaml.get("datetime")
+            self.array_item_schema = self._property_yaml.get("array_item_schema")
+            self.object_properties = self._property_yaml.get("object_properties")
             self.validate_property()
-
-    @property
-    def name(self) -> str:
-        return self._property_yaml.get("name")
-
-    @property
-    def description(self) -> str:
-        return self._property_yaml.get("description")
-
-    @property
-    def type(self) -> str:
-        return self._property_yaml.get("type")
-
-    @property
-    def required(self) -> bool:
-        return self._property_yaml.get("required", False)
-
-    @property
-    def allow_null(self) -> bool:
-        return self._property_yaml.get("allow_null", False)
-
-    @property
-    def enum(self) -> str:
-        return self._property_yaml.get("enum")
-
-    @property
-    def datetime(self) -> Optional[bool]:
-        return self._property_yaml.get("datetime")
-
-    @property
-    def array_item_schema(self) -> Optional[dict]:
-        return self._property_yaml.get("array_item_schema")
-
-    @property
-    def object_properties(self) -> Optional[dict]:
-        return self._property_yaml.get("object_properties")
 
     def _check_description(self) -> None:
         if self.description == "":
@@ -134,45 +107,44 @@ class ReflektProperty(object):
             )
             raise ReflektValidationError(message)
 
-    def _check_property_name(self) -> None:
-        project = ReflektProject()
-        case_rule = project.properties_case
-        allow_numbers = project.properties_allow_numbers
+    def _check_property_name_case(self) -> None:
+        case_rule = self._project.properties_case
 
         if case_rule is not None:
+            rule_str = f"case: {case_rule.lower()}"
             if case_rule.lower() == "title":
-                if allow_numbers:
-                    regex = TITLE_CASE_NUMBERS_RE
-                else:
-                    regex = TITLE_CASE_RE
+                regex = TITLE_CASE_RE
+            elif case_rule.lower() == "snake":
+                regex = SNAKE_CASE_RE
+            elif case_rule.lower() == "camel":
+                regex = CAMEL_CASE_RE
 
-            if case_rule.lower() == "snake":
-                if allow_numbers:
-                    regex = SNAKE_CASE_NUMBERS_RE
-                else:
-                    regex = SNAKE_CASE_RE
-
-            if case_rule.lower() == "camel":
-                if allow_numbers:
-                    regex = CAMEL_CASE_NUMBERS_RE
-                else:
-                    regex = CAMEL_CASE_RE
-
-            matched = re.match(regex, self.name)
-            is_match = bool(matched)
+            match = bool(re.match(regex, self.name))
             rule_type = "case:"
             rule_str = case_rule.lower()
 
-        if is_match:
-            pass
-        else:
-            raise ReflektValidationError(
-                f"Property name '{self.name}' does not match naming convention"
-                f" defined by '{rule_type} {rule_str}' in reflekt_project.yml "
-                f"\n\nEither: "
-                f"\n    - Rename property to match config. OR;"
-                f"\n    - Change '{rule_type} {rule_str}' in reflekt_project.yml."
-            )
+            if not match:
+                raise ReflektValidationError(
+                    f"Property name '{self.name}' does not match naming convention"
+                    f" defined by '{rule_type} {rule_str}' in reflekt_project.yml "
+                    f"\n\nEither: "
+                    f"\n    - Rename property to match config. OR;"
+                    f"\n    - Change '{rule_type} {rule_str}' in reflekt_project.yml."
+                )
+
+    def _check_property_name_numbers(self) -> None:
+        allow_numbers = self._project.properties_allow_numbers
+        if not allow_numbers:
+            contains_number = any(char.isdigit() for char in self.name)
+
+            if contains_number:
+                raise ReflektValidationError(
+                    f"Property name '{self.name}' does not match naming convention"
+                    f" defined by 'allow_numbers: {str(allow_numbers).lower()}' in reflekt_project.yml "  # noqa: E501
+                    f"\n\nEither: "
+                    f"\n    - Rename property to match config. OR;"
+                    f"\n    - Change 'allow_numbers:' rule for events in reflekt_project.yml."  # noqa: E501
+                )
 
     def validate_property(self) -> None:
         """Validate event property against Reflekt schema."""
@@ -183,7 +155,8 @@ class ReflektProperty(object):
             message = f"for property '{self.name}' - {validator.errors}"
             raise ReflektValidationError(message)
 
-        self._check_property_name()
+        self._check_property_name_case()
+        self._check_property_name_numbers()
         self._check_description()
         self._check_enum()
         self._check_datetime()

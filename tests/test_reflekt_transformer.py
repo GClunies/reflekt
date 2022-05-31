@@ -5,7 +5,6 @@
 
 from reflekt.reflekt.loader import ReflektLoader
 from reflekt.reflekt.transformer import ReflektTransformer
-
 from tests.fixtures import _build_reflekt_plan_dir
 
 
