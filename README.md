@@ -16,7 +16,9 @@ Reflekt integrates with the tracking plans in your Analytics Governance tool (e.
 
 Reflekt defines tracking plans as `code`, making them an extensible artifact for downstream use cases - like templating dbt packages. This is similar to how other tools leverage dbt's `manifest.json`.
 
+
 https://user-images.githubusercontent.com/28986302/171330405-57400ead-574d-4b71-a31b-57935e0ba9e8.mp4
+
 
 By defining tracking plans as code, they can be developed and managed using software engineer principles (version control, development branches, pull requests, reviews, and CI/CD). This is particularly useful for Segment Protocols users - see the docs on [using Reflekt + Segment Protocols](#using-reflekt--segment-protocols) for details.
 
@@ -41,6 +43,10 @@ By defining tracking plans as code, they can be developed and managed using soft
 - Save data teams time by modeling and documenting all the events in a tracking plan in an ready to consume dbt package.
 - Increase the use of software engineering workflows for tracking plan management.
 - Allow teams to assess how tracking plan changes will affect downstream dbt models.
+
+
+https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-985c-c482c7e234e0.mp4
+
 
 ### Using Reflekt + Avo
 [Avo](https://www.avo.app/) uses branches, environments, and naming conventions to manage tracking plans, bringing a workflow similar to software engineering into their web based UI.
