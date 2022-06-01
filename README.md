@@ -38,12 +38,6 @@ https://user-images.githubusercontent.com/28986302/171330405-57400ead-574d-4b71-
 
 ## Usage
 
-**Reflekt exists to:**
-- Save data teams time by modeling and documenting all the events in a tracking plan in an ready to consume dbt package.
-- Increase the use of software engineering workflows for tracking plan management.
-- Allow teams to assess how tracking plan changes will affect downstream dbt models.
-
-
 https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-985c-c482c7e234e0.mp4
 
 
