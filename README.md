@@ -18,8 +18,6 @@ Reflekt integrates with the tracking plans in your Analytics Governance tool (e.
 https://user-images.githubusercontent.com/28986302/171330405-57400ead-574d-4b71-a31b-57935e0ba9e8.mp4
 
 
-By defining tracking plans as code, they can be developed and managed using software engineer principles (version control, development branches, pull requests, reviews, and CI/CD). This is particularly useful for Segment Protocols users - see the docs on [using Reflekt + Segment Protocols](#using-reflekt--segment-protocols) for details.
-
 ## Getting Started
 - [Docs](docs/DOCUMENTATION.md/#reflekt-docs)
   - [Install](docs/DOCUMENTATION.md/#install)
@@ -78,9 +76,9 @@ https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-
 In the example above, Reflekt know's about Avo's staging branch and the staging schema in the data warehouse, allowing you to assess how tracking plan changes will affect downstream dbt models ***before pushing tracking changes to production.***
 
 ### Using Reflekt + Segment Protocols
-[Segment Protocols](https://segment.com/docs/protocols/) lets you manage tracking plans within your Segment account. While Segment does not use branches and environments,  Reflekt leverages Segment's APIs to bring software workflows to managing Segment Protocols tracking plans.
+[Segment Protocols](https://segment.com/docs/protocols/) lets you manage tracking plans within your Segment account. While Segment does not use branches and environments,  Reflekt leverages Segment's APIs to bring software workflows to managing Segment Protocols tracking plans. By defining Segment tracking plans as code using Reflekt, users can develop and manage the plans using software engineer principles (version control, development branches, pull requests, reviews, and CI/CD).
 
-**For Segment Protocols users, its recommended to manage your tracking plans as `code` in a GitHub repository containing your Reflekt project.** With this setup, you can:
+**For Segment Protocols users, its recommended to manage your tracking plans as `code`** in a GitHub repository containing your Reflekt project. With this setup, you can:
 - Make changes to a tracking plan (e.g. add new event) by changing the tracking plan code.
   ```yaml
   # Adding a new event is easy!
