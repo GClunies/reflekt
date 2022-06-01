@@ -4,6 +4,7 @@
 
 import json
 import shutil
+import typing
 from asyncio import subprocess
 from pathlib import Path
 
@@ -429,19 +430,24 @@ def test(plan_name: str) -> None:
     help="Tracking plan name in your Reflekt project.",
 )
 @click.option(
+    "--schema",
+    "schema",
+    required=False,
+    help=(
+        "Schema Reflekt will search when looking for raw event tables that match "
+        "tracking plan."
+    ),
+)
+@click.option(
     "--force-version",
     "force_version",
     required=False,
-    help="Force Reflekt to template the dbt package with a specific semantic version.",
-)
-@click.option(
-    "--warehouse-schema",
-    "warehouse_schema",
-    required=False,
-    help="Schema in which Reflekt will search for raw event data to template.",
+    help="Force Reflekt to template the dbt package with a specified semantic version.",
 )
 @click.command()
-def dbt(plan_name, force_version, warehouse_schema) -> None:
+def dbt(
+    plan_name: str, schema: typing.Optional[str], force_version: typing.Optional[str]
+) -> None:
     """Build dbt package with sources, models, and docs based on tracking plan."""
     project_dir = ReflektProject().project_dir
     plan_dir = project_dir / "tracking-plans" / plan_name
@@ -453,108 +459,81 @@ def dbt(plan_name, force_version, warehouse_schema) -> None:
     warehouse_database = reflekt_plan.warehouse_database
     warehouse_schemas = reflekt_plan.warehouse_schemas
 
-    if warehouse_schema:
-        warehouse_schemas = [warehouse_schema]
+    # Must provide --schema if plan mapped to multiple schemas in reflekt_project.yml
+    if not schema:
+        if len(warehouse_schemas) > 1:
+            logger.error(
+                f"[ERROR] Multiple warehouse schemas mapped to plan '{plan_name}'. "
+                f"See 'warehouse_schemas:' config in reflekt_project.yml.\n\n"
+                f"When a plan is mapped to multiple schema, 'reflekt dbt' requires a "
+                f"'--schema <schema_name>' arg so it can search the desired schema "
+                f"for tables with event data."
+            )
+            raise click.Abort()
+        else:
+            schema = warehouse_schemas  # Single element list
 
-    plural = ""
-    dbt_project_dict = {}
+    # else, we just use 'schema' arg as provided by user
+    pkg_name = f"reflekt_{schema}"
+    dbt_project_yml_path = dbt_pkgs_dir / pkg_name / "dbt_project.yml"
 
-    if len(warehouse_schemas) > 1:
-        logger.info(
-            f"[INFO] Multiple warehouse schemas mapped to {plan_name}. See "
-            f"'warehouse_schemas:' in reflekt_project.yml.\n\n"
-            f"This is typically done when one tracking plan is used for multiple "
-            f"applications, with each application sending data to their own "
-            f"warehouse schema.\n\n"
-            f"Reflekt will template a separate dbt package for each schema.\n"
-        )
-
-    if force_version:
+    if force_version:  # If user has forced version, use that
         try:
             version = parse_version(force_version)
         except InvalidVersion:
             logger.error(f"[ERROR] Invalid semantic version provided: {force_version}")
             raise click.Abort()
+    # If we don't find a dbt_project.yml -> package does not exist -> v0.1.0
+    elif not dbt_project_yml_path.exists():
+        version = parse_version("0.1.0")
+    else:  # Package already exists!
+        with dbt_project_yml_path.open() as f:
+            dbt_project_yml_path = yaml.safe_load(f)
 
-        for schema in warehouse_schemas:
-            pkg_name = f"reflekt_{schema}"
-            transformer = ReflektTransformer(
-                reflekt_plan=reflekt_plan,
-                database=warehouse_database,
-                schema=schema,
-                dbt_package_name=pkg_name,
-                pkg_version=version,
-            )
-            transformer.build_dbt_package()
-
-    else:
-        for schema in warehouse_schemas:
-            pkg_name = f"reflekt_{schema}"
-            dbt_project_yml_path = dbt_pkgs_dir / pkg_name / "dbt_project.yml"
-
-            if not dbt_project_yml_path.exists():
-                version = parse_version("0.1.0")
-            else:
-                with dbt_project_yml_path.open() as f:
-                    dbt_project_yml_path = yaml.safe_load(f)
-
-                dbt_pkg_version = parse_version(dbt_project_yml_path["version"])
-                new_version_str = (
-                    f"{dbt_pkg_version.major}."
-                    f"{dbt_pkg_version.minor + 1}."
-                    f"{dbt_pkg_version.micro}"
-                )
-                new_dbt_pkg_version = parse_version(new_version_str)
-                dbt_project_dict.update(
-                    {
-                        pkg_name: {
-                            "version": str(dbt_pkg_version),
-                            "bumped_version": new_version_str,
-                        }
-                    }
-                )
-
-        if len(dbt_project_dict) > 0:
-            plural = "s"
-            logger.info(f"[WARNING] Existing dbt package{plural} found:")
-
-            for pkg_name, sub_dict in dbt_project_dict.items():
-                logger.info(
-                    f"    - Package name: {pkg_name}, "
-                    f"Current version: {sub_dict['version']}, "
-                    f"Bumped version: {sub_dict['bumped_version']}"
-                )
-
-            bump = click.confirm(
-                f"Do you want to bump the dbt package version{plural}?",
-                default=True,
-            )
-
-            if bump:
-                version = new_dbt_pkg_version
-            else:
-                overwrite = click.confirm(
-                    f"[WARNING] Reflekt will overwrite current version of dbt package{plural}.\n"  # noqa: E501
-                    f"    Do you want to continue?",
-                    default=False,
-                )
-
-                if not overwrite:
-                    raise click.Abort()
-
-                print("")  # Newline in terminal
-                version = dbt_pkg_version
-
-    for schema in warehouse_schemas:
-        pkg_name = f"reflekt_{schema}"
-        transformer = ReflektTransformer(
-            reflekt_plan=reflekt_plan,
-            database=warehouse_database,
-            schema=schema,
-            dbt_package_name=pkg_name,
-            pkg_version=version,
+        existing_version = parse_version(dbt_project_yml_path["version"])
+        new_version_str = (
+            f"{existing_version.major}."
+            f"{existing_version.minor + 1}."
+            f"{existing_version.micro}"
         )
-        transformer.build_dbt_package()
+        bumped_version = parse_version(new_version_str)
+
+    if existing_version:
+        logger.info(
+            f"[WARNING] Existing dbt package found:\n"
+            f"    Package name: {pkg_name}\n"
+            f"    Existing version: {existing_version}\n"
+            f"    Bumped version: {bumped_version}\n"
+        )
+
+        bump = click.confirm(
+            f"Do you want to bump dbt package '{pkg_name}' to version {bumped_version}?",
+            default=True,
+        )
+
+        if bump:
+            version = bumped_version
+        else:
+            overwrite = click.confirm(
+                f"[WARNING] Reflekt will overwrite current version of dbt package '{pkg_name}'.\n"  # noqa: E501
+                f"    Do you want to continue?",
+                default=False,
+            )
+
+            if not overwrite:
+                raise click.Abort()
+
+            print("")  # Newline in terminal
+            version = existing_version
+
+    transformer = ReflektTransformer(
+        reflekt_plan=reflekt_plan,
+        database=warehouse_database,
+        schema=schema,
+        dbt_package_name=pkg_name,
+        pkg_version=version,
+    )
+    transformer.build_dbt_package()
 
     create_tag = click.confirm(
         f"Would you like to create a Git tag to easily reference Reflekt dbt package "
@@ -595,8 +574,17 @@ if __name__ == "__main__":
     # new(["--project-dir", "test-plan"])
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
-    test(["--name", "tracking-plan-example"])
+    # test(["--name", "tracking-plan-example"])
     # pull(["--name", "patty-bar"])
     # push(["--name", "patty-bar"])
     # test(["--name", "patty-bar"])
-    # dbt(["--name", "patty-bar", "--warehouse-schema", "patty_bar_web"])
+    dbt(
+        [
+            "--name",
+            "patty-bar",
+            "--warehouse-schema",
+            "patty_bar_web",
+            "--force-version",
+            "0.1.0",
+        ]
+    )
