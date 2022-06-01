@@ -5,7 +5,7 @@
 [tool.poetry]
 name = "reflekt"
 version = "0.1.1"
-description = "Reflekt allows users to automagically model and document the events from a tracking plan in their Analytics Governance tool."
+description = "Reflekt allows users to automagically model and document events in tracking plans pulled from their Analytics Governance tool."
 authors = ["Greg Clunies <greg.clunies@gmail.com>"]
 license = "Apache-2.0"
 include = ["reflekt/templates/**/*"]

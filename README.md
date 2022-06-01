@@ -5,7 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt
-Reflekt allows users to automagically model and document the events from a tracking plan in their Analytics Governance tool, bundling it all up in a ready to consume dbt package. Each Reflekt dbt package includes:
+Reflekt allows users to automagically model and document events in tracking plans pulled from their Analytics Governance tool, bundling it all up in a ready to consume dbt package. Each Reflekt dbt package includes:
 - A dbt [source](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in the warehouse where raw event data is loaded.
 - A dbt [model](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for each event in the tracking plan. Ready for consumption or further modeling.
 - A dbt [doc](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) entry for every model in the package, pulling information *directly from the tracking plan*. The data team and the business always know what your models and columns mean.
