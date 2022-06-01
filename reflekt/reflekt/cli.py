@@ -471,7 +471,7 @@ def dbt(
             )
             raise click.Abort()
         else:
-            schema = warehouse_schemas  # Single element list
+            schema = warehouse_schemas[0]  # Get schema from single element list
 
     # else, we just use 'schema' arg as provided by user
     pkg_name = f"reflekt_{schema}"
@@ -498,13 +498,13 @@ def dbt(
         )
         bumped_version = parse_version(new_version_str)
 
-    if existing_version:
-        logger.info(
-            f"[WARNING] Existing dbt package found:\n"
-            f"    Package name: {pkg_name}\n"
-            f"    Existing version: {existing_version}\n"
-            f"    Bumped version: {bumped_version}\n"
-        )
+        if existing_version:
+            logger.info(
+                f"[WARNING] Existing dbt package found:\n"
+                f"    Package name: {pkg_name}\n"
+                f"    Existing version: {existing_version}\n"
+                f"    Bumped version: {bumped_version}\n"
+            )
 
         bump = click.confirm(
             f"Do you want to bump dbt package '{pkg_name}' to version {bumped_version}?",
