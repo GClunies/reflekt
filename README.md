@@ -10,11 +10,9 @@ Reflekt allows users to automagically model and document events in tracking plan
 - A dbt [model](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for each event in the tracking plan. Ready for consumption or further modeling.
 - A dbt [doc](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) entry for every model in the package, pulling information *directly from the tracking plan*. The data team and the business always know what your models and columns mean.
 
-Reflekt integrates with the tracking plans in your Analytics Governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)), the raw events in your Data Warehouse (e.g. [Snowflake](https://www.snowflake.com/)), and [dbt](https://www.getdbt.com/).
+Reflekt integrates with the tracking plans in your Analytics Governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)), the raw events in your Data Warehouse (e.g. [Snowflake](https://www.snowflake.com/)), and [dbt](https://www.getdbt.com/). By defining tracking plans as `code`, Reflekt makes them an extensible artifact for downstream use cases - like templating dbt packages. This is similar to how other tools leverage dbt's `manifest.json`.
 
 ![reflekt-architecture](/docs/reflekt-arch-flow.jpg)
-
-Reflekt defines tracking plans as `code`, making them an extensible artifact for downstream use cases - like templating dbt packages. This is similar to how other tools leverage dbt's `manifest.json`.
 
 
 https://user-images.githubusercontent.com/28986302/171330405-57400ead-574d-4b71-a31b-57935e0ba9e8.mp4
