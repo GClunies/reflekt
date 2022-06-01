@@ -379,7 +379,7 @@ Usage: reflekt dbt [OPTIONS]
   Build dbt package with sources, models, and docs based on tracking plan.
 
 Options:
-  --warehouse-schema TEXT  Schema in which Reflekt will search for raw event
+  --schema TEXT            Schema in which Reflekt will search for raw event
                            data to template.
   --force-version TEXT     Force Reflekt to template the dbt package with a
                            specific semantic version.

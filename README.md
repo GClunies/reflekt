@@ -60,7 +60,7 @@ https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-
 
 - Template a dbt package modeling and documenting all the events in the tracking plan. You can tell Reflekt to template based on data in specified schema (configure available schemas for plans in `reflekt_project.yml`).
   ```bash
-  reflekt dbt --name my-plan --warehouse-schema my_app_staging
+  reflekt dbt --name my-plan --schema my_app_staging
   ```
 
 - Open a GitHub pull request with new/updated Reflekt dbt package. Get reviews from team members. Merge to main branch when approved.
@@ -99,7 +99,7 @@ In the example above, Reflekt know's about Avo's staging branch and the staging 
   ```
 - Template a dbt package modeling and documenting all the events in the tracking plan.
   ```bash
-  reflekt dbt --name my-plan --warehouse-schema my_app
+  reflekt dbt --name my-plan --schema my_app
   ```
 - Open pull requests in GitHub. Request reviews from team members, debate, and collaborate.
 - Trigger a GitHub Action CI suite on pull request open, checking that tracking plan changes meet follow your naming conventions and metadata expectations.

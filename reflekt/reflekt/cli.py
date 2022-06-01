@@ -582,7 +582,7 @@ if __name__ == "__main__":
         [
             "--name",
             "patty-bar",
-            "--warehouse-schema",
+            "--schema",
             "patty_bar_web",
             "--force-version",
             "0.1.0",
