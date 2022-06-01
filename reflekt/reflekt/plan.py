@@ -61,8 +61,7 @@ class ReflektPlan(object):
             )
 
     def add_event(self, event_yaml_obj: dict) -> None:
-        event = ReflektEvent(event_yaml_obj)
-        self.events.append(event)
+        self.events.append(ReflektEvent(event_yaml_obj))
 
     def add_identify_trait(self, trait_yaml: dict) -> None:
         trait_property = ReflektProperty(trait_yaml)

@@ -9,14 +9,7 @@ from collections import Counter
 
 from cerberus import Validator
 
-from reflekt.reflekt.casing import (
-    CAMEL_CASE_NUMBERS_RE,
-    CAMEL_CASE_RE,
-    SNAKE_CASE_NUMBERS_RE,
-    SNAKE_CASE_RE,
-    TITLE_CASE_NUMBERS_RE,
-    TITLE_CASE_RE,
-)
+from reflekt.reflekt.casing import CAMEL_CASE_RE, SNAKE_CASE_RE, TITLE_CASE_RE
 from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.project import ReflektProject
 from reflekt.reflekt.property import ReflektProperty
@@ -29,34 +22,21 @@ from reflekt.reflekt.schema import reflekt_event_schema, reflekt_expected_metada
 class ReflektEvent(object):
     def __init__(self, event_yaml_obj: dict) -> None:
         if ReflektProject().exists:
+            self._project = ReflektProject()
             self._event_yaml_obj = event_yaml_obj
             self._properties = [
                 ReflektProperty(property)
                 for property in self._event_yaml_obj["properties"]
             ]
+            self.version = self._event_yaml_obj.get("version")
+            self.name = self._event_yaml_obj.get("name")
+            self.description = self._event_yaml_obj.get("description")
+            self.metadata = self._event_yaml_obj.get("metadata")
+            self.properties = [
+                ReflektProperty(property)
+                for property in self._event_yaml_obj["properties"]
+            ]
             self.validate_event()
-
-    @property
-    def version(self):
-        return self._event_yaml_obj.get("version")
-
-    @property
-    def name(self):
-        return self._event_yaml_obj.get("name")
-
-    @property
-    def description(self):
-        return self._event_yaml_obj.get("description")
-
-    @property
-    def metadata(self):
-        return self._event_yaml_obj.get("metadata")
-
-    @property
-    def properties(self):
-        return [
-            ReflektProperty(property) for property in self._event_yaml_obj["properties"]
-        ]
 
     def _check_event_metadata(self) -> None:
         if self.metadata:
@@ -71,46 +51,44 @@ class ReflektEvent(object):
                 )
                 raise ReflektValidationError(message)
 
-    def _check_event_name(self) -> None:
-        project = ReflektProject()
-        case_rule = project.events_case
-        allow_numbers = project.events_allow_numbers
+    def _check_event_name_case(self) -> None:
+        case_rule = self._project.events_case
 
         if case_rule is not None:
             rule_str = f"case: {case_rule.lower()}"
             if case_rule.lower() == "title":
-                if allow_numbers:
-                    regex = TITLE_CASE_NUMBERS_RE
-                else:
-                    regex = TITLE_CASE_RE
+                regex = TITLE_CASE_RE
+            elif case_rule.lower() == "snake":
+                regex = SNAKE_CASE_RE
+            elif case_rule.lower() == "camel":
+                regex = CAMEL_CASE_RE
 
-            if case_rule.lower() == "snake":
-                if allow_numbers:
-                    regex = SNAKE_CASE_NUMBERS_RE
-                else:
-                    regex = SNAKE_CASE_RE
-
-            if case_rule.lower() == "camel":
-                if allow_numbers:
-                    regex = CAMEL_CASE_NUMBERS_RE
-                else:
-                    regex = CAMEL_CASE_RE
-
-            matched = re.match(regex, self.name)
-            is_match = bool(matched)
+            match = bool(re.match(regex, self.name))
             rule_type = "case:"
             rule_str = case_rule.lower()
 
-        if is_match:
-            pass
-        else:
-            raise ReflektValidationError(
-                f"Event name '{self.name}' does not match naming convention"
-                f" defined by '{rule_type} {rule_str}' in reflekt_project.yml "
-                f"\n\nEither: "
-                f"\n    - Rename property to match config. OR;"
-                f"\n    - Change '{rule_type} {rule_str}' in reflekt_project.yml."
-            )
+            if not match:
+                raise ReflektValidationError(
+                    f"Event name '{self.name}' does not match naming convention"
+                    f" defined by '{rule_type} {rule_str}' in reflekt_project.yml "
+                    f"\n\nEither: "
+                    f"\n    - Rename property to match config. OR;"
+                    f"\n    - Change '{rule_type} {rule_str}' in reflekt_project.yml."
+                )
+
+    def _check_event_name_numbers(self) -> None:
+        allow_numbers = self._project.events_allow_numbers
+        if not allow_numbers:
+            contains_number = any(char.isdigit() for char in self.name)
+
+            if contains_number:
+                raise ReflektValidationError(
+                    f"\nEvent name '{self.name}' does not match naming convention"
+                    f" defined by 'allow_numbers: {str(allow_numbers).lower()}' in reflekt_project.yml "  # noqa: E501
+                    f"\n\nEither: "
+                    f"\n    - Rename property to match config. OR;"
+                    f"\n    - Change 'allow_numbers:' rule for events in reflekt_project.yml."  # noqa: E501
+                )
 
     def _check_duplicate_properties(self) -> None:
         if len(self.properties) == 0:
@@ -148,7 +126,8 @@ class ReflektEvent(object):
             message = f"for event '{self.name}' - {validator.errors}"
             raise ReflektValidationError(message)
 
-        self._check_event_name()
+        self._check_event_name_case()
+        self._check_event_name_numbers()
         self._check_duplicate_properties()
         self._check_reserved_property_names()
 
