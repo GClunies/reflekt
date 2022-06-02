@@ -70,7 +70,7 @@ def init(project_dir_str: str) -> None:
     )
 
     if not reflekt_config_path.exists():
-        reflekt_config_path.mkdir()
+        reflekt_config_path.mkdir(parents=True)
         reflekt_config_obj = {
             config_name: {
                 "plan_type": "",
