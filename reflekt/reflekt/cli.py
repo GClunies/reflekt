@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import os
 import shutil
 import typing
 from asyncio import subprocess
@@ -57,12 +58,14 @@ def init(project_dir_str: str) -> None:
             )
             raise click.Abort()
 
-    reflekt_config_path = click.prompt(
-        "Enter the absolute path where reflekt_config.yml will be created for "
-        "use by this Reflekt project",
+    reflekt_config_dir = click.prompt(
+        "Enter path to the DIRECTORY where Reflekt will write your "
+        "reflekt_config.yml to be use by this Reflekt project",
         type=str,
-        default=str(Path.home() / ".reflekt" / "reflekt_config.yml"),
+        default=str(Path.home() / ".reflekt"),
     )
+    reflekt_config_dir = Path(reflekt_config_dir)
+    reflekt_config_path = reflekt_config_dir / "reflekt_config.yml"
     reflekt_config_path = Path(reflekt_config_path)
     collect_config = True  # Default to collect config from user
     config_name = click.prompt(
@@ -70,7 +73,9 @@ def init(project_dir_str: str) -> None:
     )
 
     if not reflekt_config_path.exists():
-        reflekt_config_path.mkdir(parents=True)
+        if not reflekt_config_dir.exists():
+            reflekt_config_dir.mkdir(parents=True)
+        reflekt_config_path.touch()
         reflekt_config_obj = {
             config_name: {
                 "plan_type": "",
