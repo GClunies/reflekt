@@ -3,7 +3,7 @@ Documentation to get you started using Reflekt and setting up you project. Where
 
 - [Reflekt Docs](#reflekt-docs)
   - [Install](#install)
-  - [Setup a Reflekt project](#setup-a-reflekt-project)
+  - [Create a Reflekt project](#create-a-reflekt-project)
     - [Connect Reflekt + Segment Protocols](#connect-reflekt--segment-protocols)
     - [Connect Reflekt + Avo](#connect-reflekt--avo)
   - [Project configuration](#project-configuration)
@@ -17,6 +17,7 @@ Documentation to get you started using Reflekt and setting up you project. Where
     - [Identify traits](#identify-traits)
     - [Group traits](#group-traits)
   - [Commands](#commands)
+    - [Command compatibility](#command-compatibility)
     - [`reflekt --help`](#reflekt---help)
     - [`reflekt init`](#reflekt-init)
     - [`reflekt new`](#reflekt-new)
@@ -24,15 +25,14 @@ Documentation to get you started using Reflekt and setting up you project. Where
     - [`reflekt push`](#reflekt-push)
     - [`reflekt test`](#reflekt-test)
     - [`reflekt dbt`](#reflekt-dbt)
-    - [Feature compatibility](#feature-compatibility)
 
 ## Install
-Install Reflekt with `pip`. Installing in a virtual Python environment is recommended.
+Install Reflekt with `pip`.
 ```bash
 pip install reflekt
 ```
 
-## Setup a Reflekt project
+## Create a Reflekt project
 
 1. Create a Git repo or clone an empty one you've created in GitHub.
 ```bash
@@ -353,6 +353,23 @@ traits:
 
 ## Commands
 
+### Command compatibility
+Reflekt does not support the `init`, `new`, or `push` commands when connected to Avo. There are two reasons for this:
+1. Avo does not support pushing tracking plans back to Avo via the Avo CLI, which Reflekt uses in the background.
+2. Since Avo already embraces software engineering workflows (branches, environments) in its web UI, we think it's better for Avo users to manage their tracking plan their and use Reflekt to build dbt packages to model and document the events.
+
+See the table below for command compatibility details.
+
+| Command      | Avo | Segment Protocols |
+|--------------|:-----:|:-------------------:|
+| reflekt init |  ❌   |         ✅          |
+| reflekt new  |  ❌   |         ✅          |
+| reflekt pull |  ✅   |         ✅          |
+| reflekt push |  ❌   |         ✅          |
+| reflekt test |  ✅   |         ✅          |
+| reflekt dbt  |  ✅   |         ✅          |
+
+
 ### `reflekt --help`
 Show a list of available Reflekt commands.
 ```bash
@@ -568,19 +585,3 @@ reflekt dbt --name my-plan
 
 Would you like to create a Git tag to easily reference Reflekt dbt package reflekt_patty_bar_web_staging (version: 0.1.0) in your dbt project? [y/N]: N
 ```
-
-### Feature compatibility
-Reflekt does not support the `init`, `new`, or `push` commands when connected to Avo. There are two reasons for this:
-1. Avo does not support pushing tracking plans back to Avo via the Avo CLI, which Reflekt uses in the background.
-2. We think it's better for Avo users to manage their tracking plan in Avo since it already embraces software engineering workflows in its web base UI.
-
-See the table below for command compatibility details.
-
-| Command      | Avo | Segment Protocols |
-|--------------|:-----:|:-------------------:|
-| reflekt init |  ❌   |         ✅          |
-| reflekt new  |  ❌   |         ✅          |
-| reflekt pull |  ✅   |         ✅          |
-| reflekt push |  ❌   |         ✅          |
-| reflekt test |  ✅   |         ✅          |
-| reflekt dbt  |  ✅   |         ✅          |
