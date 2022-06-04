@@ -46,14 +46,14 @@ https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-
 ### Using Reflekt + Avo
 [Avo](https://www.avo.app/) uses branches, environments, and naming conventions to manage tracking plans, bringing a workflow similar to software engineering into their web UI.
 
-**For Avo users, its recommended to continuing manage tracking plans in Avo, then connecting Reflekt to Avo** (see the docs on [Connecting Reflekt + Avo](DOCUMENTATION.md/#connecting-reflekt--avo)). With this setup, you can:
+**For Avo users, it's recommended to continuing manage tracking plans in Avo, then connecting Reflekt to Avo** (see the docs on [Connecting Reflekt + Avo](DOCUMENTATION.md/#connecting-reflekt--avo)). With this setup, you can:
 - Pull the tracking plan from Avo as it changes (can specify Avo branch) into Reflekt.
   ```bash
   reflekt pull --name my-plan --avo-branch staging
   ```
   This creates a copy of the plan as code in the Reflekt project, to be used by Reflekt's dbt templater.
 
-- Template a dbt package modeling and documenting all the events in the tracking plan. You can tell Reflekt to template based on data in specified schema (configure available schemas for plans in `reflekt_project.yml`).
+- Template a dbt package modeling and documenting all the events in the tracking plan. You can tell Reflekt to template based on data in a specified schema (configure available schemas for plans in `reflekt_project.yml`).
   ```bash
   reflekt dbt --name my-plan --schema my_app_staging
   ```
@@ -75,10 +75,10 @@ https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-
 In the example above, Reflekt know's about Avo's staging branch and the staging schema in the data warehouse, allowing you to assess how tracking plan changes will affect downstream dbt models ***before pushing tracking changes to production.***
 
 ### Using Reflekt + Segment Protocols
-[Segment Protocols](https://segment.com/docs/protocols/) lets you manage tracking plans within your Segment account. While Segment does not use branches and environments,  Reflekt leverages Segment's APIs to bring software workflows to managing Segment Protocols tracking plans (version control, development branches, pull requests, reviews, and CI/CD).
+[Segment Protocols](https://segment.com/docs/protocols/) lets you manage tracking plans within your Segment account. While Segment Protocols does not use branches or environments, it does have a robust API. Reflekt leverages this API to enable managing tracking plans using software engineering principles** (version control, branches, pull requests, reviews, and CI/CD)
 
-**For Segment Protocols users, its recommended to manage your tracking plans as `code`** in a GitHub repository containing your Reflekt project. With this setup, you can:
-- Make changes to a tracking plan (e.g. add new event) by changing the tracking plan code.
+**For Segment Protocols users, it's recommended to manage tracking plans as `code` in a GitHub repository containing your Reflekt project.** With this setup, you can:
+- Make a change to a tracking plan (e.g. add new event) by changing the tracking plan code.
   ```yaml
   # Adding a new event is easy!
   version: 1
@@ -92,12 +92,8 @@ In the example above, Reflekt know's about Avo's staging branch and the staging 
     type: string
     required: true
   ```
-- Template a dbt package modeling and documenting all the events in the tracking plan.
-  ```bash
-  reflekt dbt --name my-plan --schema my_app
-  ```
-- Open pull requests in GitHub. Request reviews from team members, debate, and collaborate.
-- Trigger a GitHub Action CI suite on pull request open, checking that tracking plan changes meet follow your naming conventions and metadata expectations.
+
+- Open a Pull Request (PR) in GitHub to merge your change. Request reviews from team members, discuss, and collaborate. This could trigger a GitHub Action CI suite that checks the changes follow your naming conventions and metadata expectations.
   <details><summary><strong>test-plans-github-action.yml</strong> (CLICK TO EXPAND EXAMPLE)</summary><p>
 
   ```yaml
@@ -131,7 +127,7 @@ In the example above, Reflekt know's about Avo's staging branch and the staging 
   ```
   </p></details>
 
-- On merge to main branch in GitHub, automatically your updated tracking plan code to Segment Protocols using a GitHub Action. Reflekt handles the conversion for you.
+- Merge the changes to the main branch in GitHub, triggering a GitHub Action to automatically sync your changes to Segment Protocols using `reflekt push --name my-plan`.
   <details><summary><strong>sync-plans-github-action.yml</strong> (CLICK TO EXPAND EXAMPLE)</summary><p>
 
   ```yaml
@@ -164,6 +160,13 @@ In the example above, Reflekt know's about Avo's staging branch and the staging 
           reflekt push --name my-plan
   ```
   </p></details>
+
+- As desired, template a dbt package modeling and documenting all the events in the tracking plan.
+  ```bash
+  reflekt dbt --name my-plan --schema my_app
+  ```
+
+- Open a GitHub pull request with new/updated Reflekt dbt package. Get reviews from team members. Merge to main branch when approved.
 
 - Reference Reflekt dbt packages in your dbt project.
   ```yaml
