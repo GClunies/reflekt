@@ -5,25 +5,16 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt
-Reflekt automagically models and documents the events in your tracking plan pulled from your Analytics Governance tool, and bundles them in a dbt package ready for use in your dbt project. Each Reflekt dbt package includes:
+Reflekt enables anyone using dbt to automagically build a dbt package that models and documents the events in a tracking plan pulled from an Analytics Governance tool, ready for use in a dbt project. Each Reflekt dbt package includes:
 - A dbt [source](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in the warehouse where raw event data is loaded.
 - A dbt [model](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for each event in the tracking plan. Ready for consumption or further modeling.
 - A dbt [doc](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) entry for every model in the package, pulling information *directly from the tracking plan*. The data team and the business always know what your models and columns mean.
 
-Reflekt integrates with your Analytics Governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)), your Data Warehouse (e.g. [Snowflake](https://www.snowflake.com/)), and [dbt](https://www.getdbt.com/).
-
-By defining tracking plans with `code`, Reflekt makes them extensible artifacts that can power downstream uses - like templating dbt packages. This code can also be used to manage tracking plans using software engineering principles (version control, branches, pull requests, reviews, and CI/CD).
-
-
-![reflekt-architecture](/docs/reflekt-arch-flow.jpg)
-
-
 https://user-images.githubusercontent.com/28986302/171330405-57400ead-574d-4b71-a31b-57935e0ba9e8.mp4
-
 
 ## Getting Started
 - [Docs](docs/DOCUMENTATION.md/#reflekt-docs)
-  - [Install](docs/DOCUMENTATION.md/#install)
+  - [`pip install reflekt`](docs/DOCUMENTATION.md/#install)
   - [Setup](docs/DOCUMENTATION.md/#setup)
     - [Connecting Reflekt + Avo](docs/DOCUMENTATION.md/#connecting-reflekt--avo)
   - [Commands](docs/DOCUMENTATION.md/#commands)
@@ -35,6 +26,19 @@ https://user-images.githubusercontent.com/28986302/171330405-57400ead-574d-4b71-
 - [Example Reflekt project](https://github.com/GClunies/patty-bar-reflekt) (used in demo above)
 - [Reporting bugs](#reporting-bugs)
 - [Contributing](#contributing-code)
+
+## How it works
+
+Reflekt integrates with your Analytics Governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)), your Data Warehouse (e.g. [Snowflake](https://www.snowflake.com/)), and [dbt](https://www.getdbt.com/).
+
+By defining tracking plans with `code`, Reflekt makes them extensible artifacts that can power downstream uses - like templating dbt packages. This code can also be used to manage tracking plans using software engineering principles (version control, branches, pull requests, reviews, and CI/CD).
+
+
+![reflekt-architecture](/docs/reflekt-arch-flow.jpg)
+
+
+https://user-images.githubusercontent.com/28986302/171330405-57400ead-574d-4b71-a31b-57935e0ba9e8.mp4
+
 
 ## Usage
 
