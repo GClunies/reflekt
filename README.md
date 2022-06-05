@@ -68,7 +68,7 @@ https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-
     version: 0.8.5
 
   - git: "https://github.com/my-github-user/reflekt-project-repo"
-    subdirectory: "dbt_packages/reflekt_my_app_staging"
+    subdirectory: "dbt_packages/reflekt_my_app"
     revision: v0.1.0__reflekt_my_app  # Git tag or full commit
   ```
 
