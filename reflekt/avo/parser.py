@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
+from curses import meta
+
+
 def parse_avo_property(name: str, property_json: dict, required: list = []) -> dict:
     p_type = property_json.get("type")
     p = {
@@ -43,7 +46,14 @@ def parse_avo_property(name: str, property_json: dict, required: list = []) -> d
 
 def parse_avo_event(event_json: dict) -> dict:
     tags = event_json.get("tags")
-    metadata = {tag.split(":")[0]: tag.split(":")[1].replace(" ", "") for tag in tags}
+    metadata_raw = {
+        tag.split(":")[0]: tag.split(":")[1].replace(" ", "") for tag in tags
+    }
+    metadata = {}
+
+    for key, value in sorted(metadata_raw.items()):
+        metadata.update({key: value})
+
     event_obj = {
         "name": event_json.get("name"),
         "description": event_json.get("description"),

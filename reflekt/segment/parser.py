@@ -84,7 +84,13 @@ def parse_segment_property(name: str, property_json: dict, required: list = []):
 # function parse_event from project tracking-plan-kit licensed under MIT.
 # All changes are licensed under Apache-2.0.
 def parse_segment_event(event_json: dict):
-    metadata = sorted(event_json.get("rules").get("labels"))
+    metadata_raw = event_json.get("rules").get("labels")
+
+    metadata = {}
+
+    for key, value in sorted(metadata_raw.items()):
+        metadata.update({key: value})
+
     event_obj = {
         "name": event_json.get("name"),
         "description": event_json.get("description"),

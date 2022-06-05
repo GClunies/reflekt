@@ -581,16 +581,16 @@ if __name__ == "__main__":
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
-    # pull(["--name", "patty-bar"])
-    # push(["--name", "patty-bar"])
-    # test(["--name", "patty-bar"])
-    dbt(
-        [
-            "--name",
-            "patty-bar",
-            "--schema",
-            "patty_bar_web",
-            "--force-version",
-            "0.1.0",
-        ]
-    )
+    pull(["--name", "my-plan"])
+    # push(["--name", "my-plan"])
+    # test(["--name", "my-plan"])
+    # dbt(
+    #     [
+    #         "--name",
+    #         "my-plan",
+    #         "--schema",
+    #         "patty_bar_web",
+    #         "--force-version",
+    #         "0.1.0",
+    #     ]
+    # )

@@ -51,7 +51,30 @@ class ReflektProject:
     def _get_project_root(self, path: Path) -> Path:
         try:
             git_repo = Repo(path, search_parent_directories=True)
-            git_root = git_repo.git.rev_parse("--show-toplevel")
+            git_root = Path(git_repo.git.rev_parse("--show-toplevel"))
+            reflekt_project_list = list(git_root.glob("**/reflekt_project.yml"))
+
+            # This removes the reflekt_project.yml in th template folder of
+            # the Reflekt project repo
+            reflekt_project_list = [
+                path
+                for path in reflekt_project_list
+                if "templates/project/reflekt_project.yml" not in str(path)
+            ]
+
+            if len(reflekt_project_list) > 1:
+                raise ReflektProjectError(
+                    f"\n"
+                    f"\nFound a git repo at '{str(git_root)}' with more than one "
+                    f"Reflekt project. Only one Reflekt project per repo."
+                    f"\n"
+                    f"\n{reflekt_project_list}"
+                )
+
+            project_root = reflekt_project_list[0].parents[0]
+
+            return project_root
+
             return Path(git_root)
         except InvalidGitRepositoryError:
             raise ReflektProjectError(
