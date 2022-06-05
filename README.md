@@ -49,13 +49,13 @@ https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-
 **For Avo users, it's recommended to continuing manage tracking plans in Avo, then connecting Reflekt to Avo** (see the docs on [Connecting Reflekt + Avo](DOCUMENTATION.md/#connecting-reflekt--avo)). With this setup, you can:
 - Pull the tracking plan from Avo as it changes (can specify Avo branch) into Reflekt.
   ```bash
-  reflekt pull --name my-plan --avo-branch staging
+  reflekt pull --name my-plan --avo-branch main
   ```
   This creates a copy of the plan as code in the Reflekt project, to be used by Reflekt's dbt templater.
 
 - Template a dbt package modeling and documenting all the events in the tracking plan. You can tell Reflekt to template based on data in a specified schema (configure available schemas for plans in `reflekt_project.yml`).
   ```bash
-  reflekt dbt --name my-plan --schema my_app_staging
+  reflekt dbt --name my-plan --schema my_app
   ```
 
 - Open a GitHub pull request with new/updated Reflekt dbt package. Get reviews from team members. Merge to main branch when approved.
@@ -69,10 +69,8 @@ https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-
 
   - git: "https://github.com/my-github-user/reflekt-project-repo"
     subdirectory: "dbt_packages/reflekt_my_app_staging"
-    revision: v0.1.0__reflekt_my_app_staging  # Git tag or full commit
+    revision: v0.1.0__reflekt_my_app  # Git tag or full commit
   ```
-
-In the example above, Reflekt know's about Avo's staging branch and the staging schema in the data warehouse, allowing you to assess how tracking plan changes will affect downstream dbt models ***before pushing tracking changes to production.***
 
 ### Using Reflekt + Segment Protocols
 [Segment Protocols](https://segment.com/docs/protocols/) lets you manage tracking plans within your Segment account. While Segment Protocols does not use branches or environments, it does have a robust API. Reflekt leverages this API to enable managing tracking plans using software engineering principles** (version control, branches, pull requests, reviews, and CI/CD)
