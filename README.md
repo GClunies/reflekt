@@ -94,7 +94,6 @@ In the example above, Reflekt know's about Avo's staging branch and the staging 
   ```
 
 - Open a Pull Request (PR) in GitHub to merge your change. Request reviews from team members, discuss, and collaborate. This could trigger a GitHub Action CI suite that checks the changes follow your naming conventions and metadata expectations.
-  <details><summary><strong>test-plans-github-action.yml</strong> (CLICK TO EXPAND EXAMPLE)</summary><p>
 
   ```yaml
   # test-plans-github-action.yml
@@ -125,10 +124,8 @@ In the example above, Reflekt know's about Avo's staging branch and the staging 
         run: |
           reflekt test --name my-plan
   ```
-  </p></details>
 
 - Merge the changes to the main branch in GitHub, triggering a GitHub Action to automatically sync your changes to Segment Protocols using `reflekt push --name my-plan`.
-  <details><summary><strong>sync-plans-github-action.yml</strong> (CLICK TO EXPAND EXAMPLE)</summary><p>
 
   ```yaml
   # sync-plans-github-action.yml
@@ -162,7 +159,6 @@ In the example above, Reflekt know's about Avo's staging branch and the staging 
         run: |
           reflekt push --name my-plan
   ```
-  </p></details>
 
 - As desired, template a dbt package modeling and documenting all the events in the tracking plan.
   ```bash
