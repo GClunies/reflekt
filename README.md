@@ -134,7 +134,10 @@ In the example above, Reflekt know's about Avo's staging branch and the staging 
   # sync-plans-github-action.yml
 
   name: Sync Tracking Plans
-  on: pull_request
+  on:
+    push:
+      branches:
+        - main
 
   jobs:
     test:
