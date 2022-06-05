@@ -4,11 +4,11 @@
 
 import pytest
 import yaml
+
 from reflekt.reflekt.errors import ReflektValidationError
 from reflekt.reflekt.event import ReflektEvent
 from reflekt.reflekt.loader import ReflektLoader
 from reflekt.reflekt.plan import ReflektPlan
-
 from tests.fixtures import (
     REFLEKT_EVENT,
     REFLEKT_EVENT_BAD,

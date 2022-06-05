@@ -3,9 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from curses import meta
-
-
 def parse_avo_property(name: str, property_json: dict, required: list = []) -> dict:
     p_type = property_json.get("type")
     p = {
