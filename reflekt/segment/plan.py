@@ -12,7 +12,6 @@ import funcy
 import yaml
 from inflection import dasherize, underscore
 from loguru import logger
-
 from reflekt.reflekt.dumper import ReflektYamlDumper
 from reflekt.segment.parser import parse_segment_event, parse_segment_property
 
@@ -140,7 +139,7 @@ class SegmentPlan(object):
     def _build_reflekt_identify_file(self, plan_dir: Path, traits_json: dict):
         traits = [
             parse_segment_property(name, prop_json)
-            for (name, prop_json) in traits_json.items()
+            for (name, prop_json) in sorted(traits_json.items())
         ]
         traits_obj = {"traits": traits}
         traits_file = plan_dir / "identify-traits.yml"
@@ -161,7 +160,7 @@ class SegmentPlan(object):
     def _build_reflekt_group_file(self, plan_dir: Path, group_traits_json: dict):
         traits = [
             parse_segment_property(name, prop_json)
-            for (name, prop_json) in group_traits_json.items()
+            for (name, prop_json) in sorted(group_traits_json.items())
         ]
         traits_obj = {"traits": traits}
         traits_file = plan_dir / "group-traits.yml"

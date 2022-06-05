@@ -52,7 +52,7 @@ def parse_segment_property(name: str, property_json: dict, required: list = []):
             array_props = []
             reqd_array_props = property_json.get("items").get("required")
 
-            for property_name, property_prop in (
+            for property_name, property_prop in sorted(
                 property_json.get("items").get("properties").items()
             ):
                 item_p = parse_segment_property(
@@ -67,7 +67,9 @@ def parse_segment_property(name: str, property_json: dict, required: list = []):
         reqd_object_props = property_json.get("required")
 
         if "properties" in property_json.keys():
-            for property_name, property_prop in property_json.get("properties").items():
+            for property_name, property_prop in sorted(
+                property_json.get("properties").items()
+            ):
                 obj_p = parse_segment_property(
                     property_name, property_prop, reqd_object_props
                 )  # Using RECURSION
@@ -82,7 +84,7 @@ def parse_segment_property(name: str, property_json: dict, required: list = []):
 # function parse_event from project tracking-plan-kit licensed under MIT.
 # All changes are licensed under Apache-2.0.
 def parse_segment_event(event_json: dict):
-    metadata = event_json.get("rules").get("labels")
+    metadata = sorted(event_json.get("rules").get("labels"))
     event_obj = {
         "name": event_json.get("name"),
         "description": event_json.get("description"),
