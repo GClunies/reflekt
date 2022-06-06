@@ -540,28 +540,6 @@ def dbt(
     )
     transformer.build_dbt_package()
 
-    create_tag = click.confirm(
-        f"Would you like to create a Git tag to easily reference Reflekt dbt package "
-        f"{pkg_name} (version: {str(version)}) in your dbt project?",
-        default=False,
-    )
-
-    if create_tag:
-        tag = click.prompt(
-            "Tag",
-            type=str,
-            default=f"v{str(version)}_{pkg_name}",
-        )
-        git_executable = shutil.which("git")
-        subprocess.call(
-            args=[
-                git_executable,
-                "tag",
-                tag,
-            ],
-            cwd=project_dir,
-        )
-
 
 # Add CLI commands to CLI group
 cli.add_command(init)
