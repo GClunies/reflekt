@@ -27,6 +27,7 @@ pip install reflekt
   - [Usage](#usage)
     - [Using Reflekt + Avo](#using-reflekt--avo)
     - [Using Reflekt + Segment Protocols](#using-reflekt--segment-protocols)
+  - [Supported Integrations](#supported-integrations)
   - [Reporting bugs](#reporting-bugs)
   - [Contributing code](#contributing-code)
 
@@ -177,11 +178,19 @@ https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-
     revision: v0.1.0__reflekt_my_app  # Git tag or full commit
   ```
 
+## Supported integrations
+
+| Integration Type     | Supported              | Future Research                 |
+|----------------------|------------------------|---------------------------------|
+| Analytics Governance | [Avo](https://www.avo.app/), [Segment Protocols](https://segment.com/docs/protocols/) | [RudderStack Data Governance API](https://www.rudderstack.com/docs/data-governance/rudderstack-data-governance-api/) |
+| Warehouse            | [Snowflake](https://www.snowflake.com/), [Redshift](https://aws.amazon.com/redshift/)    | [BigQuery](https://cloud.google.com/bigquery)                        |
+| Transformation       | [dbt](https://www.getdbt.com/)                    | -                               |
+
 ## Reporting bugs
 If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).
 
 ## Contributing code
-Feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls) for contributions you would like to propose.
+Contributions are welcome. Feel free to open a [Pull Request](https://github.com/GClunies/reflekt/pulls).
 
 #### Development environment
 reflekt uses [poetry](https://python-poetry.org/) for packaging and dependency management. If you use poetry, this repo includes `poetry.lock` and `pyproject.toml` files to help spin up a dev environment.
