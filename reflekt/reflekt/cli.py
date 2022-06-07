@@ -5,8 +5,8 @@
 import json
 import shutil
 import subprocess
-import typing
 from pathlib import Path
+from typing import Optional
 
 import click
 import pkg_resources
@@ -345,12 +345,10 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
         # elif config.plan_type.lower() == "snowplow":
         #     plan = SnowplowPlan(plan_json)
 
-        logger.info(f"Building Reflekt tracking plan '{plan_name}'")
+        logger.info(f"Building Reflekt tracking plan '{plan_name}' at {plan_dir}")
         plan.build_reflekt(plan_dir)
         print("")  # Terminal newline
-        logger.info(
-            f"[SUCCESS] Reflekt tracking plan '{plan_name}' built at {str(plan_dir)}"
-        )
+        logger.info(f"[SUCCESS] Built Reflekt tracking plan '{plan_name}'")
 
 
 @click.command()
@@ -414,18 +412,9 @@ def test(plan_name: str) -> None:
     # Initialize ReflektLoader() always runs checks. Simple, but inelegant.
     ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
 
-    # if loader.has_validation_errors:
-    #     for error in loader.validation_errors:
-    #         logger.error("[FAILED] The following test failures were encountered: ")
-    #         click.echo(error, err=True)
-    #         click.echo()
-    #     click.echo()
-    #     raise click.Abort()
-    # else:
-    #     print("")  # Terminal newline
-    #     logger.info(
-    #         f"[PASSED] No errors detected in Reflekt tracking plan '{plan_name}'"
-    #     )
+    # If no errors are thrown, passed tests
+    logger.info("")
+    logger.info(f"[PASSED] No errors detected in Reflekt tracking plan '{plan_name}'")
 
 
 @click.option(
@@ -451,35 +440,24 @@ def test(plan_name: str) -> None:
 )
 @click.command()
 def dbt(
-    plan_name: str, schema: typing.Optional[str], force_version: typing.Optional[str]
+    plan_name: str,
+    schema: Optional[str] = None,
+    force_version: Optional[str] = None,
 ) -> None:
     """Build dbt package with sources, models, and docs based on tracking plan."""
     project_dir = ReflektProject().project_dir
     plan_dir = project_dir / "tracking-plans" / plan_name
     dbt_pkgs_dir = project_dir / "dbt_packages"
     logger.info(f"Loading Reflekt tracking plan {plan_name}")
-    loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
+    loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name, schema_name=schema)
     reflekt_plan = loader.plan
     logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
-    warehouse_database = reflekt_plan.warehouse_database
-    warehouse_schemas = reflekt_plan.warehouse_schemas
-
-    # Must provide --schema if plan mapped to multiple schemas in reflekt_project.yml
-    if not schema:
-        if len(warehouse_schemas) > 1:
-            logger.error(
-                f"[ERROR] Multiple warehouse schemas mapped to plan '{plan_name}'. "
-                f"See 'warehouse_schemas:' config in reflekt_project.yml.\n\n"
-                f"When a plan is mapped to multiple schema, 'reflekt dbt' requires a "
-                f"'--schema <schema_name>' arg so it can search the desired schema "
-                f"for tables with event data."
-            )
-            raise click.Abort()
-        else:
-            schema = warehouse_schemas[0]  # Get schema from single element list
-
-    # else, we just use 'schema' arg as provided by user
-    pkg_name = f"reflekt_{schema}"
+    pkg_suffix = (
+        reflekt_plan.schema_alias
+        if reflekt_plan.schema_alias is not None
+        else reflekt_plan.schema
+    )
+    pkg_name = f"reflekt_{pkg_suffix}"
     dbt_project_yml_path = dbt_pkgs_dir / pkg_name / "dbt_project.yml"
 
     if force_version:  # If user has forced version, use that
@@ -533,8 +511,6 @@ def dbt(
 
     transformer = ReflektTransformer(
         reflekt_plan=reflekt_plan,
-        database=warehouse_database,
-        schema=schema,
         dbt_package_name=pkg_name,
         pkg_version=version,
     )

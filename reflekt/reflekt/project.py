@@ -40,8 +40,8 @@ class ReflektProject:
         self._get_properties_allow_numbers()
         self._get_properties_reserved()
         self._get_data_types()
-        self._get_warehouse_database()
-        self._get_warehouse_schemas()
+        self._get_warehouse_database_obj()
+        self._get_warehouse_schema_obj()
         self._get_expected_metadata_schema()
         self._get_dbt_src_prefix()
         self._get_dbt_model_prefix()
@@ -237,9 +237,9 @@ class ReflektProject:
                 "\nSee docs in Reflekt Github repo for available data types"
             )
 
-    def _get_warehouse_database(self) -> None:
+    def _get_warehouse_database_obj(self) -> None:
         try:
-            self.warehouse_database = self.project["tracking_plans"]["warehouse"][
+            self.warehouse_database_obj = self.project["tracking_plans"]["warehouse"][
                 "database"
             ]
         except KeyError:
@@ -255,22 +255,16 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_warehouse_schemas(self) -> None:
+    def _get_warehouse_schema_obj(self) -> None:
         try:
-            self.warehouse_schemas = self.project["tracking_plans"]["warehouse"][
+            self.warehouse_schema_obj = self.project["tracking_plans"]["warehouse"][
                 "schema"
             ]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define schema(s) for each tracking plan in "
-                "reflekt_project.yml where Reflekt should search for corresponding raw "
-                "event data is stored. Example:"
-                "\n"
-                "\ntracking_plans:"
-                "\n  warehouse:"
-                "\n    schema:"
-                "\n      plan-name: schema_name  # string or list of schemas"
-                "\n"
+                "Must define warehouse 'schema:' config in reflekt_project.yml. "
+                "See Reflekt documentation for guidance on config setup:\n"
+                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#reflekt-project"
             )
 
     def _get_expected_metadata_schema(self) -> None:

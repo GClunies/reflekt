@@ -4,7 +4,7 @@
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
 
-from typing import Counter
+from typing import Counter, List, Optional
 
 from cerberus import Validator
 
@@ -14,28 +14,44 @@ from reflekt.reflekt.event import ReflektEvent
 from reflekt.reflekt.project import ReflektProject
 from reflekt.reflekt.property import ReflektProperty
 from reflekt.reflekt.schema import reflekt_plan_schema
+from reflekt.reflekt.trait import ReflektTrait
 
 
 # The class ReflektPlan is a derivative work based on the class
 # YamlTrackingPlan from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektPlan(object):
-    def __init__(self, plan_yaml_obj: dict, plan_name: str) -> None:
+    def __init__(
+        self,
+        plan_yaml_obj: dict,
+        plan_name: str,
+        schema_name: Optional[str] = None,
+    ) -> None:
         if ReflektProject().exists:
             self._config = ReflektConfig()
             self._project = ReflektProject()
             self.plan_yaml_obj = plan_yaml_obj
             self.name = plan_name
-            self.warehouse_database = self._get_warehouse_database(self.name)
-            self.warehouse_schemas = self._get_warehouse_schemas(self.name)
-            self.events = []
-            self.identify_traits = []
-            self.group_traits = []
 
-    def _get_warehouse_database(self, plan_name: str) -> list:
+            if schema_name:
+                self.schema_arg = schema_name
+                self.database = self._get_database(self.name)
+                self.schema, self.schema_alias = self._get_schema_and_schema_alias(
+                    self.name
+                )
+            else:
+                self.database = None
+                self.schema = None
+                self.schema_alias = None
+
+            self.events: List[ReflektEvent] = []
+            self.identify_traits: List[ReflektTrait] = []
+            self.group_traits: List[ReflektTrait] = []
+
+    def _get_database(self, plan_name: str) -> list:
         try:
-            warehouse_database = self._project.warehouse_database[plan_name]
-            return warehouse_database
+            plan_database = self._project.warehouse_database_obj[plan_name]
+            return plan_database
         except KeyError:
             raise KeyError(
                 f"Tracking plan '{plan_name}' not found under...\n\n"
@@ -45,19 +61,22 @@ class ReflektPlan(object):
                 f"(https://github.com/GClunies/reflekt) on how to specify."
             )
 
-    def _get_warehouse_schemas(self, plan_name: str) -> list:
+    def _get_schema_and_schema_alias(self, plan_name: str) -> list:
         try:
-            warehouse_schemas = self._project.warehouse_schemas[plan_name]
-            if isinstance(warehouse_schemas, str):
-                warehouse_schemas = [warehouse_schemas]
-            return warehouse_schemas
+            schema_configs = self._project.warehouse_schema_obj[plan_name]
+
+            for schema_config in schema_configs:
+                if schema_config["schema"] == self.schema_arg:
+                    schema = schema_config["schema"]
+                    schema_alias = schema_config.get("schema_alias")
+
+                    return schema, schema_alias
+
         except KeyError:
             raise KeyError(
-                f"Tracking plan '{plan_name}' not found under...\n\n"
-                f"    warehouse:\n"
-                f"      schema:\n\n"
-                f"... in reflekt_project.yml. See docs in Reflekt GitHub repo "
-                f"(https://github.com/GClunies/reflekt) on how to specify."
+                f"Error in 'schema:' config for tracking plan '{plan_name}'."
+                f"See Reflekt docs for guidance on 'schema:' config.\n"
+                f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#reflekt-project"
             )
 
     def add_event(self, event_yaml_obj: dict) -> None:
