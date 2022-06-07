@@ -264,7 +264,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "Must define warehouse 'schema:' config in reflekt_project.yml. "
                 "See Reflekt documentation for guidance on config setup:\n"
-                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#reflekt-project"
+                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#reflekt-project"  # noqa: E501
             )
 
     def _get_expected_metadata_schema(self) -> None:

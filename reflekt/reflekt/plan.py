@@ -76,7 +76,7 @@ class ReflektPlan(object):
             raise KeyError(
                 f"Error in 'schema:' config for tracking plan '{plan_name}'."
                 f"See Reflekt docs for guidance on 'schema:' config.\n"
-                f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#reflekt-project"
+                f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#reflekt-project"  # noqa: E501
             )
 
     def add_event(self, event_yaml_obj: dict) -> None:

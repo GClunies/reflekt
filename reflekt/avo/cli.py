@@ -8,7 +8,7 @@ import subprocess
 from typing import Optional
 
 from loguru import logger
-from reflekt.avo.errors import AvoCliError
+
 from reflekt.logger import logger_config
 from reflekt.reflekt.config import ReflektConfig
 from reflekt.reflekt.project import ReflektProject
