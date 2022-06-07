@@ -47,6 +47,7 @@ class ReflektProject:
         self._get_dbt_model_prefix()
         self._get_dbt_model_materialized()
         self._get_dbt_model_incremental_logic()
+        self._get_dbt_docs_prefix()
 
     def _get_project_root(self, path: Path) -> Path:
         try:
@@ -344,3 +345,15 @@ class ReflektProject:
                 )
         else:
             self.incremental_logic = None
+
+    def _get_dbt_docs_prefix(self) -> None:
+        try:
+            self.docs_prefix = self.project["dbt"]["templater"]["docs"]["prefix"]
+        except KeyError:
+            raise ReflektProjectError(
+                "\n\nMust define 'prefix:' for templated dbt docs in reflekt_project.yml. Example:"  # noqa E501
+                "\n"
+                "\ndbt:"
+                "\n  docs:"
+                "\n    prefix: reflekt_"
+            )

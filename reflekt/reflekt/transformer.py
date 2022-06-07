@@ -82,6 +82,7 @@ class ReflektTransformer(object):
             self.db_engine = WarehouseConnection()
             self.src_prefix = self.reflekt_project.src_prefix
             self.model_prefix = self.reflekt_project.model_prefix
+            self.docs_prefix = self.reflekt_project.docs_prefix
             self.materialized = self.reflekt_project.materialized
             self.incremental_logic = self.reflekt_project.incremental_logic
 
@@ -410,13 +411,11 @@ class ReflektTransformer(object):
                 else:
                     table_name = std_segment_table["name"]
                     model_name = f"{self.model_prefix}{self.schema}__{table_name}"
+                    doc_name = f"{self.docs_prefix}{self.schema}__{table_name}"
                     self._template_dbt_table(
                         dbt_src=dbt_src,
                         table_name=table_name,
                         table_description=std_segment_table["description"],
-                        # db_columns=db_columns,
-                        # cdp_cols=std_segment_table["cdp_cols"],
-                        # plan_cols=std_segment_table["plan_cols"],
                     )
                     self._template_dbt_model(
                         materialized=self.materialized,
@@ -427,6 +426,7 @@ class ReflektTransformer(object):
                         plan_cols=std_segment_table["plan_cols"],
                     )
                     self._template_dbt_doc(
+                        doc_name=doc_name,
                         model_name=model_name,
                         model_description=std_segment_table["description"],
                         db_columns=db_columns,
@@ -446,13 +446,11 @@ class ReflektTransformer(object):
                 else:
                     table_name = segment_2_snake(event.name)
                     model_name = f"{self.model_prefix}{self.schema}__{table_name}"
+                    doc_name = f"{self.docs_prefix}{self.schema}__{table_name}"
                     self._template_dbt_table(
                         dbt_src=dbt_src,
                         table_name=table_name,
                         table_description=event.description,
-                        # db_columns=db_columns,
-                        # cdp_cols=seg_event_cols,
-                        # plan_cols=event.properties,
                     )
                     self._template_dbt_model(
                         materialized=self.materialized,
@@ -463,6 +461,7 @@ class ReflektTransformer(object):
                         plan_cols=event.properties,
                     )
                     self._template_dbt_doc(
+                        doc_name=doc_name,
                         model_name=model_name,
                         model_description=event.description,
                         db_columns=db_columns,
@@ -544,27 +543,6 @@ class ReflektTransformer(object):
         dbt_tbl = copy.deepcopy(dbt_table_schema)
         dbt_tbl["name"] = table_name
         dbt_tbl["description"] = table_description
-
-        # for column, mapped_columns in cdp_cols.items():
-        #     if column in db_columns or column in reflekt_columns:
-        #         for mapped_column in mapped_columns:
-        #             if mapped_column["source_name"] is not None:
-        #                 logger.info(
-        #                     f"    Adding column {mapped_column['source_name']} to "
-        #                     f"table {table_name}"
-        #                 )
-        #                 tbl_col = copy.deepcopy(dbt_column_schema)
-        #                 tbl_col["name"] = mapped_column["source_name"]
-        #                 tbl_col["description"] = mapped_column["description"]
-        #                 dbt_tbl["columns"].append(tbl_col)
-
-        # for column in plan_cols:
-        #     logger.info(f"    Adding column {segment_2_snake(column.name)} to table")
-        #     tbl_col = copy.deepcopy(dbt_column_schema)
-        #     tbl_col["name"] = segment_2_snake(column.name)
-        #     tbl_col["description"] = column.description
-        #     dbt_tbl["columns"].append(tbl_col)
-
         dbt_src["sources"][0]["tables"].append(dbt_tbl)
 
     def _template_dbt_model(
@@ -706,6 +684,7 @@ class ReflektTransformer(object):
 
     def _template_dbt_doc(
         self,
+        doc_name: str,
         model_name: str,
         model_description: str,
         db_columns: list,
@@ -714,10 +693,7 @@ class ReflektTransformer(object):
     ) -> None:
         print("")  # Terminal newline
         logger.info(
-            f"Templating dbt docs "
-            f"{model_name}.yml"
-            f" for model "
-            f"{model_name}.sql"
+            f"Templating dbt docs " f"{doc_name}.yml" f" for model " f"{model_name}.sql"
         )
         dbt_doc = copy.deepcopy(dbt_doc_schema)
         dbt_mdl_doc = copy.deepcopy(dbt_model_schema)
@@ -748,7 +724,7 @@ class ReflektTransformer(object):
 
         dbt_doc["models"].append(dbt_mdl_doc)
 
-        docs_path = self.tmp_pkg_dir / "models" / f"{model_name}.yml"
+        docs_path = self.tmp_pkg_dir / "models" / f"{doc_name}.yml"
 
         with open(docs_path, "w") as f:
             yaml.dump(
