@@ -546,7 +546,10 @@ class ReflektTransformer(object):
     def _template_dbt_source(self, reflekt_plan: ReflektPlan) -> dict:
         logger.info(f"Initializing template for dbt source {self.schema}")
         dbt_src = copy.deepcopy(dbt_src_schema)
-        dbt_src["sources"][0]["name"] = self.schema
+        dbt_src["sources"][0]["name"] = (
+            self.schema_alias if self.schema_alias is not None else self.schema
+        )
+        dbt_src["sources"][0]["schema"] = self.schema
         dbt_src["sources"][0]["database"] = self.database
         dbt_src["sources"][0]["description"] = (
             f"Schema in {titleize(self.warehouse_type)} where data for the "
@@ -593,8 +596,11 @@ class ReflektTransformer(object):
             self.warehouse_type,
         )
         logger.info("    Adding source CTE to model SQL")
+        source_schema = (
+            self.schema_alias if self.schema_alias is not None else self.schema
+        )
         mdl_sql += self._template_dbt_source_cte(
-            source_schema=self.schema,
+            source_schema=source_schema,
             source_table=table_name,
             incremental_logic=self.incremental_logic,
         )
