@@ -564,17 +564,11 @@ cli.add_command(dbt)
 # Used for CLI debugging
 if __name__ == "__main__":
     # Call CLI command here with arguments as a list
-
-    # init(["--project-dir", "~/Repos/test-repo"])
-
+    init(["--project-dir", "~/Repos/test-repo"])
     # new(["--project-dir", "test-plan"])
-
     # pull(["--name", "my-plan"])
-
     # push(["--name", "my-plan"])
-
     # test(["--name", "my-plan"])
-
     # dbt(
     #     [
     #         "--name",
@@ -585,9 +579,6 @@ if __name__ == "__main__":
     #         "0.1.0",
     #     ]
     # )
-
     # pull(["--name", "tracking-plan-example"])
-
     # push(["--name", "tracking-plan-example"])
-
     # test(["--name", "tracking-plan-example"])

@@ -30,18 +30,6 @@ class ReflektProject:
                 else:
                     self._project_errors.append(err)
 
-        # if self.exists:
-        #     with open(self.project_yml, "r") as f:
-        #         self.project = yaml.safe_load(f)
-
-        #     try:
-        #         self.validate_project()
-        #     except ReflektProjectError as err:
-        #         if raise_project_errors:
-        #             raise err
-        #         else:
-        #             self._project_errors.append(err)
-
     def validate_project(self):
         self._get_project_name()
         self._get_config_profile()
