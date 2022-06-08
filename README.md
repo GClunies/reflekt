@@ -109,19 +109,19 @@ https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-
           os: ['ubuntu-latest']
           python-version: ['3.9']
       runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-      - name: Install Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python: ${{ matrix.python-version }}
-      - name: Install Reflekt
-        run: |
-          pip install reflekt
-      - name: Run reflekt test
-        run: |
-          reflekt test --name my-plan
+      steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v2
+        - name: Install Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v3
+          with:
+            python: ${{ matrix.python-version }}
+        - name: Install Reflekt
+          run: |
+            pip install reflekt
+        - name: Run reflekt test
+          run: |
+            reflekt test --name my-plan
   ```
 
 - Merge the changes to the main branch in GitHub, triggering a GitHub Action to automatically sync your changes to Segment Protocols using `reflekt push --name my-plan`.
@@ -144,19 +144,19 @@ https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-
           os: ['ubuntu-latest']
           python-version: ['3.9']
       runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-      - name: Install Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python: ${{ matrix.python-version }}
-      - name: Install Reflekt
-        run: |
-          pip install reflekt
-      - name: Run reflekt test
-        run: |
-          reflekt push --name my-plan
+      steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v2
+        - name: Install Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v3
+          with:
+            python: ${{ matrix.python-version }}
+        - name: Install Reflekt
+          run: |
+            pip install reflekt
+        - name: Run reflekt test
+          run: |
+            reflekt push --name my-plan
   ```
 
 - As desired, template a dbt package modeling and documenting all the events in the tracking plan.
