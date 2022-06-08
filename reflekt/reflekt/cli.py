@@ -5,7 +5,6 @@
 import json
 import shutil
 import subprocess
-from importlib.abc import Loader
 from pathlib import Path
 from typing import Optional
 
@@ -47,6 +46,8 @@ def init(project_dir_str: str) -> None:
         "Enter your project name (letters, digits, underscore)", type=str
     )
     project_yml = project_dir / "reflekt_project.yml"
+    readme_md = project_dir / "README.md"
+
     if project_yml.exists():
         with open(project_yml, "r") as f:
             reflekt_project_obj = yaml.safe_load(f)
@@ -129,13 +130,11 @@ def init(project_dir_str: str) -> None:
                 hide_input=True,
             )
             reflekt_config_obj[config_name]["access_token"] = access_token
-
         elif plan_type == "avo":
             avo_end_msg = (
                 "You've selected Avo as your Analytics Governance tool which requires "
-                "additional setup steps and contacting Avo support. Please "
-                "see the docs for additional guidance:\n"
-                "    https://github.com/GClunies/reflekt/blob/main/docs/AVO.md"
+                "additional setup steps. Please see the docs for additional guidance:\n"
+                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#connect-reflekt--avo"
             )
 
         # TODO - Enable support for other CDPs below as developed
@@ -232,6 +231,7 @@ def init(project_dir_str: str) -> None:
     )
     shutil.copytree(project_template_dir, project_dir, dirs_exist_ok=True)
 
+    # Template reflekt_project.yml
     with open(project_yml, "r") as f:
         project_yml_str = f.read()
 
@@ -241,6 +241,17 @@ def init(project_dir_str: str) -> None:
 
     with open(project_yml, "w") as f:
         f.write(project_yml_str)
+
+    # Template Reflekt project README
+    with open(readme_md, "r") as f:
+        readme_md_str = f.read()
+
+    readme_md_str = readme_md_str.replace("PROJECT_NAME", project_name).replace(
+        "default_profile", config_name
+    )
+
+    with open(readme_md, "w") as f:
+        f.write(readme_md_str)
 
     logger.info(
         f"Your Reflekt project '{project_name}' has been created!"

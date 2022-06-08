@@ -1,5 +1,4 @@
 # Reflekt Docs
-Documentation to get you started using Reflekt and setting up you project. Where possible, demo videos are included in addition to the written docs.
 
 - [Reflekt Docs](#reflekt-docs)
   - [Install](#install)
