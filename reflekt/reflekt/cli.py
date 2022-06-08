@@ -35,7 +35,8 @@ def cli():
 @click.option(
     "--project-dir",
     "project_dir_str",
-    default=".",
+    # default=".",
+    required=True,
     help="Path where Reflekt project will be created. Defaults to current directory.",
 )
 @click.command()
@@ -134,7 +135,7 @@ def init(project_dir_str: str) -> None:
             avo_end_msg = (
                 "You've selected Avo as your Analytics Governance tool which requires "
                 "additional setup steps. Please see the docs for additional guidance:\n"
-                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#connect-reflekt--avo"
+                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#connect-reflekt--avo"  # noqa: E501
             )
 
         # TODO - Enable support for other CDPs below as developed
@@ -563,14 +564,17 @@ cli.add_command(dbt)
 # Used for CLI debugging
 if __name__ == "__main__":
     # Call CLI command here with arguments as a list
-    # init(["--project-dir", "/Users/gclunies/Repos/patty-bar-reflekt"])
+
+    # init(["--project-dir", "~/Repos/test-repo"])
+
     # new(["--project-dir", "test-plan"])
-    # pull(["--name", "tracking-plan-example"])
-    # push(["--name", "tracking-plan-example"])
-    # test(["--name", "tracking-plan-example"])
-    pull(["--name", "my-plan"])
+
+    # pull(["--name", "my-plan"])
+
     # push(["--name", "my-plan"])
+
     # test(["--name", "my-plan"])
+
     # dbt(
     #     [
     #         "--name",
@@ -581,3 +585,9 @@ if __name__ == "__main__":
     #         "0.1.0",
     #     ]
     # )
+
+    # pull(["--name", "tracking-plan-example"])
+
+    # push(["--name", "tracking-plan-example"])
+
+    # test(["--name", "tracking-plan-example"])

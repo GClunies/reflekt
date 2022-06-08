@@ -14,7 +14,7 @@ To use a Reflekt dbt package in your dbt project, reference it in the `packages.
     revision: v0.1.0__reflekt_dbt_package_one  # Git branch, tag, or specific commit (full 40-character hash)
 
   - git: "https://github.com/your/reflekt-project-repo"
-    subdirectory: "dbt_packages/reflekt_dbt_package_folder_two"
+    subdirectory: "dbt_packages/reflekt_dbt_package_two"
     revision: v0.3.0__reflekt_dbt_package_two  # Git branch, tag, or specific commit (full 40-character hash)
   ```
 

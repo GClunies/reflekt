@@ -14,10 +14,11 @@ class ReflektProject:
     def __init__(self, raise_project_errors: bool = True) -> None:
         self._project_errors = []
         self.project_dir = self._get_project_root(Path.cwd())
-        self.project_yml = self.project_dir / "reflekt_project.yml"
-        self.exists = True if self.project_yml.exists() else False
+        self.exists = False  # Assume project does not exist by defualt
 
-        if self.exists:
+        if self.project_dir is not None:
+            self.project_yml = self.project_dir / "reflekt_project.yml"
+            self.exists = True if self.project_yml.exists() else False
             with open(self.project_yml, "r") as f:
                 self.project = yaml.safe_load(f)
 
@@ -28,6 +29,18 @@ class ReflektProject:
                     raise err
                 else:
                     self._project_errors.append(err)
+
+        # if self.exists:
+        #     with open(self.project_yml, "r") as f:
+        #         self.project = yaml.safe_load(f)
+
+        #     try:
+        #         self.validate_project()
+        #     except ReflektProjectError as err:
+        #         if raise_project_errors:
+        #             raise err
+        #         else:
+        #             self._project_errors.append(err)
 
     def validate_project(self):
         self._get_project_name()
@@ -55,8 +68,8 @@ class ReflektProject:
             git_root = Path(git_repo.git.rev_parse("--show-toplevel"))
             reflekt_project_list = list(git_root.glob("**/reflekt_project.yml"))
 
-            # This removes the reflekt_project.yml in th template folder of
-            # the Reflekt project repo
+            # This excludes the reflekt_project.yml file in the templates/
+            # folder of this repo. Only an issue for development. Not users.
             reflekt_project_list = [
                 path
                 for path in reflekt_project_list
@@ -72,11 +85,13 @@ class ReflektProject:
                     f"\n{reflekt_project_list}"
                 )
 
-            project_root = reflekt_project_list[0].parents[0]
+            # If no reflekt project found (i.e. before 'reflekt init') then
+            # return None
+            if reflekt_project_list:
+                return reflekt_project_list[0].parents[0]  # project root
+            else:
+                return  # None
 
-            return project_root
-
-            return Path(git_root)
         except InvalidGitRepositoryError:
             raise ReflektProjectError(
                 "\n"

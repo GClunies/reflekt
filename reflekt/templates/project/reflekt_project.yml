@@ -13,14 +13,14 @@ tracking_plans:
   # schema(s) where Reflekt should search for corresponding event data.
   warehouse:
     database:
-      example-plan: example_database
+      example-plan: example_database  # Example config for a 'example-plan' below.
     schema:
       # For each tracking plan, specify the schema(s) where raw event data is loaded.
       # When templating dbt packages, Reflekt uses the schema in the dbt package
       # and file names (e.g. reflekt_schema_name__event_name.sql). You can
       # override the schema by specifying a schema_alias
       # (e.g. reflekt_schema_alias__event_name.sql).
-      example-plan:
+      example-plan:  # Example config for a 'example-plan' below.
         - schema: poorly_named_example_schema
           schema_alias: example_schema  # OPTIONAL (schema_alias:)
         - schema: example_schema_two    # OPTIONAL - can specify multiple schemas for a plan.
@@ -34,8 +34,7 @@ tracking_plans:
     # OPTIONAL (expected_metadata:)
     # Define a schema for expected event metadata. Tested when running:
     #     reflekt test --name <plan-name>
-    # See example metadata schema below.
-    # expected_metadata:
+    # expected_metadata:  # Example metadata schema for events
     #   product_owner:
     #     type: string
     #     required: true
@@ -74,15 +73,15 @@ tracking_plans:
 dbt:
   templater:
     sources:
-      prefix: _src_reflekt_       # Prefix for templated dbt package sources
+      prefix: _src_reflekt_      # Prefix for templated dbt package sources
 
     models:
       prefix: reflekt_           # Prefix for models & docs in templated dbt package
-      materialized: view  # view|incremental
-      # OPTIONAL (incremental_logic:) [REQUIRED if 'materialized: incremental']
+      materialized: view         # view|incremental
+      # OPTIONAL (incremental_logic:)
       # Specify the incremental logic to use when templating dbt models.
       # Must include {%- if is_incremental() %} ... {%- endif %} block
-      # incremental_logic: |
+      # incremental_logic: |  # REQUIRED if 'materialized: incremental'
       #   {%- if is_incremental() %}
       #   where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
       #   {%- endif %}
