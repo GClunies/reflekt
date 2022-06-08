@@ -1,0 +1,11 @@
+reflekt_github_actions:
+  cdp: segment
+  plan_type: avo
+  warehouse:
+    snowflake:
+      account: dummy_account
+      database: dummy_database
+      password: foobar
+      role: dummy_role
+      user: dummy_user
+      warehouse: dummy_warehouse

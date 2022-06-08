@@ -1,0 +1,85 @@
+# Configurations are REQUIRED unless flagged by an '# OPTIONAL (optional_config:)' comment
+# Uncomment OPTIONAL configurations to use them
+
+name: reflekt_github_actions
+
+config_profile: reflekt_github_actions  # Profile defined in reflekt_config.yml
+
+# OPTIONAL (config_path:)
+config_path:  /home/runner/work/reflekt/reflekt/.reflekt/reflekt_config.yml
+
+tracking_plans:
+  # For each tracking plan in your Reflekt project, specify the warehouse and
+  # schema(s) where Reflekt should search for corresponding event data.
+  warehouse:
+    database:
+      test-plan: dummy_database
+    schema:
+      # When templating dbt packages, Reflekt uses schemas in folder and file
+      # names (e.g. reflekt_schema_name__event_name.sql)
+      test-plan:
+        - schema: dummy_schema
+
+  events:
+    naming:
+      case: title           # One of title|snake|camel
+      allow_numbers: false  # true|false
+      reserved: []          # Reserved event names (casing matters)
+
+    # OPTIONAL (expected_metadata:)
+    # Define a schema for expected event metadata. Tested when running:
+    #     reflekt test --name <plan-name>
+    expected_metadata:
+      product_owner:
+        type: string
+        required: true
+        allowed:
+          - Maura
+          - Greg
+      code_owner:
+        required: true
+        type: string
+        allowed:
+          - Maura
+          - Greg
+      stakeholders:
+        type: string
+        allowed:
+          - Product
+          - Engineering
+          - Data
+
+  properties:
+    naming:
+      case: snake           # One of title|snake|camel
+      allow_numbers: false  # true|false
+      reserved: []          # Reserved property names (casing matters)
+
+    data_types: # Specify allowed data types. Available types listed below
+      - string
+      - integer
+      - boolean
+      - number
+      - object
+      - array
+      - any
+      - 'null'  # Specify null type in quotes
+
+dbt:
+  templater:
+    sources:
+      prefix: src_reflekt_       # Prefix for templated dbt package sources
+
+    models:
+      prefix: reflekt_           # Prefix for models & docs in templated dbt package
+      materialized: view  # One of view|incremental
+      # OPTIONAL (incremental_logic:) [REQUIRED if 'materialized: incremental']
+      # Specify the incremental logic to use when templating dbt models.
+      # Must include {%- if is_incremental() %} ... {%- endif %} block
+      # incremental_logic: |
+      #   {%- if is_incremental() %}
+      #   where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
+      #   {%- endif %}
+
+    docs:
+      prefix: _reflekt_           # Prefix for docs in templated dbt package
