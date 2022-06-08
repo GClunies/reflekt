@@ -5,6 +5,7 @@
 import json
 import shutil
 import subprocess
+from importlib.abc import Loader
 from pathlib import Path
 from typing import Optional
 

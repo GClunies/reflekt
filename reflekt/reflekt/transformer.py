@@ -492,9 +492,12 @@ class ReflektTransformer(object):
                         plan_cols=event.properties,
                     )
 
-        dbt_src_path = (
-            self.tmp_pkg_dir / "models" / f"{self.src_prefix}{self.schema}.yml"
+        src_name = (
+            f"{self.src_prefix}{self.schema}"
+            if self.schema_alias is None
+            else f"{self.src_prefix}{self.schema_alias}"
         )
+        dbt_src_path = self.tmp_pkg_dir / "models" / f"{src_name}.yml"
 
         with open(dbt_src_path, "w") as f:
             yaml.dump(

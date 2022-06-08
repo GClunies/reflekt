@@ -149,16 +149,23 @@ name: example_project
 config_profile: example_profile  # Profile defined in reflekt_config.yml
 
 # OPTIONAL (config_path:)
-# config_path: /absolute/path/to/reflekt_config.yml  # OPTIONAL
+# config_path: /absolute/path/to/reflekt_config.yml
 
 tracking_plans:
-  warehouse_schemas:
-    # For each tracking plan, specify the schema(s) in data warehouse where
-    # Reflekt should look for raw event data. This can be a single schema
-    # (e.g. plan-name: schema_name) or a list of schemas (e.g. plan-name: ['schema_one', 'schema_two']).
-    # Schema names are used by Reflekt to build dbt package folder and file
-    # names when templating dbt packages (e.g. reflekt_schema_name__event_name.sql).
-    example-plan: example_schema
+  # For each tracking plan in your Reflekt project, specify the warehouse and
+  # schema(s) where Reflekt should search for corresponding event data.
+  warehouse:
+    database:
+      my-plan: raw
+    schema:
+      # For each tracking plan, specify the schema where raw event data is loaded.
+      # When templating dbt packages, Reflekt uses the schema in the dbt package
+      # and file names (e.g. reflekt_schema_name__event_name.sql). You can
+      # override the schema by specifying a schema_alias
+      # (e.g. reflekt_schema_alias__event_name.sql).
+      my-plan:
+        - schema: poorly_named_schema
+          schema_alias: my_app_web  # OPTIONAL (schema_alias:)
 
   events:
     naming:        # Naming conventions for events
@@ -202,11 +209,11 @@ tracking_plans:
 dbt:
   templater:
     sources:
-      prefix: src_reflekt_       # Prefix for templated dbt package sources
+      prefix: _src_reflekt_       # Prefix for templated dbt package sources
 
     models:
-      prefix: reflekt_           # Prefix for templated dbt package models & docs
-      materialized: incremental  # view|incremental
+      prefix: reflekt_           # Prefix for models in templated dbt package
+      materialized: incremental  # One of view|incremental
       # OPTIONAL (incremental_logic:) [REQUIRED if 'materialized: incremental']
       # Specify the incremental logic to use when templating dbt models.
       # Must include {%- if is_incremental() %} ... {%- endif %} block
@@ -214,6 +221,9 @@ dbt:
         {%- if is_incremental() %}
         where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
         {%- endif %}
+
+    docs:
+      prefix: _reflekt_           # Prefix for docs in templated dbt package
 
 ```
 

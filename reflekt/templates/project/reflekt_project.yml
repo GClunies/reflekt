@@ -15,9 +15,15 @@ tracking_plans:
     database:
       example-plan: example_database
     schema:
-      # When templating dbt packages, Reflekt uses schemas in folder and file
-      # names (e.g. reflekt_schema_name__event_name.sql)
-      example-plan: example_schema
+      # For each tracking plan, specify the schema(s) where raw event data is loaded.
+      # When templating dbt packages, Reflekt uses the schema in the dbt package
+      # and file names (e.g. reflekt_schema_name__event_name.sql). You can
+      # override the schema by specifying a schema_alias
+      # (e.g. reflekt_schema_alias__event_name.sql).
+      example-plan:
+        - schema: poorly_named_example_schema
+          schema_alias: example_schema  # OPTIONAL (schema_alias:)
+        - schema: example_schema_two    # OPTIONAL - can specify multiple schemas for a plan.
 
   events:
     naming:
@@ -68,7 +74,7 @@ tracking_plans:
 dbt:
   templater:
     sources:
-      prefix: src_reflekt_       # Prefix for templated dbt package sources
+      prefix: _src_reflekt_       # Prefix for templated dbt package sources
 
     models:
       prefix: reflekt_           # Prefix for models & docs in templated dbt package
@@ -80,3 +86,6 @@ dbt:
       #   {%- if is_incremental() %}
       #   where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
       #   {%- endif %}
+
+    docs:
+      prefix: _reflekt_           # Prefix for docs in templated dbt package
