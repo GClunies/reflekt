@@ -14,10 +14,11 @@ class ReflektProject:
     def __init__(self, raise_project_errors: bool = True) -> None:
         self._project_errors = []
         self.project_dir = self._get_project_root(Path.cwd())
-        self.project_yml = self.project_dir / "reflekt_project.yml"
-        self.exists = True if self.project_yml.exists() else False
+        self.exists = False  # Assume project does not exist by defualt
 
-        if self.exists:
+        if self.project_dir is not None:
+            self.project_yml = self.project_dir / "reflekt_project.yml"
+            self.exists = True if self.project_yml.exists() else False
             with open(self.project_yml, "r") as f:
                 self.project = yaml.safe_load(f)
 
@@ -40,13 +41,14 @@ class ReflektProject:
         self._get_properties_allow_numbers()
         self._get_properties_reserved()
         self._get_data_types()
-        self._get_warehouse_database()
-        self._get_warehouse_schemas()
+        self._get_warehouse_database_obj()
+        self._get_warehouse_schema_obj()
         self._get_expected_metadata_schema()
         self._get_dbt_src_prefix()
         self._get_dbt_model_prefix()
         self._get_dbt_model_materialized()
         self._get_dbt_model_incremental_logic()
+        self._get_dbt_docs_prefix()
 
     def _get_project_root(self, path: Path) -> Path:
         try:
@@ -54,8 +56,8 @@ class ReflektProject:
             git_root = Path(git_repo.git.rev_parse("--show-toplevel"))
             reflekt_project_list = list(git_root.glob("**/reflekt_project.yml"))
 
-            # This removes the reflekt_project.yml in th template folder of
-            # the Reflekt project repo
+            # This excludes the reflekt_project.yml file in the templates/
+            # folder of this repo. Only an issue for development. Not users.
             reflekt_project_list = [
                 path
                 for path in reflekt_project_list
@@ -71,11 +73,13 @@ class ReflektProject:
                     f"\n{reflekt_project_list}"
                 )
 
-            project_root = reflekt_project_list[0].parents[0]
+            # If no reflekt project found (i.e. before 'reflekt init') then
+            # return None
+            if reflekt_project_list:
+                return reflekt_project_list[0].parents[0]  # project root
+            else:
+                return  # None
 
-            return project_root
-
-            return Path(git_root)
         except InvalidGitRepositoryError:
             raise ReflektProjectError(
                 "\n"
@@ -236,9 +240,9 @@ class ReflektProject:
                 "\nSee docs in Reflekt Github repo for available data types"
             )
 
-    def _get_warehouse_database(self) -> None:
+    def _get_warehouse_database_obj(self) -> None:
         try:
-            self.warehouse_database = self.project["tracking_plans"]["warehouse"][
+            self.warehouse_database_obj = self.project["tracking_plans"]["warehouse"][
                 "database"
             ]
         except KeyError:
@@ -254,22 +258,16 @@ class ReflektProject:
                 "\n"
             )
 
-    def _get_warehouse_schemas(self) -> None:
+    def _get_warehouse_schema_obj(self) -> None:
         try:
-            self.warehouse_schemas = self.project["tracking_plans"]["warehouse"][
+            self.warehouse_schema_obj = self.project["tracking_plans"]["warehouse"][
                 "schema"
             ]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define schema(s) for each tracking plan in "
-                "reflekt_project.yml where Reflekt should search for corresponding raw "
-                "event data is stored. Example:"
-                "\n"
-                "\ntracking_plans:"
-                "\n  warehouse:"
-                "\n    schema:"
-                "\n      plan-name: schema_name  # string or list of schemas"
-                "\n"
+                "Must define warehouse 'schema:' config in reflekt_project.yml. "
+                "See Reflekt documentation for guidance on config setup:\n"
+                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#reflekt-project"  # noqa: E501
             )
 
     def _get_expected_metadata_schema(self) -> None:
@@ -344,3 +342,15 @@ class ReflektProject:
                 )
         else:
             self.incremental_logic = None
+
+    def _get_dbt_docs_prefix(self) -> None:
+        try:
+            self.docs_prefix = self.project["dbt"]["templater"]["docs"]["prefix"]
+        except KeyError:
+            raise ReflektProjectError(
+                "\n\nMust define 'prefix:' for templated dbt docs in reflekt_project.yml. Example:"  # noqa E501
+                "\n"
+                "\ndbt:"
+                "\n  docs:"
+                "\n    prefix: reflekt_"
+            )

@@ -33,7 +33,7 @@ pip install reflekt
 
 
 ## How it works
-Reflekt connects with your Analytics Governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)), your Data Warehouse (e.g. [Snowflake](https://www.snowflake.com/)), and [dbt](https://www.getdbt.com/).
+Reflekt connects with your Analytics Governance tool (e.g. [Segment Protocols](https://segment.com/docs/protocols/), [Avo](https://www.avo.app/)), Customer Data Platform (e.g. [Segment](https://segment.com/)), Data Warehouse (e.g. [Snowflake](https://www.snowflake.com/)), and [dbt](https://www.getdbt.com/).
 
 ![reflekt-architecture](/docs/reflekt-arch-flow.jpg)
 
@@ -180,11 +180,12 @@ https://user-images.githubusercontent.com/28986302/171340104-f4a6f989-4c6b-4ca9-
 
 ## Supported integrations
 
-| Integration Type     | Supported              | Future Research                 |
-|----------------------|------------------------|---------------------------------|
-| Analytics Governance | [Avo](https://www.avo.app/), [Segment Protocols](https://segment.com/docs/protocols/) | [RudderStack Data Governance API](https://www.rudderstack.com/docs/data-governance/rudderstack-data-governance-api/) |
-| Warehouse            | [Snowflake](https://www.snowflake.com/), [Redshift](https://aws.amazon.com/redshift/)    | [BigQuery](https://cloud.google.com/bigquery)                        |
-| Transformation       | [dbt](https://www.getdbt.com/)                    | -                               |
+| Integration Type     | Supported              | Developing | Considering                                   |
+|----------------------|------------------------|------------|-----------------------------------------------|
+| CDP                  | [Segment](https://segment.com/)                |            | [Rudderstack](https://www.rudderstack.com/), [Snowplow](https://snowplowanalytics.com/snowplow-bdp/)                         |
+| Analytics Governance | [Avo](https://www.avo.app/), [Segment Protocols](https://segment.com/docs/protocols/) |            | [RudderStack Data Governance API](https://www.rudderstack.com/docs/data-governance/rudderstack-data-governance-api/), [Snowplow BDP Data Structures](https://docs.snowplowanalytics.com/docs/understanding-tracking-design/managing-data-structures-via-the-api-2/) |
+| Warehouse            | [Snowflake](https://www.snowflake.com/), [Redshift](https://aws.amazon.com/redshift/)    |            | [BigQuery](https://cloud.google.com/bigquery)                                      |
+| Transformation       | [dbt](https://www.getdbt.com/)                    | -          | -                                             |
 
 ## Reporting bugs
 If you want to report a bug or request a feature, please open an [issue](https://github.com/GClunies/reflekt/issues).

@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
+from typing import Optional
 
 import yaml
 from loguru import logger
@@ -17,10 +18,13 @@ from reflekt.reflekt.project import ReflektProject
 # PlanLoader from project tracking-plan-kit licensed under MIT. All
 # changes are licensed under Apache-2.0.
 class ReflektLoader(object):
-    def __init__(self, plan_dir: Path, plan_name: str) -> None:
+    def __init__(
+        self, plan_dir: Path, plan_name: str, schema_name: Optional[str] = None
+    ) -> None:
         # self._validation_errors = []
         if ReflektProject().exists:
             self.plan_name = plan_name
+            self.schema_name = schema_name
             self._load_plan_file(plan_dir / "plan.yml")
             self._load_events(plan_dir / "events")
             self._load_identify_traits(plan_dir / "identify-traits.yml")
@@ -30,7 +34,11 @@ class ReflektLoader(object):
     def _load_plan_file(self, path: Path) -> None:
         with open(path, "r") as plan_file:
             yaml_obj = yaml.safe_load(plan_file)
-            self.plan = ReflektPlan(plan_yaml_obj=yaml_obj, plan_name=self.plan_name)
+            self.plan = ReflektPlan(
+                plan_yaml_obj=yaml_obj,
+                plan_name=self.plan_name,
+                schema_name=self.schema_name,
+            )
 
     def _load_events(self, path: Path) -> None:
         for file in sorted(Path(path).glob("**/*.yml")):

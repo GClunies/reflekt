@@ -9,7 +9,6 @@ from typing import Optional
 
 from loguru import logger
 
-from reflekt.avo.errors import AvoCliError
 from reflekt.logger import logger_config
 from reflekt.reflekt.config import ReflektConfig
 from reflekt.reflekt.project import ReflektProject
@@ -26,22 +25,17 @@ class AvoCli:
         logger.configure(**logger_config)
 
     def get(self, plan_name: str) -> None:
-        warehouse_schemas = self._project.warehouse_schemas
+        # warehouse_schemas = self._project.warehouse_schemas
         avo_json_file = self.avo_dir / f"{plan_name}.json"
 
         if not avo_json_file.exists():
             avo_json_file.touch()
             avo_json_file.write_text("{}")
 
-        if plan_name not in warehouse_schemas:
-            raise AvoCliError(
-                f"Plan {plan_name} not found in `warehouse_schemas:` in "
-                f"{self._project.project_dir}/reflekt_project.yml"
-            )
-        else:
-            self._run_avo_pull(plan_name)
-            with open(avo_json_file) as f:
-                return json.load(f)
+        self._run_avo_pull(plan_name)
+
+        with open(avo_json_file) as f:
+            return json.load(f)
 
     def _run_avo_pull(self, plan_name: str) -> None:
         logger.info(f"Fetching plan {plan_name} from Avo.\n")

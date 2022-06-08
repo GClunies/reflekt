@@ -40,7 +40,6 @@ class AvoPlan(object):
             if not dir.exists():
                 dir.mkdir()
 
-        logger.info(f"Building Reflekt plan at {plan_dir}")
         self._build_reflekt_plan_file(plan_dir)
 
         for event_json in self.plan_json.get("events", []):

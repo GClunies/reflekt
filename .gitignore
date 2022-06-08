@@ -150,3 +150,5 @@ dbt_packages/
 # Allow template files in reflekt python package
 !reflekt/templates/**/*
 !reflekt/templates/project/reflekt_project.yml
+!tests/tests_reflekt_config.yml
+!tests/tests_reflekt_project.yml

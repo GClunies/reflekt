@@ -4,8 +4,8 @@
 
 [tool.poetry]
 name = "reflekt"
-version = "0.1.7"
-description = "Reflekt allows users to automagically model and document events in tracking plans pulled from their Analytics Governance tool."
+version = "0.1.8"
+description = "Reflekt enables anyone using dbt to automagically build a dbt package that models and documents the events in a tracking plan pulled from an Analytics Governance tool, ready for use in a dbt project."
 authors = ["Greg Clunies <greg.clunies@gmail.com>"]
 license = "Apache-2.0"
 include = ["reflekt/templates/**/*"]
