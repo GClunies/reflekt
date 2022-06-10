@@ -530,18 +530,43 @@ def dbt(
     transformer.build_dbt_package()
 
     create_tag = click.confirm(
-        f"Would you like to create a Git tag to easily reference Reflekt dbt package "
-        f"{pkg_name} (version: {str(version)}) in your dbt project?",
+        f"Would you like to create a Git commit and tag to easily reference this "
+        f"Reflekt dbt package {pkg_name} in your dbt project?",
         default=False,
     )
 
     if create_tag:
-        tag = click.prompt(
-            "Tag",
+        commit_msg = click.prompt(
+            "Git commit message will be",
             type=str,
-            default=f"v{str(version)}_{pkg_name}",
+            default=f"build: {pkg_name}",
+        )
+        tag = click.prompt(
+            "Git tag will be",
+            type=str,
+            default=f"v{str(version)}__{pkg_name}",
         )
         git_executable = shutil.which("git")
+        rel_pkg_path = f"dbt_packages/{pkg_name}"
+        rel_avo_json_path = ".reflekt/avo/avo.json"
+        subprocess.call(
+            args=[
+                git_executable,
+                "add",
+                rel_pkg_path,
+                rel_avo_json_path,
+            ],
+            cwd=project_dir,
+        )
+        subprocess.call(
+            args=[
+                git_executable,
+                "commit",
+                "-m",
+                commit_msg,
+            ],
+            cwd=project_dir,
+        )
         subprocess.call(
             args=[
                 git_executable,

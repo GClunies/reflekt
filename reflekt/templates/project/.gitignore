@@ -131,7 +131,11 @@ dmypy.json
 # macOS stuff
 .DS_Store
 
-# reflekt
-avo.json
+# Reflekt
 reflekt_config.yml
-.reflekt
+.reflekt/logs
+.reflekt/tmp
+.reflekt/avo/*
+
+# Allow
+!.reflekt/avo/avo.json
