@@ -14,7 +14,7 @@ class ReflektProject:
     def __init__(self, raise_project_errors: bool = True) -> None:
         self._project_errors = []
         self.project_dir = self._get_project_root(Path.cwd())
-        self.exists = False  # Assume project does not exist by defualt
+        self.exists = False  # Assume project does not exist by default
 
         if self.project_dir is not None:
             self.project_yml = self.project_dir / "reflekt_project.yml"
@@ -49,6 +49,7 @@ class ReflektProject:
         self._get_dbt_model_materialized()
         self._get_dbt_model_incremental_logic()
         self._get_dbt_docs_prefix()
+        self._get_dbt_docs_in_folder()
 
     def _get_project_root(self, path: Path) -> Path:
         try:
@@ -289,8 +290,9 @@ class ReflektProject:
                 "\n\nMust define 'prefix:' for templated dbt sources in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ndbt:"
-                "\n  sources:"
-                "\n    prefix: src_"
+                "\n  templater:"
+                "\n    sources:"
+                "\n      prefix: src_"
             )
 
     def _get_dbt_model_prefix(self) -> None:
@@ -301,8 +303,9 @@ class ReflektProject:
                 "\n\nMust define 'prefix:' for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ndbt:"
-                "\n  sources:"
-                "\n    prefix: src_"
+                "\n  templater:"
+                "\n    sources:"
+                "\n      prefix: src_"
             )
 
     def _get_dbt_model_materialized(self) -> None:
@@ -321,7 +324,9 @@ class ReflektProject:
                 "\n\nMust set 'materialized:' for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
                 "\n\n"
                 "\ndbt:"
-                "\n  materialized: view  # OR incremental"
+                "\n  templater:"
+                "\n    models:"
+                "\n      materialized: view  # view|incremental"
             )
 
     def _get_dbt_model_incremental_logic(self) -> None:
@@ -335,10 +340,12 @@ class ReflektProject:
                     "\n\nWhen 'materialized: incremental' in reflekt_project.yml, must define incremental logic for templated dbt models. Example:"  # noqa E501
                     "\n\n"
                     "\ndbt:"
-                    "\n  incremental_logic: |"
-                    "\n    {%- if is_incremental() %}"
-                    "\n        where event_timestamp >= (select max(event_timestamp)::date from {{ this }})"  # noqa E501
-                    "\n    {%- endif %}"
+                    "\n  templater:"
+                    "\n    models:"
+                    "\n      incremental_logic: |"
+                    "\n      {%- if is_incremental() %}"
+                    "\n          where event_timestamp >= (select max(event_timestamp)::date from {{ this }})"  # noqa E501
+                    "\n      {%- endif %}"
                 )
         else:
             self.incremental_logic = None
@@ -351,6 +358,20 @@ class ReflektProject:
                 "\n\nMust define 'prefix:' for templated dbt docs in reflekt_project.yml. Example:"  # noqa E501
                 "\n"
                 "\ndbt:"
-                "\n  docs:"
-                "\n    prefix: reflekt_"
+                "\n  templater:"
+                "\n    docs:"
+                "\n      prefix: reflekt_"
+            )
+
+    def _get_dbt_docs_in_folder(self) -> None:
+        try:
+            self.docs_in_folder = self.project["dbt"]["templater"]["docs"]["in_folder"]
+        except KeyError:
+            raise ReflektProjectError(
+                "\n\nMust define 'in_folder:' for templated dbt docs in reflekt_project.yml. Example:"  # noqa E501
+                "\n"
+                "\ndbt:"
+                "\n  templater:"
+                "\n    docs:"
+                "\n      in_folder: false  # true|false"
             )

@@ -4,6 +4,7 @@
 
 import copy
 import shutil
+from pathlib import Path
 from typing import Optional, Union
 
 import pkg_resources
@@ -11,6 +12,7 @@ import yaml
 from inflection import titleize, underscore
 from loguru import logger
 from packaging.version import Version
+from sqlalchemy import exists
 
 from reflekt.reflekt.columns import reflekt_columns
 from reflekt.reflekt.config import ReflektConfig
@@ -83,9 +85,10 @@ class ReflektTransformer(object):
             self.db_engine = WarehouseConnection()
             self.src_prefix = self.reflekt_project.src_prefix
             self.model_prefix = self.reflekt_project.model_prefix
-            self.docs_prefix = self.reflekt_project.docs_prefix
             self.materialized = self.reflekt_project.materialized
             self.incremental_logic = self.reflekt_project.incremental_logic
+            self.docs_prefix = self.reflekt_project.docs_prefix
+            self.docs_in_folder = self.reflekt_project.docs_in_folder
 
     def build_cdp_plan(self, plan_type: Optional[str] = None) -> None:
         if plan_type is None:
@@ -499,6 +502,14 @@ class ReflektTransformer(object):
         )
         dbt_src_path = self.tmp_pkg_dir / "models" / f"{src_name}.yml"
 
+        if self.docs_in_folder:
+            docs_folder_str = str(self.tmp_pkg_dir) + "/models/docs"
+            docs_folder_path = Path(docs_folder_str)
+            docs_folder_path.mkdir(exist_ok=True)
+            dbt_src_path = docs_folder_path / f"{src_name}.yml"
+        else:
+            dbt_src_path = self.tmp_pkg_dir / "models" / f"{src_name}.yml"
+
         with open(dbt_src_path, "w") as f:
             yaml.dump(
                 dbt_src,
@@ -753,7 +764,13 @@ class ReflektTransformer(object):
 
         dbt_doc["models"].append(dbt_mdl_doc)
 
-        docs_path = self.tmp_pkg_dir / "models" / f"{doc_name}.yml"
+        if self.docs_in_folder:
+            docs_folder_str = str(self.tmp_pkg_dir) + "/models/docs"
+            docs_folder_path = Path(docs_folder_str)
+            docs_folder_path.mkdir(exist_ok=True)
+            docs_path = docs_folder_path / f"{doc_name}.yml"
+        else:
+            docs_path = self.tmp_pkg_dir / "models" / f"{doc_name}.yml"
 
         with open(docs_path, "w") as f:
             yaml.dump(
