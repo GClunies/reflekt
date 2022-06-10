@@ -87,4 +87,5 @@ dbt:
       #   {%- endif %}
 
     docs:
-      prefix: _reflekt_           # Prefix for docs in templated dbt package
+      prefix: _reflekt_          # Prefix for docs in templated dbt package
+      in_folder: false           # Write docs in models/docs/ folder?
