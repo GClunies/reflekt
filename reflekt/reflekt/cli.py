@@ -26,8 +26,12 @@ from reflekt.reflekt.project import ReflektProject
 from reflekt.reflekt.transformer import ReflektTransformer
 from reflekt.segment.plan import SegmentPlan
 
+# from ..reflekt import __version__
+
 
 @click.group()
+# @click.version_option(__version__)
+# @click.pass_context
 def cli():
     logger.configure(**logger_config)
 
