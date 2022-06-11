@@ -14,24 +14,24 @@ from loguru import logger
 from packaging.version import Version
 from sqlalchemy import exists
 
-from reflekt.reflekt.columns import reflekt_columns
-from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.dbt import (
+from reflekt.columns import reflekt_columns
+from reflekt.config import ReflektConfig
+from reflekt.dbt import (
     dbt_column_schema,
     dbt_doc_schema,
     dbt_model_schema,
     dbt_src_schema,
     dbt_table_schema,
 )
-from reflekt.reflekt.dumper import ReflektYamlDumper
-from reflekt.reflekt.errors import ReflektProjectError
-from reflekt.reflekt.event import ReflektEvent
-from reflekt.reflekt.plan import ReflektPlan
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.property import ReflektProperty
-from reflekt.reflekt.trait import ReflektTrait
-from reflekt.reflekt.utils import segment_2_snake
-from reflekt.reflekt.warehouse import WarehouseConnection
+from reflekt.dumper import ReflektYamlDumper
+from reflekt.errors import ReflektProjectError
+from reflekt.event import ReflektEvent
+from reflekt.plan import ReflektPlan
+from reflekt.project import ReflektProject
+from reflekt.property import ReflektProperty
+from reflekt.trait import ReflektTrait
+from reflekt.utils import segment_2_snake
+from reflekt.warehouse import WarehouseConnection
 from reflekt.segment.columns import (
     seg_event_cols,
     seg_groups_cols,

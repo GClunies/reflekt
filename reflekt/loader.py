@@ -10,8 +10,8 @@ from typing import Optional
 import yaml
 from loguru import logger
 
-from reflekt.reflekt.plan import ReflektPlan
-from reflekt.reflekt.project import ReflektProject
+from reflekt.plan import ReflektPlan
+from reflekt.project import ReflektProject
 
 
 # The class ReflektLoader is a derivative work based on the class

@@ -10,8 +10,8 @@ from typing import Optional
 from loguru import logger
 
 from reflekt.logger import logger_config
-from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.project import ReflektProject
+from reflekt.config import ReflektConfig
+from reflekt.project import ReflektProject
 
 
 class AvoCli:

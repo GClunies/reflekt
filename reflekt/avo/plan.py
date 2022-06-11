@@ -11,7 +11,7 @@ from inflection import dasherize, underscore
 from loguru import logger
 
 from reflekt.avo.parser import parse_avo_event
-from reflekt.reflekt.dumper import ReflektYamlDumper
+from reflekt.dumper import ReflektYamlDumper
 
 
 class AvoPlan(object):

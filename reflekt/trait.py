@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from reflekt.reflekt.property import ReflektProperty
+from reflekt.property import ReflektProperty
 
 
 # Traits behave the same way as properties, but traits capture attributes of a

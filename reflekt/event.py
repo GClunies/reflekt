@@ -9,11 +9,11 @@ from collections import Counter
 
 from cerberus import Validator
 
-from reflekt.reflekt.casing import CAMEL_CASE_RE, SNAKE_CASE_RE, TITLE_CASE_RE
-from reflekt.reflekt.errors import ReflektValidationError
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.property import ReflektProperty
-from reflekt.reflekt.schema import reflekt_event_schema, reflekt_expected_metadata_schema
+from reflekt.casing import CAMEL_CASE_RE, SNAKE_CASE_RE, TITLE_CASE_RE
+from reflekt.errors import ReflektValidationError
+from reflekt.project import ReflektProject
+from reflekt.property import ReflektProperty
+from reflekt.schema import reflekt_event_schema, reflekt_expected_metadata_schema
 
 
 # The class ReflektEvent is a derivative work based on the class

@@ -7,7 +7,7 @@ from pathlib import Path
 import yaml
 from git import InvalidGitRepositoryError, Repo
 
-from reflekt.reflekt.errors import ReflektProjectError
+from reflekt.errors import ReflektProjectError
 
 
 class ReflektProject:

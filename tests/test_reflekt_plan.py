@@ -5,8 +5,8 @@
 import pytest
 import yaml
 
-from reflekt.reflekt.errors import ReflektValidationError
-from reflekt.reflekt.plan import ReflektPlan
+from reflekt.errors import ReflektValidationError
+from reflekt.plan import ReflektPlan
 from tests.fixtures import (
     REFLEKT_EVENT,
     REFLEKT_GROUP,

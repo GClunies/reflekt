@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from reflekt.reflekt.cli import cli  # noqa: F401
+from reflekt.cli import cli  # noqa: F401
 
 # from importlib import metadata
 

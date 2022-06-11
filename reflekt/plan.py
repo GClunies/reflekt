@@ -8,13 +8,13 @@ from typing import Counter, List, Optional
 
 from cerberus import Validator
 
-from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.errors import ReflektValidationError
-from reflekt.reflekt.event import ReflektEvent
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.property import ReflektProperty
-from reflekt.reflekt.schema import reflekt_plan_schema
-from reflekt.reflekt.trait import ReflektTrait
+from reflekt.config import ReflektConfig
+from reflekt.errors import ReflektValidationError
+from reflekt.event import ReflektEvent
+from reflekt.project import ReflektProject
+from reflekt.property import ReflektProperty
+from reflekt.schema import reflekt_plan_schema
+from reflekt.trait import ReflektTrait
 
 
 # The class ReflektPlan is a derivative work based on the class

@@ -8,8 +8,8 @@ import sqlalchemy
 from snowflake.sqlalchemy import URL as snow_url
 from sqlalchemy.engine.url import URL as redshift_url
 
-from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.errors import ReflektConfigError
+from reflekt.config import ReflektConfig
+from reflekt.errors import ReflektConfigError
 
 
 class WarehouseConnection:
