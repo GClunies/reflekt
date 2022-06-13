@@ -72,7 +72,7 @@ tracking_plans:
 dbt:
   templater:
     sources:
-      prefix: src_reflekt_       # Prefix for templated dbt package sources
+      prefix: _src_reflekt_       # Prefix for templated dbt package sources
 
     models:
       prefix: reflekt_           # Prefix for models & docs in templated dbt package
@@ -86,4 +86,5 @@ dbt:
       #   {%- endif %}
 
     docs:
-      prefix: _reflekt_           # Prefix for docs in templated dbt package
+      prefix: _reflekt_          # Prefix for docs in templated dbt package
+      in_folder: false           # Write docs in models/docs/ folder?
