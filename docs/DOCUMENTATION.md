@@ -8,7 +8,7 @@
   - [Project configuration](#project-configuration)
     - [Project structure](#project-structure)
     - [Reflekt project](#reflekt-project)
-    - [Reflekt profile](#reflekt-profile)
+    - [Reflekt config](#reflekt-config)
   - [Tracking plans as `code`](#tracking-plans-as-code)
     - [Events](#events)
       - [Metadata](#metadata)
@@ -227,7 +227,7 @@ dbt:
 
 ```
 
-### Reflekt profile
+### Reflekt config
 Similar to dbt's `profiles.yml`, the `reflekt_config.yml` holds profiles used by your Reflekt project to connect and integrate with your Analytics Governance Tool, CDP, and data warehouse. Profiles are configured when you run `reflekt init` to first create your Reflekt project. Two example profiles are provided below.
 
 ```yaml
@@ -275,7 +275,7 @@ Tracking plans are managed in a `tracking-plans/` directory of the Reflekt proje
 ![my-plan-example](/docs/my-plan.png)
 
 ### Events
-Each event in your tracking plan has its own YAML file, making it easy to manage and update.
+Each event in your tracking plan is defined by a YAML file, making it easy to manage and update.
 
 #### Metadata
 Event metadata is defined under the `metadata:` config (see example `Product Added` event below). It can be used to tag events with metadata not included when an event fires on your application or servers. Metadata can be whatever you want! Some example use cases are:

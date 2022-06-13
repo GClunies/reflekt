@@ -380,7 +380,7 @@ def push(plan_name, dry) -> None:
     """Sync tracking plan to CDP or Analytics Governance tool."""
     api = ReflektApiHandler().get_api()
     if api.type.lower() in ["avo", "iteratively"]:
-        logger.error(f"`reflekt push` not supported for {titleize(api.type)}.")
+        logger.error(f"'reflekt push' not supported for {titleize(api.type)}.")
         raise click.Abort()
 
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name

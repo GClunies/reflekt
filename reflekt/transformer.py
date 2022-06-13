@@ -12,7 +12,6 @@ import yaml
 from inflection import titleize, underscore
 from loguru import logger
 from packaging.version import Version
-from sqlalchemy import exists
 
 from reflekt.columns import reflekt_columns
 from reflekt.config import ReflektConfig
@@ -29,9 +28,6 @@ from reflekt.event import ReflektEvent
 from reflekt.plan import ReflektPlan
 from reflekt.project import ReflektProject
 from reflekt.property import ReflektProperty
-from reflekt.trait import ReflektTrait
-from reflekt.utils import segment_2_snake
-from reflekt.warehouse import WarehouseConnection
 from reflekt.segment.columns import (
     seg_event_cols,
     seg_groups_cols,
@@ -48,6 +44,9 @@ from reflekt.segment.schema import (
     segment_plan_schema,
     segment_property_schema,
 )
+from reflekt.trait import ReflektTrait
+from reflekt.utils import segment_2_snake
+from reflekt.warehouse import WarehouseConnection
 
 
 class ReflektTransformer(object):
@@ -533,8 +532,8 @@ class ReflektTransformer(object):
             print("")  # Terminal newline
             logger.warning(
                 f"[WARNING] The following database error(s) were encountered "
-                f"while templating the dbt package. NOTE - these errors do not prevent "
-                f"templating.\n\n{db_errors_str}"
+                f"while templating the dbt package.\n"
+                f"  NOTE - these errors do not prevent templating.\n\n{db_errors_str}"
             )
 
         logger.info(
@@ -688,9 +687,10 @@ class ReflektTransformer(object):
             )
         else:
             raise ReflektProjectError(
-                f"Invalid materialized config in reflekt_project.yml...\n"
-                f"    materialized: {materialized}\n"
-                f"... is not accepted. Must be either 'view' or 'incremental'."
+                "Invalid materialized config in reflekt_project.yml. Must be "
+                "either 'view' or 'incremental'. See Reflekt docs on project "
+                "configuration:"
+                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
         return model_config

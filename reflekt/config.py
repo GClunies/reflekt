@@ -46,14 +46,15 @@ class ReflektConfig:
             return config_yml[self.config_profile]
         except FileNotFoundError:
             raise ReflektConfigError(
-                f"\nNo config file found at: {self.path}\nPlease create one."
+                f"\nNo reflekt_config.yml file found at: {self.path}\nPlease create one."
             )
 
     def _get_warehouse_type(self) -> str:
         if len(self.warehouse.keys()) > 1:
             raise ReflektConfigError(
                 f"Multiple warehouses defined for "
-                f"`config_profile: {self.config_profile}' in {self.path}"
+                f"`config_profile: {self.config_profile}' in reflekt_config.yml at "
+                f"{self.path}"
                 f"\nOnly one warehouse can be defined."
             )
 
@@ -61,8 +62,8 @@ class ReflektConfig:
 
         if warehouse_type not in WAREHOUSES:
             raise ReflektConfigError(
-                f"Unknown warehouse {warehouse_type} specified. Check config "
-                f"at {self.path}"
+                f"Unknown warehouse {warehouse_type} specified in reflekt_config.yml"
+                f" at {self.path}."
             )
 
         return warehouse_type
