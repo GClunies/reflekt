@@ -159,7 +159,7 @@ tracking_plans:
     schema:
       # For each tracking plan, specify the schema where raw event data is loaded.
       # When templating dbt packages, Reflekt uses the schema in the dbt package
-      # and file names (e.g. reflekt_schema_name__event_name.sql). You can
+      # and file names (e.g. reflekt_schema_name__event_name.sql). You can also
       # override the schema by specifying a schema_alias
       # (e.g. reflekt_schema_alias__event_name.sql).
       my-plan:
@@ -223,6 +223,7 @@ dbt:
 
     docs:
       prefix: _reflekt_           # Prefix for docs in templated dbt package
+      in_folder: false            # Write docs in models/docs/ folder?subfolder?
 
 ```
 
