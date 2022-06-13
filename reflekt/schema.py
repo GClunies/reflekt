@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from reflekt.reflekt.project import ReflektProject
+from reflekt.project import ReflektProject
 
 # fmt: off
 reflekt_plan_schema = {

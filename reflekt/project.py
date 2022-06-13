@@ -7,14 +7,14 @@ from pathlib import Path
 import yaml
 from git import InvalidGitRepositoryError, Repo
 
-from reflekt.reflekt.errors import ReflektProjectError
+from reflekt.errors import ReflektProjectError
 
 
 class ReflektProject:
     def __init__(self, raise_project_errors: bool = True) -> None:
         self._project_errors = []
         self.project_dir = self._get_project_root(Path.cwd())
-        self.exists = False  # Assume project does not exist by defualt
+        self.exists = False  # Assume project does not exist by default
 
         if self.project_dir is not None:
             self.project_yml = self.project_dir / "reflekt_project.yml"
@@ -49,6 +49,7 @@ class ReflektProject:
         self._get_dbt_model_materialized()
         self._get_dbt_model_incremental_logic()
         self._get_dbt_docs_prefix()
+        self._get_dbt_docs_in_folder()
 
     def _get_project_root(self, path: Path) -> Path:
         try:
@@ -92,10 +93,9 @@ class ReflektProject:
             self.name = self.project["name"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a project name in reflekt_project.yml. Example:"
-                "\n"
-                "\nname: my_project  # letters, digits, underscores"
-                "\n"
+                "\nMust define a project name in reflekt_project.yml. See Reflekt "
+                "docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_config_profile(self) -> None:
@@ -103,10 +103,9 @@ class ReflektProject:
             self.config_profile = self.project["config_profile"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a config profile in reflekt_project.yml. Example:"
-                "\n"
-                "\nconfig_profile: my_config_profile  # letters, digits, underscores"
-                "\n"
+                "\nMust define a config profile in reflekt_project.yml. See Reflekt "
+                "docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_config_path(self) -> None:
@@ -133,13 +132,9 @@ class ReflektProject:
             self.events_case = self.project["tracking_plans"]["events"]["naming"]["case"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a 'case:' rule for event naming convention in reflekt_project.yml. Example:"  # noqa E501
-                "\n"
-                "\ntracking_plans:"
-                "\n  events:"
-                "\n    naming:"
-                "\n      case: title  # One of title|snake|camel"
-                "\n"
+                "\n\nMust define a 'case:' rule for event naming conventions in reflekt_project.yml. See Reflekt "  # noqa: E501
+                "docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_events_allow_numbers(self) -> None:
@@ -149,13 +144,9 @@ class ReflektProject:
             ]["allow_numbers"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define an 'allow_numbers:' rule for events naming in reflekt_project.yml. Example:"  # noqa E501
-                "\n"
-                "\ntracking_plans:"
-                "\n  events:"
-                "\n    naming:"
-                "\n      allow_numbers: true  # true|false"
-                "\n"
+                "\n\nMust define an 'allow_numbers:' rule for events naming in reflekt_project.yml. See Reflekt "  # noqa: E501
+                "docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_events_reserved(self) -> None:
@@ -165,13 +156,9 @@ class ReflektProject:
             ]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a 'reserved:' rule for events naming in reflekt_project.yml. Example:"  # noqa E501
-                "\n"
-                "\ntracking_plans:"
-                "\n  events:"
-                "\n    naming:"
-                "\n      reserved: ['My Reserved Event']  # List (can be empty)"  # noqa E501
-                "\n"
+                "\n\nMust define a 'reserved:' rule for events naming in reflekt_project.yml. See Reflekt "  # noqa: E501
+                "docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_properties_case(self) -> None:
@@ -181,13 +168,9 @@ class ReflektProject:
             ]["case"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define a 'case:' rule for properties naming convention in reflekt_project.yml. Example:"  # noqa E501
-                "\n"
-                "\ntracking_plans:"
-                "\n  properties:"
-                "\n    naming:"
-                "\n      case: title  # One of title|snake|camel"
-                "\n"
+                "\n\nMust define a 'case:' rule for properties naming convention in reflekt_project.yml. See Reflekt "  # noqa: E501
+                "docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_properties_allow_numbers(self) -> None:
@@ -197,13 +180,9 @@ class ReflektProject:
             ]["allow_numbers"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define an 'allow_numbers:' rule for properties naming in reflekt_project.yml. Example:"  # noqa E501
-                "\n"
-                "\ntracking_plans:"
-                "\n  properties:"
-                "\n    naming:"
-                "\n      allow_numbers: true  # true|false"
-                "\n"
+                "\n\nMust define an 'allow_numbers:' rule for properties naming in reflekt_project.yml. See Reflekt "  # noqa: E501
+                "docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_properties_reserved(self) -> None:
@@ -227,17 +206,9 @@ class ReflektProject:
             self.data_types = self.project["tracking_plans"]["properties"]["data_types"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define allowed data types for event properties in reflekt_project.yml. Example:"  # noqa E501
-                "\n"
-                "\ntracking_plans:"
-                "\n  properties:"
-                "\n    data_types:"
-                "\n      - list"
-                "\n      - data"
-                "\n      - types"
-                "\n      - here"
-                "\n"
-                "\nSee docs in Reflekt Github repo for available data types"
+                "\n\nMust define allowed data types for event properties in reflekt_project.yml. See Reflekt "  # noqa: E501
+                "docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_warehouse_database_obj(self) -> None:
@@ -248,14 +219,8 @@ class ReflektProject:
         except KeyError:
             raise ReflektProjectError(
                 "\n\nMust define a database for each tracking plan in "
-                "reflekt_project.yml where Reflekt should search for corresponding raw "
-                "event tables. Example:"
-                "\n"
-                "\ntracking_plans:"
-                "\n  warehouse:"
-                "\n    schema:"
-                "\n      plan-name: database_name"
-                "\n"
+                "reflekt_project.yml. See Reflekt docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_warehouse_schema_obj(self) -> None:
@@ -265,9 +230,9 @@ class ReflektProject:
             ]
         except KeyError:
             raise ReflektProjectError(
-                "Must define warehouse 'schema:' config in reflekt_project.yml. "
-                "See Reflekt documentation for guidance on config setup:\n"
-                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#reflekt-project"  # noqa: E501
+                "\n\nMust define warehouse 'schema:' config in reflekt_project.yml. "
+                " See Reflekt docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_expected_metadata_schema(self) -> None:
@@ -286,11 +251,9 @@ class ReflektProject:
             self.src_prefix = self.project["dbt"]["templater"]["sources"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define 'prefix:' for templated dbt sources in reflekt_project.yml. Example:"  # noqa E501
-                "\n"
-                "\ndbt:"
-                "\n  sources:"
-                "\n    prefix: src_"
+                "\n\nMust define 'prefix:' for templated dbt sources in reflekt_project.yml. "  # noqa: E501
+                "See Reflekt docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_dbt_model_prefix(self) -> None:
@@ -298,11 +261,9 @@ class ReflektProject:
             self.model_prefix = self.project["dbt"]["templater"]["models"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define 'prefix:' for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
-                "\n"
-                "\ndbt:"
-                "\n  sources:"
-                "\n    prefix: src_"
+                "\n\nMust define 'prefix:' for templated dbt models in reflekt_project.yml. "  # noqa: E501
+                "See Reflekt docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_dbt_model_materialized(self) -> None:
@@ -312,16 +273,16 @@ class ReflektProject:
             ].lower()
             if self.materialized not in ["view", "incremental"]:
                 raise ReflektProjectError(
-                    f"Invalid materialized config in reflekt_project.yml...\n"
-                    f"    materialized: {self.materialized}\n"
-                    f"... is not accepted. Must be either 'view' or 'incremental'."
+                    "\n\nInvalid materialized config in reflekt_project.yml. "
+                    "Must be either 'view' or 'incremental'. See Reflekt docs on "
+                    "project configuration:"
+                    "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
                 )
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust set 'materialized:' for templated dbt models in reflekt_project.yml. Example:"  # noqa E501
-                "\n\n"
-                "\ndbt:"
-                "\n  materialized: view  # OR incremental"
+                "\n\nMust set 'materialized:' for templated dbt models in "
+                "reflekt_project.yml. See Reflekt docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
     def _get_dbt_model_incremental_logic(self) -> None:
@@ -335,10 +296,14 @@ class ReflektProject:
                     "\n\nWhen 'materialized: incremental' in reflekt_project.yml, must define incremental logic for templated dbt models. Example:"  # noqa E501
                     "\n\n"
                     "\ndbt:"
-                    "\n  incremental_logic: |"
-                    "\n    {%- if is_incremental() %}"
-                    "\n        where event_timestamp >= (select max(event_timestamp)::date from {{ this }})"  # noqa E501
-                    "\n    {%- endif %}"
+                    "\n  templater:"
+                    "\n    models:"
+                    "\n      incremental_logic: |"
+                    "\n      {%- if is_incremental() %}"
+                    "\n          where event_timestamp >= (select max(event_timestamp)::date from {{ this }})"  # noqa E501
+                    "\n      {%- endif %}"
+                    "\n\n See Reflekt docs on project configuration:"
+                    "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
                 )
         else:
             self.incremental_logic = None
@@ -348,9 +313,17 @@ class ReflektProject:
             self.docs_prefix = self.project["dbt"]["templater"]["docs"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define 'prefix:' for templated dbt docs in reflekt_project.yml. Example:"  # noqa E501
-                "\n"
-                "\ndbt:"
-                "\n  docs:"
-                "\n    prefix: reflekt_"
+                "\n\nMust define 'prefix:' for templated dbt docs in "
+                "reflekt_project.yml. See Reflekt docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+            )
+
+    def _get_dbt_docs_in_folder(self) -> None:
+        try:
+            self.docs_in_folder = self.project["dbt"]["templater"]["docs"]["in_folder"]
+        except KeyError:
+            raise ReflektProjectError(
+                "\n\nMust define 'in_folder:' for templated dbt docs in "
+                "reflekt_project.yml. See Reflekt docs on project configuration:"
+                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )

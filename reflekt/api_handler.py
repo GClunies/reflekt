@@ -5,7 +5,7 @@
 from typing import Optional
 
 from reflekt.avo.cli import AvoCli
-from reflekt.reflekt.config import ReflektConfig
+from reflekt.config import ReflektConfig
 from reflekt.segment.api import SegmentApi
 
 

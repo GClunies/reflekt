@@ -9,11 +9,11 @@ from collections import Counter
 
 from cerberus import Validator
 
-from reflekt.reflekt.casing import CAMEL_CASE_RE, SNAKE_CASE_RE, TITLE_CASE_RE
-from reflekt.reflekt.errors import ReflektValidationError
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.property import ReflektProperty
-from reflekt.reflekt.schema import reflekt_event_schema, reflekt_expected_metadata_schema
+from reflekt.casing import CAMEL_CASE_RE, SNAKE_CASE_RE, TITLE_CASE_RE
+from reflekt.errors import ReflektValidationError
+from reflekt.project import ReflektProject
+from reflekt.property import ReflektProperty
+from reflekt.schema import reflekt_event_schema, reflekt_expected_metadata_schema
 
 
 # The class ReflektEvent is a derivative work based on the class
@@ -45,11 +45,13 @@ class ReflektEvent(object):
                 self.metadata, reflekt_expected_metadata_schema
             )
             if not is_valid:
-                message = (
-                    f"for `metadata:` defined in event "
-                    f"'{self.name}' - {validator.errors}"
+                raise ReflektValidationError(
+                    f"Invalid metadata specified for event '{self.name} - "
+                    f"{validator.errors}\n\n"
+                    f"See Reflekt docs on defining metadata and metadata tests:"
+                    f"\n    Event metadata: https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#metadata"  # noqa: E501
+                    f"\n    Defining metadata tests: https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
                 )
-                raise ReflektValidationError(message)
 
     def _check_event_name_case(self) -> None:
         case_rule = self._project.events_case
@@ -70,10 +72,9 @@ class ReflektEvent(object):
             if not match:
                 raise ReflektValidationError(
                     f"Event name '{self.name}' does not match naming convention"
-                    f" defined by '{rule_type} {rule_str}' in reflekt_project.yml "
-                    f"\n\nEither: "
-                    f"\n    - Rename property to match config. OR;"
-                    f"\n    - Change '{rule_type} {rule_str}' in reflekt_project.yml."
+                    f" defined by '{rule_type} {rule_str}' in reflekt_project.yml. "
+                    f"See Reflekt docs on defining naming conventions:\n"
+                    f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configuration"  # noqa: E501
                 )
 
     def _check_event_name_numbers(self) -> None:
@@ -85,9 +86,8 @@ class ReflektEvent(object):
                 raise ReflektValidationError(
                     f"\nEvent name '{self.name}' does not match naming convention"
                     f" defined by 'allow_numbers: {str(allow_numbers).lower()}' in reflekt_project.yml "  # noqa: E501
-                    f"\n\nEither: "
-                    f"\n    - Rename property to match config. OR;"
-                    f"\n    - Change 'allow_numbers:' rule for events in reflekt_project.yml."  # noqa: E501
+                    f"See Reflekt docs on defining naming conventions:\n"
+                    f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configuration"  # noqa: E501
                 )
 
     def _check_duplicate_properties(self) -> None:
@@ -114,7 +114,9 @@ class ReflektEvent(object):
         for prop_name in prop_names:
             if prop_name in ReflektProject().properties_reserved:
                 raise ReflektValidationError(
-                    f"Property name '{prop_name}' is reserved and cannot be used"
+                    f"Property name '{prop_name}' is reserved and cannot be used."
+                    f"See Reflekt docs on defining reserved property names:\n"
+                    f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configuration"  # noqa: E501
                 )
 
     def validate_event(self) -> None:
@@ -123,8 +125,11 @@ class ReflektEvent(object):
         is_valid = validator.validate(self._event_yaml_obj, reflekt_event_schema)
 
         if not is_valid:
-            message = f"for event '{self.name}' - {validator.errors}"
-            raise ReflektValidationError(message)
+            raise ReflektValidationError(
+                f"Event validation error for event '{self.name}' - {validator.errors}"  # noqa: E501
+                f"\n\nSee Reflekt docs on event definition:\n"
+                f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#events"  # noqa: E501
+            )
 
         self._check_event_name_case()
         self._check_event_name_numbers()

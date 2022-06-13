@@ -8,8 +8,8 @@ import sqlalchemy
 from snowflake.sqlalchemy import URL as snow_url
 from sqlalchemy.engine.url import URL as redshift_url
 
-from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.errors import ReflektConfigError
+from reflekt.config import ReflektConfig
+from reflekt.errors import ReflektConfigError
 
 
 class WarehouseConnection:
@@ -47,7 +47,9 @@ class WarehouseConnection:
 
         else:
             raise ReflektConfigError(
-                f"Invalid warehouse type specified in {self._config.path}"
+                f"Invalid warehouse type specified in {self._config.path}. See "
+                f"Reflekt docs on reflekt_config.yml configuration:"
+                f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-config"  # noqa: E501
             )
 
     def get_columns(

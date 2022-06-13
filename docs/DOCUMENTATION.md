@@ -8,7 +8,7 @@
   - [Project configuration](#project-configuration)
     - [Project structure](#project-structure)
     - [Reflekt project](#reflekt-project)
-    - [Reflekt profile](#reflekt-profile)
+    - [Reflekt config](#reflekt-config)
   - [Tracking plans as `code`](#tracking-plans-as-code)
     - [Events](#events)
       - [Metadata](#metadata)
@@ -159,7 +159,7 @@ tracking_plans:
     schema:
       # For each tracking plan, specify the schema where raw event data is loaded.
       # When templating dbt packages, Reflekt uses the schema in the dbt package
-      # and file names (e.g. reflekt_schema_name__event_name.sql). You can
+      # and file names (e.g. reflekt_schema_name__event_name.sql). You can also
       # override the schema by specifying a schema_alias
       # (e.g. reflekt_schema_alias__event_name.sql).
       my-plan:
@@ -223,10 +223,11 @@ dbt:
 
     docs:
       prefix: _reflekt_           # Prefix for docs in templated dbt package
+      in_folder: false            # Write docs in models/docs/ folder?subfolder?
 
 ```
 
-### Reflekt profile
+### Reflekt config
 Similar to dbt's `profiles.yml`, the `reflekt_config.yml` holds profiles used by your Reflekt project to connect and integrate with your Analytics Governance Tool, CDP, and data warehouse. Profiles are configured when you run `reflekt init` to first create your Reflekt project. Two example profiles are provided below.
 
 ```yaml
@@ -274,7 +275,7 @@ Tracking plans are managed in a `tracking-plans/` directory of the Reflekt proje
 ![my-plan-example](/docs/my-plan.png)
 
 ### Events
-Each event in your tracking plan has its own YAML file, making it easy to manage and update.
+Each event in your tracking plan is defined by a YAML file, making it easy to manage and update.
 
 #### Metadata
 Event metadata is defined under the `metadata:` config (see example `Product Added` event below). It can be used to tag events with metadata not included when an event fires on your application or servers. Metadata can be whatever you want! Some example use cases are:

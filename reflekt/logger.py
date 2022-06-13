@@ -4,7 +4,7 @@
 
 import sys
 
-from reflekt.reflekt.project import ReflektProject
+from reflekt.project import ReflektProject
 
 if ReflektProject().exists:
     sink = (

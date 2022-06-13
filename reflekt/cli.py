@@ -16,15 +16,15 @@ from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
 
+from reflekt import constants
+from reflekt.api_handler import ReflektApiHandler
 from reflekt.avo.plan import AvoPlan
+from reflekt.config import ReflektConfig
+from reflekt.loader import ReflektLoader
 from reflekt.logger import logger_config
-from reflekt.reflekt import constants
-from reflekt.reflekt.api_handler import ReflektApiHandler
-from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.loader import ReflektLoader
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.transformer import ReflektTransformer
+from reflekt.project import ReflektProject
 from reflekt.segment.plan import SegmentPlan
+from reflekt.transformer import ReflektTransformer
 
 
 @click.group()
@@ -380,7 +380,7 @@ def push(plan_name, dry) -> None:
     """Sync tracking plan to CDP or Analytics Governance tool."""
     api = ReflektApiHandler().get_api()
     if api.type.lower() in ["avo", "iteratively"]:
-        logger.error(f"`reflekt push` not supported for {titleize(api.type)}.")
+        logger.error(f"'reflekt push' not supported for {titleize(api.type)}.")
         raise click.Abort()
 
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
@@ -589,21 +589,21 @@ cli.add_command(dbt)
 # Used for CLI debugging
 if __name__ == "__main__":
     # Call CLI command here with arguments as a list
-    init(["--project-dir", "~/Repos/test-repo"])
+    # init(["--project-dir", "~/Repos/test-repo"])
     # new(["--project-dir", "test-plan"])
     # pull(["--name", "my-plan"])
     # push(["--name", "my-plan"])
     # test(["--name", "my-plan"])
-    # dbt(
-    #     [
-    #         "--name",
-    #         "my-plan",
-    #         "--schema",
-    #         "patty_bar_web",
-    #         "--force-version",
-    #         "0.1.0",
-    #     ]
-    # )
+    dbt(
+        [
+            "--name",
+            "my-plan",
+            "--schema",
+            "patty_bar_web",
+            "--force-version",
+            "0.1.0",
+        ]
+    )
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])

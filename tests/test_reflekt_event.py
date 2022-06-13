@@ -5,9 +5,9 @@
 import pytest
 import yaml
 
-from reflekt.reflekt.errors import ReflektValidationError
-from reflekt.reflekt.event import ReflektEvent
-from reflekt.reflekt.property import ReflektProperty
+from reflekt.errors import ReflektValidationError
+from reflekt.event import ReflektEvent
+from reflekt.property import ReflektProperty
 from tests.fixtures import (
     REFLEKT_EVENT,
     REFLEKT_EVENT_BAD,

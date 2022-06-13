@@ -4,6 +4,7 @@
 
 import copy
 import shutil
+from pathlib import Path
 from typing import Optional, Union
 
 import pkg_resources
@@ -12,24 +13,21 @@ from inflection import titleize, underscore
 from loguru import logger
 from packaging.version import Version
 
-from reflekt.reflekt.columns import reflekt_columns
-from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.dbt import (
+from reflekt.columns import reflekt_columns
+from reflekt.config import ReflektConfig
+from reflekt.dbt import (
     dbt_column_schema,
     dbt_doc_schema,
     dbt_model_schema,
     dbt_src_schema,
     dbt_table_schema,
 )
-from reflekt.reflekt.dumper import ReflektYamlDumper
-from reflekt.reflekt.errors import ReflektProjectError
-from reflekt.reflekt.event import ReflektEvent
-from reflekt.reflekt.plan import ReflektPlan
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.property import ReflektProperty
-from reflekt.reflekt.trait import ReflektTrait
-from reflekt.reflekt.utils import segment_2_snake
-from reflekt.reflekt.warehouse import WarehouseConnection
+from reflekt.dumper import ReflektYamlDumper
+from reflekt.errors import ReflektProjectError
+from reflekt.event import ReflektEvent
+from reflekt.plan import ReflektPlan
+from reflekt.project import ReflektProject
+from reflekt.property import ReflektProperty
 from reflekt.segment.columns import (
     seg_event_cols,
     seg_groups_cols,
@@ -46,6 +44,9 @@ from reflekt.segment.schema import (
     segment_plan_schema,
     segment_property_schema,
 )
+from reflekt.trait import ReflektTrait
+from reflekt.utils import segment_2_snake
+from reflekt.warehouse import WarehouseConnection
 
 
 class ReflektTransformer(object):
@@ -83,9 +84,10 @@ class ReflektTransformer(object):
             self.db_engine = WarehouseConnection()
             self.src_prefix = self.reflekt_project.src_prefix
             self.model_prefix = self.reflekt_project.model_prefix
-            self.docs_prefix = self.reflekt_project.docs_prefix
             self.materialized = self.reflekt_project.materialized
             self.incremental_logic = self.reflekt_project.incremental_logic
+            self.docs_prefix = self.reflekt_project.docs_prefix
+            self.docs_in_folder = self.reflekt_project.docs_in_folder
 
     def build_cdp_plan(self, plan_type: Optional[str] = None) -> None:
         if plan_type is None:
@@ -499,6 +501,14 @@ class ReflektTransformer(object):
         )
         dbt_src_path = self.tmp_pkg_dir / "models" / f"{src_name}.yml"
 
+        if self.docs_in_folder:
+            docs_folder_str = str(self.tmp_pkg_dir) + "/models/docs"
+            docs_folder_path = Path(docs_folder_str)
+            docs_folder_path.mkdir(exist_ok=True)
+            dbt_src_path = docs_folder_path / f"{src_name}.yml"
+        else:
+            dbt_src_path = self.tmp_pkg_dir / "models" / f"{src_name}.yml"
+
         with open(dbt_src_path, "w") as f:
             yaml.dump(
                 dbt_src,
@@ -522,8 +532,8 @@ class ReflektTransformer(object):
             print("")  # Terminal newline
             logger.warning(
                 f"[WARNING] The following database error(s) were encountered "
-                f"while templating the dbt package. NOTE - these errors do not prevent "
-                f"templating.\n\n{db_errors_str}"
+                f"while templating the dbt package.\n"
+                f"  NOTE - these errors do not prevent templating.\n\n{db_errors_str}"
             )
 
         logger.info(
@@ -677,9 +687,10 @@ class ReflektTransformer(object):
             )
         else:
             raise ReflektProjectError(
-                f"Invalid materialized config in reflekt_project.yml...\n"
-                f"    materialized: {materialized}\n"
-                f"... is not accepted. Must be either 'view' or 'incremental'."
+                "Invalid materialized config in reflekt_project.yml. Must be "
+                "either 'view' or 'incremental'. See Reflekt docs on project "
+                "configuration:"
+                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
             )
 
         return model_config
@@ -753,7 +764,13 @@ class ReflektTransformer(object):
 
         dbt_doc["models"].append(dbt_mdl_doc)
 
-        docs_path = self.tmp_pkg_dir / "models" / f"{doc_name}.yml"
+        if self.docs_in_folder:
+            docs_folder_str = str(self.tmp_pkg_dir) + "/models/docs"
+            docs_folder_path = Path(docs_folder_str)
+            docs_folder_path.mkdir(exist_ok=True)
+            docs_path = docs_folder_path / f"{doc_name}.yml"
+        else:
+            docs_path = self.tmp_pkg_dir / "models" / f"{doc_name}.yml"
 
         with open(docs_path, "w") as f:
             yaml.dump(

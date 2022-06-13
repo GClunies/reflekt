@@ -8,13 +8,13 @@ from typing import Counter, List, Optional
 
 from cerberus import Validator
 
-from reflekt.reflekt.config import ReflektConfig
-from reflekt.reflekt.errors import ReflektValidationError
-from reflekt.reflekt.event import ReflektEvent
-from reflekt.reflekt.project import ReflektProject
-from reflekt.reflekt.property import ReflektProperty
-from reflekt.reflekt.schema import reflekt_plan_schema
-from reflekt.reflekt.trait import ReflektTrait
+from reflekt.config import ReflektConfig
+from reflekt.errors import ReflektValidationError
+from reflekt.event import ReflektEvent
+from reflekt.project import ReflektProject
+from reflekt.property import ReflektProperty
+from reflekt.schema import reflekt_plan_schema
+from reflekt.trait import ReflektTrait
 
 
 # The class ReflektPlan is a derivative work based on the class
@@ -55,10 +55,12 @@ class ReflektPlan(object):
         except KeyError:
             raise KeyError(
                 f"Tracking plan '{plan_name}' not found under...\n\n"
+                f"  tracking_plans:\n"
                 f"    warehouse:\n"
                 f"      database:\n\n"
-                f"... in reflekt_project.yml. See docs in Reflekt GitHub repo "
-                f"(https://github.com/GClunies/reflekt) on how to specify."
+                f"... in reflekt_project.yml. See Reflekt docs on "
+                f"reflekt_project.yml configuration: "
+                f"\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configuration"  # noqa: E501
             )
 
     def _get_schema_and_schema_alias(self, plan_name: str) -> list:
@@ -76,7 +78,7 @@ class ReflektPlan(object):
             raise KeyError(
                 f"Error in 'schema:' config for tracking plan '{plan_name}'."
                 f"See Reflekt docs for guidance on 'schema:' config.\n"
-                f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#reflekt-project"  # noqa: E501
+                f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configuration"  # noqa: E501
             )
 
     def add_event(self, event_yaml_obj: dict) -> None:
@@ -110,7 +112,9 @@ class ReflektPlan(object):
         for event_name in event_names:
             if event_name in ReflektProject().events_reserved:
                 raise ReflektValidationError(
-                    f"Event name '{event_name}' is reserved and cannot be " f"used."
+                    f"Event name '{event_name}' is reserved and cannot be used. "
+                    "See Reflekt docs on project configuration:"
+                    "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
                 )
 
     def validate_plan(self) -> None:
@@ -118,8 +122,9 @@ class ReflektPlan(object):
         is_valid = validator.validate(self.plan_yaml_obj, reflekt_plan_schema)
 
         if not is_valid:
-            message = f"For plan '{self.name}' - {validator.errors}"
-            raise ReflektValidationError(message)
+            raise ReflektValidationError(
+                f"Invalid plan definition for plan '{self.name}' - {validator.errors}"
+            )
 
         self._check_duplicate_events()
         self._check_reserved_event_names()
