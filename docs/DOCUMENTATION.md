@@ -483,7 +483,7 @@ reflekt push --name my-plan
 12:32:15     Parsing event file order-completed.yml
 12:32:16     Parsing event file page-viewed.yml
 
-12:32:17 Converting Reflekt tracking plan 'tracking-plan-example'to Segment format
+12:32:17 Converting Reflekt tracking plan 'tracking-plan-example' to Segment format
 12:32:18     Converting 'Account Created'
 12:32:18     Converting 'Account Deleted'
 12:32:18     Converting 'Checkout Step Viewed'
