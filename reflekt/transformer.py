@@ -12,7 +12,6 @@ import yaml
 from inflection import titleize, underscore
 from loguru import logger
 from packaging.version import Version
-
 from reflekt.columns import reflekt_columns
 from reflekt.config import ReflektConfig
 from reflekt.dbt import (
@@ -113,7 +112,7 @@ class ReflektTransformer(object):
         segment_plan["display_name"] = self.plan_name
         print("")  # Terminal newline
         logger.info(
-            f"Converting Reflekt tracking plan '{self.plan_name}'to "
+            f"Converting Reflekt tracking plan '{self.plan_name}' to "
             f"{titleize(self.plan_type)} format"
         )
 
