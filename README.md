@@ -134,17 +134,40 @@ For Segment Protocols users, **we recommended to manage tracking plans as `code`
           os: ['ubuntu-latest']
           python-version: ['3.9']
       runs-on: ${{ matrix.os }}
+
       steps:
         - name: Checkout Repo
-          uses: actions/checkout@v2
+          uses: actions/checkout@v3
+
         - name: Install Python ${{ matrix.python-version }}
           uses: actions/setup-python@v3
           with:
             python: ${{ matrix.python-version }}
+
+        - name: CI Setup - make reflekt_config.yml for CI suite
+          run: |
+            mkdir /home/runner/.reflekt
+            echo "${{ secrets.CI_REFLEKT_CONFIG_YML }}" > /home/runner/.reflekt/reflekt_config.yml
+
+        - name: CI Setup - set path to reflekt_config.yml in reflekt_project.yml
+          uses: jacobtomlinson/gha-find-replace@2.0.0
+          with:
+            find: "# config_path: /absolute/path/to/reflekt_config.yml"
+            replace: "config_path: /home/runner/.reflekt/reflekt_config.yml"
+            include: "reflekt_project.yml"
+
         - name: Install Reflekt
           run: |
             pip install reflekt
-        - name: Run reflekt test
+
+        - name: Get changed files
+          id: changed-files
+          uses: tj-actions/changed-files@v23
+          with:
+            dir_names: true  # Output unique changed directories
+
+        - name: Test my-plan (if modified)
+          if: contains(steps.changed-files.outputs.all_changed_files, 'tracking-plans/my-plan')
           run: |
             reflekt test --name my-plan
   ```
@@ -159,7 +182,7 @@ For Segment Protocols users, **we recommended to manage tracking plans as `code`
         - main
 
   jobs:
-    test:
+    push:
       name: Sync Tracking Plans
       strategy:
         fail-fast: false
@@ -167,17 +190,40 @@ For Segment Protocols users, **we recommended to manage tracking plans as `code`
           os: ['ubuntu-latest']
           python-version: ['3.9']
       runs-on: ${{ matrix.os }}
+
       steps:
         - name: Checkout Repo
           uses: actions/checkout@v2
+
         - name: Install Python ${{ matrix.python-version }}
           uses: actions/setup-python@v3
           with:
             python: ${{ matrix.python-version }}
+
+        - name: CI Setup - make reflekt_config.yml for CI suite
+          run: |
+            mkdir /home/runner/.reflekt
+            echo "${{ secrets.CI_REFLEKT_CONFIG_YML }}" > /home/runner/.reflekt/reflekt_config.yml
+
+        - name: CI Setup - set path to reflekt_config.yml in reflekt_project.yml
+          uses: jacobtomlinson/gha-find-replace@2.0.0
+          with:
+            find: "# config_path: /absolute/path/to/reflekt_config.yml"
+            replace: "config_path: /home/runner/.reflekt/reflekt_config.yml"
+            include: "reflekt_project.yml"
+
         - name: Install Reflekt
           run: |
             pip install reflekt
-        - name: Run reflekt test
+
+        - name: Get changed files
+          id: changed-files
+          uses: tj-actions/changed-files@v23
+          with:
+            dir_names: true  # Output unique changed directories
+
+        - name: Sync my-plan (if modified)
+          if: contains(steps.changed-files.outputs.all_changed_files, 'tracking-plans/my-plan')
           run: |
             reflekt push --name my-plan
   ```
