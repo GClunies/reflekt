@@ -15,8 +15,6 @@ from inflection import titleize
 from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
-
-from reflekt import constants
 from reflekt.api_handler import ReflektApiHandler
 from reflekt.avo.plan import AvoPlan
 from reflekt.config import ReflektConfig
@@ -25,6 +23,8 @@ from reflekt.logger import logger_config
 from reflekt.project import ReflektProject
 from reflekt.segment.plan import SegmentPlan
 from reflekt.transformer import ReflektTransformer
+
+from reflekt import constants
 
 
 @click.group()
@@ -459,6 +459,7 @@ def dbt(
 ) -> None:
     """Build dbt package with sources, models, and docs based on tracking plan."""
     project_dir = ReflektProject().project_dir
+    plan_type = str.lower(ReflektConfig().plan_type)
     plan_dir = project_dir / "tracking-plans" / plan_name
     dbt_pkgs_dir = project_dir / "dbt_packages"
     logger.info(f"Loading Reflekt tracking plan {plan_name}")
@@ -548,16 +549,28 @@ def dbt(
         )
         git_executable = shutil.which("git")
         rel_pkg_path = f"dbt_packages/{pkg_name}"
-        rel_avo_json_path = ".reflekt/avo/avo.json"
-        subprocess.call(
-            args=[
-                git_executable,
-                "add",
-                rel_pkg_path,
-                rel_avo_json_path,
-            ],
-            cwd=project_dir,
-        )
+
+        if plan_type == "avo":
+            rel_avo_json_path = ".reflekt/avo/avo.json"
+            subprocess.call(
+                args=[
+                    git_executable,
+                    "add",
+                    rel_pkg_path,
+                    rel_avo_json_path,
+                ],
+                cwd=project_dir,
+            )
+        else:
+            subprocess.call(
+                args=[
+                    git_executable,
+                    "add",
+                    rel_pkg_path,
+                ],
+                cwd=project_dir,
+            )
+
         subprocess.call(
             args=[
                 git_executable,
