@@ -1,0 +1,36 @@
+version: 2
+models:
+  - name: stg_buoyweather_web__deleted_account
+    description: Server-side event fired when a user's account is deleted.
+    columns:
+      - name: event_id
+        description: The unique identifier of the event call.
+        tests:
+          - not_null
+          - unique
+      - name: source_schema
+        description: The schema of the source table.
+      - name: source_table
+        description: The source table.
+      - name: tracking_plan
+        description: Name of the tracking plan the event is defined in.
+      - name: library_name
+        description: Name of the library that invoked the call.
+      - name: library_version
+        description: Version of the library that invoked the call.
+      - name: sent_at_tstamp
+        description: Timestamp when call was sent by client device, OR sent_at
+          value manually passed in. This timestamp can be affected by clock
+          skew on the client device.
+      - name: received_at_tstamp
+        description: Timestamp when Segment's servers received the call.
+      - name: tstamp
+        description: Timestamp when the call was invoked. Calculated by
+          Segment to correct client-device clock skew.
+      - name: user_id
+        description: Unique identifier for the user.
+      - name: segment_protocols_source_id
+        description: If a protocol violation is detected for this instance
+          of the event firing, the ID of the Segment source.
+      - name: trigger
+        description: The source of the deletion (user-requested vs admininstrative)

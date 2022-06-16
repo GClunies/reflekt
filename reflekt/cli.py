@@ -461,7 +461,7 @@ def dbt(
     project_dir = ReflektProject().project_dir
     plan_type = str.lower(ReflektConfig().plan_type)
     plan_dir = project_dir / "tracking-plans" / plan_name
-    dbt_pkgs_dir = project_dir / "dbt_packages"
+    dbt_pkgs_dir = project_dir / "dbt-packages"
     logger.info(f"Loading Reflekt tracking plan {plan_name}")
     loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name, schema_name=schema)
     reflekt_plan = loader.plan
@@ -548,7 +548,7 @@ def dbt(
             default=f"v{str(version)}__{pkg_name}",
         )
         git_executable = shutil.which("git")
-        rel_pkg_path = f"dbt_packages/{pkg_name}"
+        rel_pkg_path = f"dbt-packages/{pkg_name}"
 
         if plan_type == "avo":
             rel_avo_json_path = ".reflekt/avo/avo.json"

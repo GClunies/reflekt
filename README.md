@@ -60,7 +60,7 @@ For [Avo](https://www.avo.app/) users, **we recommended to continue to manage yo
     version: 0.8.5
 
   - git: "https://github.com/my-github-user/reflekt-project-repo"
-    subdirectory: "dbt_packages/reflekt_my_app_web"
+    subdirectory: "dbt-packages/reflekt_my_app_web"
     revision: v0.1.0__reflekt_my_app_web  # Git tag created by 'reflekt dbt'
   ```
 - Use the models from your Reflekt dbt package in your dbt project!
@@ -243,7 +243,7 @@ You can now follow a similar process as outlined for Avo above, shown again belo
     version: 0.8.5
 
   - git: "https://github.com/my-github-user/reflekt-project-repo"
-    subdirectory: "dbt_packages/reflekt_my_app_web"
+    subdirectory: "dbt-packages/reflekt_my_app_web"
     revision: v0.1.0__reflekt_my_app_web  # Git tag created by 'reflekt dbt'
   ```
 

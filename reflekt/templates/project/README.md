@@ -1,5 +1,5 @@
 # reflekt-PROJECT_NAME
-A [Reflekt](https://github.com/GClunies/reflekt) project representing tracking plans as `code`. Tracking plans are defined in the [`tracking-plans/`](tracking-plans/) directory. dbt packages templated by Reflekt that model and document the events found in the tracking plans, are defined in the [`dbt_packages/`](dbt_packages/) directory.
+A [Reflekt](https://github.com/GClunies/reflekt) project representing tracking plans as `code`. Tracking plans are defined in the [`tracking-plans/`](tracking-plans/) directory. dbt packages templated by Reflekt that model and document the events found in the tracking plans, are defined in the [`dbt-packages/`](dbt-packages/) directory.
 
 To use a Reflekt dbt package in your dbt project, reference it in the `packages.yml` of your dbt project. Like so:
 ```yaml
@@ -10,11 +10,11 @@ To use a Reflekt dbt package in your dbt project, reference it in the `packages.
 
   # Can reference multiple Reflekt dbt packages in a dbt project
   - git: "https://github.com/your/reflekt-project-repo"
-    subdirectory: "dbt_packages/reflekt_dbt_package_one"
+    subdirectory: "dbt-packages/reflekt_dbt_package_one"
     revision: v0.1.0__reflekt_dbt_package_one  # Git branch, tag, or specific commit (full 40-character hash)
 
   - git: "https://github.com/your/reflekt-project-repo"
-    subdirectory: "dbt_packages/reflekt_dbt_package_two"
+    subdirectory: "dbt-packages/reflekt_dbt_package_two"
     revision: v0.3.0__reflekt_dbt_package_two  # Git branch, tag, or specific commit (full 40-character hash)
   ```
 

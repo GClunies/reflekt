@@ -74,7 +74,7 @@ class ReflektTransformer(object):
             self.tmp_pkg_dir = (
                 self.project_dir / ".reflekt" / "tmp" / self.dbt_package_name
             )
-            self.dbt_pkgs_dir = self.project_dir / "dbt_packages"
+            self.dbt_pkgs_dir = self.project_dir / "dbt-packages"
             self.dbt_pkg_path = self.dbt_pkgs_dir / self.dbt_package_name
             self.pkg_template = pkg_resources.resource_filename(
                 "reflekt", "templates/dbt/"

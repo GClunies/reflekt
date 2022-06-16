@@ -1,0 +1,57 @@
+version: 2
+models:
+  - name: stg_surfline_web__days_to_convert_from_trial
+    description: "Server side event fired 7 days before a users free trial\
+      \ is set to convert. Sent with properties:\n  - daysToPremium\n  -\
+      \ cardType.\nWe'll use the daysToPremium property in the email text\
+      \ to the user, this will allow us to change the timing of this reminder\
+      \ in Stripe without having to change the email. The cardType will\
+      \ be used in customer.io to make sure we only send reminders to users\
+      \ with a VISA card. We should only send this event if users are converting\
+      \ from a trial to a subscription (and have not canceled).\n"
+    columns:
+      - name: event_id
+        description: The unique identifier of the event call.
+        tests:
+          - not_null
+          - unique
+      - name: source_schema
+        description: The schema of the source table.
+      - name: source_table
+        description: The source table.
+      - name: tracking_plan
+        description: Name of the tracking plan the event is defined in.
+      - name: library_name
+        description: Name of the library that invoked the call.
+      - name: library_version
+        description: Version of the library that invoked the call.
+      - name: sent_at_tstamp
+        description: Timestamp when call was sent by client device, OR sent_at
+          value manually passed in. This timestamp can be affected by clock
+          skew on the client device.
+      - name: received_at_tstamp
+        description: Timestamp when Segment's servers received the call.
+      - name: tstamp
+        description: Timestamp when the call was invoked. Calculated by
+          Segment to correct client-device clock skew.
+      - name: user_id
+        description: Unique identifier for the user.
+      - name: segment_protocols_source_id
+        description: If a protocol violation is detected for this instance
+          of the event firing, the ID of the Segment source.
+      - name: segment_protocols_violations
+        description: If a protocol violation is detected for this instance
+          of the event firing, a list of the protocol violations.
+      - name: segment_protocols_omitted_properties
+        description: If this instance of the event fired with unplanned
+          properties (not in tracking plan), a list of the unplanned properties,
+          which are omitted from the event payload and do not reach thea
+          data warehouse.
+      - name: card_type
+        description: The card type.
+      - name: days_to_premium
+        description: Number of days until the subscription is set to convert.
+      - name: plan_id
+        description: The plan ID.
+      - name: platform
+        description: The platform the event is attributed to.

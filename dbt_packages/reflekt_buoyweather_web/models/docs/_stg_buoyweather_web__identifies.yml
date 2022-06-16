@@ -1,0 +1,31 @@
+version: 2
+models:
+  - name: stg_buoyweather_web__identifies
+    description: A table with identify() calls.
+    columns:
+      - name: event_id
+        description: The unique identifier of the identify call.
+        tests:
+          - not_null
+          - unique
+      - name: source_schema
+        description: The schema of the source table.
+      - name: source_table
+        description: The source table.
+      - name: tracking_plan
+        description: The name of the tracking plan where the event is defined.
+      - name: received_at_tstamp
+        description: The timestamp when the identify call hit Segment's
+          API.
+      - name: sent_at_tstamp
+        description: The timestamp when the client’s device made the network
+          request to the Segment API.
+      - name: tstamp
+        description: When the call was invoked. Calculated by Segment to
+          correct client-device clock skew. Use for analysis when chronology
+          DOES matter.
+      - name: anonymous_id
+        description: A pseudo-unique substitute for a User ID, for cases
+          when we don’t have an absolutely unique identifier.
+      - name: user_id
+        description: Unique identifier for the user.

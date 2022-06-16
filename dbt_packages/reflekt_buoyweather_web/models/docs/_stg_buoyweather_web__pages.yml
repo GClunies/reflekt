@@ -1,0 +1,77 @@
+version: 2
+models:
+  - name: stg_buoyweather_web__pages
+    description: A table with page() calls.
+    columns:
+      - name: page_id
+        description: The unique identifier of the page call.
+        tests:
+          - not_null
+          - unique
+      - name: source_schema
+        description: The schema of the source table.
+      - name: source_table
+        description: The source table.
+      - name: tracking_plan
+        description: The name of the tracking plan where the event is defined.
+      - name: page_name
+        description: The page name (used to group similar pages, e.g., `Spot
+          Report`).
+      - name: library_name
+        description: The name of the library that invoked the call.
+      - name: library_version
+        description: The version of the library that invoked the call.
+      - name: sent_at_tstamp
+        description: Time on client device when call was sent, OR sent_at
+          value manually passed in. NOTE - sent_at is NOT USEFUL for analysis
+          since it’s not always trustworthy as it can be easily adjusted
+          and affected by clock skew.
+      - name: received_at_tstamp
+        description: Time on Segment server clock when call was received.
+          received_at is used as sort key in Warehouses. For max query speed,
+          received_at is the recommended timestamp for analysis when chronology
+          DOES NOT matter as chronology is NOT ENSURED.
+      - name: tstamp
+        description: When the call was invoked. Calculated by Segment to
+          correct client-device clock skew. Use for analysis when chronology
+          DOES matter.
+      - name: anonymous_id
+        description: A pseudo-unique substitute for a user ID, for cases
+          when we don’t have an absolutely unique identifier. A user_id
+          or an anonymous_id is required for all events.
+      - name: user_id
+        description: Unique identifier for the user. A user_id or an anonymous_id
+          is required for all events.
+      - name: page_url_host
+        description: The hostname of the page where the call was invoked.
+      - name: referrer_host
+        description: The hostname of the page that referred the user to
+          the page where the call was invoked.
+      - name: utm_source
+        description: The source of the campaign that the user was in when
+          the call was invoked.
+      - name: utm_medium
+        description: The medium of the campaign that the user was in when
+          the call was invoked.
+      - name: utm_campaign
+        description: The name of the campaign that the user was in when
+          the call was invoked.
+      - name: utm_term
+        description: The term of the campaign that the user was in when
+          the call was invoked.
+      - name: utm_content
+        description: The content of the campaign that the user was in when
+          the call was invoked. Maps directly to utm_content parameter.
+      - name: ip
+        description: The IP address the event was generated from.
+      - name: user_agent
+        description: The user agent string of the device generating the
+          event.
+      - name: device
+        description: The device that invoked the call.
+      - name: locale
+        description: Locale string for the device generating the event,
+          for example 'en-US'.
+      - name: segment_protocols_source_id
+        description: If a protocol violation is detected for this instance
+          of the event firing, the ID of the Segment source.

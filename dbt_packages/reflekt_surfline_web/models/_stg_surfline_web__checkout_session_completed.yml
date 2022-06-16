@@ -1,0 +1,75 @@
+version: 2
+models:
+  - name: stg_surfline_web__checkout_session_completed
+    description: Server side event fired when a user completes a Stripe
+      Checkout Session. Session Object Reference - https://stripe.com/docs/api/checkout/sessions/object
+    columns:
+      - name: event_id
+        description: The unique identifier of the event call.
+        tests:
+          - not_null
+          - unique
+      - name: source_schema
+        description: The schema of the source table.
+      - name: source_table
+        description: The source table.
+      - name: tracking_plan
+        description: Name of the tracking plan the event is defined in.
+      - name: library_name
+        description: Name of the library that invoked the call.
+      - name: library_version
+        description: Version of the library that invoked the call.
+      - name: sent_at_tstamp
+        description: Timestamp when call was sent by client device, OR sent_at
+          value manually passed in. This timestamp can be affected by clock
+          skew on the client device.
+      - name: received_at_tstamp
+        description: Timestamp when Segment's servers received the call.
+      - name: tstamp
+        description: Timestamp when the call was invoked. Calculated by
+          Segment to correct client-device clock skew.
+      - name: user_id
+        description: Unique identifier for the user.
+      - name: segment_protocols_source_id
+        description: If a protocol violation is detected for this instance
+          of the event firing, the ID of the Segment source.
+      - name: segment_protocols_violations
+        description: If a protocol violation is detected for this instance
+          of the event firing, a list of the protocol violations.
+      - name: after_expiration
+        description: When set provides configuration for actions to take
+          if this Checkout Session expires.
+      - name: allow_promotion_codes
+        description: Enables user redeemable promotion codes.
+      - name: amount_subtotal
+        description: Total of all items before discounts or taxes are applied.
+      - name: amount_total
+        description: Total of all items after discounts and taxes are applied.
+      - name: currency
+        description: Three-letter ISO currency code.
+      - name: customer
+        description: The ID of the customer for the Checkout Session.
+      - name: customer_email
+        description: The email of the customer.
+      - name: locale
+        description: The IETF language tag of the locale Checkout is displayed
+          in.
+      - name: mode
+        description: The mode of the Checkout Session.
+      - name: payment_intent
+        description: The ID of the PaymentIntent for Checkout Sessions in
+          payment mode.
+      - name: payment_status
+        description: The payment status of the Checkout Session.
+      - name: recovered_from
+        description: The ID of the original expired Checkout Session that
+          triggered the recovery flow.
+      - name: setup_intent
+        description: The ID of the SetupIntent for Checkout Sessions in
+          setup mode.
+      - name: subscription
+        description: The ID of the subscription for Checkout Sessions in
+          subscription mode.
+      - name: success_url
+        description: The URL the customer will be directed to after the
+          payment or subscription creation is successful.
