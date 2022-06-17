@@ -7,11 +7,9 @@ import shutil
 from pathlib import Path
 from typing import Optional, Union
 
-import pkg_resources
 import yaml
 from inflection import titleize, underscore
 from loguru import logger
-from packaging.version import Version
 from reflekt.columns import reflekt_columns
 from reflekt.config import ReflektConfig
 from reflekt.dbt import (
@@ -56,7 +54,6 @@ class ReflektTransformer(object):
         dbt_pkg_dir: Optional[Path] = None,
         tmp_pkg_dir: Optional[Path] = None,
         models_subfolder: Optional[str] = None,
-        # pkg_version: Optional[Version] = None,
     ) -> None:
         self.reflekt_plan = reflekt_plan
         self.plan_name = str.lower(self.reflekt_plan.name)
@@ -75,10 +72,6 @@ class ReflektTransformer(object):
             self.dbt_pkg_dir = dbt_pkg_dir
             self.tmp_pkg_dir = tmp_pkg_dir
             self.models_subfolder = models_subfolder
-            # self.pkg_template = pkg_resources.resource_filename(
-            #     "reflekt", "templates/dbt/"
-            # )
-            # self.pkg_version = pkg_version
             self.db_engine = WarehouseConnection()
             self.src_prefix = self.reflekt_project.src_prefix
             self.model_prefix = self.reflekt_project.model_prefix
