@@ -15,8 +15,6 @@ from inflection import titleize
 from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
-
-from reflekt import constants
 from reflekt.api_handler import ReflektApiHandler
 from reflekt.avo.plan import AvoPlan
 from reflekt.config import ReflektConfig
@@ -25,6 +23,8 @@ from reflekt.logger import logger_config
 from reflekt.project import ReflektProject
 from reflekt.segment.plan import SegmentPlan
 from reflekt.transformer import ReflektTransformer
+
+from reflekt import constants
 
 
 @click.group()
@@ -681,24 +681,16 @@ if __name__ == "__main__":
     # pull(["--name", "my-plan"])
     # push(["--name", "my-plan"])
     # test(["--name", "my-plan"])
-    # dbt(
-    #     [
-    #         "--name",
-    #         "my-plan",
-    #         "--schema",
-    #         "patty_bar_web",
-    #         "--force-version",
-    #         "0.1.0",
-    #     ]
-    # )
-    # pull(["--name", "tracking-plan-example"])
-    # push(["--name", "tracking-plan-example"])
-    # test(["--name", "tracking-plan-example"])
     dbt(
         [
             "--name",
-            "buoyweather-android",
+            "my-plan",
             "--schema",
-            "buoyweatherandroid",
+            "patty_bar_web",
+            "--force-version",
+            "0.1.0",
         ]
     )
+    # pull(["--name", "tracking-plan-example"])
+    # push(["--name", "tracking-plan-example"])
+    # test(["--name", "tracking-plan-example"])
