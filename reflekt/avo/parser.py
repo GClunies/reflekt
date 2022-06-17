@@ -4,12 +4,22 @@
 
 
 def parse_avo_property(name: str, property_json: dict, required: list = []) -> dict:
-    p_type = property_json.get("type")
+    p_types = property_json.get("type")
+    if not isinstance(p_types, (list,)):
+        p_types = [p_types]  # If p_types is not list, make it one
+
+    if not p_types[0]:
+        p_types[0] = "any"
+
     p = {
         "name": name,
         "description": property_json.get("description"),
-        "type": p_type,
+        "type": p_types[0],
     }
+    allow_null = len(p_types) > 1 and p_types[1] == "null"
+
+    if allow_null:
+        p["allow_null"] = True
 
     if required is not None and name in required:
         p["required"] = True
@@ -17,7 +27,7 @@ def parse_avo_property(name: str, property_json: dict, required: list = []) -> d
     if "enum" in property_json.keys():
         p["enum"] = property_json.get("enum")
 
-    if p_type == "array":
+    if p["type"] == "array":
         # Unlike Segment, Avo takes a simplified approach to array types, user
         # can only specify the type of the array elements. No 'array items'
         # like Segment. This placeholder is kept in case this changes.

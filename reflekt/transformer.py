@@ -52,10 +52,11 @@ class ReflektTransformer(object):
     def __init__(
         self,
         reflekt_plan: ReflektPlan,
-        # database: Optional[str] = None,
-        # schema: Optional[str] = None,
         dbt_package_name: Optional[str] = None,
-        pkg_version: Optional[Version] = None,
+        dbt_pkg_dir: Optional[Path] = None,
+        tmp_pkg_dir: Optional[Path] = None,
+        models_subfolder: Optional[str] = None,
+        # pkg_version: Optional[Version] = None,
     ) -> None:
         self.reflekt_plan = reflekt_plan
         self.plan_name = str.lower(self.reflekt_plan.name)
@@ -71,15 +72,13 @@ class ReflektTransformer(object):
             self.reflekt_project = ReflektProject()
             self.project_dir = self.reflekt_project.project_dir
             self.dbt_package_name = dbt_package_name
-            self.tmp_pkg_dir = (
-                self.project_dir / ".reflekt" / "tmp" / self.dbt_package_name
-            )
-            self.dbt_pkgs_dir = self.project_dir / "dbt-packages"
-            self.dbt_pkg_path = self.dbt_pkgs_dir / self.dbt_package_name
-            self.pkg_template = pkg_resources.resource_filename(
-                "reflekt", "templates/dbt/"
-            )
-            self.pkg_version = pkg_version
+            self.dbt_pkg_dir = dbt_pkg_dir
+            self.tmp_pkg_dir = tmp_pkg_dir
+            self.models_subfolder = models_subfolder
+            # self.pkg_template = pkg_resources.resource_filename(
+            #     "reflekt", "templates/dbt/"
+            # )
+            # self.pkg_version = pkg_version
             self.db_engine = WarehouseConnection()
             self.src_prefix = self.reflekt_project.src_prefix
             self.model_prefix = self.reflekt_project.model_prefix
@@ -275,44 +274,44 @@ class ReflektTransformer(object):
         pass
 
     def build_dbt_package(self) -> None:
-        logger.info(
-            f"Building Reflekt dbt package:"
-            f"\n        cdp: {self.cdp_name}"
-            f"\n        analytics governance tool: {self.plan_type}"
-            f"\n        tracking plan: {self.plan_name}"
-            f"\n        warehouse: {self.warehouse_type}"
-            f"\n        schema: {self.schema}"
-            f"\n        schema_alias: {self.schema_alias}"
-            f"\n        dbt package name: {self.dbt_package_name}"
-            f"\n        dbt package version: {self.pkg_version}"
-            f"\n        dbt package path: {self.dbt_pkg_path}\n"
-        )
+        # logger.info(
+        #     f"Building Reflekt dbt package:"
+        #     f"\n        cdp: {self.cdp_name}"
+        #     f"\n        analytics governance tool: {self.plan_type}"
+        #     f"\n        tracking plan: {self.plan_name}"
+        #     f"\n        warehouse: {self.warehouse_type}"
+        #     f"\n        schema: {self.schema}"
+        #     f"\n        schema_alias: {self.schema_alias}"
+        #     f"\n        dbt package name: {self.dbt_package_name}"
+        #     f"\n        dbt package version: {self.pkg_version}"
+        #     f"\n        dbt package path: {self.dbt_pkg_dir}\n"
+        # )
 
-        if self.tmp_pkg_dir.exists():
-            shutil.rmtree(str(self.tmp_pkg_dir))
-        shutil.copytree(self.pkg_template, str(self.tmp_pkg_dir))
+        # if self.tmp_pkg_dir.exists():
+        #     shutil.rmtree(str(self.tmp_pkg_dir))
+        # shutil.copytree(self.pkg_template, str(self.tmp_pkg_dir))
 
-        # Update the version string in templated dbt_project.yml
-        with open(self.tmp_pkg_dir / "dbt_project.yml", "r") as f:
-            dbt_project_yml_str = f.read()
+        # # Update the version string in templated dbt_project.yml
+        # with open(self.tmp_pkg_dir / "dbt_project.yml", "r") as f:
+        #     dbt_project_yml_str = f.read()
 
-        dbt_project_yml_str = dbt_project_yml_str.replace(
-            "0.1.0", str(self.pkg_version)  # Template always has version '0.1.0'
-        ).replace("reflekt_package_name", self.dbt_package_name)
+        # dbt_project_yml_str = dbt_project_yml_str.replace(
+        #     "0.1.0", str(self.pkg_version)  # Template always has version '0.1.0'
+        # ).replace("reflekt_package_name", self.dbt_package_name)
 
-        with open(self.tmp_pkg_dir / "dbt_project.yml", "w") as f:
-            f.write(dbt_project_yml_str)
+        # with open(self.tmp_pkg_dir / "dbt_project.yml", "w") as f:
+        #     f.write(dbt_project_yml_str)
 
-        # Set dbt_pkg_name and plan_name in README.md
-        with open(self.tmp_pkg_dir / "README.md", "r") as f:
-            readme_str = f.read()
+        # # Set dbt_pkg_name and plan_name in README.md
+        # with open(self.tmp_pkg_dir / "README.md", "r") as f:
+        #     readme_str = f.read()
 
-        readme_str = readme_str.replace("_DBT_PKG_NAME_", self.dbt_package_name).replace(
-            "_PLAN_NAME_", self.plan_name
-        )
+        # readme_str = readme_str.replace("_DBT_PKG_NAME_", self.dbt_package_name).replace(
+        #     "_PLAN_NAME_", self.plan_name
+        # )
 
-        with open(self.tmp_pkg_dir / "README.md", "w") as f:
-            f.write(readme_str)
+        # with open(self.tmp_pkg_dir / "README.md", "w") as f:
+        #     f.write(readme_str)
 
         if self.cdp_name == "rudderstack":
             return self._dbt_package_rudderstack(self.reflekt_plan)
@@ -498,15 +497,21 @@ class ReflektTransformer(object):
             if self.schema_alias is None
             else f"{self.src_prefix}{self.schema_alias}"
         )
-        dbt_src_path = self.tmp_pkg_dir / "models" / f"{src_name}.yml"
+        dbt_src_path = (
+            self.tmp_pkg_dir / "models" / self.models_subfolder / f"{src_name}.yml"
+        )
 
         if self.docs_in_folder:
-            docs_folder_str = str(self.tmp_pkg_dir) + "/models/docs"
+            docs_folder_str = (
+                str(self.tmp_pkg_dir) + f"/models/{self.models_subfolder}/docs"
+            )
             docs_folder_path = Path(docs_folder_str)
             docs_folder_path.mkdir(exist_ok=True)
             dbt_src_path = docs_folder_path / f"{src_name}.yml"
         else:
-            dbt_src_path = self.tmp_pkg_dir / "models" / f"{src_name}.yml"
+            dbt_src_path = (
+                self.tmp_pkg_dir / "models" / self.models_subfolder / f"{src_name}.yml"
+            )
 
         with open(dbt_src_path, "w") as f:
             yaml.dump(
@@ -537,18 +542,18 @@ class ReflektTransformer(object):
 
         logger.info(
             f"Copying dbt package from temporary path "
-            f"{self.tmp_pkg_dir} to {self.dbt_pkg_path}"
+            f"{self.tmp_pkg_dir} to {self.dbt_pkg_dir}"
         )
 
-        if self.dbt_pkg_path.exists():
-            shutil.rmtree(self.dbt_pkg_path)
+        if self.dbt_pkg_dir.exists():
+            shutil.rmtree(self.dbt_pkg_dir)
 
-        shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_path)
+        shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_dir)
 
         print("")  # Terminal newline
         logger.info(
             f"[SUCCESS] Created Reflekt dbt package '{self.dbt_package_name}' "
-            f"at: {self.dbt_pkg_path}"
+            f"at: {self.dbt_pkg_dir}"
         )
         print("")  # Cleanup stdout
 
@@ -649,7 +654,9 @@ class ReflektTransformer(object):
             "select * from renamed\n"
         )
         # fmt: on
-        model_path = self.tmp_pkg_dir / "models" / f"{model_name}.sql"
+        model_path = (
+            self.tmp_pkg_dir / "models" / self.models_subfolder / f"{model_name}.sql"
+        )
 
         with open(model_path, "w") as f:
             f.write(mdl_sql)
@@ -764,12 +771,16 @@ class ReflektTransformer(object):
         dbt_doc["models"].append(dbt_mdl_doc)
 
         if self.docs_in_folder:
-            docs_folder_str = str(self.tmp_pkg_dir) + "/models/docs"
+            docs_folder_str = (
+                str(self.tmp_pkg_dir) + f"/models/{self.models_subfolder}/docs"
+            )
             docs_folder_path = Path(docs_folder_str)
             docs_folder_path.mkdir(exist_ok=True)
             docs_path = docs_folder_path / f"{doc_name}.yml"
         else:
-            docs_path = self.tmp_pkg_dir / "models" / f"{doc_name}.yml"
+            docs_path = (
+                self.tmp_pkg_dir / "models" / self.models_subfolder / f"{doc_name}.yml"
+            )
 
         with open(docs_path, "w") as f:
             yaml.dump(
