@@ -15,6 +15,8 @@ from inflection import titleize
 from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
+
+from reflekt import constants
 from reflekt.api_handler import ReflektApiHandler
 from reflekt.avo.plan import AvoPlan
 from reflekt.config import ReflektConfig
@@ -23,8 +25,6 @@ from reflekt.logger import logger_config
 from reflekt.project import ReflektProject
 from reflekt.segment.plan import SegmentPlan
 from reflekt.transformer import ReflektTransformer
-
-from reflekt import constants
 
 
 @click.group()

@@ -267,45 +267,6 @@ class ReflektTransformer(object):
         pass
 
     def build_dbt_package(self) -> None:
-        # logger.info(
-        #     f"Building Reflekt dbt package:"
-        #     f"\n        cdp: {self.cdp_name}"
-        #     f"\n        analytics governance tool: {self.plan_type}"
-        #     f"\n        tracking plan: {self.plan_name}"
-        #     f"\n        warehouse: {self.warehouse_type}"
-        #     f"\n        schema: {self.schema}"
-        #     f"\n        schema_alias: {self.schema_alias}"
-        #     f"\n        dbt package name: {self.dbt_package_name}"
-        #     f"\n        dbt package version: {self.pkg_version}"
-        #     f"\n        dbt package path: {self.dbt_pkg_dir}\n"
-        # )
-
-        # if self.tmp_pkg_dir.exists():
-        #     shutil.rmtree(str(self.tmp_pkg_dir))
-        # shutil.copytree(self.pkg_template, str(self.tmp_pkg_dir))
-
-        # # Update the version string in templated dbt_project.yml
-        # with open(self.tmp_pkg_dir / "dbt_project.yml", "r") as f:
-        #     dbt_project_yml_str = f.read()
-
-        # dbt_project_yml_str = dbt_project_yml_str.replace(
-        #     "0.1.0", str(self.pkg_version)  # Template always has version '0.1.0'
-        # ).replace("reflekt_package_name", self.dbt_package_name)
-
-        # with open(self.tmp_pkg_dir / "dbt_project.yml", "w") as f:
-        #     f.write(dbt_project_yml_str)
-
-        # # Set dbt_pkg_name and plan_name in README.md
-        # with open(self.tmp_pkg_dir / "README.md", "r") as f:
-        #     readme_str = f.read()
-
-        # readme_str = readme_str.replace("_DBT_PKG_NAME_", self.dbt_package_name).replace(
-        #     "_PLAN_NAME_", self.plan_name
-        # )
-
-        # with open(self.tmp_pkg_dir / "README.md", "w") as f:
-        #     f.write(readme_str)
-
         if self.cdp_name == "rudderstack":
             return self._dbt_package_rudderstack(self.reflekt_plan)
         elif self.cdp_name == "segment":
