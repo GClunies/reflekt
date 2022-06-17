@@ -524,7 +524,7 @@ reflekt dbt --name my-plan
         schema: patty_bar_web_staging
         dbt package name: reflekt_patty_bar_web_staging
         dbt package version: 0.1.0
-        dbt package path: /Users/gclunies/Repos/reflekt/dbt_packages/reflekt_patty_bar_web_staging
+        dbt package path: /Users/gclunies/Repos/reflekt/dbt-packages/reflekt_patty_bar_web_staging
 
 12:46:52 Initializing template for dbt source patty_bar_web_staging
 
@@ -591,7 +591,7 @@ reflekt dbt --name my-plan
 ...
 ...
 
-12:47:23 [SUCCESS] Created Reflekt dbt package 'reflekt_patty_bar_web_staging' at: /Users/gclunies/Repos/reflekt/dbt_packages/reflekt_patty_bar_web_staging
+12:47:23 [SUCCESS] Created Reflekt dbt package 'reflekt_patty_bar_web_staging' at: /Users/gclunies/Repos/reflekt/dbt-packages/reflekt_patty_bar_web_staging
 
 Would you like to create a Git tag to easily reference Reflekt dbt package reflekt_patty_bar_web_staging (version: 0.1.0) in your dbt project? [y/N]: N
 ```

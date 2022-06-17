@@ -10,7 +10,7 @@ To use the models in this package, reference it in the `packages.yml` of your db
     version: 0.8.5
 
   - git: "https://github.com/your/reflekt-project-repo"
-    subdirectory: "dbt_packages/reflekt_my_app"
+    subdirectory: "dbt-packages/reflekt_my_app"
     revision: v0.1.0__reflekt_my_app  # Git branch, tag, or specific commit (full 40-character hash)
   ```
 

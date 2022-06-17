@@ -458,58 +458,71 @@ def dbt(
     force_version: Optional[str] = None,
 ) -> None:
     """Build dbt package with sources, models, and docs based on tracking plan."""
-    project_dir = ReflektProject().project_dir
-    plan_type = str.lower(ReflektConfig().plan_type)
+    project = ReflektProject()
+    project_name = project.name
+    project_dir = project.project_dir
+    config = ReflektConfig()
+    cdp = config.cdp_name
+    plan_type = str.lower(config.plan_type)
     plan_dir = project_dir / "tracking-plans" / plan_name
-    dbt_pkgs_dir = project_dir / "dbt_packages"
-    logger.info(f"Loading Reflekt tracking plan {plan_name}")
-    loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name, schema_name=schema)
-    reflekt_plan = loader.plan
-    logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
-    pkg_suffix = (
-        reflekt_plan.schema_alias
-        if reflekt_plan.schema_alias is not None
-        else reflekt_plan.schema
-    )
-    pkg_name = f"reflekt_{pkg_suffix}"
-    dbt_project_yml_path = dbt_pkgs_dir / pkg_name / "dbt_project.yml"
+    pkg_name = f"reflekt_{project_name}_{cdp}"
+    dbt_pkg_dir = project_dir / "dbt-packages" / pkg_name
+    dbt_project_yml = dbt_pkg_dir / "dbt_project.yml"
+    blank_pkg_template = pkg_resources.resource_filename("reflekt", "templates/dbt/")
+    tmp_pkg_dir = project_dir / ".reflekt" / "tmp" / pkg_name
+    warehouse_type = config.warehouse_type
 
+    # Determine dbt pkg version
     if force_version:  # If user has forced version, use that
         try:
             version = parse_version(force_version)
         except InvalidVersion:
-            logger.error(f"[ERROR] Invalid semantic version provided: {force_version}")
+            logger.error(
+                f"[ERROR] Invalid semantic version provided by --force-version: "
+                f"{force_version}"
+            )
             raise click.Abort()
     # If we don't find a dbt_project.yml -> package does not exist -> v0.1.0
-    elif not dbt_project_yml_path.exists():
+    elif not dbt_project_yml.exists():
         version = parse_version("0.1.0")
     else:  # Package already exists!
-        with dbt_project_yml_path.open() as f:
-            dbt_project_yml_path = yaml.safe_load(f)
+        with dbt_project_yml.open() as f:
+            dbt_project_yml = yaml.safe_load(f)
 
-        existing_version = parse_version(dbt_project_yml_path["version"])
-        new_version_str = (
-            f"{existing_version.major}."
-            f"{existing_version.minor + 1}."
-            f"{existing_version.micro}"
-        )
-        bumped_version = parse_version(new_version_str)
+        existing_version = parse_version(dbt_project_yml["version"])
 
         if existing_version:
             logger.info(
                 f"[WARNING] Existing dbt package found:\n"
                 f"    Package name: {pkg_name}\n"
                 f"    Existing version: {existing_version}\n"
-                f"    Bumped version: {bumped_version}\n"
             )
 
         bump = click.confirm(
-            f"Do you want to bump dbt package '{pkg_name}' to version {bumped_version}?",
+            "Do you want to bump dbt package version?",
             default=True,
         )
+        major_bump = f"{existing_version.major + 1}.{existing_version.minor}.{existing_version.micro}"  # noqa: E501
+        minor_bump = f"{existing_version.major}.{existing_version.minor + 1}.{existing_version.micro}"  # noqa: E501
+        patch_bump = f"{existing_version.major}.{existing_version.minor}.{existing_version.micro + 1}"  # noqa: E501
 
         if bump:
-            version = bumped_version
+            bump_type = click.prompt(
+                f"Select the semantic version you would like to bump to:\n"
+                f"[1] Major: v{major_bump}\n"
+                f"[2] Minor: v{minor_bump}\n"
+                f"[3] Patch: v{patch_bump}\n"
+                f"\nEnter a number",
+                type=int,
+            )
+
+            if bump_type == 1:
+                version = parse_version(f"{major_bump}")  # noqa: E501
+            elif bump_type == 2:
+                version = parse_version(f"{minor_bump}")  # noqa: E501
+            else:
+                version = parse_version(f"{patch_bump}")  # noqa: E501
+
         else:
             overwrite = click.confirm(
                 f"[WARNING] Reflekt will overwrite current version of dbt package '{pkg_name}'.\n"  # noqa: E501
@@ -523,10 +536,71 @@ def dbt(
             print("")  # Newline in terminal
             version = existing_version
 
+    # Setup temporary dbt pkg
+    if dbt_pkg_dir.exists():
+        # If dbt pk exists, use it as template
+        shutil.rmtree(tmp_pkg_dir)
+        shutil.copytree(dbt_pkg_dir, str(tmp_pkg_dir))
+    else:
+        # If dbt pkg doesn't exist, use blank template
+        shutil.rmtree(tmp_pkg_dir)
+        shutil.copytree(blank_pkg_template, str(tmp_pkg_dir))
+
+    # Load Reflekt plan from 'tracking-plans/'
+    logger.info(f"Loading Reflekt tracking plan {plan_name}")
+    loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name, schema_name=schema)
+    reflekt_plan = loader.plan
+    logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
+    models_subfolder: Path = (
+        reflekt_plan.schema_alias
+        if reflekt_plan.schema_alias is not None
+        else reflekt_plan.schema
+    )
+    models_subfolder_dir = tmp_pkg_dir / "models" / models_subfolder
+    models_subfolder_dir.mkdir(parents=True, exist_ok=True)
+
+    logger.info(
+        f"Building Reflekt dbt package:"
+        f"\n        dbt package name: {pkg_name}"
+        f"\n        dbt package version: {version}"
+        f"\n        dbt package directory: {dbt_pkg_dir}"
+        f"\n        cdp: {cdp}"
+        f"\n        analytics governance tool: {plan_type}"
+        f"\n        tracking plan: {plan_name}"
+        f"\n        warehouse: {warehouse_type}"
+        f"\n        schema: {schema}"
+        f"\n        schema_alias: {reflekt_plan.schema_alias}"
+        f"\n        models subdirectory: models/{models_subfolder}\n"
+    )
+
+    # Update the version string in templated dbt_project.yml
+    with open(tmp_pkg_dir / "dbt_project.yml", "r") as f:
+        dbt_project_yml_str = f.read()
+
+    dbt_project_yml_str = dbt_project_yml_str.replace(
+        "0.1.0", str(version)  # Template always has version '0.1.0'
+    ).replace("reflekt_package_name", pkg_name)
+
+    with open(tmp_pkg_dir / "dbt_project.yml", "w") as f:
+        f.write(dbt_project_yml_str)
+
+    # Set dbt_pkg_name and plan_name in README.md
+    with open(tmp_pkg_dir / "README.md", "r") as f:
+        readme_str = f.read()
+
+    readme_str = readme_str.replace("_DBT_PKG_NAME_", pkg_name).replace(
+        "_PLAN_NAME_", plan_name
+    )
+
+    with open(tmp_pkg_dir / "README.md", "w") as f:
+        f.write(readme_str)
+
     transformer = ReflektTransformer(
         reflekt_plan=reflekt_plan,
         dbt_package_name=pkg_name,
-        pkg_version=version,
+        dbt_pkg_dir=dbt_pkg_dir,
+        tmp_pkg_dir=tmp_pkg_dir,
+        models_subfolder=models_subfolder,
     )
     transformer.build_dbt_package()
 
@@ -548,7 +622,7 @@ def dbt(
             default=f"v{str(version)}__{pkg_name}",
         )
         git_executable = shutil.which("git")
-        rel_pkg_path = f"dbt_packages/{pkg_name}"
+        rel_pkg_path = f"dbt-packages/{pkg_name}"
 
         if plan_type == "avo":
             rel_avo_json_path = ".reflekt/avo/avo.json"

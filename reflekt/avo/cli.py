@@ -9,8 +9,8 @@ from typing import Optional
 
 from loguru import logger
 
-from reflekt.logger import logger_config
 from reflekt.config import ReflektConfig
+from reflekt.logger import logger_config
 from reflekt.project import ReflektProject
 
 
