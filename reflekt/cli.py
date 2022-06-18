@@ -525,7 +525,7 @@ def dbt(
 
         else:
             overwrite = click.confirm(
-                f"[WARNING] Reflekt will overwrite current version of dbt package '{pkg_name}'.\n"  # noqa: E501
+                f"[WARNING] Reflekt will UPDATE the current version of dbt package '{pkg_name}'.\n"  # noqa: E501
                 f"    Do you want to continue?",
                 default=False,
             )
