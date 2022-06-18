@@ -542,8 +542,9 @@ def dbt(
         shutil.rmtree(tmp_pkg_dir)
         shutil.copytree(dbt_pkg_dir, str(tmp_pkg_dir))
     else:
+        if tmp_pkg_dir.exists():  # ensure tmp dir is empty
+            shutil.rmtree(tmp_pkg_dir)
         # If dbt pkg doesn't exist, use blank template
-        shutil.rmtree(tmp_pkg_dir)
         shutil.copytree(blank_pkg_template, str(tmp_pkg_dir))
 
     # Load Reflekt plan from 'tracking-plans/'
