@@ -13,7 +13,7 @@
     - [Events](#events)
       - [Metadata](#metadata)
       - [Properties](#properties)
-    - [Identify traits](#identify-traits)
+    - [Identify traits](#user-traits)
     - [Group traits](#group-traits)
   - [Commands](#commands)
     - [Command compatibility](#command-compatibility)
@@ -334,7 +334,7 @@ Event properties are defined under the `properties:` config (see example `Produc
 User traits are defined in a YAML file under a `traits:` config.
 
 ```yaml
-# identify-traits.yml
+# user-traits.yml
 traits:
   - name: email
     description: The user's email address.
