@@ -9,7 +9,6 @@ from typing import Optional
 
 import yaml
 from loguru import logger
-
 from reflekt.plan import ReflektPlan
 from reflekt.project import ReflektProject
 
@@ -27,7 +26,7 @@ class ReflektLoader(object):
             self.schema_name = schema_name
             self._load_plan_file(plan_dir / "plan.yml")
             self._load_events(plan_dir / "events")
-            self._load_identify_traits(plan_dir / "identify-traits.yml")
+            self._load_identify_traits(plan_dir / "user-traits.yml")
             self._load_group_traits(plan_dir / "group-traits.yml")
             self.plan.validate_plan()
 

@@ -143,7 +143,7 @@ class SegmentPlan(object):
             for (name, prop_json) in sorted(traits_json.items())
         ]
         traits_obj = {"traits": traits}
-        traits_file = plan_dir / "identify-traits.yml"
+        traits_file = plan_dir / "user-traits.yml"
 
         with open(traits_file, "w") as f:
             yaml.dump(

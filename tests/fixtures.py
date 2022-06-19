@@ -238,7 +238,7 @@ def _create_reflekt_event(tmp_dir, event_fixture=REFLEKT_EVENT):
 
 
 def _create_reflekt_identify(tmp_dir, identify_fixture=REFLEKT_IDENTIFY):
-    r_identify = tmp_dir / "identify-traits.yml"
+    r_identify = tmp_dir / "user-traits.yml"
     r_identify.write(identify_fixture)
 
 
