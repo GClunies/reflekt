@@ -14,7 +14,9 @@ Each Reflekt dbt package includes:
 - A dbt [model](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for each event in the tracking plan. Ready for consumption or use in downstream models.
 - A dbt [doc](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) entry for every event modeled in the package. These docs are a perfect *reflektion* of the tracking plan, ensuring the data team and business always know what a model and its columns mean.
 
-https://user-images.githubusercontent.com/28986302/171330405-57400ead-574d-4b71-a31b-57935e0ba9e8.mp4
+
+https://user-images.githubusercontent.com/28986302/174503683-2ad433b6-3091-45bc-8a9b-a03ede52b676.mp4
+
 
 ## Getting Started
 Install Reflekt with `pip`.
