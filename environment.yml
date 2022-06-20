@@ -1,0 +1,11 @@
+# Setup env using:
+#    conda env update --file /Users/gclunies2-mba/Repos/Reflekt/environment.yml --prune
+name: reflekt-conda
+channels:
+- conda-forge
+- defaults
+dependencies:
+- pip
+- python =3.9
+- pip:
+  - poetry
