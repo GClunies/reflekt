@@ -10,6 +10,7 @@ from typing import Optional, Union
 import yaml
 from inflection import titleize, underscore
 from loguru import logger
+
 from reflekt.columns import reflekt_columns
 from reflekt.config import ReflektConfig
 from reflekt.dbt import (
@@ -535,12 +536,15 @@ class ReflektTransformer(object):
         # cdp_cols: dict,
         # plan_cols: list,
     ) -> None:
-        print("")  # Terminal newline
-        logger.info(f"Templating table '{table_name}' in dbt source {self.schema}")
-        dbt_tbl = copy.deepcopy(dbt_table_schema)
-        dbt_tbl["name"] = table_name
-        dbt_tbl["description"] = table_description
-        dbt_src["sources"][0]["tables"].append(dbt_tbl)
+        # Check that table does not already exist in dbt source. This can happen
+        # for Segment events with multiple versions
+        if table_name not in dbt_src["sources"][0]["tables"]:
+            print("")  # Terminal newline
+            logger.info(f"Templating table '{table_name}' in dbt source {self.schema}")
+            dbt_tbl = copy.deepcopy(dbt_table_schema)
+            dbt_tbl["name"] = table_name
+            dbt_tbl["description"] = table_description
+            dbt_src["sources"][0]["tables"].append(dbt_tbl)
 
     def _template_dbt_model(
         self,
