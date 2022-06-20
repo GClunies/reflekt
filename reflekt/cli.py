@@ -15,6 +15,8 @@ from inflection import titleize
 from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
+
+from reflekt import constants
 from reflekt.api_handler import ReflektApiHandler
 from reflekt.avo.plan import AvoPlan
 from reflekt.config import ReflektConfig
@@ -23,8 +25,6 @@ from reflekt.logger import logger_config
 from reflekt.project import ReflektProject
 from reflekt.segment.plan import SegmentPlan
 from reflekt.transformer import ReflektTransformer
-
-from reflekt import constants
 
 
 @click.group()
@@ -236,8 +236,12 @@ def init(project_dir_str: str) -> None:
     with open(project_yml, "r") as f:
         project_yml_str = f.read()
 
-    project_yml_str = project_yml_str.replace("default_project", project_name).replace(
-        "default_profile", config_name
+    project_yml_str = (
+        project_yml_str.replace("default_project", project_name)
+        .replace("default_profile", config_name)
+        .replace(
+            "# config_path: [directorypath]", f"config_path: {str(reflekt_config_path)}"
+        )
     )
 
     with open(project_yml, "w") as f:
