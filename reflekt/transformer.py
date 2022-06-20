@@ -408,7 +408,9 @@ class ReflektTransformer(object):
                 pass  # Already handled above by std_segment_tables for loop
             else:
                 # Get event versions
-                multi_version_event_list = [event for event in reflekt_plan.events]
+                multi_version_event_list = [
+                    x for x in reflekt_plan.events if x.name == event.name
+                ]
                 event_versions = [event.version for event in multi_version_event_list]
 
                 # Only template latest version of event
