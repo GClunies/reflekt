@@ -10,7 +10,7 @@ name: reflekt_github_actions
 config_profile: reflekt_github_actions  # Profile defined in reflekt_config.yml
 
 # OPTIONAL (config_path:)
-config_path:  /home/runner/work/reflekt/reflekt/.reflekt/reflekt_config.yml
+config_path:  /home/runner/work/Reflekt/Reflekt/.reflekt/reflekt_config.yml
 
 tracking_plans:
   # For each tracking plan in your Reflekt project, specify the warehouse and
