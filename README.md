@@ -15,7 +15,7 @@ Each Reflekt dbt package includes:
 - A dbt [doc](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) entry for every event modeled in the package. These docs are a perfect *reflektion* of the tracking plan, ensuring the data team and business always know what a model and its columns mean.
 
 
-https://user-images.githubusercontent.com/28986302/174642373-1208d0d8-b0a9-4b74-94f2-5bcca8073e99.mp4
+https://user-images.githubusercontent.com/28986302/174643122-a38ef58b-bf98-451c-b9da-09d3554794b2.mp4
 
 
 ## Getting Started
