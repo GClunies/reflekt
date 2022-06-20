@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 # Setup env using:
 #    conda env update --file /Users/gclunies2-mba/Repos/Reflekt/environment.yml --prune
 name: reflekt-conda

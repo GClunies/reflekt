@@ -225,25 +225,25 @@ seg_event_cols = {
             "description": "The user agent string of the device generating the event.",
             "sql": "context_user_agent as user_agent",
         },
-        {
-            "source_name": None,
-            "schema_name": "device",
-            "description": "The device that invoked the call.",
-            "sql": """
-            cast(
-                case
-                    when lower(context_user_agent) like '%android%'
-                        then 'Android'
-                    else replace(
-                        {{ dbt_utils.split_part(dbt_utils.split_part('context_user_agent', "'('", 2), "' '", 1) }},
-                    ';',
-                    ''
-                    )
-                end
-                as varchar
-            ) as device
-            """,
-        }
+        # {
+        #     "source_name": None,
+        #     "schema_name": "device",
+        #     "description": "The device that invoked the call.",
+        #     "sql": """
+        #     cast(
+        #         case
+        #             when lower(context_user_agent) like '%android%'
+        #                 then 'Android'
+        #             else replace(
+        #                 {{ dbt_utils.split_part(dbt_utils.split_part('context_user_agent', "'('", 2), "' '", 1) }},
+        #             ';',
+        #             ''
+        #             )
+        #         end
+        #         as varchar
+        #     ) as device
+        #     """,
+        # }
     ],
     "context_device_id": [  # Mobile
         {
@@ -274,14 +274,20 @@ seg_event_cols = {
             "source_name": "context_device_model",
             "schema_name": "device",
             "description": "The device that invoked the call.",
-            "sql": "regexp_substr(context_device_model, '[a-zA-Z]+') as device",
+            "sql": "context_device_model as device_model",
         },
-        {
-            "source_name": None,
-            "schema_name": "device_version",
-            "description": "The version of the device that invoked the call.",
-            "sql": "regexp_replace(regexp_replace(context_device_model, '[a-zA-Z]', ''), ',', '.') as device_version",
-        },
+        # {
+        #     "source_name": "context_device_model",
+        #     "schema_name": "device",
+        #     "description": "The device that invoked the call.",
+        #     "sql": "regexp_substr(context_device_model, '[a-zA-Z]+') as device",
+        # },
+        # {
+        #     "source_name": None,
+        #     "schema_name": "device_version",
+        #     "description": "The version of the device that invoked the call.",
+        #     "sql": "regexp_replace(regexp_replace(context_device_model, '[a-zA-Z]', ''), ',', '.') as device_version",
+        # },
     ],
     "context_timezone": [  # Mobile
         {
@@ -700,25 +706,25 @@ seg_pages_cols = {
             "description": "The user agent string of the device generating the event.",
             "sql": "context_user_agent as user_agent",
         },
-        {
-            "source_name": None,
-            "schema_name": "device",
-            "description": "The device that invoked the call.",
-            "sql": """
-            cast(
-                case
-                    when lower(context_user_agent) like '%android%'
-                        then 'Android'
-                    else replace(
-                        {{ dbt_utils.split_part(dbt_utils.split_part('context_user_agent', "'('", 2), "' '", 1) }},
-                    ';',
-                    ''
-                    )
-                end
-                as varchar
-            ) as device
-            """,
-        }
+        # {
+        #     "source_name": None,
+        #     "schema_name": "device",
+        #     "description": "The device that invoked the call.",
+        #     "sql": """
+        #     cast(
+        #         case
+        #             when lower(context_user_agent) like '%android%'
+        #                 then 'Android'
+        #             else replace(
+        #                 {{ dbt_utils.split_part(dbt_utils.split_part('context_user_agent', "'('", 2), "' '", 1) }},
+        #             ';',
+        #             ''
+        #             )
+        #         end
+        #         as varchar
+        #     ) as device
+        #     """,
+        # }
     ],
     "context_locale": [
         {
@@ -937,14 +943,20 @@ seg_screens_cols = {
             "source_name": "context_device_model",
             "schema_name": "device",
             "description": "The device that invoked the call.",
-            "sql": "regexp_substr(context_device_model, '[a-zA-Z]+') as device",
+            "sql": "context_device_model as device_model",
         },
-        {
-            "source_name": None,
-            "schema_name": "device_version",
-            "description": "The version of the device that invoked the call.",
-            "sql": "regexp_replace(regexp_replace(context_device_model, '[a-zA-Z]', ''), ',', '.') as device_version",
-        },
+        # {
+        #     "source_name": "context_device_model",
+        #     "schema_name": "device",
+        #     "description": "The device that invoked the call.",
+        #     "sql": "regexp_substr(context_device_model, '[a-zA-Z]+') as device",
+        # },
+        # {
+        #     "source_name": None,
+        #     "schema_name": "device_version",
+        #     "description": "The version of the device that invoked the call.",
+        #     "sql": "regexp_replace(regexp_replace(context_device_model, '[a-zA-Z]', ''), ',', '.') as device_version",
+        # },
     ],
     "context_timezone": [
         {
