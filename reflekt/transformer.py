@@ -407,45 +407,51 @@ class ReflektTransformer(object):
             if event.name.lower() in ["page viewed", "screen viewed"]:
                 pass  # Already handled above by std_segment_tables for loop
             else:
-                db_columns, error_msg = self.db_engine.get_columns(
-                    self.schema, segment_2_snake(event.name)
-                )
-                if error_msg is not None:
-                    self.db_errors.append(error_msg)
-                else:
-                    table_name = segment_2_snake(event.name)
-                    model_name = (
-                        f"{self.model_prefix}{self.schema}__{table_name}"
-                        if self.schema_alias is None
-                        else f"{self.model_prefix}{self.schema_alias}__{table_name}"
+                # Get event versions
+                multi_version_event_list = [event for event in reflekt_plan.events]
+                event_versions = [event.version for event in multi_version_event_list]
+
+                # Only template latest version of event
+                if event.version == max(event_versions):
+                    db_columns, error_msg = self.db_engine.get_columns(
+                        self.schema, segment_2_snake(event.name)
                     )
-                    doc_name = (
-                        f"{self.docs_prefix}{self.schema}__{table_name}"
-                        if self.schema_alias is None
-                        else f"{self.docs_prefix}{self.schema_alias}__{table_name}"
-                    )
-                    self._template_dbt_table(
-                        dbt_src=dbt_src,
-                        table_name=table_name,
-                        table_description=event.description,
-                    )
-                    self._template_dbt_model(
-                        materialized=self.materialized,
-                        unique_key="event_id",
-                        table_name=table_name,
-                        model_name=model_name,
-                        db_columns=db_columns,
-                        cdp_cols=seg_event_cols,
-                        plan_cols=event.properties,
-                    )
-                    self._template_dbt_doc(
-                        doc_name=doc_name,
-                        model_name=model_name,
-                        model_description=event.description,
-                        db_columns=db_columns,
-                        cdp_cols=seg_event_cols,
-                        plan_cols=event.properties,
-                    )
+                    if error_msg is not None:
+                        self.db_errors.append(error_msg)
+                    else:
+                        table_name = segment_2_snake(event.name)
+                        model_name = (
+                            f"{self.model_prefix}{self.schema}__{table_name}"
+                            if self.schema_alias is None
+                            else f"{self.model_prefix}{self.schema_alias}__{table_name}"
+                        )
+                        doc_name = (
+                            f"{self.docs_prefix}{self.schema}__{table_name}"
+                            if self.schema_alias is None
+                            else f"{self.docs_prefix}{self.schema_alias}__{table_name}"
+                        )
+                        self._template_dbt_table(
+                            dbt_src=dbt_src,
+                            table_name=table_name,
+                            table_description=event.description,
+                        )
+                        self._template_dbt_model(
+                            materialized=self.materialized,
+                            unique_key="event_id",
+                            table_name=table_name,
+                            model_name=model_name,
+                            db_columns=db_columns,
+                            cdp_cols=seg_event_cols,
+                            plan_cols=event.properties,
+                        )
+                        self._template_dbt_doc(
+                            doc_name=doc_name,
+                            model_name=model_name,
+                            model_description=event.description,
+                            db_columns=db_columns,
+                            cdp_cols=seg_event_cols,
+                            plan_cols=event.properties,
+                        )
 
         src_name = (
             f"{self.src_prefix}{self.schema}"
