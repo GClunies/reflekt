@@ -7,6 +7,7 @@
 import re
 
 from cerberus import Validator
+
 from reflekt.casing import CAMEL_CASE_RE, SNAKE_CASE_RE, TITLE_CASE_RE
 from reflekt.errors import ReflektValidationError
 from reflekt.project import ReflektProject

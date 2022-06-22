@@ -10,7 +10,6 @@ from typing import Optional, Union
 import yaml
 from inflection import titleize, underscore
 from loguru import logger
-from pyparsing import col
 
 from reflekt.columns import reflekt_columns, reflekt_reserved_columns
 from reflekt.config import ReflektConfig
