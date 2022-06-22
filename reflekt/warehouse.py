@@ -31,7 +31,10 @@ class WarehouseConnection:
                     database=self.warehouse.get("redshift").get("db_name"),
                     username=self.warehouse.get("redshift").get("user"),
                     password=self.warehouse.get("redshift").get("password"),
-                )
+                ),
+                connect_args={
+                    "sslmode": "prefer",
+                },
             )
         elif self.warehouse_type == "snowflake":
             self.engine = sqlalchemy.create_engine(
