@@ -529,7 +529,7 @@ def dbt(
 
         else:
             overwrite = click.confirm(
-                f"[WARNING] Reflekt will UPDATE the current version of dbt package '{pkg_name}'.\n"  # noqa: E501
+                f"[WARNING] Reflekt will UPSERT dbt models and docs in dbt package '{pkg_name}'.\n"  # noqa: E501
                 f"    Do you want to continue?",
                 default=False,
             )
@@ -689,9 +689,9 @@ if __name__ == "__main__":
     dbt(
         [
             "--name",
-            "my-plan",
+            "surfline-web-test",
             "--schema",
-            "patty_bar_web",
+            "surfline",
             "--force-version",
             "0.1.0",
         ]
