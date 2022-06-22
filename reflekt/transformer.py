@@ -11,7 +11,7 @@ import yaml
 from inflection import titleize, underscore
 from loguru import logger
 
-from reflekt.columns import reflekt_columns
+from reflekt.columns import reflekt_columns, reflekt_reserved_columns
 from reflekt.config import ReflektConfig
 from reflekt.dbt import (
     dbt_column_schema,
@@ -308,27 +308,30 @@ class ReflektTransformer(object):
         else:
             screen_viewed_props = screen_viewed_event[0].properties
 
+        user_traits = [trait for trait in reflekt_plan.identify_traits]
+        group_traits = [trait for trait in reflekt_plan.group_traits]
+
         std_segment_tables = [
             {
                 "name": "identifies",
                 "description": "A table with identify() calls.",  # noqa: E501
                 "unique_key": "identify_id",
                 "cdp_cols": seg_identify_cols,
-                "plan_cols": [],
+                "plan_cols": user_traits,
             },
             {
                 "name": "users",
                 "description": "A table with the latest traits for users.",  # noqa: E501
                 "unique_key": "user_id",
                 "cdp_cols": seg_users_cols,
-                "plan_cols": [],
+                "plan_cols": user_traits,
             },
             {
                 "name": "groups",
                 "description": "A table with group() calls.",  # noqa: E501
                 "unique_key": "group_id",
                 "cdp_cols": seg_groups_cols,
-                "plan_cols": [],
+                "plan_cols": group_traits,
             },
             {
                 "name": "pages",
@@ -445,6 +448,7 @@ class ReflektTransformer(object):
                             db_columns=db_columns,
                             cdp_cols=seg_event_cols,
                             plan_cols=event.properties,
+                            event_name=event.name,
                         )
                         self._template_dbt_doc(
                             doc_name=doc_name,
@@ -563,6 +567,7 @@ class ReflektTransformer(object):
         db_columns: list,
         cdp_cols: dict,
         plan_cols: list,
+        event_name: Optional[str] = None,
     ) -> None:
         print("")  # Terminal newline
         logger.info(
@@ -591,7 +596,10 @@ class ReflektTransformer(object):
         for column, mapped_columns in cdp_cols.items():
             if column in db_columns or column in reflekt_columns:
                 for mapped_column in mapped_columns:
-                    if mapped_column["schema_name"] is not None:
+                    if (
+                        mapped_column["source_name"] in db_columns
+                        or column in reflekt_columns
+                    ) and mapped_column["schema_name"] is not None:
                         logger.info(
                             f"    Adding column '{mapped_column['schema_name']}' to "
                             f"model SQL"
@@ -602,14 +610,27 @@ class ReflektTransformer(object):
                             .replace("__TABLE_NAME__", table_name)
                             .replace("__PLAN_NAME__", self.plan_name)
                         )
+
+                        if event_name is not None:
+                            col_sql = col_sql.replace("__EVENT_NAME__", event_name)
+
                         mdl_sql += "\n        " + col_sql + ","
 
+        # TODO - Test this logic
         for column in plan_cols:
-            logger.info(
-                f"    Adding column '{segment_2_snake(column.name)}' to model SQL"
-            )
-            col_sql = segment_2_snake(column.name)
-            mdl_sql += "\n        " + col_sql + ","
+            if (
+                segment_2_snake(column.name) in db_columns
+                and segment_2_snake(column.name) not in reflekt_reserved_columns
+            ):
+                # If the columns is named 'interval', surround in double quotes
+                column_name = (
+                    segment_2_snake(column.name)
+                    if column.name != "interval"  # Handle columns named "interval"
+                    else '"interval"'
+                )
+                logger.info(f"    Adding column '{column_name}' to model SQL")
+                col_sql = column_name
+                mdl_sql += "\n        " + col_sql + ","
 
         mdl_sql = mdl_sql[:-1]  # Remove final trailing comma
         # fmt: off
@@ -723,16 +744,31 @@ class ReflektTransformer(object):
                         mdl_col = copy.deepcopy(dbt_column_schema)
                         mdl_col["name"] = mapped_column["schema_name"]
                         mdl_col["description"] = mapped_column["description"]
-                        if mapped_column.get("tests") is not None:
-                            mdl_col["tests"] = mapped_column["tests"]
+                        # if mapped_column.get("tests") is not None:  # remove id tests for now  # noqa: E501
+                        #     mdl_col["tests"] = mapped_column["tests"]
                         dbt_mdl_doc["columns"].append(mdl_col)
 
         for column in plan_cols:
-            logger.info(f"    Adding column '{segment_2_snake(column.name)}' to docs")
-            mdl_col = copy.deepcopy(dbt_column_schema)
-            mdl_col["name"] = segment_2_snake(column.name)
-            mdl_col["description"] = column.description
-            dbt_mdl_doc["columns"].append(mdl_col)
+            if (
+                segment_2_snake(column.name) in db_columns
+                and segment_2_snake(column.name) not in reflekt_reserved_columns
+            ):
+                logger.info(
+                    f"    Adding column '{segment_2_snake(column.name)}' to docs"
+                )
+                mdl_col = copy.deepcopy(dbt_column_schema)
+                mdl_col["name"] = segment_2_snake(column.name)
+                mdl_col["description"] = column.description
+                dbt_mdl_doc["columns"].append(mdl_col)
+        # for column in plan_cols:
+        #     if column.name in db_columns:
+        # logger.info(
+        #     f"    Adding column '{segment_2_snake(column.name)}' to docs"
+        # )
+        # mdl_col = copy.deepcopy(dbt_column_schema)
+        # mdl_col["name"] = segment_2_snake(column.name)
+        # mdl_col["description"] = column.description
+        # dbt_mdl_doc["columns"].append(mdl_col)
 
         dbt_doc["models"].append(dbt_mdl_doc)
 
