@@ -273,7 +273,7 @@ class ReflektProject:
             if self.materialized not in ["view", "incremental"]:
                 raise ReflektProjectError(
                     "\n\nInvalid materialized config in reflekt_project.yml. "
-                    "Must be either 'view' or 'incremental'. See Reflekt docs on project configuration:"
+                    "Must be either 'view' or 'incremental'. See Reflekt docs on project configuration:"  # noqa: E501
                     "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
                 )
         except KeyError:
