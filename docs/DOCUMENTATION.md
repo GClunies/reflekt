@@ -13,7 +13,7 @@
     - [Events](#events)
       - [Metadata](#metadata)
       - [Properties](#properties)
-    - [Identify traits](#user-traits)
+    - [Identify traits](#identify-traits)
     - [Group traits](#group-traits)
   - [Commands](#commands)
     - [Command compatibility](#command-compatibility)
@@ -125,7 +125,7 @@ Connecting Reflekt with [Avo](https://www.avo.app/) requires some additional ste
         └─ your-avo-json-source.json
    ```
 
-8. Configure your Reflekt project in the `reflekt_project.yml`. See the [Project configs](https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configs) docs.
+8. Configure your Reflekt project in the `reflekt_project.yml`. See the [Project configs](https://reflekt-ci.notion.site/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74) docs.
 
 ## Project configuration
 

@@ -154,7 +154,7 @@ seg_event_cols = {
         {
             "source_name": "context_page_search",
             "schema_name": "page_url_query",
-            "description": "The the URL search query parameters of the page where the call was invoked.",
+            "description": "The URL search query parameters of the page where the call was invoked.",
             "sql": "context_page_search as page_url_query",
         }
     ],
@@ -449,7 +449,7 @@ seg_event_cols = {
         {
             "source_name": "context_protocols_source_id",
             "schema_name": "segment_protocols_source_id",
-            "description": "If a protocol violation is detected for this instance of the event firing, the ID of the Segment source.",
+            "description": "If a protocol violation is detected when the call is invoked, the ID of the Segment source.",
             "sql": "context_protocols_source_id as segment_protocols_source_id",
         }
     ],
@@ -457,7 +457,7 @@ seg_event_cols = {
         {
             "source_name": "context_protocols_source_name",
             "schema_name": "segment_protocols_source_name",
-            "description": "If a protocol violation is detected for this instance of the event firing, the name of the Segment source.",
+            "description": "If a protocol violation is detected when the call is invoked, the name of the Segment source.",
             "sql": "context_protocols_source_name as segment_protocols_source_name",
         }
     ],
@@ -465,7 +465,7 @@ seg_event_cols = {
         {
             "source_name": "context_protocols_violations",
             "schema_name": "segment_protocols_violations",
-            "description": "If a protocol violation is detected for this instance of the event firing, a list of the protocol violations.",
+            "description": "A list of Segment Protocols violation (if any) detected when the call was invoked.",
             "sql": "context_protocols_violations as segment_protocols_violations",
         }
     ],
@@ -473,7 +473,7 @@ seg_event_cols = {
         {
             "source_name": "context_protocols_omitted",
             "schema_name": "segment_protocols_omitted_properties",
-            "description": "If this instance of the event fired with unplanned properties (not in tracking plan), a list of the unplanned properties, which are omitted from the event payload and do not reach thea data warehouse.",
+            "description": "A list of unplanned properties (not in tracking plan) that were omitted by Segment Protocols (i.e. not delivered to destinations).",
             "sql": "context_protocols_omitted as segment_protocols_omitted_properties",
         }
     ],
@@ -621,7 +621,7 @@ seg_tracks_cols = {
         {
             "source_name": "context_page_search",
             "schema_name": "page_url_query",
-            "description": "The the URL search query parameters of the page where the call was invoked.",
+            "description": "The URL search query parameters of the page where the call was invoked.",
             "sql": "context_page_search as page_url_query",
         }
     ],
@@ -916,7 +916,7 @@ seg_tracks_cols = {
         {
             "source_name": "context_protocols_source_id",
             "schema_name": "segment_protocols_source_id",
-            "description": "If a protocol violation is detected for this instance of the event firing, the ID of the Segment source.",
+            "description": "If a protocol violation is detected when the call is invoked, the ID of the Segment source.",
             "sql": "context_protocols_source_id as segment_protocols_source_id",
         }
     ],
@@ -924,7 +924,7 @@ seg_tracks_cols = {
         {
             "source_name": "context_protocols_source_name",
             "schema_name": "segment_protocols_source_name",
-            "description": "If a protocol violation is detected for this instance of the event firing, the name of the Segment source.",
+            "description": "If a protocol violation is detected when the call is invoked, the name of the Segment source.",
             "sql": "context_protocols_source_name as segment_protocols_source_name",
         }
     ],
@@ -932,7 +932,7 @@ seg_tracks_cols = {
         {
             "source_name": "context_protocols_violations",
             "schema_name": "segment_protocols_violations",
-            "description": "If a protocol violation is detected for this instance of the event firing, a list of the protocol violations.",
+            "description": "A list of Segment Protocols violation (if any) detected when the call was invoked.",
             "sql": "context_protocols_violations as segment_protocols_violations",
         }
     ],
@@ -940,7 +940,7 @@ seg_tracks_cols = {
         {
             "source_name": "context_protocols_omitted",
             "schema_name": "segment_protocols_omitted_properties",
-            "description": "If this instance of the event fired with unplanned properties (not in tracking plan), a list of the unplanned properties, which are omitted from the event payload and do not reach thea data warehouse.",
+            "description": "A list of unplanned properties (not in tracking plan) that were omitted by Segment Protocols (i.e. not delivered to destinations).",
             "sql": "context_protocols_omitted as segment_protocols_omitted_properties",
         }
     ],
@@ -1063,9 +1063,9 @@ seg_pages_cols = {
     "context_page_url": [
         {
             "source_name": "context_page_url",
-            "schema_name": None,  # page() call automatically collects `url`
+            "schema_name": "page_url",
             "description": "The URL of the page where the call was invoked.",
-            "sql": None,
+            "sql": "context_page_url as page_url",
         },
         {
             "source_name": None,
@@ -1077,33 +1077,33 @@ seg_pages_cols = {
     "context_page_path": [
         {
             "source_name": "context_page_path",
-            "schema_name": None,  # page() call automatically collects `path`
+            "schema_name": "page_url_path",
             "description": "The path of the page where the call was invoked.",
-            "sql": None,
+            "sql": "context_page_path as page_url_path",
         }
     ],
     "context_page_title": [
         {
             "source_name": "context_page_title",
-            "schema_name": None,  # page() call automatically collects `title`
+            "schema_name": "page_title",
             "description": "The title of the page where the call was invoked.",
-            "sql": None,
+            "sql": "context_page_title as page_title",
         }
     ],
     "context_page_search": [
         {
             "source_name": "context_page_search",
-            "schema_name": None,  # page() call automatically collects `search`
-            "description": "The the URL search query parameters of the page where the call was invoked.",
-            "sql": None,
+            "schema_name": "page_url_query",
+            "description": "The URL search query parameters of the page where the call was invoked.",
+            "sql": "context_page_search as page_url_query",
         }
     ],
     "context_page_referrer": [
         {
             "source_name": "context_page_referrer",
-            "schema_name": None,  # page() call automatically collects `referrer`
+            "schema_name": "referrer",
             "description": "The URL of the page that referred the user to the page where the call was invoked.",
-            "sql": None,
+            "sql": "context_page_referrer as page_referrer",
         },
         {
             "source_name": None,
@@ -1220,7 +1220,7 @@ seg_pages_cols = {
         {
             "source_name": "context_protocols_source_id",
             "schema_name": "segment_protocols_source_id",
-            "description": "If a protocol violation is detected for this instance of the event firing, the ID of the Segment source.",
+            "description": "If a protocol violation is detected when the call is invoked, the ID of the Segment source.",
             "sql": "context_protocols_source_id as segment_protocols_source_id",
         }
     ],
@@ -1228,7 +1228,7 @@ seg_pages_cols = {
         {
             "source_name": "context_protocols_source_name",
             "schema_name": "segment_protocols_source_name",
-            "description": "If a protocol violation is detected for this instance of the event firing, the name of the Segment source.",
+            "description": "If a protocol violation is detected when the call is invoked, the name of the Segment source.",
             "sql": "context_protocols_source_name as segment_protocols_source_name",
         }
     ],
@@ -1236,7 +1236,7 @@ seg_pages_cols = {
         {
             "source_name": "context_protocols_violations",
             "schema_name": "segment_protocols_violations",
-            "description": "If a protocol violation is detected for this instance of the event firing, a list of the protocol violations.",
+            "description": "A list of Segment Protocols violation (if any) detected when the call was invoked.",
             "sql": "context_protocols_violations as segment_protocols_violations",
         }
     ],
@@ -1244,7 +1244,7 @@ seg_pages_cols = {
         {
             "source_name": "context_protocols_omitted",
             "schema_name": "segment_protocols_omitted_properties",
-            "description": "If this instance of the event fired with unplanned properties (not in tracking plan), a list of the unplanned properties, which are omitted from the event payload and do not reach thea data warehouse.",
+            "description": "A list of unplanned properties (not in tracking plan) that were omitted by Segment Protocols (i.e. not delivered to destinations).",
             "sql": "context_protocols_omitted as segment_protocols_omitted_properties",
         }
     ],
@@ -1548,7 +1548,7 @@ seg_screens_cols = {
         {
             "source_name": "context_protocols_source_id",
             "schema_name": "segment_protocols_source_id",
-            "description": "If a protocol violation is detected for this instance of the event firing, the ID of the Segment source.",
+            "description": "If a protocol violation is detected when the call is invoked, the ID of the Segment source.",
             "sql": "context_protocols_source_id as segment_protocols_source_id",
         }
     ],
@@ -1556,7 +1556,7 @@ seg_screens_cols = {
         {
             "source_name": "context_protocols_source_name",
             "schema_name": "segment_protocols_source_name",
-            "description": "If a protocol violation is detected for this instance of the event firing, the name of the Segment source.",
+            "description": "If a protocol violation is detected when the call is invoked, the name of the Segment source.",
             "sql": "context_protocols_source_name as segment_protocols_source_name",
         }
     ],
@@ -1564,7 +1564,7 @@ seg_screens_cols = {
         {
             "source_name": "context_protocols_violations",
             "schema_name": "segment_protocols_violations",
-            "description": "If a protocol violation is detected for this instance of the event firing, a list of the protocol violations.",
+            "description": "A list of Segment Protocols violation (if any) detected when the call was invoked.",
             "sql": "context_protocols_violations as segment_protocols_violations",
         }
     ],
@@ -1572,7 +1572,7 @@ seg_screens_cols = {
         {
             "source_name": "context_protocols_omitted",
             "schema_name": "segment_protocols_omitted_properties",
-            "description": "If this instance of the event fired with unplanned properties (not in tracking plan), a list of the unplanned properties, which are omitted from the event payload and do not reach thea data warehouse.",
+            "description": "A list of unplanned properties (not in tracking plan) that were omitted by Segment Protocols (i.e. not delivered to destinations).",
             "sql": "context_protocols_omitted as segment_protocols_omitted_properties",
         }
     ],
