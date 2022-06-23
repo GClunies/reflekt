@@ -135,7 +135,7 @@ def init(project_dir_str: str) -> None:
             avo_end_msg = (
                 "You've selected Avo as your Analytics Governance tool which requires "
                 "additional setup steps. Please see the docs for additional guidance:\n"
-                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md/#connect-reflekt--avo"  # noqa: E501
+                "    https://reflekt-ci.notion.site/Connect-Reflekt-to-Avo-489158cf319f43c491470c54b37e3b13"  # noqa: E501
             )
 
         # TODO - Enable support for other CDPs below as developed
@@ -562,6 +562,10 @@ def dbt(
         else reflekt_plan.schema
     )
     models_subfolder_dir = tmp_pkg_dir / "models" / models_subfolder
+
+    if models_subfolder_dir.exists():
+        shutil.rmtree(models_subfolder_dir)
+
     models_subfolder_dir.mkdir(parents=True, exist_ok=True)
 
     logger.info(
@@ -594,7 +598,7 @@ def dbt(
         readme_str = f.read()
 
     readme_str = readme_str.replace("_DBT_PKG_NAME_", pkg_name).replace(
-        "_PLAN_NAME_", plan_name
+        "_PLAN_TOOL_", titleize(reflekt_plan.plan_type)
     )
 
     with open(tmp_pkg_dir / "README.md", "w") as f:

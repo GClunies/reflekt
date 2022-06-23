@@ -48,9 +48,8 @@ class ReflektEvent(object):
                 raise ReflektValidationError(
                     f"Invalid metadata specified for event '{self.name} - "
                     f"{validator.errors}\n\n"
-                    f"See Reflekt docs on defining metadata and metadata tests:"
-                    f"\n    Event metadata: https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#metadata"  # noqa: E501
-                    f"\n    Defining metadata tests: https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                    f"See Reflekt Project configuration docs for guidance on defining expected event metadata:\n"  # noqa: E501
+                    f"    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
                 )
 
     def _check_event_name_case(self) -> None:
@@ -73,8 +72,8 @@ class ReflektEvent(object):
                 raise ReflektValidationError(
                     f"Event name '{self.name}' does not match naming convention"
                     f" defined by '{rule_type} {rule_str}' in reflekt_project.yml. "
-                    f"See Reflekt docs on defining naming conventions:\n"
-                    f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configuration"  # noqa: E501
+                    f"See Reflekt Project configuration docs for guidance on defining naming conventions:\n"  # noqa: E501
+                    f"    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
                 )
 
     def _check_event_name_numbers(self) -> None:
@@ -86,8 +85,8 @@ class ReflektEvent(object):
                 raise ReflektValidationError(
                     f"\nEvent name '{self.name}' does not match naming convention"
                     f" defined by 'allow_numbers: {str(allow_numbers).lower()}' in reflekt_project.yml "  # noqa: E501
-                    f"See Reflekt docs on defining naming conventions:\n"
-                    f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configuration"  # noqa: E501
+                    f"See Reflekt Project configuration docs for guidance on defining naming conventions:\n"  # noqa: E501
+                    f"    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
                 )
 
     def _check_duplicate_properties(self) -> None:
@@ -115,8 +114,8 @@ class ReflektEvent(object):
             if prop_name in ReflektProject().properties_reserved:
                 raise ReflektValidationError(
                     f"Property name '{prop_name}' is reserved and cannot be used."
-                    f"See Reflekt docs on defining reserved property names:\n"
-                    f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#project-configuration"  # noqa: E501
+                    f"See Reflekt Project configuration docs for guidance on defining naming conventions:\n"  # noqa: E501
+                    f"    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
                 )
 
     def validate_event(self) -> None:
@@ -128,7 +127,7 @@ class ReflektEvent(object):
             raise ReflektValidationError(
                 f"Event validation error for event '{self.name}' - {validator.errors}"  # noqa: E501
                 f"\n\nSee Reflekt docs on event definition:\n"
-                f"    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#events"  # noqa: E501
+                f"    https://www.notion.so/reflekt-ci/Tracking-Plans-0886264fb3d54891898730ed28b804c0#9c3d1d8cdcd84f19878bd15e2e1bf981"  # noqa: E501
             )
 
         self._check_event_name_case()

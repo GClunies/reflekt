@@ -683,7 +683,7 @@ class ReflektTransformer(object):
                 "Invalid materialized config in reflekt_project.yml. Must be "
                 "either 'view' or 'incremental'. See Reflekt docs on project "
                 "configuration:"
-                "    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
         return model_config

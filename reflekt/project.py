@@ -95,7 +95,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "\nMust define a project name in reflekt_project.yml. See Reflekt "
                 "docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_config_profile(self) -> None:
@@ -105,7 +105,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "\nMust define a config profile in reflekt_project.yml. See Reflekt "
                 "docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_config_path(self) -> None:
@@ -134,7 +134,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "\n\nMust define a 'case:' rule for event naming conventions in reflekt_project.yml. See Reflekt "  # noqa: E501
                 "docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_events_allow_numbers(self) -> None:
@@ -146,7 +146,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "\n\nMust define an 'allow_numbers:' rule for events naming in reflekt_project.yml. See Reflekt "  # noqa: E501
                 "docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_events_reserved(self) -> None:
@@ -158,7 +158,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "\n\nMust define a 'reserved:' rule for events naming in reflekt_project.yml. See Reflekt "  # noqa: E501
                 "docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_properties_case(self) -> None:
@@ -170,7 +170,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "\n\nMust define a 'case:' rule for properties naming convention in reflekt_project.yml. See Reflekt "  # noqa: E501
                 "docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_properties_allow_numbers(self) -> None:
@@ -182,7 +182,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "\n\nMust define an 'allow_numbers:' rule for properties naming in reflekt_project.yml. See Reflekt "  # noqa: E501
                 "docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_properties_reserved(self) -> None:
@@ -199,6 +199,8 @@ class ReflektProject:
                 "\n    naming:"
                 "\n      reserved: ['my_reserved_property']  # List (can be empty)"  # noqa E501
                 "\n"
+                "See Reflekt docs on project configuration:"
+                "\n   https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_data_types(self) -> None:
@@ -208,7 +210,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "\n\nMust define allowed data types for event properties in reflekt_project.yml. See Reflekt "  # noqa: E501
                 "docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n   https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_warehouse_database_obj(self) -> None:
@@ -220,7 +222,7 @@ class ReflektProject:
             raise ReflektProjectError(
                 "\n\nMust define a database for each tracking plan in "
                 "reflekt_project.yml. See Reflekt docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_warehouse_schema_obj(self) -> None:
@@ -230,9 +232,8 @@ class ReflektProject:
             ]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define warehouse 'schema:' config in reflekt_project.yml. "
-                " See Reflekt docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n\nMust define warehouse 'schema:' config in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_expected_metadata_schema(self) -> None:
@@ -251,9 +252,8 @@ class ReflektProject:
             self.src_prefix = self.project["dbt"]["templater"]["sources"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define 'prefix:' for templated dbt sources in reflekt_project.yml. "  # noqa: E501
-                "See Reflekt docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n\nMust define 'prefix:' for templated dbt sources in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_dbt_model_prefix(self) -> None:
@@ -261,9 +261,8 @@ class ReflektProject:
             self.model_prefix = self.project["dbt"]["templater"]["models"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define 'prefix:' for templated dbt models in reflekt_project.yml. "  # noqa: E501
-                "See Reflekt docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n\nMust define 'prefix:' for templated dbt models in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_dbt_model_materialized(self) -> None:
@@ -274,15 +273,13 @@ class ReflektProject:
             if self.materialized not in ["view", "incremental"]:
                 raise ReflektProjectError(
                     "\n\nInvalid materialized config in reflekt_project.yml. "
-                    "Must be either 'view' or 'incremental'. See Reflekt docs on "
-                    "project configuration:"
-                    "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                    "Must be either 'view' or 'incremental'. See Reflekt docs on project configuration:"
+                    "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
                 )
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust set 'materialized:' for templated dbt models in "
-                "reflekt_project.yml. See Reflekt docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n\nMust set 'materialized:' for templated dbt models in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_dbt_model_incremental_logic(self) -> None:
@@ -303,7 +300,7 @@ class ReflektProject:
                     "\n          where event_timestamp >= (select max(event_timestamp)::date from {{ this }})"  # noqa E501
                     "\n      {%- endif %}"
                     "\n\n See Reflekt docs on project configuration:"
-                    "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                    "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
                 )
         else:
             self.incremental_logic = None
@@ -313,9 +310,8 @@ class ReflektProject:
             self.docs_prefix = self.project["dbt"]["templater"]["docs"]["prefix"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define 'prefix:' for templated dbt docs in "
-                "reflekt_project.yml. See Reflekt docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n\nMust define 'prefix:' for templated dbt docs in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 
     def _get_dbt_docs_in_folder(self) -> None:
@@ -323,7 +319,6 @@ class ReflektProject:
             self.docs_in_folder = self.project["dbt"]["templater"]["docs"]["in_folder"]
         except KeyError:
             raise ReflektProjectError(
-                "\n\nMust define 'in_folder:' for templated dbt docs in "
-                "reflekt_project.yml. See Reflekt docs on project configuration:"
-                "\n    https://github.com/GClunies/reflekt/blob/main/docs/DOCUMENTATION.md#reflekt-project"  # noqa: E501
+                "\n\nMust define 'in_folder:' for templated dbt docs in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
