@@ -87,4 +87,7 @@ dbt:
 
     docs:
       prefix: _reflekt_          # Prefix for docs in templated dbt package
+      id_tests:           # Include docs test on ID column (e.g. event_id)?
+        not_null: true
+        unique: true
       in_folder: false           # Write docs in models/docs/ folder?

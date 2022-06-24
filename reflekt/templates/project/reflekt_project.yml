@@ -70,4 +70,7 @@ dbt:                                    # dbt configurations
 
     docs:                               # Configuration for dbt docs
       prefix: _reflekt_                 # Prefix for dbt docs
+      id_tests:                         # Include docs test on ID column (e.g. event_id)?
+        not_null: true
+        unique: true
       in_folder: false                  # Write docs in 'docs/' folder?
