@@ -44,7 +44,7 @@ seg_event_cols = {
             "source_name": None,
             "schema_name": "event_name",
             "description": "The name of the event.",
-            "sql": "'__EVENT_NAME__'::varchar as event_name",
+            "sql": "event_text as event_name",
         }
     ],
     "call_type": [
@@ -513,6 +513,14 @@ seg_tracks_cols = {
             "description": "The name of the tracking plan where the event is defined.",
             "sql": "'__PLAN_NAME__'::varchar as tracking_plan",
         },
+    ],
+    "event_text": [
+        {
+            "source_name": "event_name",  # Hack to force this column to be templated
+            "schema_name": "event_name",
+            "description": "The name of the event.",
+            "sql": "event_text as event_name",
+        }
     ],
     "call_type": [
         {
