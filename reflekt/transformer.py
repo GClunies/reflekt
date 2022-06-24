@@ -13,22 +13,35 @@ from loguru import logger
 
 from reflekt.columns import reflekt_columns, reflekt_reserved_columns
 from reflekt.config import ReflektConfig
-from reflekt.dbt import (dbt_column_schema, dbt_doc_schema, dbt_model_schema,
-                         dbt_src_schema, dbt_table_schema)
+from reflekt.dbt import (
+    dbt_column_schema,
+    dbt_doc_schema,
+    dbt_model_schema,
+    dbt_src_schema,
+    dbt_table_schema,
+)
 from reflekt.dumper import ReflektYamlDumper
 from reflekt.errors import ReflektProjectError
 from reflekt.event import ReflektEvent
 from reflekt.plan import ReflektPlan
 from reflekt.project import ReflektProject
 from reflekt.property import ReflektProperty
-from reflekt.segment.columns import (seg_event_cols, seg_groups_cols,
-                                     seg_identify_cols, seg_pages_cols,
-                                     seg_screens_cols, seg_tracks_cols,
-                                     seg_users_cols)
-from reflekt.segment.schema import (segment_event_schema, segment_items_schema,
-                                    segment_payload_schema,
-                                    segment_plan_schema,
-                                    segment_property_schema)
+from reflekt.segment.columns import (
+    seg_event_cols,
+    seg_groups_cols,
+    seg_identify_cols,
+    seg_pages_cols,
+    seg_screens_cols,
+    seg_tracks_cols,
+    seg_users_cols,
+)
+from reflekt.segment.schema import (
+    segment_event_schema,
+    segment_items_schema,
+    segment_payload_schema,
+    segment_plan_schema,
+    segment_property_schema,
+)
 from reflekt.trait import ReflektTrait
 from reflekt.utils import segment_2_snake
 from reflekt.warehouse import WarehouseConnection
@@ -509,7 +522,7 @@ class ReflektTransformer(object):
         print("")  # Terminal newline
         logger.info(
             f"[SUCCESS] Modeled and documented tracking plan '{reflekt_plan.name}' "
-            f"in dbt package '{self.dbt_package_name}' at: {self.dbt_pkg_dir}"
+            f"in dbt package '{self.dbt_package_name}'"
         )
         print("")  # Cleanup stdout
 
