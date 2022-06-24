@@ -49,6 +49,7 @@ class ReflektProject:
         self._get_dbt_model_materialized()
         self._get_dbt_model_incremental_logic()
         self._get_dbt_docs_prefix()
+        self._get_dbt_docs_tests()
         self._get_dbt_docs_in_folder()
 
     def _get_project_root(self, path: Path) -> Path:
@@ -311,6 +312,27 @@ class ReflektProject:
         except KeyError:
             raise ReflektProjectError(
                 "\n\nMust define 'prefix:' for templated dbt docs in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+            )
+
+    def _get_dbt_docs_tests(self) -> None:
+        try:
+            self.docs_test_not_null = self.project["dbt"]["templater"]["docs"][
+                "id_tests"
+            ]["not_null"]
+        except KeyError:
+            raise ReflektProjectError(
+                "\n\nMust define 'not_null:' test configuration for templated dbt docs in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+            )
+
+        try:
+            self.docs_test_unique = self.project["dbt"]["templater"]["docs"]["id_tests"][
+                "unique"
+            ]
+        except KeyError:
+            raise ReflektProjectError(
+                "\n\nMust define 'unique:' test configuration for templated dbt docs in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
 

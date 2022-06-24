@@ -79,6 +79,8 @@ class ReflektTransformer(object):
             self.materialized = self.reflekt_project.materialized
             self.incremental_logic = self.reflekt_project.incremental_logic
             self.docs_prefix = self.reflekt_project.docs_prefix
+            self.docs_test_not_null = self.reflekt_project.docs_test_not_null
+            self.docs_test_unique = self.reflekt_project.docs_test_unique
             self.docs_in_folder = self.reflekt_project.docs_in_folder
 
     def build_cdp_plan(self, plan_type: Optional[str] = None) -> None:
@@ -616,7 +618,6 @@ class ReflektTransformer(object):
 
                         mdl_sql += "\n        " + col_sql + ","
 
-        # TODO - Test this logic
         for column in plan_cols:
             if (
                 segment_2_snake(column.name) in db_columns
@@ -744,8 +745,19 @@ class ReflektTransformer(object):
                         mdl_col = copy.deepcopy(dbt_column_schema)
                         mdl_col["name"] = mapped_column["schema_name"]
                         mdl_col["description"] = mapped_column["description"]
-                        # if mapped_column.get("tests") is not None:  # remove id tests for now  # noqa: E501
-                        #     mdl_col["tests"] = mapped_column["tests"]
+                        if mapped_column["source_name"] == "id" and (
+                            self.docs_test_not_null or self.docs_test_unique
+                        ):
+                            mdl_col["tests"] = []
+
+                            if self.docs_test_not_null:
+                                mdl_col["tests"].append("not_null")
+
+                            if self.docs_test_unique:
+                                mdl_col["tests"].append("unique")
+
+                        if mapped_column.get("tests") is not None:
+                            mdl_col["tests"] = mapped_column["tests"]
                         dbt_mdl_doc["columns"].append(mdl_col)
 
         for column in plan_cols:
