@@ -521,8 +521,8 @@ class ReflektTransformer(object):
 
         print("")  # Terminal newline
         logger.info(
-            f"[SUCCESS] Created Reflekt dbt package '{self.dbt_package_name}' "
-            f"at: {self.dbt_pkg_dir}"
+            f"[SUCCESS] Modeled and documented tracking plan '{reflekt_plan.name}' "
+            f"in dbt package '{self.dbt_package_name}'"
         )
         print("")  # Cleanup stdout
 

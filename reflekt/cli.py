@@ -435,21 +435,6 @@ def test(plan_name: str) -> None:
 
 
 @click.option(
-    "--name",
-    "plan_name",
-    required=True,
-    help="Tracking plan name in your Reflekt project.",
-)
-@click.option(
-    "--schema",
-    "schema",
-    required=False,
-    help=(
-        "Schema Reflekt will search when looking for raw event tables that match "
-        "tracking plan."
-    ),
-)
-@click.option(
     "--force-version",
     "force_version",
     required=False,
@@ -469,11 +454,40 @@ def test(plan_name: str) -> None:
     required=False,
     help="The git tag Reflekt should add after templating. Tag format = 'v<semantic_version>__reflekt_<project_name>_<cdp>'",  # noqa: E501
 )
+@click.option(
+    "--skip-git",
+    "skip_git",
+    is_flag=True,
+    required=False,
+    help="Skip prompts at the end of templating to create Git commit and tag.",
+)
+@click.option(
+    "--force-version",
+    "force_version",
+    required=False,
+    help="Force Reflekt to template the dbt package with a specified semantic version.",
+)
+@click.option(
+    "--schema",
+    "schema",
+    required=False,
+    help=(
+        "Schema Reflekt will search when looking for raw event tables that match "
+        "tracking plan."
+    ),
+)
+@click.option(
+    "--name",
+    "plan_name",
+    required=True,
+    help="Tracking plan name in your Reflekt project.",
+)
 @click.command()
 def dbt(
     plan_name: str,
     schema: Optional[str] = None,
     force_version: Optional[str] = None,
+    skip_git: Optional[bool] = None,
     force_commit: Optional[str] = None,
     force_tag: Optional[str] = None,
 ) -> None:
@@ -629,142 +643,84 @@ def dbt(
     )
     transformer.build_dbt_package()
 
-    if force_commit:
-        commit_str = f"build: {pkg_name}/models/{models_subfolder}/"
-    else:
-        create_commit = click.confirm(
-            "Would you like Reflekt to create a Git commit after templating?",
-            default=False,
-        )
-        if create_commit:
-            commit_str = click.prompt(
-                "Git commit message",
-                type=str,
-                default=f"build: {pkg_name}/models/{models_subfolder}/",
-            )
+    if not skip_git:
+        if force_commit:
+            commit_str = f"build: {pkg_name}/models/{models_subfolder}/"
         else:
-            commit_str = None
-
-    if force_tag:
-        tag_str = f"v{str(version)}__{pkg_name}"
-    else:
-        create_tag = click.confirm(
-            f"Would you like Reflekt to create a Git tag to easily reference "
-            f"dbt package {pkg_name} in your dbt project?",
-            default=False,
-        )
-        if create_tag:
-            tag_str = click.prompt(
-                "Git tag",
-                type=str,
-                default=f"v{str(version)}__{pkg_name}",
+            create_commit = click.confirm(
+                "Would you like Reflekt to create a Git commit after templating?",
+                default=False,
             )
+            if create_commit:
+                commit_str = click.prompt(
+                    "Git commit message",
+                    type=str,
+                    default=f"build: {pkg_name}/models/{models_subfolder}/",
+                )
+            else:
+                commit_str = None
+
+        if force_tag:
+            tag_str = f"v{str(version)}__{pkg_name}"
         else:
-            tag_str = None
+            create_tag = click.confirm(
+                f"Would you like Reflekt to create a Git tag to easily reference "
+                f"dbt package {pkg_name} in your dbt project?",
+                default=False,
+            )
+            if create_tag:
+                tag_str = click.prompt(
+                    "Git tag",
+                    type=str,
+                    default=f"v{str(version)}__{pkg_name}",
+                )
+            else:
+                tag_str = None
 
-    git_executable = shutil.which("git")
-    rel_pkg_path = f"dbt-packages/{pkg_name}"
+        git_executable = shutil.which("git")
+        rel_pkg_path = f"dbt-packages/{pkg_name}"
 
-    if commit_str is not None:
-        if plan_type == "avo":
-            rel_avo_json_path = ".reflekt/avo/avo.json"
+        if commit_str is not None:
+            if plan_type == "avo":
+                rel_avo_json_path = ".reflekt/avo/avo.json"
+                subprocess.call(
+                    args=[
+                        git_executable,
+                        "add",
+                        rel_pkg_path,
+                        rel_avo_json_path,
+                    ],
+                    cwd=project_dir,
+                )
+            else:
+                subprocess.call(
+                    args=[
+                        git_executable,
+                        "add",
+                        rel_pkg_path,
+                    ],
+                    cwd=project_dir,
+                )
+
             subprocess.call(
                 args=[
                     git_executable,
-                    "add",
-                    rel_pkg_path,
-                    rel_avo_json_path,
+                    "commit",
+                    "-m",
+                    commit_str,
                 ],
                 cwd=project_dir,
             )
-        else:
+
+        if tag_str is not None:
             subprocess.call(
                 args=[
                     git_executable,
-                    "add",
-                    rel_pkg_path,
+                    "tag",
+                    tag_str,
                 ],
                 cwd=project_dir,
             )
-
-        subprocess.call(
-            args=[
-                git_executable,
-                "commit",
-                "-m",
-                commit_str,
-            ],
-            cwd=project_dir,
-        )
-
-    if tag_str is not None:
-        subprocess.call(
-            args=[
-                git_executable,
-                "tag",
-                tag_str,
-            ],
-            cwd=project_dir,
-        )
-
-    # create_tag = click.confirm(
-    #     f"Would you like to create a Git commit and tag to easily reference this "
-    #     f"Reflekt dbt package {pkg_name} in your dbt project?",
-    #     default=False,
-    # )
-
-    # if create_tag:
-    #     commit_msg = click.prompt(
-    #         "Git commit message will be",
-    #         type=str,
-    #         default=f"build: {pkg_name}",
-    #     )
-    #     tag = click.prompt(
-    #         "Git tag will be",
-    #         type=str,
-    #         default=f"v{str(version)}__{pkg_name}",
-    #     )
-    #     git_executable = shutil.which("git")
-    #     rel_pkg_path = f"dbt-packages/{pkg_name}"
-
-    #     if plan_type == "avo":
-    #         rel_avo_json_path = ".reflekt/avo/avo.json"
-    #         subprocess.call(
-    #             args=[
-    #                 git_executable,
-    #                 "add",
-    #                 rel_pkg_path,
-    #                 rel_avo_json_path,
-    #             ],
-    #             cwd=project_dir,
-    #         )
-    #     else:
-    #         subprocess.call(
-    #             args=[
-    #                 git_executable,
-    #                 "add",
-    #                 rel_pkg_path,
-    #             ],
-    #             cwd=project_dir,
-    #         )
-
-    #     subprocess.call(
-    #         args=[
-    #             git_executable,
-    #             "commit",
-    #             "-m",
-    #             commit_msg,
-    #         ],
-    #         cwd=project_dir,
-    #     )
-    #     subprocess.call(
-    #         args=[
-    #             git_executable,
-    #             "tag",
-    #             tag,
-    #         ],
-    #         cwd=project_dir,
-    #     )
 
 
 # Add CLI commands to CLI group
