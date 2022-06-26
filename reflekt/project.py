@@ -2,21 +2,48 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import sys
 from pathlib import Path
 
 import yaml
 from git import InvalidGitRepositoryError, Repo
+from loguru import logger
 
 from reflekt.errors import ReflektProjectError
+from reflekt.utils import log_formatter
 
 
 class ReflektProject:
     def __init__(self, raise_project_errors: bool = True) -> None:
+        logger_config = {
+            "handlers": [
+                {
+                    "sink": sys.stdout,
+                    "format": log_formatter,
+                },
+            ],
+        }
+        logger.configure(**logger_config)
         self._project_errors = []
         self.project_dir = self._get_project_root(Path.cwd())
         self.exists = False  # Assume project does not exist by default
 
         if self.project_dir is not None:
+            sink = str(self.project_dir) + "/.reflekt/logs/reflekt.log"
+            logger_config = {
+                "handlers": [
+                    {
+                        "sink": sys.stdout,
+                        "format": log_formatter,
+                    },
+                    {
+                        "sink": sink,
+                        "format": log_formatter,
+                    },
+                ],
+            }
+            logger.configure(**logger_config)
+
             self.project_yml = self.project_dir / "reflekt_project.yml"
             self.exists = True if self.project_yml.exists() else False
             with open(self.project_yml, "r") as f:
@@ -67,13 +94,20 @@ class ReflektProject:
             ]
 
             if len(reflekt_project_list) > 1:
-                raise ReflektProjectError(
-                    f"\n"
-                    f"\nFound a git repo at '{str(git_root)}' with more than one "
-                    f"Reflekt project. Only one Reflekt project per repo."
-                    f"\n"
-                    f"\n{reflekt_project_list}"
+
+                msg_list = ""
+
+                for proj in reflekt_project_list:
+                    msg_list += "    " + str(proj) + "\n"
+
+                logger.error(
+                    f"Found a Git repo at '{str(git_root)}', but repo contains >1 "
+                    f"reflekt_project.yml:\n\n"
+                    f"{msg_list}"
+                    "\nOnly one Reflekt project (one reflekt_project.yml) per repo."
                 )
+                # print()
+                sys.exit(1)
 
             # If no reflekt project found (i.e. before 'reflekt init') then
             # return None
@@ -83,31 +117,35 @@ class ReflektProject:
                 return  # None
 
         except InvalidGitRepositoryError:
-            raise ReflektProjectError(
-                "\n"
-                "\nGit repository not detected. Your Reflekt project must be inside a Git repo to function correctly."  # noqa E501
-                "\nYou can create a git repo by running 'git init' at the root of your Reflekt project."  # noqa E501
+            logger.error(
+                "Git repository not detected. Reflekt project must be inside a Git repo."
+                " You can create a Git repo by running"
+                "\n\n    git init"
+                "\n\nat the root of your Reflekt project."
             )
+            sys.exit(1)
 
     def _get_project_name(self) -> None:
         try:
             self.name = self.project["name"]
         except KeyError:
-            raise ReflektProjectError(
-                "\nMust define a project name in reflekt_project.yml. See Reflekt "
-                "docs on project configuration:"
+            logger.error(
+                "Project 'name:' config not defined in reflekt_project.yml. See Reflekt "
+                "docs for guidance on project name configuration: "
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_config_profile(self) -> None:
         try:
             self.config_profile = self.project["config_profile"]
         except KeyError:
-            raise ReflektProjectError(
-                "\nMust define a config profile in reflekt_project.yml. See Reflekt "
-                "docs on project configuration:"
+            logger.error(
+                "No 'config_profile:' defined in reflekt_project.yml. See Reflekt "
+                "docs for guidance on 'config_profile:' configuration: "
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_config_path(self) -> None:
         config_path_check = self.project.get("config_path")
@@ -116,15 +154,18 @@ class ReflektProject:
             self.config_path = Path(config_path_check)
 
             if not self.config_path.exists():
-                raise ReflektProjectError(
-                    f"\n\nOptional 'config_path:' {str(self.config_path)} in reflekt_project.yml does not exist!"  # noqa E501
+                logger.error(
+                    "The 'config_path: {str(self.config_path)}' defined in "
+                    "reflekt_project.yml does not exist."
                 )
+                sys.exit(1)
 
             if not self.config_path.is_absolute():
-                raise ReflektProjectError(
-                    f"\n\n"
-                    f"Optional 'config_path:' {str(self.config_path)} in reflekt_project.yml must be an absolute path!"  # noqa E501
+                logger.error(
+                    "The 'config_path: {str(self.config_path)}' defined in "
+                    "reflekt_project.yml must be an absolute path."
                 )
+                sys.exit(1)
         else:
             self.config_path = None
 
@@ -132,11 +173,13 @@ class ReflektProject:
         try:
             self.events_case = self.project["tracking_plans"]["events"]["naming"]["case"]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define a 'case:' rule for event naming conventions in reflekt_project.yml. See Reflekt "  # noqa: E501
-                "docs on project configuration:"
+            logger.error(
+                "Missing 'case:' config for event naming conventions in "
+                "reflekt_project.yml. See Reflekt docs for guidance on defining"
+                "event naming conventions:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_events_allow_numbers(self) -> None:
         try:
@@ -144,11 +187,13 @@ class ReflektProject:
                 "naming"
             ]["allow_numbers"]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define an 'allow_numbers:' rule for events naming in reflekt_project.yml. See Reflekt "  # noqa: E501
-                "docs on project configuration:"
+            logger.error(
+                "Missing 'allow_numbers:' config for event naming conventions in "
+                "reflekt_project.yml. See Reflekt docs for guidance on defining"
+                "event naming conventions:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_events_reserved(self) -> None:
         try:
@@ -156,11 +201,13 @@ class ReflektProject:
                 "reserved"
             ]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define a 'reserved:' rule for events naming in reflekt_project.yml. See Reflekt "  # noqa: E501
-                "docs on project configuration:"
+            logger.error(
+                "Missing 'reserved:' config for event naming conventions in "
+                "reflekt_project.yml. NOTE - empty list acceptable (e.g 'reserved: []') "
+                "See Reflekt docs for guidance on defining event naming conventions:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_properties_case(self) -> None:
         try:
@@ -168,11 +215,13 @@ class ReflektProject:
                 "naming"
             ]["case"]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define a 'case:' rule for properties naming convention in reflekt_project.yml. See Reflekt "  # noqa: E501
-                "docs on project configuration:"
+            logger.error(
+                "Missing 'case:' config for properties naming conventions in "
+                "reflekt_project.yml. See Reflekt docs for guidance on defining"
+                "properties naming conventions:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_properties_allow_numbers(self) -> None:
         try:
@@ -180,11 +229,13 @@ class ReflektProject:
                 "naming"
             ]["allow_numbers"]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define an 'allow_numbers:' rule for properties naming in reflekt_project.yml. See Reflekt "  # noqa: E501
-                "docs on project configuration:"
+            logger.error(
+                "Missing 'allow_numbers:' config for properties naming conventions in "
+                "reflekt_project.yml. See Reflekt docs for guidance on defining"
+                "properties naming conventions:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_properties_reserved(self) -> None:
         try:
@@ -192,27 +243,25 @@ class ReflektProject:
                 "naming"
             ]["reserved"]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define a 'reserved:' rule for properties naming in reflekt_project.yml. Example:"  # noqa E501
-                "\n"
-                "\ntracking_plans:"
-                "\n  properties:"
-                "\n    naming:"
-                "\n      reserved: ['my_reserved_property']  # List (can be empty)"  # noqa E501
-                "\n"
-                "See Reflekt docs on project configuration:"
-                "\n   https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+            logger.error(
+                "Missing 'reserved:' config for properties naming conventions in "
+                "reflekt_project.yml. NOTE - empty list acceptable (e.g 'reserved: []') "
+                "See Reflekt docs for guidance on defining properties naming conventions:"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_data_types(self) -> None:
         try:
             self.data_types = self.project["tracking_plans"]["properties"]["data_types"]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define allowed data types for event properties in reflekt_project.yml. See Reflekt "  # noqa: E501
-                "docs on project configuration:"
-                "\n   https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+            logger.error(
+                "Missing 'data_types:' config for allowed properties data types "
+                " in reflekt_project.yml. See Reflekt docs for guidance on "
+                "defining allowed data types:"  # noqa: E501
+                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_warehouse_database_obj(self) -> None:
         try:
@@ -220,11 +269,14 @@ class ReflektProject:
                 "database"
             ]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define a database for each tracking plan in "
-                "reflekt_project.yml. See Reflekt docs on project configuration:"
+            logger.error(
+                "'database:' config not defined in reflekt_project.yml. Each tracking "
+                "plan in Reflekt project must have a defined database where Reflekt "
+                "will look for raw event data when templating dbt packages. See Reflekt "
+                "docs for guidance on 'database:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_warehouse_schema_obj(self) -> None:
         try:
@@ -232,10 +284,14 @@ class ReflektProject:
                 "schema"
             ]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define warehouse 'schema:' config in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+            logger.error(
+                "'schema:' config not defined in reflekt_project.yml. Each tracking "
+                "plan in Reflekt project must have a defined schema where Reflekt will "
+                "look for raw event data when templating dbt packages. See Reflekt docs "
+                "for guidance on 'schema:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_expected_metadata_schema(self) -> None:
         if (
@@ -252,19 +308,25 @@ class ReflektProject:
         try:
             self.src_prefix = self.project["dbt"]["templater"]["sources"]["prefix"]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define 'prefix:' for templated dbt sources in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+            logger.error(
+                "No 'prefix:' config defined for templated dbt sources in "
+                "reflekt_project.yml. See Reflekt docs for guidance on source "
+                "'prefix:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_dbt_model_prefix(self) -> None:
         try:
             self.model_prefix = self.project["dbt"]["templater"]["models"]["prefix"]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define 'prefix:' for templated dbt models in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+            logger.error(
+                "No 'prefix:' config defined for templated dbt models in "
+                "reflekt_project.yml. See Reflekt docs for guidance on model "
+                "'prefix:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_dbt_model_materialized(self) -> None:
         try:
@@ -272,16 +334,22 @@ class ReflektProject:
                 "materialized"
             ].lower()
             if self.materialized not in ["view", "incremental"]:
-                raise ReflektProjectError(
-                    "\n\nInvalid materialized config in reflekt_project.yml. "
-                    "Must be either 'view' or 'incremental'. See Reflekt docs on project configuration:"  # noqa: E501
+                logger.error(
+                    "Invalid 'materialized:' config defined for templated dbt models in "
+                    "reflekt_project.yml. Must be either 'view' or 'incremental'. "
+                    "See Reflekt docs on model configuration:"
                     "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
                 )
+                sys.exit(1)
+
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust set 'materialized:' for templated dbt models in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+            logger.error(
+                "No 'materialized:' config defined for templated dbt models in "
+                "reflekt_project.yml. Must be either 'view' or 'incremental'. "
+                "See Reflekt docs on model configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_dbt_model_incremental_logic(self) -> None:
         if self.materialized == "incremental":
@@ -310,10 +378,13 @@ class ReflektProject:
         try:
             self.docs_prefix = self.project["dbt"]["templater"]["docs"]["prefix"]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define 'prefix:' for templated dbt docs in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+            logger.error(
+                "No 'prefix:' config defined for templated dbt docs in "
+                "reflekt_project.yml. See Reflekt docs for guidance on doc "
+                "'prefix:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_dbt_docs_tests(self) -> None:
         try:
@@ -321,26 +392,35 @@ class ReflektProject:
                 "id_tests"
             ]["not_null"]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define 'not_null:' test configuration for templated dbt docs in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+            logger.error(
+                "'not_null:' test configuration not defined for templated dbt docs "
+                "in reflekt_project.yml. See Reflekt docs for guidance on doc "
+                "'not_null:' test configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
         try:
             self.docs_test_unique = self.project["dbt"]["templater"]["docs"]["id_tests"][
                 "unique"
             ]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define 'unique:' test configuration for templated dbt docs in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+            logger.error(
+                "'unique:' test configuration not defined for templated dbt docs "
+                "in reflekt_project.yml. See Reflekt docs for guidance on doc "
+                "'unique:' test configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)
 
     def _get_dbt_docs_in_folder(self) -> None:
         try:
             self.docs_in_folder = self.project["dbt"]["templater"]["docs"]["in_folder"]
         except KeyError:
-            raise ReflektProjectError(
-                "\n\nMust define 'in_folder:' for templated dbt docs in reflekt_project.yml. See Reflekt docs on project configuration:"  # noqa: E501
+            logger.error(
+                "No 'in_folder:' configuration defined for templated dbt docs "
+                "in reflekt_project.yml. See Reflekt docs for guidance on docs "
+                "'in_folder:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
+            sys.exit(1)

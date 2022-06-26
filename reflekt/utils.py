@@ -5,6 +5,17 @@
 import re
 
 
+def log_formatter(record):
+    if record["level"].no >= 40:
+        return "{time:HH:mm:ss} [<red>{level}</red>] {message}\n"
+    elif record["level"].no >= 30:
+        return "{time:HH:mm:ss} [<yellow>{level}</yellow>] {message}\n"
+    elif record["level"].no >= 25:
+        return "{time:HH:mm:ss} [<green>{level}</green>] {message}\n"
+    else:
+        return "{time:HH:mm:ss} {message}\n"
+
+
 def segment_2_snake(in_str: str) -> str:
     """Converts a planCase/PlanCase/PLanCase string to snake_case. Inserts
     underscore only where casing switches from lower to UPPER, lower() entire

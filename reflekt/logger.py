@@ -5,25 +5,22 @@
 import sys
 
 from reflekt.project import ReflektProject
+from reflekt.utils import log_formatter
 
 if ReflektProject().exists:
-    sink = (
-        str(ReflektProject().project_dir)
-        + "/.reflekt/logs/reflekt_{time:YYYY-MM-DD-HHmmss}.log"
-    )
+    sink = str(ReflektProject().project_dir) + "/.reflekt/logs/reflekt.log"
 else:
-    sink = "./.reflekt/logs/reflekt_{time:YYYY-MM-DD-HHmmss}.log"
-
+    sink = "./.reflekt/logs/reflekt.log"
 
 logger_config = {
     "handlers": [
         {
             "sink": sys.stdout,
-            "format": "{time:HH:mm:ss} {message}",
+            "format": log_formatter,
         },
         {
             "sink": sink,
-            "serialize": True,
+            "format": log_formatter,
         },
     ],
 }
