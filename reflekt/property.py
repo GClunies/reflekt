@@ -47,8 +47,15 @@ class ReflektProperty(object):
         if self.type != "string" and self.enum:
             message = (
                 f"Property {self.name} is of type {self.type}. Cannot specify "
-                f"`enum:` for {self.type} data types. "
-                f"Only for string data types"
+                f"'enum:' for {self.type} data types. Only for string data types"
+            )
+            raise ReflektValidationError(message)
+
+    def _check_pattern(self) -> None:
+        if self.type != "string" and self.pattern:
+            message = (
+                f"Property {self.name} is of type {self.type}. Cannot specify "
+                f"'pattern:' for {self.type} data types. Only for string data types"
             )
             raise ReflektValidationError(message)
 
@@ -56,8 +63,7 @@ class ReflektProperty(object):
         if self.type != "string" and self.datetime:
             message = (
                 f"Property {self.name} is of type {self.type}. Cannot specify "
-                f"`datetime:` for {self.type} data types. "
-                f"Only for string data types"
+                f"'datetime:' for {self.type} data types. Only for string data types"
             )
             raise ReflektValidationError(message)
 
@@ -79,7 +85,7 @@ class ReflektProperty(object):
                 print(self._property_yaml)
             message = (
                 f"Property {self.name} is of type {self.type}. Cannot specify "
-                f"`array_item_schema:` for {self.type} data types. "
+                f"'array_item_schema:' for {self.type} data types. "
                 f"Only for array data types"
             )
             raise ReflektValidationError(message)
@@ -160,6 +166,7 @@ class ReflektProperty(object):
         self._check_property_name_numbers()
         self._check_description()
         self._check_enum()
+        self._check_pattern()
         self._check_datetime()
         self._check_array_item_schema()
         self._check_object_properties()

@@ -4,15 +4,16 @@
 
 import pytest
 import yaml
-
 from reflekt.errors import ReflektValidationError
 from reflekt.event import ReflektEvent
 from reflekt.property import ReflektProperty
-from tests.fixtures import (
-    REFLEKT_EVENT,
-    REFLEKT_EVENT_BAD,
-    REFLEKT_EVENT_DUPLICATE_PROPS,
-)
+
+# from tests.fixtures import (
+#     REFLEKT_EVENT,
+#     REFLEKT_EVENT_BAD,
+#     REFLEKT_EVENT_DUPLICATE_PROPS,
+# )
+from tests.fixtures.reflekt_event import REFLEKT_EVENT
 
 
 def test_reflekt_event():
@@ -44,18 +45,43 @@ def test_property_parser():
 
 
 def test_duplicate_property():
-    event_yaml_obj = yaml.safe_load(REFLEKT_EVENT_DUPLICATE_PROPS)[0]
+    event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
+    # Duplicate a property
+    event_yaml_obj["properties"].append(event_yaml_obj["properties"][0])
 
     with pytest.raises(ReflektValidationError):
         ReflektEvent(event_yaml_obj)
 
 
 def test_event_validation():
-    event_good = ReflektEvent(yaml.safe_load(REFLEKT_EVENT)[0])
+    # ReflektEvent runs validate_event() when initialized
+    event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
+    event_good = ReflektEvent(event_yaml_obj)
 
-    # Redundant, but makes it clear that the test is testing
+    # Validate event against reflekt_event_schema
     assert event_good.validate_event() is None
 
     with pytest.raises(ReflektValidationError):
-        # ReflektEvent runs validate_event() when initialized
-        ReflektEvent(yaml.safe_load(REFLEKT_EVENT_BAD)[0])
+        event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
+        event_yaml_obj["version"] = 0  # Invalid version (must be >= 1)
+        ReflektEvent(event_yaml_obj)
+
+    with pytest.raises(ReflektValidationError):
+        event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
+        event_yaml_obj["name"] = None  # Must have a name
+        ReflektEvent(event_yaml_obj)
+
+    with pytest.raises(ReflektValidationError):
+        event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
+        event_yaml_obj["description"] = None  # Must have a description
+        ReflektEvent(event_yaml_obj)
+
+    with pytest.raises(ReflektValidationError):
+        event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
+        event_yaml_obj["metadata"] = "A string"  # Must be dictionary
+        ReflektEvent(event_yaml_obj)
+
+    with pytest.raises(AttributeError):
+        event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
+        event_yaml_obj["properties"] = "A string"  # Must be a list of dicts
+        ReflektEvent(event_yaml_obj)

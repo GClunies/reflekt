@@ -8,32 +8,25 @@
 name: reflekt_github_actions
 
 config_profile: reflekt_github_actions  # Profile defined in reflekt_config.yml
+config_path:  /home/runner/work/Reflekt/Reflekt/.reflekt/reflekt_config.yml  # OPTIONAL - overrides default path '~/.reflekt/reflekt_config.yml'
 
-# OPTIONAL (config_path:)
-config_path:  /home/runner/work/Reflekt/Reflekt/.reflekt/reflekt_config.yml
+tracking_plans:                         # Tracking plan configurations
+  warehouse:                            # Specify where event data is in warehouse
+    database:                           # Database configuration                     # Specify database where event data is loaded
+      test-plan: dummy_database         # Specify database where event data is loaded
+    schema:                             # Schema configuration
+      test-plan:                        # Config events in tracking plan 'my-plan'
+        - schema: dummy_schema          # Specify schema where event data is loaded
 
-tracking_plans:
-  # For each tracking plan in your Reflekt project, specify the warehouse and
-  # schema(s) where Reflekt should search for corresponding event data.
-  warehouse:
-    database:
-      test-plan: dummy_database
-    schema:
-      # When templating dbt packages, Reflekt uses schemas in folder and file
-      # names (e.g. reflekt_schema_name__event_name.sql)
-      test-plan:
-        - schema: dummy_schema
+  events:                               # Event configurations
+    naming:                             # Naming convention config
+      case: title                       # title|snake|camel
+      allow_numbers: false              # true|false
+      reserved: []                      # Reserved event names (casing matters)
 
-  events:
-    naming:
-      case: title           # One of title|snake|camel
-      allow_numbers: false  # true|false
-      reserved: []          # Reserved event names (casing matters)
-
-    # OPTIONAL (expected_metadata:)
-    # Define a schema for expected event metadata. Tested when running:
-    #     reflekt test --name <plan-name>
-    expected_metadata:
+    expected_metadata:                  # OPTIONAL metadata configuration
+      # Define a schema for expected event metadata. Tested when running:
+      #     reflekt test --name <plan-name>
       product_owner:
         type: string
         required: true
@@ -55,11 +48,11 @@ tracking_plans:
 
   properties:
     naming:
-      case: snake           # One of title|snake|camel
-      allow_numbers: false  # true|false
-      reserved: []          # Reserved property names (casing matters)
+      case: snake                       # One of title|snake|camel
+      allow_numbers: false              # true|false
+      reserved: []                      # Reserved property names (casing matters)
 
-    data_types: # Specify allowed data types. Available types listed below
+    data_types:                         # Specify allowed data types. Available types listed below
       - string
       - integer
       - boolean
@@ -67,27 +60,24 @@ tracking_plans:
       - object
       - array
       - any
-      - 'null'  # Specify null type in quotes
+      - 'null'                          # Specify null type in quotes
 
 dbt:
   templater:
     sources:
-      prefix: _src_reflekt_       # Prefix for templated dbt package sources
+      prefix: _src_reflekt_             # Prefix for templated dbt package sources
 
     models:
-      prefix: reflekt_           # Prefix for models & docs in templated dbt package
-      materialized: view  # One of view|incremental
-      # OPTIONAL (incremental_logic:) [REQUIRED if 'materialized: incremental']
-      # Specify the incremental logic to use when templating dbt models.
-      # Must include {%- if is_incremental() %} ... {%- endif %} block
-      # incremental_logic: |
-      #   {%- if is_incremental() %}
-      #   where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
-      #   {%- endif %}
+      prefix: reflekt_                  # Prefix for models & docs in templated dbt package
+      materialized: view                # view|incremental
+      # incremental_logic: |    # OPTIONAL (if 'materialized: incremental')
+      #  {%- if is_incremental() %}
+      #  where received_at >= ( select max(received_at_tstamp)::date from {{ this }} )
+      #  {%- endif %}
 
     docs:
-      prefix: _reflekt_          # Prefix for docs in templated dbt package
-      id_tests:           # Include docs test on ID column (e.g. event_id)?
+      prefix: _reflekt_                 # Prefix for docs in templated dbt package
+      id_tests:                         # Include docs test on ID column (e.g. event_id)?
         not_null: true
         unique: true
-      in_folder: false           # Write docs in models/docs/ folder?
+      in_folder: false                  # Write docs in models/docs/ folder?

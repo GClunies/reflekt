@@ -4,24 +4,69 @@
 
 import pytest
 import yaml
-
 from reflekt.errors import ReflektValidationError
 from reflekt.property import ReflektProperty
-from tests.fixtures import REFLEKT_PROPERTY, REFLEKT_PROPERTY_BAD
+
+from tests.fixtures.reflekt_property import (
+    REFLEKT_PROPERTY,
+    REFLEKT_PROPERTY_ARRAY_NESTED,
+    REFLEKT_PROPERTY_DATETIME,
+    REFLEKT_PROPERTY_ENUM,
+    REFLEKT_PROPERTY_OBJ,
+    REFLEKT_PROPERTY_PATTERN,
+)
 
 
 def test_reflekt_property():
     property = ReflektProperty(yaml.safe_load(REFLEKT_PROPERTY))
 
-    assert property.name == "property_one"
+    assert property.name == "test_property"
     assert property.description == "A test property."
     assert property.type == "string"
     assert property.required is True
     assert property.allow_null is True
 
     with pytest.raises(ReflektValidationError):
-        # This bad event mixes integer type with enum (not allowed)
-        ReflektProperty(yaml.safe_load(REFLEKT_PROPERTY_BAD))
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
+        prop_yaml_obj["name"] = None
+        ReflektProperty(prop_yaml_obj)  # Must have a name
+
+    with pytest.raises(ReflektValidationError):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
+        prop_yaml_obj["description"] = None
+        ReflektProperty(prop_yaml_obj)  # Must have a description
+
+    with pytest.raises(ReflektValidationError):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
+        prop_yaml_obj["type"] = None
+        ReflektProperty(prop_yaml_obj)  # Must have a type
+
+    with pytest.raises(ReflektValidationError):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_ENUM)
+        prop_yaml_obj["type"] = "integer"
+        ReflektProperty(prop_yaml_obj)  # Must have type string
+
+    with pytest.raises(ReflektValidationError):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_PATTERN)
+        prop_yaml_obj["type"] = "number"
+        ReflektProperty(prop_yaml_obj)  # Must have type string
+
+    with pytest.raises(ReflektValidationError):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_DATETIME)
+        prop_yaml_obj[
+            "type"
+        ] = "datetime"  # Not a valid type, datetime handled by datetime: prop config
+        ReflektProperty(prop_yaml_obj)  # Must have type string
+
+    with pytest.raises(ReflektValidationError):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_OBJ)
+        prop_yaml_obj["object_properties"] = {"name": "this wont work"}
+        ReflektProperty(prop_yaml_obj)  # Must be a list of dicts
+
+    with pytest.raises(ReflektValidationError):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_ARRAY_NESTED)
+        prop_yaml_obj["object_properties"] = {"name": "this wont work"}
+        ReflektProperty(prop_yaml_obj)  # Must be a list of dicts
 
 
 def test_default_property_values():
@@ -46,9 +91,4 @@ def test_valid_type():
 def test_property_validation():
     property_good = ReflektProperty(yaml.safe_load(REFLEKT_PROPERTY))
 
-    # Redundant, but makes it clear that the test is testing
     assert property_good.validate_property() is None
-
-    with pytest.raises(ReflektValidationError):
-        # ReflektEvent runs validate_event() when initialized
-        ReflektProperty(yaml.safe_load(REFLEKT_PROPERTY_BAD))
