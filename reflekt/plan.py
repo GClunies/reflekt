@@ -56,8 +56,8 @@ class ReflektPlan(object):
         except KeyError:
             raise KeyError(
                 f"Tracking plan '{plan_name}' not found under 'database:' config in reflekt_project.yml."  # noqa: E501
-                f"See Reflekt docs on project configuration for guidance on 'database:' configuration: "  # noqa: E501
-                f"\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                f"See the Reflekt docs on project configuration for guidance on 'database:' configuration: "  # noqa: E501
+                f"\n    https://bit.ly/reflekt-project-config"  # noqa: E501
             )
 
     def _get_schema_and_schema_alias(self, plan_name: str) -> list:
@@ -74,8 +74,8 @@ class ReflektPlan(object):
         except KeyError:
             raise KeyError(
                 f"Error in 'schema:' config for tracking plan '{plan_name}'."
-                f"See Reflekt docs on project configuration for guidance on 'schema:' configuration: "  # noqa: E501
-                f"\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                f"See the Reflekt docs on project configuration for guidance on 'schema:' configuration: "  # noqa: E501
+                f"\n    https://bit.ly/reflekt-project-config"  # noqa: E501
             )
 
     def add_event(self, event_yaml_obj: dict) -> None:
@@ -110,8 +110,8 @@ class ReflektPlan(object):
             if event_name in ReflektProject().events_reserved:
                 raise ReflektValidationError(
                     f"Event name '{event_name}' is reserved and cannot be used. "
-                    f"See Reflekt docs on project configuration for guidance on 'reserved:' configuration for events:"  # noqa: E501
-                    f"\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                    f"See the Reflekt docs on project configuration for guidance on 'reserved:' configuration for events:"  # noqa: E501
+                    f"\n    https://bit.ly/reflekt-project-config"  # noqa: E501
                 )
 
     def validate_plan(self) -> None:

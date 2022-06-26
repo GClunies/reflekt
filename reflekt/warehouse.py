@@ -51,7 +51,7 @@ class WarehouseConnection:
         else:
             raise ReflektConfigError(
                 f"Invalid warehouse type specified in {self._config.path}. See "
-                f"Reflekt docs on Reflekt Profile configuration:"
+                f"Reflekt docs on Reflekt Profile configuration."
                 f"    https://reflekt-ci.notion.site/Reflekt-Profile-Configuration-8ee71745477b4c91a6aafbb025cf2280"  # noqa: E501
             )
 

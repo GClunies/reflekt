@@ -130,8 +130,8 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Project 'name:' config not defined in reflekt_project.yml. See Reflekt "
-                "docs for guidance on project name configuration: "
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "docs for details on project name configuration: "
+                # noqa: E501
             )
             raise SystemExit(1)
 
@@ -141,8 +141,8 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "No 'config_profile:' defined in reflekt_project.yml. See Reflekt "
-                "docs for guidance on 'config_profile:' configuration: "
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "docs for details on 'config_profile:' configuration: "
+                # noqa: E501
             )
             raise SystemExit(1)
 
@@ -174,9 +174,10 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Missing 'case:' config for event naming conventions in "
-                "reflekt_project.yml. See Reflekt docs for guidance on defining"
-                "event naming conventions:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "reflekt_project.yml. \n\nSee the Reflekt docs"
+                "(https://bit.ly/reflekt-project-config) for details on defining"
+                "event naming conventions."
+                # noqa: E501
             )
             raise SystemExit(1)
 
@@ -188,9 +189,10 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Missing 'allow_numbers:' config for event naming conventions in "
-                "reflekt_project.yml. See Reflekt docs for guidance on defining"
-                "event naming conventions:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "reflekt_project.yml. \n\nSee the Reflekt docs"
+                "(https://bit.ly/reflekt-project-config) for details on defining"
+                "event naming conventions."
+                # noqa: E501
             )
             raise SystemExit(1)
 
@@ -203,8 +205,9 @@ class ReflektProject:
             logger.error(
                 "Missing 'reserved:' config for event naming conventions in "
                 "reflekt_project.yml. NOTE - empty list acceptable (e.g 'reserved: []') "
-                "See Reflekt docs for guidance on defining event naming conventions:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "\n\nSee the Reflekt docs (https://bit.ly/reflekt-project-config) for "
+                "details on defining event naming conventions."
+                # noqa: E501
             )
             raise SystemExit(1)
 
@@ -216,9 +219,10 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Missing 'case:' config for properties naming conventions in "
-                "reflekt_project.yml. See Reflekt docs for guidance on defining"
-                "properties naming conventions:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "reflekt_project.yml. \n\nSee the Reflekt docs"
+                "(https://bit.ly/reflekt-project-config) for details on defining"
+                "properties naming conventions."
+                # noqa: E501
             )
             raise SystemExit(1)
 
@@ -230,9 +234,9 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Missing 'allow_numbers:' config for properties naming conventions in "
-                "reflekt_project.yml. See Reflekt docs for guidance on defining"
-                "properties naming conventions:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "reflekt_project.yml. \n\nSee the Reflekt docs"
+                "(https://bit.ly/reflekt-project-config) for details on defining"
+                "properties naming conventions."
             )
             raise SystemExit(1)
 
@@ -245,8 +249,8 @@ class ReflektProject:
             logger.error(
                 "Missing 'reserved:' config for properties naming conventions in "
                 "reflekt_project.yml. NOTE - empty list acceptable (e.g 'reserved: []') "
-                "See Reflekt docs for guidance on defining properties naming conventions:"  # noqa: E501
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "\n\nSee the Reflekt docs (https://bit.ly/reflekt-project-config) for "
+                "details on defining properties naming conventions."
             )
             raise SystemExit(1)
 
@@ -256,9 +260,9 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Missing 'data_types:' config for allowed properties data types "
-                " in reflekt_project.yml. See Reflekt docs for guidance on "
-                "defining allowed data types:"  # noqa: E501
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                " in reflekt_project.yml. \n\nSee the Reflekt docs"
+                "(https://bit.ly/reflekt-project-config) for details on defining "
+                "allowed data types:"
             )
             raise SystemExit(1)
 
@@ -269,11 +273,11 @@ class ReflektProject:
             ]
         except KeyError:
             logger.error(
-                "'database:' config not defined in reflekt_project.yml. Each tracking "
-                "plan in Reflekt project must have a defined database where Reflekt "
-                "will look for raw event data when templating dbt packages. See Reflekt "
-                "docs for guidance on 'database:' configuration:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "Tracking plan 'database:' config not defined in reflekt_project.yml. "
+                "Each tracking plan in Reflekt project must have a defined database "
+                "where Reflekt will search for raw event data when templating dbt "
+                "packages. See the Reflekt docs (https://bit.ly/reflekt-project-config) "
+                "for details on s'database:' configuration."
             )
             raise SystemExit(1)
 
@@ -284,11 +288,11 @@ class ReflektProject:
             ]
         except KeyError:
             logger.error(
-                "'schema:' config not defined in reflekt_project.yml. Each tracking "
-                "plan in Reflekt project must have a defined schema where Reflekt will "
-                "look for raw event data when templating dbt packages. See Reflekt docs "
-                "for guidance on 'schema:' configuration:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "Tracking plan 'schema:' config not defined in reflekt_project.yml. "
+                "Each tracking plan in Reflekt project must have a defined schema where "
+                "Reflekt will search for raw event data when templating dbt packages. "
+                "\n\nSee the Reflekt docs (https://bit.ly/reflekt-project-config) for "
+                "details on 'schema:' configuration."
             )
             raise SystemExit(1)
 
@@ -308,10 +312,10 @@ class ReflektProject:
             self.src_prefix = self.project["dbt"]["templater"]["sources"]["prefix"]
         except KeyError:
             logger.error(
-                "No 'prefix:' config defined for templated dbt sources in "
-                "reflekt_project.yml. See Reflekt docs for guidance on source "
-                "'prefix:' configuration:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "dbt templating 'prefix:' config not defined for templated dbt sources "
+                "in reflekt_project.yml. \n\nSee the Reflekt docs"
+                "(https://bit.ly/reflekt-project-config) for details on source "
+                "'prefix:' configuration."
             )
             raise SystemExit(1)
 
@@ -320,10 +324,10 @@ class ReflektProject:
             self.model_prefix = self.project["dbt"]["templater"]["models"]["prefix"]
         except KeyError:
             logger.error(
-                "No 'prefix:' config defined for templated dbt models in "
-                "reflekt_project.yml. See Reflekt docs for guidance on model "
-                "'prefix:' configuration:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "dbt templating  'prefix:' config not defined for templated dbt models "
+                "in reflekt_project.yml. \n\nSee the Reflekt docs"
+                "(https://bit.ly/reflekt-project-config) for details on model 'prefix:' "
+                "configuration."
             )
             raise SystemExit(1)
 
@@ -336,8 +340,8 @@ class ReflektProject:
                 logger.error(
                     "Invalid 'materialized:' config defined for templated dbt models in "
                     "reflekt_project.yml. Must be either 'view' or 'incremental'. "
-                    "See Reflekt docs on model configuration:"
-                    "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                    "\n\nSee the Reflekt docs (https://bit.ly/reflekt-project-config) on "
+                    "model configuration."
                 )
                 raise SystemExit(1)
 
@@ -345,8 +349,8 @@ class ReflektProject:
             logger.error(
                 "No 'materialized:' config defined for templated dbt models in "
                 "reflekt_project.yml. Must be either 'view' or 'incremental'. "
-                "See Reflekt docs on model configuration:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "\n\nSee the Reflekt docs (https://bit.ly/reflekt-project-config) on model "
+                "configuration."
             )
             raise SystemExit(1)
 
@@ -357,19 +361,15 @@ class ReflektProject:
                     "incremental_logic"
                 ]
             except KeyError:
-                raise ReflektProjectError(
-                    "\n\nWhen 'materialized: incremental' in reflekt_project.yml, must define incremental logic for templated dbt models. Example:"  # noqa E501
-                    "\n\n"
-                    "\ndbt:"
-                    "\n  templater:"
-                    "\n    models:"
-                    "\n      incremental_logic: |"
-                    "\n      {%- if is_incremental() %}"
-                    "\n          where event_timestamp >= (select max(event_timestamp)::date from {{ this }})"  # noqa E501
-                    "\n      {%- endif %}"
-                    "\n\n See Reflekt docs on project configuration:"
-                    "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                logger.error(
+                    "dbt templating 'materialized: incremental' defined in "
+                    "reflekt_project.yml for templated dbt models, but missing "
+                    "'incremental_logic:' configuration. \n\nSee the Reflekt docs"
+                    "(https://bit.ly/reflekt-project-config) for details on "
+                    "'incremental_logic:' configuration."
                 )
+                raise SystemExit(1)
+
         else:
             self.incremental_logic = None
 
@@ -378,10 +378,10 @@ class ReflektProject:
             self.docs_prefix = self.project["dbt"]["templater"]["docs"]["prefix"]
         except KeyError:
             logger.error(
-                "No 'prefix:' config defined for templated dbt docs in "
-                "reflekt_project.yml. See Reflekt docs for guidance on doc "
-                "'prefix:' configuration:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "dbt templating configuration 'prefix:' not defined in "
+                "reflekt_project.yml for templated dbt docs. \n\nSee the Reflekt docs"
+                "(https://bit.ly/reflekt-project-config) for details on 'prefix:' "
+                "configuration."
             )
             raise SystemExit(1)
 
@@ -392,10 +392,10 @@ class ReflektProject:
             ]["not_null"]
         except KeyError:
             logger.error(
-                "'not_null:' test configuration not defined for templated dbt docs "
-                "in reflekt_project.yml. See Reflekt docs for guidance on doc "
-                "'not_null:' test configuration:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "dbt test configuration 'not_null:' not defined in reflekt_project.yml "
+                "for templated dbt docs.  \n\nSee the Reflekt docs"
+                "(https://bit.ly/reflekt-project-config) for details on doc 'not_null:' "
+                "test configuration."
             )
             raise SystemExit(1)
 
@@ -405,10 +405,10 @@ class ReflektProject:
             ]
         except KeyError:
             logger.error(
-                "'unique:' test configuration not defined for templated dbt docs "
-                "in reflekt_project.yml. See Reflekt docs for guidance on doc "
-                "'unique:' test configuration:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "Test configuration 'unique:' not defined is reflekt_project.yml for "
+                "templated dbt docs. \n\nSee the Reflekt docs"
+                "(https://bit.ly/reflekt-project-config) for details on 'unique:' test "
+                "configuration."
             )
             raise SystemExit(1)
 
@@ -417,9 +417,9 @@ class ReflektProject:
             self.docs_in_folder = self.project["dbt"]["templater"]["docs"]["in_folder"]
         except KeyError:
             logger.error(
-                "No 'in_folder:' configuration defined for templated dbt docs "
-                "in reflekt_project.yml. See Reflekt docs for guidance on docs "
-                "'in_folder:' configuration:"
-                "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "Templating configuration 'in_folder:' not defined in "
+                "reflekt_project.yml for templated dbt docs. \n\nSee the Reflekt docs"
+                "(https://bit.ly/reflekt-project-config) for details on 'in_folder:' "
+                "configuration."
             )
             raise SystemExit(1)
