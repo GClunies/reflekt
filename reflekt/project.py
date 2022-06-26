@@ -174,7 +174,7 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Missing 'case:' config for event naming conventions in "
-                "reflekt_project.yml. \n\nSee the Reflekt docs"
+                "reflekt_project.yml. \n\nSee the Reflekt docs "
                 "(https://bit.ly/reflekt-project-config) for details on defining"
                 "event naming conventions."
                 # noqa: E501
@@ -189,7 +189,7 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Missing 'allow_numbers:' config for event naming conventions in "
-                "reflekt_project.yml. \n\nSee the Reflekt docs"
+                "reflekt_project.yml. \n\nSee the Reflekt docs "
                 "(https://bit.ly/reflekt-project-config) for details on defining"
                 "event naming conventions."
                 # noqa: E501
@@ -219,7 +219,7 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Missing 'case:' config for properties naming conventions in "
-                "reflekt_project.yml. \n\nSee the Reflekt docs"
+                "reflekt_project.yml. \n\nSee the Reflekt docs "
                 "(https://bit.ly/reflekt-project-config) for details on defining"
                 "properties naming conventions."
                 # noqa: E501
@@ -234,7 +234,7 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Missing 'allow_numbers:' config for properties naming conventions in "
-                "reflekt_project.yml. \n\nSee the Reflekt docs"
+                "reflekt_project.yml. \n\nSee the Reflekt docs "
                 "(https://bit.ly/reflekt-project-config) for details on defining"
                 "properties naming conventions."
             )
@@ -260,7 +260,7 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Missing 'data_types:' config for allowed properties data types "
-                " in reflekt_project.yml. \n\nSee the Reflekt docs"
+                " in reflekt_project.yml. \n\nSee the Reflekt docs "
                 "(https://bit.ly/reflekt-project-config) for details on defining "
                 "allowed data types:"
             )
@@ -313,7 +313,7 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "dbt templating 'prefix:' config not defined for templated dbt sources "
-                "in reflekt_project.yml. \n\nSee the Reflekt docs"
+                "in reflekt_project.yml. \n\nSee the Reflekt docs "
                 "(https://bit.ly/reflekt-project-config) for details on source "
                 "'prefix:' configuration."
             )
@@ -325,7 +325,7 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "dbt templating  'prefix:' config not defined for templated dbt models "
-                "in reflekt_project.yml. \n\nSee the Reflekt docs"
+                "in reflekt_project.yml. \n\nSee the Reflekt docs "
                 "(https://bit.ly/reflekt-project-config) for details on model 'prefix:' "
                 "configuration."
             )
@@ -349,8 +349,8 @@ class ReflektProject:
             logger.error(
                 "No 'materialized:' config defined for templated dbt models in "
                 "reflekt_project.yml. Must be either 'view' or 'incremental'. "
-                "\n\nSee the Reflekt docs (https://bit.ly/reflekt-project-config) on model "
-                "configuration."
+                "\n\nSee the Reflekt docs (https://bit.ly/reflekt-project-config) on "
+                "model configuration."
             )
             raise SystemExit(1)
 
@@ -364,7 +364,7 @@ class ReflektProject:
                 logger.error(
                     "dbt templating 'materialized: incremental' defined in "
                     "reflekt_project.yml for templated dbt models, but missing "
-                    "'incremental_logic:' configuration. \n\nSee the Reflekt docs"
+                    "'incremental_logic:' configuration. \n\nSee the Reflekt docs "
                     "(https://bit.ly/reflekt-project-config) for details on "
                     "'incremental_logic:' configuration."
                 )
@@ -379,7 +379,7 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "dbt templating configuration 'prefix:' not defined in "
-                "reflekt_project.yml for templated dbt docs. \n\nSee the Reflekt docs"
+                "reflekt_project.yml for templated dbt docs. \n\nSee the Reflekt docs "
                 "(https://bit.ly/reflekt-project-config) for details on 'prefix:' "
                 "configuration."
             )
@@ -393,7 +393,7 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "dbt test configuration 'not_null:' not defined in reflekt_project.yml "
-                "for templated dbt docs.  \n\nSee the Reflekt docs"
+                "for templated dbt docs.  \n\nSee the Reflekt docs "
                 "(https://bit.ly/reflekt-project-config) for details on doc 'not_null:' "
                 "test configuration."
             )
@@ -406,7 +406,7 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Test configuration 'unique:' not defined is reflekt_project.yml for "
-                "templated dbt docs. \n\nSee the Reflekt docs"
+                "templated dbt docs. \n\nSee the Reflekt docs "
                 "(https://bit.ly/reflekt-project-config) for details on 'unique:' test "
                 "configuration."
             )
@@ -418,7 +418,7 @@ class ReflektProject:
         except KeyError:
             logger.error(
                 "Templating configuration 'in_folder:' not defined in "
-                "reflekt_project.yml for templated dbt docs. \n\nSee the Reflekt docs"
+                "reflekt_project.yml for templated dbt docs. \n\nSee the Reflekt docs "
                 "(https://bit.ly/reflekt-project-config) for details on 'in_folder:' "
                 "configuration."
             )
