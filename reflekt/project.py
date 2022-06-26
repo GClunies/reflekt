@@ -106,8 +106,7 @@ class ReflektProject:
                     f"{msg_list}"
                     "\nOnly one Reflekt project (one reflekt_project.yml) per repo."
                 )
-                # print()
-                sys.exit(1)
+                raise SystemExit(1)
 
             # If no reflekt project found (i.e. before 'reflekt init') then
             # return None
@@ -123,7 +122,7 @@ class ReflektProject:
                 "\n\n    git init"
                 "\n\nat the root of your Reflekt project."
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_project_name(self) -> None:
         try:
@@ -134,7 +133,7 @@ class ReflektProject:
                 "docs for guidance on project name configuration: "
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_config_profile(self) -> None:
         try:
@@ -145,7 +144,7 @@ class ReflektProject:
                 "docs for guidance on 'config_profile:' configuration: "
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_config_path(self) -> None:
         config_path_check = self.project.get("config_path")
@@ -158,14 +157,14 @@ class ReflektProject:
                     "The 'config_path: {str(self.config_path)}' defined in "
                     "reflekt_project.yml does not exist."
                 )
-                sys.exit(1)
+                raise SystemExit(1)
 
             if not self.config_path.is_absolute():
                 logger.error(
                     "The 'config_path: {str(self.config_path)}' defined in "
                     "reflekt_project.yml must be an absolute path."
                 )
-                sys.exit(1)
+                raise SystemExit(1)
         else:
             self.config_path = None
 
@@ -179,7 +178,7 @@ class ReflektProject:
                 "event naming conventions:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_events_allow_numbers(self) -> None:
         try:
@@ -193,7 +192,7 @@ class ReflektProject:
                 "event naming conventions:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_events_reserved(self) -> None:
         try:
@@ -207,7 +206,7 @@ class ReflektProject:
                 "See Reflekt docs for guidance on defining event naming conventions:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_properties_case(self) -> None:
         try:
@@ -221,7 +220,7 @@ class ReflektProject:
                 "properties naming conventions:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_properties_allow_numbers(self) -> None:
         try:
@@ -235,7 +234,7 @@ class ReflektProject:
                 "properties naming conventions:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_properties_reserved(self) -> None:
         try:
@@ -249,7 +248,7 @@ class ReflektProject:
                 "See Reflekt docs for guidance on defining properties naming conventions:"  # noqa: E501
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_data_types(self) -> None:
         try:
@@ -261,7 +260,7 @@ class ReflektProject:
                 "defining allowed data types:"  # noqa: E501
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_warehouse_database_obj(self) -> None:
         try:
@@ -276,7 +275,7 @@ class ReflektProject:
                 "docs for guidance on 'database:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_warehouse_schema_obj(self) -> None:
         try:
@@ -291,7 +290,7 @@ class ReflektProject:
                 "for guidance on 'schema:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_expected_metadata_schema(self) -> None:
         if (
@@ -314,7 +313,7 @@ class ReflektProject:
                 "'prefix:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_dbt_model_prefix(self) -> None:
         try:
@@ -326,7 +325,7 @@ class ReflektProject:
                 "'prefix:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_dbt_model_materialized(self) -> None:
         try:
@@ -340,7 +339,7 @@ class ReflektProject:
                     "See Reflekt docs on model configuration:"
                     "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
                 )
-                sys.exit(1)
+                raise SystemExit(1)
 
         except KeyError:
             logger.error(
@@ -349,7 +348,7 @@ class ReflektProject:
                 "See Reflekt docs on model configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_dbt_model_incremental_logic(self) -> None:
         if self.materialized == "incremental":
@@ -384,7 +383,7 @@ class ReflektProject:
                 "'prefix:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_dbt_docs_tests(self) -> None:
         try:
@@ -398,7 +397,7 @@ class ReflektProject:
                 "'not_null:' test configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
         try:
             self.docs_test_unique = self.project["dbt"]["templater"]["docs"]["id_tests"][
@@ -411,7 +410,7 @@ class ReflektProject:
                 "'unique:' test configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
 
     def _get_dbt_docs_in_folder(self) -> None:
         try:
@@ -423,4 +422,4 @@ class ReflektProject:
                 "'in_folder:' configuration:"
                 "\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
             )
-            sys.exit(1)
+            raise SystemExit(1)
