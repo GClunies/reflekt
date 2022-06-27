@@ -5,6 +5,7 @@
 from typing import Optional, Tuple
 
 import sqlalchemy
+from loguru import logger
 from snowflake.sqlalchemy import URL as snow_url
 from sqlalchemy.engine.url import URL as redshift_url
 
@@ -49,10 +50,14 @@ class WarehouseConnection:
             )
 
         else:
+            logger.error(
+                f"Invalid warehouse type specified in {self._config.path}. See the "
+                f"Reflekt profile configuration docs ()"
+            )
             raise ReflektConfigError(
                 f"Invalid warehouse type specified in {self._config.path}. See "
-                f"Reflekt docs on Reflekt Profile configuration:"
-                f"    https://reflekt-ci.notion.site/Reflekt-Profile-Configuration-8ee71745477b4c91a6aafbb025cf2280"  # noqa: E501
+                f"Reflekt docs on Reflekt Profile configuration "
+                f"(https://bit.ly/reflekt-profile-config)."
             )
 
     def get_columns(

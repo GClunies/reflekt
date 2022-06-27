@@ -5,15 +5,11 @@
 import pytest
 import yaml
 
-from reflekt.errors import ReflektValidationError
 from reflekt.plan import ReflektPlan
-from tests.fixtures import (
-    REFLEKT_EVENT,
-    REFLEKT_GROUP,
-    REFLEKT_IDENTIFY,
-    REFLEKT_PLAN,
-    REFLEKT_PLAN_BAD,
-)
+from tests.fixtures.reflekt_event import REFLEKT_EVENT
+from tests.fixtures.reflekt_groups import REFLEKT_GROUPS
+from tests.fixtures.reflekt_plan import REFLEKT_PLAN, REFLEKT_PLAN_BAD
+from tests.fixtures.reflekt_users import REFLEKT_USERS
 
 
 def test_reflekt_plan():
@@ -31,7 +27,7 @@ def test_add_event():
 
 def test_add_identify_trait():
     plan = ReflektPlan(yaml.safe_load(REFLEKT_PLAN), "test-plan")
-    yaml_obj = yaml.safe_load(REFLEKT_IDENTIFY)
+    yaml_obj = yaml.safe_load(REFLEKT_USERS)
     trait = yaml_obj["traits"][0]
     plan.add_identify_trait(trait)
 
@@ -40,7 +36,7 @@ def test_add_identify_trait():
 
 def test_add_group_trait():
     plan = ReflektPlan(yaml.safe_load(REFLEKT_PLAN), "test-plan")
-    yaml_obj = yaml.safe_load(REFLEKT_GROUP)
+    yaml_obj = yaml.safe_load(REFLEKT_GROUPS)
     trait = yaml_obj["traits"][0]
     plan.add_group_trait(trait)
 
@@ -53,17 +49,17 @@ def test_duplicate_events():
     plan.add_event(yaml.safe_load(REFLEKT_EVENT)[0])
     plan.add_event(yaml.safe_load(REFLEKT_EVENT)[0])
 
-    with pytest.raises(ReflektValidationError):
+    with pytest.raises(SystemExit):
         plan.validate_plan()
 
 
 def test_plan_validation():
     plan_good = ReflektPlan(yaml.safe_load(REFLEKT_PLAN), "test-plan")
     plan_bad = ReflektPlan(
-        yaml.safe_load(REFLEKT_PLAN_BAD), "test-plan"
-    )  # Missing `name:``
+        yaml.safe_load(REFLEKT_PLAN_BAD), "test-plan"  # Missing 'name:'
+    )
 
     assert plan_good.validate_plan() is None
 
-    with pytest.raises(ReflektValidationError):
+    with pytest.raises(SystemExit):
         plan_bad.validate_plan()

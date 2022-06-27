@@ -2,7 +2,23 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# fmt: off
+TITLE_CASE_RE = r"[A-Z][a-z]+"
+CAMEL_CASE_RE = r"(^[a-z]|[A-Z])[a-z]*"
+SNAKE_CASE_RE = r"^[a-z._]+$"
+
+REFLEKT_TEMPLATE_COLUMNS = [
+    "source_schema",
+    "source_table",
+    "tracking_plan",
+    "event_text",
+    "call_type",
+]
+
+REFLEKT_RESERVED_COLUMNS = [
+    "user_id",
+    "anonymous_id",
+]
+
 PLANS = [
     "segment",
     "avo",
@@ -50,13 +66,9 @@ WAREHOUSES = [
     "redshift",
 ]
 
-WAREHOUSE_INIT_STRING = (
-    "\n[1] Snowflake"
-    "\n[2] Redshift"
-)
+WAREHOUSE_INIT_STRING = "\n[1] Snowflake" "\n[2] Redshift"
 
 WAREHOUSE_MAP = {
     "1": "snowflake",
     "2": "redshift",
 }
-# fmt: on

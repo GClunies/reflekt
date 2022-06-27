@@ -11,8 +11,8 @@ import yaml
 from inflection import titleize, underscore
 from loguru import logger
 
-from reflekt.columns import reflekt_columns, reflekt_reserved_columns
 from reflekt.config import ReflektConfig
+from reflekt.constants import REFLEKT_RESERVED_COLUMNS, REFLEKT_TEMPLATE_COLUMNS
 from reflekt.dbt import (
     dbt_column_schema,
     dbt_doc_schema,
@@ -105,7 +105,7 @@ class ReflektTransformer(object):
         segment_payload = copy.deepcopy(segment_payload_schema)
         segment_plan = copy.deepcopy(segment_plan_schema)
         segment_plan["display_name"] = self.plan_name
-        print("")  # Terminal newline
+        logger.info("")  # Terminal newline
         logger.info(
             f"Converting Reflekt tracking plan '{self.plan_name}' to "
             f"{titleize(self.plan_type)} format"
@@ -502,9 +502,9 @@ class ReflektTransformer(object):
             db_errors_str += db_error
 
         if self.db_errors:
-            print("")  # Terminal newline
+            logger.info("")  # Terminal newline
             logger.warning(
-                f"[WARNING] The following database error(s) were encountered "
+                f"The following database error(s) were encountered "
                 f"while templating the dbt package.\n"
                 f"  NOTE - these errors do not prevent templating.\n\n{db_errors_str}"
             )
@@ -519,12 +519,12 @@ class ReflektTransformer(object):
 
         shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_dir)
 
-        print("")  # Terminal newline
-        logger.info(
-            f"[SUCCESS] Modeled and documented tracking plan '{reflekt_plan.name}' "
+        logger.info("")  # Terminal newline
+        logger.success(
+            f"Modeled and documented tracking plan '{reflekt_plan.name}' "
             f"in dbt package '{self.dbt_package_name}'"
         )
-        print("")  # Cleanup stdout
+        logger.info("")  # Terminal newline
 
     def _template_dbt_source(self, reflekt_plan: ReflektPlan) -> dict:
         logger.info(f"Initializing template for dbt source {self.schema}")
@@ -553,7 +553,7 @@ class ReflektTransformer(object):
         # Check that table does not already exist in dbt source. This can happen
         # for Segment events with multiple versions
         if table_name not in dbt_src["sources"][0]["tables"]:
-            print("")  # Terminal newline
+            logger.info("")  # Terminal newline
             logger.info(f"Templating table '{table_name}' in dbt source {self.schema}")
             dbt_tbl = copy.deepcopy(dbt_table_schema)
             dbt_tbl["name"] = table_name
@@ -571,7 +571,7 @@ class ReflektTransformer(object):
         plan_cols: list,
         event_name: Optional[str] = None,
     ) -> None:
-        print("")  # Terminal newline
+        logger.info("")  # Terminal newline
         logger.info(
             f"Templating dbt model "
             f"{self.model_prefix}{self.schema}__{table_name}.sql"
@@ -596,11 +596,11 @@ class ReflektTransformer(object):
         mdl_sql += "renamed as (\n\n" "    select"
 
         for column, mapped_columns in cdp_cols.items():
-            if column in db_columns or column in reflekt_columns:
+            if column in db_columns or column in REFLEKT_TEMPLATE_COLUMNS:
                 for mapped_column in mapped_columns:
                     if (
                         mapped_column["source_name"] in db_columns
-                        or column in reflekt_columns
+                        or column in REFLEKT_TEMPLATE_COLUMNS
                     ) and mapped_column["schema_name"] is not None:
                         logger.info(
                             f"    Adding column '{mapped_column['schema_name']}' to "
@@ -621,7 +621,7 @@ class ReflektTransformer(object):
         for column in plan_cols:
             if (
                 segment_2_snake(column.name) in db_columns
-                and segment_2_snake(column.name) not in reflekt_reserved_columns
+                and segment_2_snake(column.name) not in REFLEKT_RESERVED_COLUMNS
             ):
                 # If the columns is named 'interval', surround in double quotes
                 column_name = (
@@ -682,9 +682,9 @@ class ReflektTransformer(object):
         else:
             raise ReflektProjectError(
                 "Invalid materialized config in reflekt_project.yml. Must be "
-                "either 'view' or 'incremental'. See Reflekt docs on project "
-                "configuration:"
-                "    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                "either 'view' or 'incremental'. See the Reflekt docs on project "
+                "configuration."
+                "    https://bit.ly/reflekt-project-config"  # noqa: E501
             )
 
         return model_config
@@ -725,7 +725,7 @@ class ReflektTransformer(object):
         cdp_cols: dict,
         plan_cols: list,
     ) -> None:
-        print("")  # Terminal newline
+        logger.info("")  # Terminal newline
         logger.info(
             f"Templating dbt docs " f"{doc_name}.yml" f" for model " f"{model_name}.sql"
         )
@@ -735,7 +735,7 @@ class ReflektTransformer(object):
         dbt_mdl_doc["description"] = model_description
 
         for column, mapped_columns in cdp_cols.items():
-            if column in db_columns or column in reflekt_columns:
+            if column in db_columns or column in REFLEKT_TEMPLATE_COLUMNS:
                 for mapped_column in mapped_columns:
                     if mapped_column["schema_name"] is not None:
                         logger.info(
@@ -763,7 +763,7 @@ class ReflektTransformer(object):
         for column in plan_cols:
             if (
                 segment_2_snake(column.name) in db_columns
-                and segment_2_snake(column.name) not in reflekt_reserved_columns
+                and segment_2_snake(column.name) not in REFLEKT_RESERVED_COLUMNS
             ):
                 logger.info(
                     f"    Adding column '{segment_2_snake(column.name)}' to docs"
@@ -772,15 +772,6 @@ class ReflektTransformer(object):
                 mdl_col["name"] = segment_2_snake(column.name)
                 mdl_col["description"] = column.description
                 dbt_mdl_doc["columns"].append(mdl_col)
-        # for column in plan_cols:
-        #     if column.name in db_columns:
-        # logger.info(
-        #     f"    Adding column '{segment_2_snake(column.name)}' to docs"
-        # )
-        # mdl_col = copy.deepcopy(dbt_column_schema)
-        # mdl_col["name"] = segment_2_snake(column.name)
-        # mdl_col["description"] = column.description
-        # dbt_mdl_doc["columns"].append(mdl_col)
 
         dbt_doc["models"].append(dbt_mdl_doc)
 

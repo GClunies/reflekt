@@ -16,13 +16,13 @@ class ReflektApiHandler:
 
     def __init__(self) -> None:
         self._config = ReflektConfig()
-        self.type = self._config.plan_type
+        self.type: str = self._config.plan_type
 
     def get_api(self, avo_branch: Optional[str] = None):
         if self._config.plan_type == "avo":
-            return AvoCli(
+            return AvoCli(  # Not CLI (not API), but called via get_api for consistency
                 avo_branch
-            )  # Actually a CLI, but called via get_api for naming consistency
+            )
         elif self._config.plan_type == "iteratively":
             pass
         elif self._config.plan_type == "rudderstack":

@@ -19,7 +19,6 @@ class AvoCli:
         self._project = ReflektProject()
         self._config = ReflektConfig()
         self.type = self._config.plan_type
-        self.avo_json_source = self._config.avo_json_source
         self.avo_dir = self._project.project_dir / ".reflekt" / "avo"
         self.avo_branch = avo_branch
         logger.configure(**logger_config)
@@ -65,4 +64,4 @@ class AvoCli:
                 cwd=self.avo_dir,
             )
 
-        print("")  # Make output look nicer
+        logger.info("")  # Terminal newline

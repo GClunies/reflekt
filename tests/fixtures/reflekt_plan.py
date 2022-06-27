@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-TITLE_CASE_RE = r"[A-Z][a-z]+"
-CAMEL_CASE_RE = r"(^[a-z]|[A-Z])[a-z]*"
-SNAKE_CASE_RE = r"^[a-z._]+$"
+REFLEKT_PLAN = """
+name: test-plan
+"""
+
+REFLEKT_PLAN_BAD = """
+foobar: test-plan
+"""

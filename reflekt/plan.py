@@ -7,9 +7,9 @@
 from typing import Counter, List, Optional
 
 from cerberus import Validator
+from loguru import logger
 
 from reflekt.config import ReflektConfig
-from reflekt.errors import ReflektValidationError
 from reflekt.event import ReflektEvent
 from reflekt.project import ReflektProject
 from reflekt.property import ReflektProperty
@@ -54,11 +54,12 @@ class ReflektPlan(object):
             plan_database = self._project.warehouse_database_obj[plan_name]
             return plan_database
         except KeyError:
-            raise KeyError(
-                f"Tracking plan '{plan_name}' not found under 'database:' config in reflekt_project.yml."  # noqa: E501
-                f"See Reflekt docs on project configuration for guidance on 'database:' configuration: "  # noqa: E501
-                f"\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+            logger.error(
+                f"Tracking plan '{plan_name}' not defined under 'database:' config in "
+                f"reflekt_project.yml. See the Reflekt project configuration docs () for"
+                f" details on 'database:' configuration setup."
             )
+            raise SystemExit(1)
 
     def _get_schema_and_schema_alias(self, plan_name: str) -> list:
         try:
@@ -72,11 +73,13 @@ class ReflektPlan(object):
                     return schema, schema_alias
 
         except KeyError:
-            raise KeyError(
-                f"Error in 'schema:' config for tracking plan '{plan_name}'."
-                f"See Reflekt docs on project configuration for guidance on 'schema:' configuration: "  # noqa: E501
-                f"\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+            logger.error(
+                f"Error in 'schema:' config for tracking plan '{plan_name}'. "
+                f"See the Reflekt project configuration docs "
+                f"(https://bit.ly/reflekt-project-config) for details on 'schema:' "
+                f"configuration."
             )
+            raise SystemExit(1)
 
     def add_event(self, event_yaml_obj: dict) -> None:
         self.events.append(ReflektEvent(event_yaml_obj))
@@ -96,9 +99,11 @@ class ReflektPlan(object):
 
         if len(duplicates) > 0:
             duplicate_names = ", ".join(duplicates.keys())
-            raise ReflektValidationError(
-                f"Duplicate events found. Events: {duplicate_names}"
+            logger.error(
+                f"Duplicate events found. Events:\n\n"
+                f"    Duplicates: {duplicate_names}"
             )
+            raise SystemExit(1)
 
     def _check_reserved_event_names(self) -> None:
         if len(self.events) == 0:
@@ -108,20 +113,24 @@ class ReflektPlan(object):
 
         for event_name in event_names:
             if event_name in ReflektProject().events_reserved:
-                raise ReflektValidationError(
-                    f"Event name '{event_name}' is reserved and cannot be used. "
-                    f"See Reflekt docs on project configuration for guidance on 'reserved:' configuration for events:"  # noqa: E501
-                    f"\n    https://www.notion.so/reflekt-ci/Reflekt-Project-Configuration-96d375edb06743a8b1699f480b3a2c74#68ffa7415eef443c9a6ba99c31c2d590"  # noqa: E501
+                logger.error(
+                    f"Event name '{event_name}' is reserved and cannot be used. See the "
+                    f"Reflekt project configuration docs "
+                    f"(https://bit.ly/reflekt-project-config) for details on 'reserved:'"
+                    f" event configuration."
                 )
+                raise SystemExit(1)
 
     def validate_plan(self) -> None:
         validator = Validator(reflekt_plan_schema)
         is_valid = validator.validate(self.plan_yaml_obj, reflekt_plan_schema)
 
         if not is_valid:
-            raise ReflektValidationError(
-                f"Invalid plan definition for plan '{self.name}' - {validator.errors}"
+            logger.error(
+                f"Invalid plan definition for plan '{self.name}'. Error(s) summary:\n"
+                f"    {validator.errors}"
             )
+            raise SystemExit(1)
 
         self._check_duplicate_events()
         self._check_reserved_event_names()
