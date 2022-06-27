@@ -8,8 +8,9 @@ import re
 from collections import Counter
 
 from cerberus import Validator
+from loguru import logger
 
-from reflekt.casing import CAMEL_CASE_RE, SNAKE_CASE_RE, TITLE_CASE_RE
+from reflekt.constants import CAMEL_CASE_RE, SNAKE_CASE_RE, TITLE_CASE_RE
 from reflekt.errors import ReflektValidationError
 from reflekt.project import ReflektProject
 from reflekt.property import ReflektProperty
@@ -23,16 +24,12 @@ class ReflektEvent(object):
     def __init__(self, event_yaml_obj: dict) -> None:
         if ReflektProject().exists:
             self._project = ReflektProject()
-            self._event_yaml_obj = event_yaml_obj
-            self._properties = [
-                ReflektProperty(property)
-                for property in self._event_yaml_obj["properties"]
-            ]
-            self.version = self._event_yaml_obj.get("version")
-            self.name = self._event_yaml_obj.get("name")
-            self.description = self._event_yaml_obj.get("description")
-            self.metadata = self._event_yaml_obj.get("metadata")
-            self.properties = [
+            self._event_yaml_obj: dict = event_yaml_obj
+            self.version: str = self._event_yaml_obj.get("version")
+            self.name: str = self._event_yaml_obj.get("name")
+            self.description: str = self._event_yaml_obj.get("description")
+            self.metadata: dict = self._event_yaml_obj.get("metadata")
+            self.properties: list = [
                 ReflektProperty(property)
                 for property in self._event_yaml_obj["properties"]
             ]
@@ -41,94 +38,105 @@ class ReflektEvent(object):
     def _check_event_metadata(self) -> None:
         if self.metadata:
             validator = Validator(reflekt_expected_metadata_schema)
-            is_valid = validator.validate(
+            is_valid: bool = validator.validate(
                 self.metadata, reflekt_expected_metadata_schema
             )
             if not is_valid:
-                raise ReflektValidationError(
-                    f"Invalid metadata specified for event '{self.name} - "
-                    f"{validator.errors}\n\n"
-                    f"See Reflekt Project configuration docs for guidance on defining expected event metadata:\n"  # noqa: E501
-                    f"    https://bit.ly/reflekt-project-config"  # noqa: E501
+                logger.error(
+                    f"Invalid event 'metadata:' config specified for event "
+                    f"'{self.name}'. Error(s) summary:"
+                    f"\n\n    {validator.errors}"
+                    f"\n\nSee the Reflekt docs (bit.ly/reflekt-event-metadata) on "
+                    f"metadata configuration."
                 )
+                SystemExit(1)
 
     def _check_event_name_case(self) -> None:
-        case_rule = self._project.events_case
+        case_rule: str = self._project.events_case
 
         if case_rule is not None:
-            rule_str = f"case: {case_rule.lower()}"
+            rule_str: str = f"case: {case_rule.lower()}"
             if case_rule.lower() == "title":
-                regex = TITLE_CASE_RE
+                regex: str = TITLE_CASE_RE
             elif case_rule.lower() == "snake":
-                regex = SNAKE_CASE_RE
+                regex: str = SNAKE_CASE_RE
             elif case_rule.lower() == "camel":
-                regex = CAMEL_CASE_RE
+                regex: str = CAMEL_CASE_RE
 
-            match = bool(re.match(regex, self.name))
-            rule_type = "case:"
-            rule_str = case_rule.lower()
+            match: bool = bool(re.match(regex, self.name))
+            rule_type: str = "case:"
+            rule_str: str = case_rule.lower()
 
             if not match:
-                raise ReflektValidationError(
+                logger.error(
                     f"Event name '{self.name}' does not match naming convention"
                     f" defined by '{rule_type} {rule_str}' in reflekt_project.yml. "
-                    f"See Reflekt Project configuration docs for guidance on defining naming conventions:\n"  # noqa: E501
-                    f"    https://bit.ly/reflekt-project-config"  # noqa: E501
+                    f"See the Reflekt Project configuration docs "
+                    f"(https://bit.ly/reflekt-project-config) for details on defining "
+                    f"naming conventions."
                 )
+                SystemExit(1)
 
     def _check_event_name_numbers(self) -> None:
-        allow_numbers = self._project.events_allow_numbers
+        allow_numbers: bool = self._project.events_allow_numbers
         if not allow_numbers:
-            contains_number = any(char.isdigit() for char in self.name)
+            contains_number: bool = any(char.isdigit() for char in self.name)
 
             if contains_number:
-                raise ReflektValidationError(
+                logger.error(
                     f"\nEvent name '{self.name}' does not match naming convention"
-                    f" defined by 'allow_numbers: {str(allow_numbers).lower()}' in reflekt_project.yml "  # noqa: E501
-                    f"See Reflekt Project configuration docs for guidance on defining naming conventions:\n"  # noqa: E501
-                    f"    https://bit.ly/reflekt-project-config"  # noqa: E501
+                    f" defined by 'allow_numbers: {str(allow_numbers).lower()}' in "
+                    f"reflekt_project.yml See the Reflekt Project configuration docs "
+                    f"(https://bit.ly/reflekt-project-config) for details on defining "
+                    f"naming conventions."
                 )
+                SystemExit(1)
 
     def _check_duplicate_properties(self) -> None:
         if len(self.properties) == 0:
             return
 
-        prop_names = [p.name for p in self.properties]
+        prop_names: list = [p.name for p in self.properties]
         counts = Counter(prop_names)
 
-        duplicates = {k: v for (k, v) in counts.items() if v > 1}
+        duplicates: dict = {k: v for (k, v) in counts.items() if v > 1}
         if len(duplicates) > 0:
-            duplicate_names = ", ".join(duplicates.keys())
-            raise ReflektValidationError(
-                f"Duplicate properties found on event {self.name}. "
-                f"Properties: {duplicate_names}"
+            duplicate_names: str = ", ".join(duplicates.keys())
+            logger.error(
+                f"Duplicate properties found on event {self.name}:\n\n"
+                f"    Duplicates: {duplicate_names}"
             )
+            SystemExit(1)
 
     def _check_reserved_property_names(self) -> None:
         if len(self.properties) == 0:
             return
 
-        prop_names = [p.name for p in self.properties]
+        prop_names: list = [p.name for p in self.properties]
 
         for prop_name in prop_names:
             if prop_name in ReflektProject().properties_reserved:
-                raise ReflektValidationError(
+                logger.error(
                     f"Property name '{prop_name}' is reserved and cannot be used."
-                    f"See Reflekt Project configuration docs for guidance on defining naming conventions:\n"  # noqa: E501
-                    f"    https://bit.ly/reflekt-project-config"  # noqa: E501
+                    f"See the Reflekt Project configuration docs "
+                    f"(https://bit.ly/reflekt-project-config) for details on defining "
+                    f"naming conventions."
                 )
+                SystemExit(1)
 
     def validate_event(self) -> None:
         """Validate event against Reflekt schema."""
         validator = Validator(reflekt_event_schema)
-        is_valid = validator.validate(self._event_yaml_obj, reflekt_event_schema)
+        is_valid: bool = validator.validate(self._event_yaml_obj, reflekt_event_schema)
 
         if not is_valid:
-            raise ReflektValidationError(
-                f"Event validation error for event '{self.name}' - {validator.errors}"  # noqa: E501
-                f"\n\nSee the Reflekt docs on event definition:\n"
-                f"    https://www.notion.so/reflekt-ci/Tracking-Plans-0886264fb3d54891898730ed28b804c0#9c3d1d8cdcd84f19878bd15e2e1bf981"  # noqa: E501
+            logger.error(
+                f"Event validation error for event '{self.name}'. Error(s) summary:"
+                f"\n\n    {validator.errors}"
+                f"\n\nSee the Reflekt docs (https://bit.ly/reflekt-event) for details on"
+                f"defining events."
             )
+            SystemExit(1)
 
         self._check_event_name_case()
         self._check_event_name_numbers()

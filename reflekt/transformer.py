@@ -11,8 +11,8 @@ import yaml
 from inflection import titleize, underscore
 from loguru import logger
 
-from reflekt.columns import reflekt_columns, reflekt_reserved_columns
 from reflekt.config import ReflektConfig
+from reflekt.constants import REFLEKT_RESERVED_COLUMNS, REFLEKT_TEMPLATE_COLUMNS
 from reflekt.dbt import (
     dbt_column_schema,
     dbt_doc_schema,
@@ -596,11 +596,11 @@ class ReflektTransformer(object):
         mdl_sql += "renamed as (\n\n" "    select"
 
         for column, mapped_columns in cdp_cols.items():
-            if column in db_columns or column in reflekt_columns:
+            if column in db_columns or column in REFLEKT_TEMPLATE_COLUMNS:
                 for mapped_column in mapped_columns:
                     if (
                         mapped_column["source_name"] in db_columns
-                        or column in reflekt_columns
+                        or column in REFLEKT_TEMPLATE_COLUMNS
                     ) and mapped_column["schema_name"] is not None:
                         logger.info(
                             f"    Adding column '{mapped_column['schema_name']}' to "
@@ -621,7 +621,7 @@ class ReflektTransformer(object):
         for column in plan_cols:
             if (
                 segment_2_snake(column.name) in db_columns
-                and segment_2_snake(column.name) not in reflekt_reserved_columns
+                and segment_2_snake(column.name) not in REFLEKT_RESERVED_COLUMNS
             ):
                 # If the columns is named 'interval', surround in double quotes
                 column_name = (
@@ -735,7 +735,7 @@ class ReflektTransformer(object):
         dbt_mdl_doc["description"] = model_description
 
         for column, mapped_columns in cdp_cols.items():
-            if column in db_columns or column in reflekt_columns:
+            if column in db_columns or column in REFLEKT_TEMPLATE_COLUMNS:
                 for mapped_column in mapped_columns:
                     if mapped_column["schema_name"] is not None:
                         logger.info(
@@ -763,7 +763,7 @@ class ReflektTransformer(object):
         for column in plan_cols:
             if (
                 segment_2_snake(column.name) in db_columns
-                and segment_2_snake(column.name) not in reflekt_reserved_columns
+                and segment_2_snake(column.name) not in REFLEKT_RESERVED_COLUMNS
             ):
                 logger.info(
                     f"    Adding column '{segment_2_snake(column.name)}' to docs"
@@ -772,15 +772,6 @@ class ReflektTransformer(object):
                 mdl_col["name"] = segment_2_snake(column.name)
                 mdl_col["description"] = column.description
                 dbt_mdl_doc["columns"].append(mdl_col)
-        # for column in plan_cols:
-        #     if column.name in db_columns:
-        # logger.info(
-        #     f"    Adding column '{segment_2_snake(column.name)}' to docs"
-        # )
-        # mdl_col = copy.deepcopy(dbt_column_schema)
-        # mdl_col["name"] = segment_2_snake(column.name)
-        # mdl_col["description"] = column.description
-        # dbt_mdl_doc["columns"].append(mdl_col)
 
         dbt_doc["models"].append(dbt_mdl_doc)
 

@@ -8,7 +8,6 @@ import subprocess
 from typing import Optional
 
 from loguru import logger
-
 from reflekt.config import ReflektConfig
 from reflekt.logger import logger_config
 from reflekt.project import ReflektProject
@@ -19,7 +18,6 @@ class AvoCli:
         self._project = ReflektProject()
         self._config = ReflektConfig()
         self.type = self._config.plan_type
-        self.avo_json_source = self._config.avo_json_source
         self.avo_dir = self._project.project_dir / ".reflekt" / "avo"
         self.avo_branch = avo_branch
         logger.configure(**logger_config)
