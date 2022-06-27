@@ -60,7 +60,7 @@ class ReflektPlan(object):
                 f"reflekt_project.yml. See the Reflekt project configuration docs () for"
                 f" details on 'database:' configuration setup."
             )
-            SystemExit(1)
+            raise SystemExit(1)
 
     def _get_schema_and_schema_alias(self, plan_name: str) -> list:
         try:
@@ -80,7 +80,7 @@ class ReflektPlan(object):
                 f"(https://bit.ly/reflekt-project-config) for details on 'schema:' "
                 f"configuration."
             )
-            SystemExit(1)
+            raise SystemExit(1)
 
     def add_event(self, event_yaml_obj: dict) -> None:
         self.events.append(ReflektEvent(event_yaml_obj))
@@ -104,7 +104,7 @@ class ReflektPlan(object):
                 f"Duplicate events found. Events:\n\n"
                 f"    Duplicates: {duplicate_names}"
             )
-            SystemExit(1)
+            raise SystemExit(1)
 
     def _check_reserved_event_names(self) -> None:
         if len(self.events) == 0:
@@ -120,7 +120,7 @@ class ReflektPlan(object):
                     f"(https://bit.ly/reflekt-project-config) for details on 'reserved:'"
                     f" event configuration."
                 )
-                SystemExit(1)
+                raise SystemExit(1)
 
     def validate_plan(self) -> None:
         validator = Validator(reflekt_plan_schema)
@@ -131,6 +131,7 @@ class ReflektPlan(object):
                 f"Invalid plan definition for plan '{self.name}'. Error(s) summary:\n"
                 f"    {validator.errors}"
             )
+            raise SystemExit(1)
 
         self._check_duplicate_events()
         self._check_reserved_event_names()

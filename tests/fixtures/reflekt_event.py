@@ -68,19 +68,14 @@ REFLEKT_EVENT = """
       allow_null: true
 """
 
-# Duplicate property makes event invalid
+# Missing description
 REFLEKT_EVENT_BAD = """
 - version: 1
   name: Test Event
-  description: This is a test event.
   metadata:
     product_owner: Maura
     code_owner: Greg
   properties:
-    - name: property_one
-      description: A string property.
-      type: string
-      required: true
     - name: property_one
       description: A string property.
       type: string

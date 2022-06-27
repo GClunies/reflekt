@@ -75,7 +75,7 @@ class ReflektEvent(object):
                     f"(https://bit.ly/reflekt-project-config) for details on defining "
                     f"naming conventions."
                 )
-                SystemExit(1)
+                raise SystemExit(1)
 
     def _check_event_name_numbers(self) -> None:
         allow_numbers: bool = self._project.events_allow_numbers
@@ -90,7 +90,7 @@ class ReflektEvent(object):
                     f"(https://bit.ly/reflekt-project-config) for details on defining "
                     f"naming conventions."
                 )
-                SystemExit(1)
+                raise SystemExit(1)
 
     def _check_duplicate_properties(self) -> None:
         if len(self.properties) == 0:
@@ -106,7 +106,7 @@ class ReflektEvent(object):
                 f"Duplicate properties found on event {self.name}:\n\n"
                 f"    Duplicates: {duplicate_names}"
             )
-            SystemExit(1)
+            raise SystemExit(1)
 
     def _check_reserved_property_names(self) -> None:
         if len(self.properties) == 0:
@@ -122,7 +122,7 @@ class ReflektEvent(object):
                     f"(https://bit.ly/reflekt-project-config) for details on defining "
                     f"naming conventions."
                 )
-                SystemExit(1)
+                raise SystemExit(1)
 
     def validate_event(self) -> None:
         """Validate event against Reflekt schema."""
@@ -136,7 +136,7 @@ class ReflektEvent(object):
                 f"\n\nSee the Reflekt docs (https://bit.ly/reflekt-event) for details on"
                 f"defining events."
             )
-            SystemExit(1)
+            raise SystemExit(1)
 
         self._check_event_name_case()
         self._check_event_name_numbers()

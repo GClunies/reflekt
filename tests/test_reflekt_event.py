@@ -49,7 +49,7 @@ def test_duplicate_property():
     # Duplicate a property
     event_yaml_obj["properties"].append(event_yaml_obj["properties"][0])
 
-    with pytest.raises(ReflektValidationError):
+    with pytest.raises(SystemExit):
         ReflektEvent(event_yaml_obj)
 
 
@@ -61,26 +61,36 @@ def test_event_validation():
     # Validate event against reflekt_event_schema
     assert event_good.validate_event() is None
 
-    with pytest.raises(ReflektValidationError):
+
+def test_event_bad_version():
+    with pytest.raises(SystemExit):
         event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
         event_yaml_obj["version"] = 0  # Invalid version (must be >= 1)
         ReflektEvent(event_yaml_obj)
 
-    with pytest.raises(ReflektValidationError):
+
+def test_event_bad_name():
+    with pytest.raises(SystemExit):
         event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
         event_yaml_obj["name"] = None  # Must have a name
         ReflektEvent(event_yaml_obj)
 
-    with pytest.raises(ReflektValidationError):
+
+def test_event_bad_description():
+    with pytest.raises(SystemExit):
         event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
         event_yaml_obj["description"] = None  # Must have a description
         ReflektEvent(event_yaml_obj)
 
-    with pytest.raises(ReflektValidationError):
+
+def test_event_bad_metadata():
+    with pytest.raises(SystemExit):
         event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
         event_yaml_obj["metadata"] = "A string"  # Must be dictionary
         ReflektEvent(event_yaml_obj)
 
+
+def test_event_bad_properties():
     with pytest.raises(AttributeError):
         event_yaml_obj = yaml.safe_load(REFLEKT_EVENT)[0]
         event_yaml_obj["properties"] = "A string"  # Must be a list of dicts

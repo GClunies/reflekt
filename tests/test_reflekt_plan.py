@@ -50,7 +50,7 @@ def test_duplicate_events():
     plan.add_event(yaml.safe_load(REFLEKT_EVENT)[0])
     plan.add_event(yaml.safe_load(REFLEKT_EVENT)[0])
 
-    with pytest.raises(ReflektValidationError):
+    with pytest.raises(SystemExit):
         plan.validate_plan()
 
 
@@ -62,5 +62,5 @@ def test_plan_validation():
 
     assert plan_good.validate_plan() is None
 
-    with pytest.raises(ReflektValidationError):
+    with pytest.raises(SystemExit):
         plan_bad.validate_plan()

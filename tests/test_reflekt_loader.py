@@ -50,11 +50,3 @@ def test_loader_group(tmpdir):
     traits = loader.plan.group_traits
 
     assert len(traits) == 2
-
-
-def test_loader_validation(tmpdir):
-    # Create tracking plan with bad event (missing required name)
-    plan_dir = build_reflekt_plan_dir(tmpdir, event_fixture=REFLEKT_EVENT_BAD)
-
-    with pytest.raises(ReflektValidationError):
-        ReflektLoader(plan_dir, "test-plan")
