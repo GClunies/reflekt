@@ -63,4 +63,4 @@ class AvoCli:
                 cwd=self.avo_dir,
             )
 
-        print("")  # Make output look nicer
+        logger.info("")  # Terminal newline

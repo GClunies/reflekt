@@ -502,7 +502,7 @@ class ReflektTransformer(object):
             db_errors_str += db_error
 
         if self.db_errors:
-            print("")  # Terminal newline
+            logger.info("")  # Terminal newline
             logger.warning(
                 f"The following database error(s) were encountered "
                 f"while templating the dbt package.\n"
@@ -519,12 +519,12 @@ class ReflektTransformer(object):
 
         shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_dir)
 
-        print("")  # Terminal newline
+        logger.info("")  # Terminal newline
         logger.success(
             f"Modeled and documented tracking plan '{reflekt_plan.name}' "
             f"in dbt package '{self.dbt_package_name}'"
         )
-        print("")  # Cleanup stdout
+        logger.info("")  # Terminal newline
 
     def _template_dbt_source(self, reflekt_plan: ReflektPlan) -> dict:
         logger.info(f"Initializing template for dbt source {self.schema}")
@@ -553,7 +553,7 @@ class ReflektTransformer(object):
         # Check that table does not already exist in dbt source. This can happen
         # for Segment events with multiple versions
         if table_name not in dbt_src["sources"][0]["tables"]:
-            print("")  # Terminal newline
+            logger.info("")  # Terminal newline
             logger.info(f"Templating table '{table_name}' in dbt source {self.schema}")
             dbt_tbl = copy.deepcopy(dbt_table_schema)
             dbt_tbl["name"] = table_name
@@ -571,7 +571,7 @@ class ReflektTransformer(object):
         plan_cols: list,
         event_name: Optional[str] = None,
     ) -> None:
-        print("")  # Terminal newline
+        logger.info("")  # Terminal newline
         logger.info(
             f"Templating dbt model "
             f"{self.model_prefix}{self.schema}__{table_name}.sql"
@@ -725,7 +725,7 @@ class ReflektTransformer(object):
         cdp_cols: dict,
         plan_cols: list,
     ) -> None:
-        print("")  # Terminal newline
+        logger.info("")  # Terminal newline
         logger.info(
             f"Templating dbt docs " f"{doc_name}.yml" f" for model " f"{model_name}.sql"
         )
