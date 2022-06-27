@@ -4,7 +4,7 @@
 
 import pytest
 import yaml
-from reflekt.errors import ReflektValidationError
+
 from reflekt.event import ReflektEvent
 from reflekt.property import ReflektProperty
 

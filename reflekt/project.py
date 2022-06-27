@@ -340,8 +340,8 @@ class ReflektProject:
                 logger.error(
                     "Invalid 'materialized:' config defined for templated dbt models in "
                     "reflekt_project.yml. Must be either 'view' or 'incremental'. "
-                    "\n\nSee the Reflekt docs (https://bit.ly/reflekt-project-config) on "
-                    "model configuration."
+                    "\n\nSee the Reflekt docs (https://bit.ly/reflekt-project-config) on"
+                    " model configuration."
                 )
                 raise SystemExit(1)
 

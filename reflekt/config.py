@@ -55,9 +55,9 @@ class ReflektConfig:
     def _get_warehouse_type(self) -> str:
         if len(self.warehouse.keys()) > 1:
             logger.error(
-                f"Multiple warehouses defined for 'config_profile: {self.config_profile}'"
-                f" in reflekt_config.yml at {self.path}. Only one warehouse can be "
-                f"defined per profile. See the Reflekt docs "
+                f"Multiple warehouses defined for 'config_profile: "
+                f" {self.config_profile}' in reflekt_config.yml at {self.path}. Only "
+                f"one warehouse can be defined per profile. See the Reflekt docs "
                 f"(https://bit.ly/reflekt-profile-config) on profile configuration."
             )
             SystemExit(1)

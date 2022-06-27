@@ -11,7 +11,6 @@ from cerberus import Validator
 from loguru import logger
 
 from reflekt.constants import CAMEL_CASE_RE, SNAKE_CASE_RE, TITLE_CASE_RE
-from reflekt.errors import ReflektValidationError
 from reflekt.project import ReflektProject
 from reflekt.property import ReflektProperty
 from reflekt.schema import reflekt_event_schema, reflekt_expected_metadata_schema

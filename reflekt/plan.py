@@ -10,7 +10,6 @@ from cerberus import Validator
 from loguru import logger
 
 from reflekt.config import ReflektConfig
-from reflekt.errors import ReflektValidationError
 from reflekt.event import ReflektEvent
 from reflekt.project import ReflektProject
 from reflekt.property import ReflektProperty

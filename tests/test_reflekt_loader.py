@@ -2,15 +2,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import pytest
 import yaml
-from reflekt.errors import ReflektValidationError
+
 from reflekt.event import ReflektEvent
 from reflekt.loader import ReflektLoader
 from reflekt.plan import ReflektPlan
-
 from tests.build import build_reflekt_plan_dir
-from tests.fixtures.reflekt_event import REFLEKT_EVENT, REFLEKT_EVENT_BAD
+from tests.fixtures.reflekt_event import REFLEKT_EVENT
 from tests.fixtures.reflekt_plan import REFLEKT_PLAN
 
 

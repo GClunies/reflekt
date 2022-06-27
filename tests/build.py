@@ -2,11 +2,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from tests.fixtures.reflekt_config import REFLEKT_CONFIG
 from tests.fixtures.reflekt_event import REFLEKT_EVENT
 from tests.fixtures.reflekt_groups import REFLEKT_GROUPS
 from tests.fixtures.reflekt_plan import REFLEKT_PLAN
-from tests.fixtures.reflekt_project import REFLEKT_PROJECT
 from tests.fixtures.reflekt_users import REFLEKT_USERS
 
 

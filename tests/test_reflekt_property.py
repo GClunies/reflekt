@@ -4,9 +4,8 @@
 
 import pytest
 import yaml
-from reflekt.errors import ReflektValidationError
-from reflekt.property import ReflektProperty
 
+from reflekt.property import ReflektProperty
 from tests.fixtures.reflekt_property import (
     REFLEKT_PROPERTY,
     REFLEKT_PROPERTY_ARRAY_NESTED,
