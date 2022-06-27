@@ -26,48 +26,6 @@ def test_reflekt_property():
     assert property.required is True
     assert property.allow_null is True
 
-    with pytest.raises(ReflektValidationError):
-        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
-        prop_yaml_obj["name"] = None
-        ReflektProperty(prop_yaml_obj)  # Must have a name
-
-    with pytest.raises(ReflektValidationError):
-        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
-        prop_yaml_obj["description"] = None
-        ReflektProperty(prop_yaml_obj)  # Must have a description
-
-    with pytest.raises(ReflektValidationError):
-        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
-        prop_yaml_obj["type"] = None
-        ReflektProperty(prop_yaml_obj)  # Must have a type
-
-    with pytest.raises(ReflektValidationError):
-        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_ENUM)
-        prop_yaml_obj["type"] = "integer"
-        ReflektProperty(prop_yaml_obj)  # Must have type string
-
-    with pytest.raises(ReflektValidationError):
-        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_PATTERN)
-        prop_yaml_obj["type"] = "number"
-        ReflektProperty(prop_yaml_obj)  # Must have type string
-
-    with pytest.raises(ReflektValidationError):
-        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_DATETIME)
-        prop_yaml_obj[
-            "type"
-        ] = "datetime"  # Not a valid type, datetime handled by datetime: prop config
-        ReflektProperty(prop_yaml_obj)  # Must have type string
-
-    with pytest.raises(ReflektValidationError):
-        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_OBJ)
-        prop_yaml_obj["object_properties"] = {"name": "this wont work"}
-        ReflektProperty(prop_yaml_obj)  # Must be a list of dicts
-
-    with pytest.raises(ReflektValidationError):
-        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_ARRAY_NESTED)
-        prop_yaml_obj["object_properties"] = {"name": "this wont work"}
-        ReflektProperty(prop_yaml_obj)  # Must be a list of dicts
-
 
 def test_default_property_values():
     property_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
@@ -79,16 +37,74 @@ def test_default_property_values():
     assert property.allow_null is False
 
 
-def test_valid_type():
-    property_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
-    property_yaml_obj["type"] = "foobar"
-
-    with pytest.raises(ReflektValidationError):
-        # ReflektProperty runs validate_event() when initialized
-        ReflektProperty(property_yaml_obj)
-
-
 def test_property_validation():
     property_good = ReflektProperty(yaml.safe_load(REFLEKT_PROPERTY))
 
     assert property_good.validate_property() is None
+
+
+def test_valid_type():
+    property_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
+    property_yaml_obj["type"] = "foobar"
+
+    with pytest.raises(SystemExit):
+        # ReflektProperty runs validate_event() when initialized
+        ReflektProperty(property_yaml_obj)
+
+
+def test_reflekt_property_missing_name():
+    with pytest.raises(SystemExit):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
+        prop_yaml_obj["name"] = None
+        ReflektProperty(prop_yaml_obj)  # Must have a name
+
+
+def test_reflekt_property_missing_description():
+    with pytest.raises(SystemExit):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
+        prop_yaml_obj["description"] = None
+        ReflektProperty(prop_yaml_obj)  # Must have a description
+
+
+def test_reflekt_property_missing_type():
+    with pytest.raises(SystemExit):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY)
+        prop_yaml_obj["type"] = None
+        ReflektProperty(prop_yaml_obj)  # Must have a type
+
+
+def test_reflekt_property_enum():
+    with pytest.raises(SystemExit):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_ENUM)
+        prop_yaml_obj["type"] = "integer"
+        ReflektProperty(prop_yaml_obj)  # Must have type string
+
+
+def test_reflekt_property_pattern():
+    with pytest.raises(SystemExit):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_PATTERN)
+        prop_yaml_obj["type"] = "number"
+        ReflektProperty(prop_yaml_obj)  # Must have type string
+
+
+def test_reflekt_property_datetime():
+    with pytest.raises(SystemExit):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_DATETIME)
+        prop_yaml_obj[
+            "type"
+        ] = "datetime"  # Not a valid type, datetime handled by datetime: prop config
+        ReflektProperty(prop_yaml_obj)  # Must have type string
+
+
+def test_reflekt_property_object():
+    with pytest.raises(SystemExit):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_OBJ)
+        prop_yaml_obj["object_properties"] = {"name": "this wont work"}
+        ReflektProperty(prop_yaml_obj)  # Must be a list of dicts
+
+
+def test_reflekt_property_array_nested():
+    with pytest.raises(SystemExit):
+        prop_yaml_obj = yaml.safe_load(REFLEKT_PROPERTY_ARRAY_NESTED)
+        prop_yaml_obj["object_properties"] = {"name": "this wont work"}
+        ReflektProperty(prop_yaml_obj)  # Must be a list of dicts
