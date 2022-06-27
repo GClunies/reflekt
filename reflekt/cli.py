@@ -274,7 +274,7 @@ def init(project_dir_str: str) -> None:
     )
 
     if plan_type == "avo":
-        print("")  # Terminal newline
+        logger.info("")  # Terminal newline
         logger.info(avo_end_msg)
 
 
@@ -310,8 +310,8 @@ def new(plan_name: str) -> None:
     with open(plan_yml_file, "w") as f:
         yaml.dump(doc, f)
 
-    print("")  # Terminal newline
-    logger.info(f"[SUCCESS] Created Reflekt tracking plan '{plan_name}'")
+    logger.info("")  # Terminal newline
+    logger.success(f"Created Reflekt tracking plan '{plan_name}'")
 
 
 @click.command()
@@ -364,8 +364,8 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
 
         logger.info(f"Building Reflekt tracking plan '{plan_name}' at {plan_dir}")
         plan.build_reflekt(plan_dir)
-        print("")  # Terminal newline
-        logger.info(f"[SUCCESS] Built Reflekt tracking plan '{plan_name}'")
+        logger.info("")  # Terminal newline
+        logger.success(f"Built Reflekt tracking plan '{plan_name}'")
 
 
 @click.command()
@@ -401,15 +401,15 @@ def push(plan_name, dry) -> None:
         )
         click.echo(json.dumps(payload, indent=2))
     else:
-        print("")  # Terminal newline
+        logger.info("")  # Terminal newline
         logger.info(
             f"Syncing converted tracking plan '{plan_name}' to "
             f"{titleize(transformer.plan_type)}"
         )
         api.sync(plan_name, cdp_plan)
-        print("")  # Terminal newline
-        logger.info(
-            f"[SUCCESS] Synced Reflekt tracking plan '{plan_name}' to "
+        logger.info("")  # Terminal newline
+        logger.success(
+            f"Synced Reflekt tracking plan '{plan_name}' to "
             f"{titleize(transformer.plan_type)}"
         )
 
@@ -426,12 +426,14 @@ def test(plan_name: str) -> None:
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Testing Reflekt tracking plan '{plan_name}'")
 
-    # Initialize ReflektLoader() always runs checks. Simple, but inelegant.
+    # Initialize ReflektLoader() always runs checks. Simple, not elegant.
     ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
 
     # If no errors are thrown, passed tests
     logger.info("")
-    logger.info(f"[PASSED] No errors detected in Reflekt tracking plan '{plan_name}'")
+    logger.success(
+        f"Testing completed. No errors detected in tracking plan '{plan_name}'"
+    )
 
 
 @click.option(
@@ -567,13 +569,14 @@ def dbt(
             if not overwrite:
                 raise click.Abort()
 
-            print("")  # Newline in terminal
+            logger.info("")  # Terminal newline
             version = existing_version
 
     # Setup temporary dbt pkg
     if dbt_pkg_dir.exists():
         # If dbt pk exists, use it as template
-        shutil.rmtree(tmp_pkg_dir)
+        if tmp_pkg_dir.exists():
+            shutil.rmtree(tmp_pkg_dir)
         shutil.copytree(dbt_pkg_dir, str(tmp_pkg_dir))
     else:
         if tmp_pkg_dir.exists():  # ensure tmp dir is empty

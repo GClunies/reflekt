@@ -105,7 +105,7 @@ class ReflektTransformer(object):
         segment_payload = copy.deepcopy(segment_payload_schema)
         segment_plan = copy.deepcopy(segment_plan_schema)
         segment_plan["display_name"] = self.plan_name
-        print("")  # Terminal newline
+        logger.info("")  # Terminal newline
         logger.info(
             f"Converting Reflekt tracking plan '{self.plan_name}' to "
             f"{titleize(self.plan_type)} format"
@@ -504,7 +504,7 @@ class ReflektTransformer(object):
         if self.db_errors:
             print("")  # Terminal newline
             logger.warning(
-                f"[WARNING] The following database error(s) were encountered "
+                f"The following database error(s) were encountered "
                 f"while templating the dbt package.\n"
                 f"  NOTE - these errors do not prevent templating.\n\n{db_errors_str}"
             )
@@ -520,8 +520,8 @@ class ReflektTransformer(object):
         shutil.copytree(self.tmp_pkg_dir, self.dbt_pkg_dir)
 
         print("")  # Terminal newline
-        logger.info(
-            f"[SUCCESS] Modeled and documented tracking plan '{reflekt_plan.name}' "
+        logger.success(
+            f"Modeled and documented tracking plan '{reflekt_plan.name}' "
             f"in dbt package '{self.dbt_package_name}'"
         )
         print("")  # Cleanup stdout
