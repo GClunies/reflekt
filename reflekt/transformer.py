@@ -21,7 +21,6 @@ from reflekt.dbt import (
     dbt_table_schema,
 )
 from reflekt.dumper import ReflektYamlDumper
-from reflekt.errors import ReflektProjectError
 from reflekt.event import ReflektEvent
 from reflekt.plan import ReflektPlan
 from reflekt.project import ReflektProject
@@ -680,12 +679,12 @@ class ReflektTransformer(object):
                 "}}\n\n"
             )
         else:
-            raise ReflektProjectError(
-                "Invalid materialized config in reflekt_project.yml. Must be "
-                "either 'view' or 'incremental'. See the Reflekt docs on project "
-                "configuration."
-                "    https://bit.ly/reflekt-project-config"  # noqa: E501
+            logger.error(
+                "Invalid 'materialized:' config in reflekt_project.yml. Must be either "
+                "'view' or 'incremental'. See the Reflekt docs "
+                "(https://bit.ly/reflekt-project-config) on project configuration."
             )
+            raise SystemExit(1)
 
         return model_config
 
