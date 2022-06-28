@@ -52,13 +52,11 @@ class WarehouseConnection:
         else:
             logger.error(
                 f"Invalid warehouse type specified in {self._config.path}. See the "
-                f"Reflekt profile configuration docs ()"
+                f"Reflekt profile configuration docs "
+                f"(https://bit.ly/reflekt-profile-config) for details on profile "
+                f"configuration."
             )
-            raise ReflektConfigError(
-                f"Invalid warehouse type specified in {self._config.path}. See "
-                f"Reflekt docs on Reflekt Profile configuration "
-                f"(https://bit.ly/reflekt-profile-config)."
-            )
+            raise SystemExit(1)
 
     def get_columns(
         self, schema: str, table_name: str
