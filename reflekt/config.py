@@ -8,36 +8,28 @@ import yaml
 from loguru import logger
 
 from reflekt.constants import WAREHOUSES
-from reflekt.errors import ReflektConfigError
 from reflekt.project import ReflektProject
 
 
 class ReflektConfig:
-    def __init__(self, raise_config_errors: bool = True) -> None:
+    def __init__(self) -> None:
         if ReflektProject().exists:
-            try:
-                self.config_errors: list = []
-                self.project = ReflektProject()
-                self.config_profile: str = self.project.config_profile
+            self.config_errors: list = []
+            self.project = ReflektProject()
+            self.config_profile: str = self.project.config_profile
 
-                if self.project.config_path is None:
-                    self.path = Path.home() / ".reflekt" / "reflekt_config.yml"
-                else:
-                    self.path = self.project.config_path
+            if self.project.config_path is None:
+                self.path = Path.home() / ".reflekt" / "reflekt_config.yml"
+            else:
+                self.path = self.project.config_path
 
-                self.config: dict = self._get_config()
-                self.plan_type: str = self.config.get("plan_type")
-                self.cdp_name: str = self.config.get("cdp")
-                self.access_token: str = self.config.get("access_token")
-                self.workspace_name: str = self.config.get("workspace_name")
-                self.warehouse: str = self.config.get("warehouse")
-                self.warehouse_type: str = self._get_warehouse_type()
-
-            except ReflektConfigError as error:
-                if raise_config_errors:
-                    raise error
-                else:
-                    self.config_errors.append(error)
+            self.config: dict = self._get_config()
+            self.plan_type: str = self.config.get("plan_type")
+            self.cdp_name: str = self.config.get("cdp")
+            self.access_token: str = self.config.get("access_token")
+            self.workspace_name: str = self.config.get("workspace_name")
+            self.warehouse: str = self.config.get("warehouse")
+            self.warehouse_type: str = self._get_warehouse_type()
 
     def _get_config(self) -> dict:
         try:

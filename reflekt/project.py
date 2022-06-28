@@ -9,12 +9,11 @@ import yaml
 from git import InvalidGitRepositoryError, Repo
 from loguru import logger
 
-from reflekt.errors import ReflektProjectError
 from reflekt.utils import log_formatter
 
 
 class ReflektProject:
-    def __init__(self, raise_project_errors: bool = True) -> None:
+    def __init__(self) -> None:
         logger_config = {
             "handlers": [
                 {
@@ -46,16 +45,11 @@ class ReflektProject:
 
             self.project_yml = self.project_dir / "reflekt_project.yml"
             self.exists = True if self.project_yml.exists() else False
+
             with open(self.project_yml, "r") as f:
                 self.project = yaml.safe_load(f)
 
-            try:
-                self.validate_project()
-            except ReflektProjectError as err:
-                if raise_project_errors:
-                    raise err
-                else:
-                    self._project_errors.append(err)
+            self.validate_project()
 
     def validate_project(self):
         self._get_project_name()
