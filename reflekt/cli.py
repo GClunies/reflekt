@@ -6,7 +6,7 @@ import json
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 import click
 import pkg_resources
@@ -280,6 +280,7 @@ def init(project_dir_str: str) -> None:
 
 @click.command()
 @click.option(
+    "-n",
     "--name",
     "plan_name",
     required=True,
@@ -316,6 +317,7 @@ def new(plan_name: str) -> None:
 
 @click.command()
 @click.option(
+    "-n",
     "--name",
     "plan_name",
     required=True,
@@ -370,6 +372,7 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
 
 @click.command()
 @click.option(
+    "-n",
     "--name",
     "plan_name",
     required=True,
@@ -416,31 +419,38 @@ def push(plan_name, dry) -> None:
 
 @click.command()
 @click.option(
+    "-e",
+    "--event",
+    "event_name",
+    required=False,
+    help="Name of a single event to be tested (in kebab-case).",
+)
+@click.option(
+    "-n",
     "--name",
     "plan_name",
     required=True,
-    help="Tracking plan name in CDP or Analytics Governance tool.",
+    help="Name of tracking plan to be tested (in kebab-case).",
 )
-def test(plan_name: str) -> None:
+def test(plan_name: str, event_name: str) -> None:
     """Test tracking plan schema for naming, data types, and metadata."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Testing Reflekt tracking plan '{plan_name}'")
 
     # Initialize ReflektLoader() always runs checks. Simple, not elegant.
-    ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
+    ReflektLoader(plan_dir=plan_dir, plan_name=plan_name, event_name=event_name)
 
     # If no errors are thrown, passed tests
     logger.info("")
-    logger.success(
-        f"Testing completed. No errors detected in tracking plan '{plan_name}'"
-    )
+    logger.success("Testing completed. No errors detected")
 
 
 @click.option(
-    "--force-version",
-    "force_version",
+    "--tag",
+    "force_tag",
+    is_flag=True,
     required=False,
-    help="Force Reflekt to template the dbt package with a specified semantic version.",
+    help="The git tag Reflekt should add after templating. Tag format = 'v<semantic_version>__reflekt_<project_name>_<cdp>'",  # noqa: E501
 )
 @click.option(
     "--commit",
@@ -448,13 +458,6 @@ def test(plan_name: str) -> None:
     is_flag=True,
     required=False,
     help="The git commit Reflekt should add after templating. Commit format = 'build: reflekt_<project_name>_<cdp>/models/<schema_or_alias>/'",  # noqa: E501
-)
-@click.option(
-    "--tag",
-    "force_tag",
-    is_flag=True,
-    required=False,
-    help="The git tag Reflekt should add after templating. Tag format = 'v<semantic_version>__reflekt_<project_name>_<cdp>'",  # noqa: E501
 )
 @click.option(
     "--skip-git",
@@ -470,6 +473,7 @@ def test(plan_name: str) -> None:
     help="Force Reflekt to template the dbt package with a specified semantic version.",
 )
 @click.option(
+    "-s",
     "--schema",
     "schema",
     required=False,
@@ -479,6 +483,7 @@ def test(plan_name: str) -> None:
     ),
 )
 @click.option(
+    "-n",
     "--name",
     "plan_name",
     required=True,
@@ -742,17 +747,17 @@ if __name__ == "__main__":
     # new(["--project-dir", "test-plan"])
     # pull(["--name", "my-plan"])
     # push(["--name", "my-plan"])
-    # test(["--name", "my-plan"])
-    dbt(
-        [
-            "--name",
-            "surfline-web-test",
-            "--schema",
-            "surfline",
-            "--force-version",
-            "0.1.0",
-        ]
-    )
+    test(["--name", "my-plan", "-e", "cart-viewed", "-e", "cart-viewed"])
+    # dbt(
+    #     [
+    #         "--name",
+    #         "my-plan",
+    #         "--schema",
+    #         "my_app_web",
+    #         "--force-version",
+    #         "0.1.0",
+    #     ]
+    # )
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])

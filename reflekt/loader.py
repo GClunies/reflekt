@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 import yaml
 from loguru import logger
@@ -19,14 +19,18 @@ from reflekt.project import ReflektProject
 # changes are licensed under Apache-2.0.
 class ReflektLoader(object):
     def __init__(
-        self, plan_dir: Path, plan_name: str, schema_name: Optional[str] = None
+        self,
+        plan_dir: Path,
+        plan_name: str,
+        schema_name: Optional[str] = None,
+        event_name: Optional[str] = None,
     ) -> None:
         # self._validation_errors = []
         if ReflektProject().exists:
             self.plan_name = plan_name
             self.schema_name = schema_name
             self._load_plan_file(plan_dir / "plan.yml")
-            self._load_events(plan_dir / "events")
+            self._load_events(plan_dir / "events", event_name)
             self._load_identify_traits(plan_dir / "user-traits.yml")
             self._load_group_traits(plan_dir / "group-traits.yml")
             self.plan.validate_plan()
@@ -40,8 +44,18 @@ class ReflektLoader(object):
                 schema_name=self.schema_name,
             )
 
-    def _load_events(self, path: Path) -> None:
+    def _load_events(self, path: Path, event_name: str) -> None:
+        files_to_parse = []
         for file in sorted(Path(path).glob("**/*.yml")):
+            if event_name is not None:
+                glob_file_name = str(file).split("/")[-1]
+                event_file_name = event_name + ".yml"
+                if event_file_name == glob_file_name:
+                    files_to_parse.append(file)
+            else:
+                files_to_parse.append(file)
+
+        for file in files_to_parse:
             logger.info(
                 f"    Parsing event file {file.name}",
             )
