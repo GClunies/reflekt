@@ -48,7 +48,7 @@ class ReflektLoader(object):
     def _load_events(self, path: Path, events: Optional[tuple] = None) -> None:
         glob_paths = sorted(Path(path).glob("**/*.yml"))
 
-        if events is not None:
+        if events != () and events is not None:
             event_paths = []
             for event in events:
                 event_paths.append(self.plan_dir / "events" / f"{event}.yml")

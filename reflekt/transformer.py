@@ -7,9 +7,11 @@ import shutil
 from pathlib import Path
 from typing import Optional, Union
 
+import pkg_resources
 import yaml
 from inflection import titleize, underscore
 from loguru import logger
+from packaging.version import Version
 
 from reflekt.config import ReflektConfig
 from reflekt.constants import REFLEKT_RESERVED_COLUMNS, REFLEKT_TEMPLATE_COLUMNS
@@ -50,10 +52,11 @@ class ReflektTransformer(object):
     def __init__(
         self,
         reflekt_plan: ReflektPlan,
-        dbt_package_name: Optional[str] = None,
-        dbt_pkg_dir: Optional[Path] = None,
-        tmp_pkg_dir: Optional[Path] = None,
+        # dbt_package_name: Optional[str] = None,
+        # dbt_pkg_dir: Optional[Path] = None,
+        # tmp_pkg_dir: Optional[Path] = None,
         models_subfolder: Optional[str] = None,
+        dbt_package_version: Optional[Version] = None,
     ) -> None:
         self.reflekt_plan = reflekt_plan
         self.plan_name = str.lower(self.reflekt_plan.name)
@@ -68,10 +71,18 @@ class ReflektTransformer(object):
             self.schema_alias = reflekt_plan.schema_alias
             self.reflekt_project = ReflektProject()
             self.project_dir = self.reflekt_project.project_dir
-            self.dbt_package_name = dbt_package_name
-            self.dbt_pkg_dir = dbt_pkg_dir
-            self.tmp_pkg_dir = tmp_pkg_dir
+            self.dbt_package_name = (
+                f"reflekt_{self.reflekt_project.name}_{self.cdp_name}"
+            )
+            self.dbt_package_version = dbt_package_version
+            self.dbt_pkg_dir = self.project_dir / "dbt-packages" / self.dbt_package_name
+            self.tmp_pkg_dir = (
+                self.project_dir / ".reflekt" / "tmp" / self.dbt_package_name
+            )
             self.models_subfolder = models_subfolder
+            self.blank_dbt_pkg = pkg_resources.resource_filename(
+                "reflekt", "templates/dbt/"
+            )
             self.db_engine = WarehouseConnection()
             self.src_prefix = self.reflekt_project.src_prefix
             self.model_prefix = self.reflekt_project.model_prefix
@@ -269,20 +280,85 @@ class ReflektTransformer(object):
         pass
 
     def build_dbt_package(self) -> None:
+        logger.info(
+            f"Building Reflekt dbt package:"
+            f"\n        dbt package name: {self.dbt_package_name}"
+            f"\n        dbt package version: {self.dbt_package_version}"
+            f"\n        dbt package directory: {self.dbt_pkg_dir}"
+            f"\n        cdp: {self.cdp_name}"
+            f"\n        analytics governance tool: {self.plan_type}"
+            f"\n        tracking plan: {self.plan_name}"
+            f"\n        warehouse: {self.warehouse_type}"
+            f"\n        schema: {self.schema}"
+            f"\n        schema_alias: {self.reflekt_plan.schema_alias}"
+            f"\n        models subdirectory: models/{self.models_subfolder}\n"
+        )
+
+        if self.dbt_pkg_dir.exists():  # If dbt pkg exists, use as base for temp pkg
+            if self.tmp_pkg_dir.exists():  # Clean any existing temp pkg
+                shutil.rmtree(self.tmp_pkg_dir)
+            shutil.copytree(self.dbt_pkg_dir, str(self.tmp_pkg_dir))
+        else:  # dbt pkg does not exist, start with blank dbt pkg
+            if self.tmp_pkg_dir.exists():  # Ensure tmp dir is empty
+                shutil.rmtree(self.tmp_pkg_dir)
+            shutil.copytree(self.blank_dbt_pkg, str(self.tmp_pkg_dir))
+
+        # Update version in templated dbt_project.yml
+        with open(self.tmp_pkg_dir / "dbt_project.yml", "r") as f:
+            dbt_project_yml_str = f.read()
+
+        dbt_project_yml_str = dbt_project_yml_str.replace(
+            "0.1.0", str(self.dbt_package_version)  # Template always has version '0.1.0'
+        ).replace("reflekt_package_name", self.dbt_package_name)
+
+        with open(self.tmp_pkg_dir / "dbt_project.yml", "w") as f:
+            f.write(dbt_project_yml_str)
+
+        # Set dbt_pkg_name and plan_name in README.md
+        with open(self.tmp_pkg_dir / "README.md", "r") as f:
+            readme_str = f.read()
+
+        readme_str = readme_str.replace("_DBT_PKG_NAME_", self.dbt_package_name).replace(
+            "_PLAN_TOOL_", titleize(self.reflekt_plan.plan_type)
+        )
+
+        with open(self.tmp_pkg_dir / "README.md", "w") as f:
+            f.write(readme_str)
+
+        # Create models subfolder if it doesn't already exists
+        models_subfolder_dir = self.tmp_pkg_dir / "models" / self.models_subfolder
+
+        if not models_subfolder_dir.exists():
+            models_subfolder_dir.mkdir(parents=True, exist_ok=True)
+
         if self.cdp_name == "rudderstack":
-            return self._dbt_package_rudderstack(self.reflekt_plan)
+            return self._dbt_package_rudderstack(
+                self.reflekt_plan, self.models_subfolder
+            )
         elif self.cdp_name == "segment":
-            return self._dbt_package_segment(self.reflekt_plan)
+            return self._dbt_package_segment(self.reflekt_plan, self.models_subfolder)
         elif self.cdp_name == "snowplow":
-            return self._dbt_package_snowplow(self.reflekt_plan)
+            return self._dbt_package_snowplow(self.reflekt_plan, self.models_subfolder)
 
-    def _dbt_package_rudderstack(self):
+    def _dbt_package_rudderstack(
+        self,
+        reflekt_plan: ReflektPlan,
+        models_subfolder: str,
+    ) -> None:
         pass
 
-    def _dbt_package_snowplow(self):
+    def _dbt_package_snowplow(
+        self,
+        reflekt_plan: ReflektPlan,
+        models_subfolder: str,
+    ) -> None:
         pass
 
-    def _dbt_package_segment(self, reflekt_plan: ReflektPlan) -> None:
+    def _dbt_package_segment(
+        self,
+        reflekt_plan: ReflektPlan,
+        models_subfolder: str,
+    ) -> None:
         self.db_errors = []
 
         # Setup `Page Viewed` and `Screen Viewed` events, if they exist in Reflekt plan
@@ -390,6 +466,7 @@ class ReflektTransformer(object):
                         table_description=std_segment_table["description"],
                     )
                     self._template_dbt_model(
+                        models_subfolder=self.models_subfolder,
                         materialized=self.materialized,
                         unique_key=std_segment_table["unique_key"],
                         table_name=table_name,
@@ -399,6 +476,7 @@ class ReflektTransformer(object):
                         plan_cols=std_segment_table["plan_cols"],
                     )
                     self._template_dbt_doc(
+                        models_subfolder=self.models_subfolder,
                         doc_name=doc_name,
                         model_name=model_name,
                         model_description=std_segment_table["description"],
@@ -442,6 +520,7 @@ class ReflektTransformer(object):
                             table_description=event.description,
                         )
                         self._template_dbt_model(
+                            models_subfolder=self.models_subfolder,
                             materialized=self.materialized,
                             unique_key="event_id",
                             table_name=table_name,
@@ -452,6 +531,7 @@ class ReflektTransformer(object):
                             event_name=event.name,
                         )
                         self._template_dbt_doc(
+                            models_subfolder=self.models_subfolder,
                             doc_name=doc_name,
                             model_name=model_name,
                             model_description=event.description,
@@ -525,7 +605,10 @@ class ReflektTransformer(object):
         )
         logger.info("")  # Terminal newline
 
-    def _template_dbt_source(self, reflekt_plan: ReflektPlan) -> dict:
+    def _template_dbt_source(
+        self,
+        reflekt_plan: ReflektPlan,
+    ) -> dict:
         logger.info(f"Initializing template for dbt source {self.schema}")
         dbt_src = copy.deepcopy(dbt_src_schema)
         dbt_src["sources"][0]["name"] = (
@@ -545,9 +628,6 @@ class ReflektTransformer(object):
         dbt_src: dict,
         table_name: str,
         table_description: str,
-        # db_columns: list,
-        # cdp_cols: dict,
-        # plan_cols: list,
     ) -> None:
         # Check that table does not already exist in dbt source. This can happen
         # for Segment events with multiple versions
@@ -561,6 +641,7 @@ class ReflektTransformer(object):
 
     def _template_dbt_model(
         self,
+        models_subfolder: str,
         materialized: str,
         unique_key: str,
         table_name: str,
@@ -641,9 +722,7 @@ class ReflektTransformer(object):
             "select * from renamed\n"
         )
         # fmt: on
-        model_path = (
-            self.tmp_pkg_dir / "models" / self.models_subfolder / f"{model_name}.sql"
-        )
+        model_path = self.tmp_pkg_dir / "models" / models_subfolder / f"{model_name}.sql"
 
         with open(model_path, "w") as f:
             f.write(mdl_sql)
@@ -717,6 +796,7 @@ class ReflektTransformer(object):
 
     def _template_dbt_doc(
         self,
+        models_subfolder: str,
         doc_name: str,
         model_name: str,
         model_description: str,
@@ -775,15 +855,13 @@ class ReflektTransformer(object):
         dbt_doc["models"].append(dbt_mdl_doc)
 
         if self.docs_in_folder:
-            docs_folder_str = (
-                str(self.tmp_pkg_dir) + f"/models/{self.models_subfolder}/docs"
-            )
+            docs_folder_str = str(self.tmp_pkg_dir) + f"/models/{models_subfolder}/docs"
             docs_folder_path = Path(docs_folder_str)
             docs_folder_path.mkdir(exist_ok=True)
             docs_path = docs_folder_path / f"{doc_name}.yml"
         else:
             docs_path = (
-                self.tmp_pkg_dir / "models" / self.models_subfolder / f"{doc_name}.yml"
+                self.tmp_pkg_dir / "models" / models_subfolder / f"{doc_name}.yml"
             )
 
         with open(docs_path, "w") as f:
