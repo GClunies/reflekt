@@ -10,7 +10,6 @@ from snowflake.sqlalchemy import URL as snow_url
 from sqlalchemy.engine.url import URL as redshift_url
 
 from reflekt.config import ReflektConfig
-from reflekt.errors import ReflektConfigError
 
 
 class WarehouseConnection:
@@ -52,13 +51,11 @@ class WarehouseConnection:
         else:
             logger.error(
                 f"Invalid warehouse type specified in {self._config.path}. See the "
-                f"Reflekt profile configuration docs ()"
+                f"Reflekt profile configuration docs "
+                f"(https://bit.ly/reflekt-profile-config) for details on profile "
+                f"configuration."
             )
-            raise ReflektConfigError(
-                f"Invalid warehouse type specified in {self._config.path}. See "
-                f"Reflekt docs on Reflekt Profile configuration "
-                f"(https://bit.ly/reflekt-profile-config)."
-            )
+            raise SystemExit(1)
 
     def get_columns(
         self, schema: str, table_name: str

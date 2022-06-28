@@ -2,7 +2,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import ast
 import re
+
+import click
 
 
 def log_formatter(record):
@@ -14,6 +17,14 @@ def log_formatter(record):
         return "{time:HH:mm:ss} [<green>{level}</green>] {message}\n"
     else:
         return "{time:HH:mm:ss} {message}\n"
+
+
+class PythonLiteralOption(click.Option):
+    def type_cast_value(self, ctx, value):
+        try:
+            return ast.literal_eval(value)
+        except:  # noqa: E722
+            raise click.BadParameter(value)
 
 
 def segment_2_snake(in_str: str) -> str:

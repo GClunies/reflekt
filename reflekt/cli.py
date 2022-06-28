@@ -6,7 +6,6 @@ import json
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 import click
 import pkg_resources
@@ -280,6 +279,7 @@ def init(project_dir_str: str) -> None:
 
 @click.command()
 @click.option(
+    "-n",
     "--name",
     "plan_name",
     required=True,
@@ -316,6 +316,7 @@ def new(plan_name: str) -> None:
 
 @click.command()
 @click.option(
+    "-n",
     "--name",
     "plan_name",
     required=True,
@@ -370,6 +371,7 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
 
 @click.command()
 @click.option(
+    "-n",
     "--name",
     "plan_name",
     required=True,
@@ -416,31 +418,41 @@ def push(plan_name, dry) -> None:
 
 @click.command()
 @click.option(
+    "-e",
+    "--event",
+    "events",
+    type=str,
+    multiple=True,
+    required=False,
+    help="Name of a single event to be tested (in kebab-case).",
+)
+@click.option(
+    "-n",
     "--name",
     "plan_name",
+    type=str,
     required=True,
-    help="Tracking plan name in CDP or Analytics Governance tool.",
+    help="Name of tracking plan to be tested (in kebab-case).",
 )
-def test(plan_name: str) -> None:
+def test(plan_name, events) -> None:
     """Test tracking plan schema for naming, data types, and metadata."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Testing Reflekt tracking plan '{plan_name}'")
 
     # Initialize ReflektLoader() always runs checks. Simple, not elegant.
-    ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
+    ReflektLoader(plan_dir=plan_dir, plan_name=plan_name, events=events)
 
     # If no errors are thrown, passed tests
     logger.info("")
-    logger.success(
-        f"Testing completed. No errors detected in tracking plan '{plan_name}'"
-    )
+    logger.success("Testing completed. No errors detected")
 
 
 @click.option(
-    "--force-version",
-    "force_version",
+    "--tag",
+    "force_tag",
+    is_flag=True,
     required=False,
-    help="Force Reflekt to template the dbt package with a specified semantic version.",
+    help="The git tag Reflekt should add after templating. Tag format = 'v<semantic_version>__reflekt_<project_name>_<cdp>'",  # noqa: E501
 )
 @click.option(
     "--commit",
@@ -448,13 +460,6 @@ def test(plan_name: str) -> None:
     is_flag=True,
     required=False,
     help="The git commit Reflekt should add after templating. Commit format = 'build: reflekt_<project_name>_<cdp>/models/<schema_or_alias>/'",  # noqa: E501
-)
-@click.option(
-    "--tag",
-    "force_tag",
-    is_flag=True,
-    required=False,
-    help="The git tag Reflekt should add after templating. Tag format = 'v<semantic_version>__reflekt_<project_name>_<cdp>'",  # noqa: E501
 )
 @click.option(
     "--skip-git",
@@ -466,32 +471,47 @@ def test(plan_name: str) -> None:
 @click.option(
     "--force-version",
     "force_version",
+    type=str,
     required=False,
     help="Force Reflekt to template the dbt package with a specified semantic version.",
 )
 @click.option(
+    "-s",
     "--schema",
     "schema",
-    required=False,
+    type=str,
+    required=True,
     help=(
-        "Schema Reflekt will search when looking for raw event tables that match "
-        "tracking plan."
+        "Schema Reflekt will search to look for raw event tables that match "
+        "tracking plan events."
     ),
 )
 @click.option(
+    "-e",
+    "--event",
+    "events",
+    type=str,
+    multiple=True,
+    required=False,
+    help="Name of a single event to be tested (in kebab-case).",
+)
+@click.option(
+    "-n",
     "--name",
     "plan_name",
+    type=str,
     required=True,
     help="Tracking plan name in your Reflekt project.",
 )
 @click.command()
 def dbt(
-    plan_name: str,
-    schema: Optional[str] = None,
-    force_version: Optional[str] = None,
-    skip_git: Optional[bool] = None,
-    force_commit: Optional[str] = None,
-    force_tag: Optional[str] = None,
+    plan_name,
+    events,
+    schema,
+    force_version=None,
+    skip_git=None,
+    force_commit=None,
+    force_tag=None,
 ) -> None:
     """Build dbt package with sources, models, and docs based on tracking plan."""
     project = ReflektProject()
@@ -502,13 +522,13 @@ def dbt(
     plan_type = str.lower(config.plan_type)
     plan_dir = project_dir / "tracking-plans" / plan_name
     pkg_name = f"reflekt_{project_name}_{cdp}"
-    dbt_pkg_dir = project_dir / "dbt-packages" / pkg_name
-    dbt_project_yml = dbt_pkg_dir / "dbt_project.yml"
-    blank_pkg_template = pkg_resources.resource_filename("reflekt", "templates/dbt/")
-    tmp_pkg_dir = project_dir / ".reflekt" / "tmp" / pkg_name
-    warehouse_type = config.warehouse_type
+    project_dir / "dbt-packages" / pkg_name
+    dbt_project_yml = project.project_dir / "dbt_project.yml"
+    # blank_pkg_template = pkg_resources.resource_filename("reflekt", "templates/dbt/")
+    # tmp_pkg_dir = project_dir / ".reflekt" / "tmp" / pkg_name
+    config.warehouse_type
 
-    # Determine dbt pkg version
+    # Determine dbt pkg version to pass to ReflektTransformer
     if force_version:  # If user has forced version, use that
         try:
             version = parse_version(force_version)
@@ -572,77 +592,39 @@ def dbt(
             logger.info("")  # Terminal newline
             version = existing_version
 
-    # Setup temporary dbt pkg
-    if dbt_pkg_dir.exists():
-        # If dbt pk exists, use it as template
-        if tmp_pkg_dir.exists():
-            shutil.rmtree(tmp_pkg_dir)
-        shutil.copytree(dbt_pkg_dir, str(tmp_pkg_dir))
-    else:
-        if tmp_pkg_dir.exists():  # ensure tmp dir is empty
-            shutil.rmtree(tmp_pkg_dir)
-        # If dbt pkg doesn't exist, use blank template
-        shutil.copytree(blank_pkg_template, str(tmp_pkg_dir))
+    # # TODO: move this logic. Setup temporary dbt pkg
+    # if dbt_pkg_dir.exists():
+    #     # If dbt pk exists, use it as template
+    #     if tmp_pkg_dir.exists():
+    #         shutil.rmtree(tmp_pkg_dir)
+    #     shutil.copytree(dbt_pkg_dir, str(tmp_pkg_dir))
+    # else:
+    #     if tmp_pkg_dir.exists():  # ensure tmp dir is empty
+    #         shutil.rmtree(tmp_pkg_dir)
+    #     # If dbt pkg doesn't exist, use blank template
+    #     shutil.copytree(blank_pkg_template, str(tmp_pkg_dir))
 
     # Load Reflekt plan from 'tracking-plans/'
     logger.info(f"Loading Reflekt tracking plan {plan_name}")
-    loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name, schema_name=schema)
+    loader = ReflektLoader(
+        plan_dir=plan_dir,
+        plan_name=plan_name,
+        schema_name=schema,
+        events=events,
+    )
     reflekt_plan = loader.plan
     logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
-    models_subfolder: Path = (
+
+    models_subfolder: str = (
         reflekt_plan.schema_alias
         if reflekt_plan.schema_alias is not None
         else reflekt_plan.schema
     )
-    models_subfolder_dir = tmp_pkg_dir / "models" / models_subfolder
-
-    if models_subfolder_dir.exists():
-        shutil.rmtree(models_subfolder_dir)
-
-    models_subfolder_dir.mkdir(parents=True, exist_ok=True)
-
-    logger.info(
-        f"Building Reflekt dbt package:"
-        f"\n        dbt package name: {pkg_name}"
-        f"\n        dbt package version: {version}"
-        f"\n        dbt package directory: {dbt_pkg_dir}"
-        f"\n        cdp: {cdp}"
-        f"\n        analytics governance tool: {plan_type}"
-        f"\n        tracking plan: {plan_name}"
-        f"\n        warehouse: {warehouse_type}"
-        f"\n        schema: {schema}"
-        f"\n        schema_alias: {reflekt_plan.schema_alias}"
-        f"\n        models subdirectory: models/{models_subfolder}\n"
-    )
-
-    # Update the version string in templated dbt_project.yml
-    with open(tmp_pkg_dir / "dbt_project.yml", "r") as f:
-        dbt_project_yml_str = f.read()
-
-    dbt_project_yml_str = dbt_project_yml_str.replace(
-        "0.1.0", str(version)  # Template always has version '0.1.0'
-    ).replace("reflekt_package_name", pkg_name)
-
-    with open(tmp_pkg_dir / "dbt_project.yml", "w") as f:
-        f.write(dbt_project_yml_str)
-
-    # Set dbt_pkg_name and plan_name in README.md
-    with open(tmp_pkg_dir / "README.md", "r") as f:
-        readme_str = f.read()
-
-    readme_str = readme_str.replace("_DBT_PKG_NAME_", pkg_name).replace(
-        "_PLAN_TOOL_", titleize(reflekt_plan.plan_type)
-    )
-
-    with open(tmp_pkg_dir / "README.md", "w") as f:
-        f.write(readme_str)
 
     transformer = ReflektTransformer(
         reflekt_plan=reflekt_plan,
-        dbt_package_name=pkg_name,
-        dbt_pkg_dir=dbt_pkg_dir,
-        tmp_pkg_dir=tmp_pkg_dir,
         models_subfolder=models_subfolder,
+        dbt_package_version=version,
     )
     transformer.build_dbt_package()
 
@@ -742,15 +724,24 @@ if __name__ == "__main__":
     # new(["--project-dir", "test-plan"])
     # pull(["--name", "my-plan"])
     # push(["--name", "my-plan"])
-    # test(["--name", "my-plan"])
+    # test(
+    #     [
+    #         "--name",
+    #         "my-plan",
+    #         "-e",
+    #         "cart-viewed",
+    #         "-e",
+    #         "product-added",
+    #     ]
+    # )
     dbt(
         [
             "--name",
-            "surfline-web-test",
-            "--schema",
-            "surfline",
-            "--force-version",
-            "0.1.0",
+            "my-plan",
+            # "--schema",
+            # "my_app_web",
+            # "--force-version",
+            # "0.1.0",
         ]
     )
     # pull(["--name", "tracking-plan-example"])

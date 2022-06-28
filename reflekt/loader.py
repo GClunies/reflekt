@@ -19,14 +19,19 @@ from reflekt.project import ReflektProject
 # changes are licensed under Apache-2.0.
 class ReflektLoader(object):
     def __init__(
-        self, plan_dir: Path, plan_name: str, schema_name: Optional[str] = None
+        self,
+        plan_dir: Path,
+        plan_name: str,
+        schema_name: Optional[str] = None,
+        events: Optional[tuple] = None,
     ) -> None:
         # self._validation_errors = []
         if ReflektProject().exists:
             self.plan_name = plan_name
             self.schema_name = schema_name
+            self.plan_dir = plan_dir
             self._load_plan_file(plan_dir / "plan.yml")
-            self._load_events(plan_dir / "events")
+            self._load_events(plan_dir / "events", events)
             self._load_identify_traits(plan_dir / "user-traits.yml")
             self._load_group_traits(plan_dir / "group-traits.yml")
             self.plan.validate_plan()
@@ -40,8 +45,28 @@ class ReflektLoader(object):
                 schema_name=self.schema_name,
             )
 
-    def _load_events(self, path: Path) -> None:
-        for file in sorted(Path(path).glob("**/*.yml")):
+    def _load_events(self, path: Path, events: Optional[tuple] = None) -> None:
+        glob_paths = sorted(Path(path).glob("**/*.yml"))
+
+        if events != () and events is not None:
+            event_paths = []
+            for event in events:
+                event_paths.append(self.plan_dir / "events" / f"{event}.yml")
+                events_to_parse = []
+                for event_path in event_paths:
+                    if event_path not in glob_paths:
+                        logger.error(
+                            f"Event '{event}' not found in tracking plan "
+                            f"{self.plan_name}."
+                        )
+                        raise SystemExit(1)
+
+                    events_to_parse.append(event_path)
+
+        else:
+            events_to_parse = glob_paths
+
+        for file in events_to_parse:
             logger.info(
                 f"    Parsing event file {file.name}",
             )
