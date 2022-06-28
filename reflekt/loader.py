@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
 import yaml
 from loguru import logger
@@ -23,7 +23,7 @@ class ReflektLoader(object):
         plan_dir: Path,
         plan_name: str,
         schema_name: Optional[str] = None,
-        event_name: Optional[tuple] = None,
+        events: Optional[tuple] = None,
     ) -> None:
         # self._validation_errors = []
         if ReflektProject().exists:
@@ -31,7 +31,7 @@ class ReflektLoader(object):
             self.schema_name = schema_name
             self.plan_dir = plan_dir
             self._load_plan_file(plan_dir / "plan.yml")
-            self._load_events(plan_dir / "events", event_name)
+            self._load_events(plan_dir / "events", events)
             self._load_identify_traits(plan_dir / "user-traits.yml")
             self._load_group_traits(plan_dir / "group-traits.yml")
             self.plan.validate_plan()
@@ -56,7 +56,8 @@ class ReflektLoader(object):
                 for event_path in event_paths:
                     if event_path not in glob_paths:
                         logger.error(
-                            f"Event '{event}' not found in tracking plan {self.plan_name}."
+                            f"Event '{event}' not found in tracking plan "
+                            f"{self.plan_name}."
                         )
                         raise SystemExit(1)
 
@@ -74,61 +75,6 @@ class ReflektLoader(object):
                 yaml_event_obj = yaml.safe_load(event_file)
                 for event_version in yaml_event_obj:
                     self.plan.add_event(event_version)
-
-        # if event_name is not None:
-        #     for event in event_name:
-        #         event_file_name = event + ".yml"
-        #         for glob_file in glob_files:
-        #             glob_file_name = str(glob_file).split("/")[-1]
-        #             if event_file_name == glob_file_name:
-        #                 files_to_parse.append(glob_file)
-
-        #     for file in files_to_parse:
-        #         logger.info(
-        #             f"    Parsing event file {file.name}",
-        #         )
-
-        #         with open(file, "r") as event_file:
-        #             yaml_event_obj = yaml.safe_load(event_file)
-        #             for event_version in yaml_event_obj:
-        #                 self.plan.add_event(event_version)
-
-        # else:
-        #     for file in sorted(Path(path).glob("**/*.yml")):
-        #         logger.info(
-        #             f"    Parsing event file {file.name}",
-        #         )
-
-        #         with open(file, "r") as event_file:
-        #             yaml_event_obj = yaml.safe_load(event_file)
-        #             for event_version in yaml_event_obj:
-        #                 self.plan.add_event(event_version)
-
-        # for file in sorted(Path(path).glob("**/*.yml")):
-        #     if event_name is not None:
-        #         for event in event_name:
-        #             glob_file_name = str(file).split("/")[-1]
-        #             event_file_name = event + ".yml"
-        #             if event_file_name == glob_file_name:
-        #                 files_to_parse.append(file)
-
-        #             if files_to_parse == []:
-        #                 logger.error(
-        #                     f"Event '{event}' not found in tracking plan {self.plan_name}"
-        #                 )
-        #                 raise SystemExit(1)
-        #     else:
-        #         files_to_parse.append(file)
-
-        # for file in files_to_parse:
-        #     logger.info(
-        #         f"    Parsing event file {file.name}",
-        #     )
-
-        #     with open(file, "r") as event_file:
-        #         yaml_event_obj = yaml.safe_load(event_file)
-        #         for event_version in yaml_event_obj:
-        #             self.plan.add_event(event_version)
 
     def _load_identify_traits(self, path: Path) -> None:
         if not path.exists():

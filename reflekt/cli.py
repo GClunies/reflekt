@@ -5,9 +5,7 @@
 import json
 import shutil
 import subprocess
-from email.mime import multipart
 from pathlib import Path
-from typing import Optional, Union
 
 import click
 import pkg_resources
@@ -422,7 +420,7 @@ def push(plan_name, dry) -> None:
 @click.option(
     "-e",
     "--event",
-    "event_name",
+    "events",
     type=str,
     multiple=True,
     required=False,
@@ -436,13 +434,13 @@ def push(plan_name, dry) -> None:
     required=True,
     help="Name of tracking plan to be tested (in kebab-case).",
 )
-def test(plan_name, event_name) -> None:
+def test(plan_name, events) -> None:
     """Test tracking plan schema for naming, data types, and metadata."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Testing Reflekt tracking plan '{plan_name}'")
 
     # Initialize ReflektLoader() always runs checks. Simple, not elegant.
-    ReflektLoader(plan_dir=plan_dir, plan_name=plan_name, event_name=event_name)
+    ReflektLoader(plan_dir=plan_dir, plan_name=plan_name, events=events)
 
     # If no errors are thrown, passed tests
     logger.info("")
@@ -491,7 +489,7 @@ def test(plan_name, event_name) -> None:
 @click.option(
     "-e",
     "--event",
-    "event_name",
+    "events",
     type=str,
     multiple=True,
     required=False,
@@ -508,7 +506,7 @@ def test(plan_name, event_name) -> None:
 @click.command()
 def dbt(
     plan_name,
-    event_name,
+    events,
     schema,
     force_version=None,
     skip_git=None,
@@ -524,11 +522,11 @@ def dbt(
     plan_type = str.lower(config.plan_type)
     plan_dir = project_dir / "tracking-plans" / plan_name
     pkg_name = f"reflekt_{project_name}_{cdp}"
-    dbt_pkg_dir = project_dir / "dbt-packages" / pkg_name
+    project_dir / "dbt-packages" / pkg_name
     dbt_project_yml = project.project_dir / "dbt_project.yml"
     # blank_pkg_template = pkg_resources.resource_filename("reflekt", "templates/dbt/")
     # tmp_pkg_dir = project_dir / ".reflekt" / "tmp" / pkg_name
-    warehouse_type = config.warehouse_type
+    config.warehouse_type
 
     # Determine dbt pkg version to pass to ReflektTransformer
     if force_version:  # If user has forced version, use that
@@ -612,7 +610,7 @@ def dbt(
         plan_dir=plan_dir,
         plan_name=plan_name,
         schema_name=schema,
-        event_name=event_name,
+        events=events,
     )
     reflekt_plan = loader.plan
     logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")

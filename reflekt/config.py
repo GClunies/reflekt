@@ -8,7 +8,6 @@ import yaml
 from loguru import logger
 
 from reflekt.constants import WAREHOUSES
-from reflekt.errors import ReflektConfigError
 from reflekt.project import ReflektProject
 
 
