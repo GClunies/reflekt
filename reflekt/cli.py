@@ -5,6 +5,7 @@
 import json
 import shutil
 import subprocess
+from email.mime import multipart
 from pathlib import Path
 from typing import Optional, Union
 
@@ -422,6 +423,7 @@ def push(plan_name, dry) -> None:
     "-e",
     "--event",
     "event_name",
+    multiple=True,
     required=False,
     help="Name of a single event to be tested (in kebab-case).",
 )
@@ -432,7 +434,7 @@ def push(plan_name, dry) -> None:
     required=True,
     help="Name of tracking plan to be tested (in kebab-case).",
 )
-def test(plan_name: str, event_name: str) -> None:
+def test(plan_name: str, event_name: Optional[tuple]) -> None:
     """Test tracking plan schema for naming, data types, and metadata."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Testing Reflekt tracking plan '{plan_name}'")
@@ -747,17 +749,26 @@ if __name__ == "__main__":
     # new(["--project-dir", "test-plan"])
     # pull(["--name", "my-plan"])
     # push(["--name", "my-plan"])
-    test(["--name", "my-plan", "-e", "cart-viewed", "-e", "cart-viewed"])
-    # dbt(
+    # test(
     #     [
     #         "--name",
     #         "my-plan",
-    #         "--schema",
-    #         "my_app_web",
-    #         "--force-version",
-    #         "0.1.0",
+    #         "-e",
+    #         "cart-viewed",
+    #         # "-e",
+    #         # "product-added",
     #     ]
     # )
+    dbt(
+        [
+            "--name",
+            "my-plan",
+            "--schema",
+            "my_app_web",
+            "--force-version",
+            "0.1.0",
+        ]
+    )
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
