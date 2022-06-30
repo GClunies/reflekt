@@ -12,7 +12,6 @@ import yaml
 from inflection import titleize, underscore
 from loguru import logger
 from packaging.version import Version
-from pyexpat import model
 
 from reflekt.config import ReflektConfig
 from reflekt.constants import REFLEKT_RESERVED_COLUMNS, REFLEKT_TEMPLATE_COLUMNS
@@ -767,8 +766,8 @@ class ReflektTransformer(object):
                 )
             else:
                 logger.error(
-                    "Invalid 'materialized:' config in reflekt_project.yml. Must be either "
-                    "'view' or 'incremental'. See the Reflekt docs "
+                    "Invalid 'materialized:' config in reflekt_project.yml. Must be "
+                    "either 'view' or 'incremental'. See the Reflekt docs "
                     "(https://bit.ly/reflekt-project-config) on project configuration."
                 )
                 raise SystemExit(1)
