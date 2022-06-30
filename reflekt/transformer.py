@@ -12,6 +12,7 @@ import yaml
 from inflection import titleize, underscore
 from loguru import logger
 from packaging.version import Version
+from pyexpat import model
 
 from reflekt.config import ReflektConfig
 from reflekt.constants import REFLEKT_RESERVED_COLUMNS, REFLEKT_TEMPLATE_COLUMNS
@@ -658,6 +659,7 @@ class ReflektTransformer(object):
         )
         logger.info("    Adding {{ config(...) }} to model SQL")
         mdl_sql = self._template_dbt_model_config(
+            table_name,
             materialized,
             unique_key,
             self.warehouse_type,
@@ -729,41 +731,47 @@ class ReflektTransformer(object):
 
     def _template_dbt_model_config(
         self,
+        table_name: str,
         materialized: str,
         unique_key: str,
         warehouse_type: str,
     ) -> str:
-        if materialized == "view":
-            # fmt: off
+        if table_name in ["users", "groups"]:
             model_config = (
-                "{{\n"
-                "  config(\n"
-                "    materialized = 'view',\n"
-                "  )\n"
-                "}}\n\n"
-            )
-            # fmt: on
-        elif materialized == "incremental":
-            if warehouse_type == "redshift":
-                sort_str = "sort = 'tstamp'"
-            elif warehouse_type == "snowflake":
-                sort_str = "cluster_by = 'tstamp'"
-            model_config = (
-                "{{\n"
-                f"  config(\n"
-                f"    materialized = 'incremental',\n"
-                f"    unique_key = '{unique_key}',\n"
-                f"    {sort_str}\n"
-                f"  )\n"
-                "}}\n\n"
+                "{{\n" "  config(\n" "    materialized = 'view',\n" "  )\n" "}}\n\n"
             )
         else:
-            logger.error(
-                "Invalid 'materialized:' config in reflekt_project.yml. Must be either "
-                "'view' or 'incremental'. See the Reflekt docs "
-                "(https://bit.ly/reflekt-project-config) on project configuration."
-            )
-            raise SystemExit(1)
+            if materialized == "view":
+                # fmt: off
+                model_config = (
+                    "{{\n"
+                    "  config(\n"
+                    "    materialized = 'view',\n"
+                    "  )\n"
+                    "}}\n\n"
+                )
+                # fmt: on
+            elif materialized == "incremental":
+                if warehouse_type == "redshift":
+                    sort_str = "sort = 'tstamp'"
+                elif warehouse_type == "snowflake":
+                    sort_str = "cluster_by = 'tstamp'"
+                model_config = (
+                    "{{\n"
+                    f"  config(\n"
+                    f"    materialized = 'incremental',\n"
+                    f"    unique_key = '{unique_key}',\n"
+                    f"    {sort_str}\n"
+                    f"  )\n"
+                    "}}\n\n"
+                )
+            else:
+                logger.error(
+                    "Invalid 'materialized:' config in reflekt_project.yml. Must be either "
+                    "'view' or 'incremental'. See the Reflekt docs "
+                    "(https://bit.ly/reflekt-project-config) on project configuration."
+                )
+                raise SystemExit(1)
 
         return model_config
 
