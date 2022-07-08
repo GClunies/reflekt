@@ -26,6 +26,7 @@ class ReflektPlan(object):
         plan_yaml_obj: dict,
         plan_name: str,
         schema_name: Optional[str] = None,
+        events: Optional[tuple] = None,
     ) -> None:
         if ReflektProject().exists:
             self._config = ReflektConfig()

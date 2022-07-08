@@ -727,7 +727,7 @@ if __name__ == "__main__":
     # test(
     #     [
     #         "--name",
-    #         "my-plan",
+    #         "test-plan",
     #         "-e",
     #         "cart-viewed",
     #         "-e",
@@ -737,11 +737,11 @@ if __name__ == "__main__":
     dbt(
         [
             "--name",
-            "my-plan",
-            # "--schema",
-            # "my_app_web",
-            # "--force-version",
-            # "0.1.0",
+            "test-plan",
+            "--schema",
+            "my_app_web",
+            "--force-version",
+            "0.1.0",
         ]
     )
     # pull(["--name", "tracking-plan-example"])

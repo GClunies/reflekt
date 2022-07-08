@@ -52,9 +52,6 @@ class ReflektTransformer(object):
     def __init__(
         self,
         reflekt_plan: ReflektPlan,
-        # dbt_package_name: Optional[str] = None,
-        # dbt_pkg_dir: Optional[Path] = None,
-        # tmp_pkg_dir: Optional[Path] = None,
         models_subfolder: Optional[str] = None,
         dbt_package_version: Optional[Version] = None,
     ) -> None:
@@ -343,21 +340,18 @@ class ReflektTransformer(object):
     def _dbt_package_rudderstack(
         self,
         reflekt_plan: ReflektPlan,
-        models_subfolder: str,
     ) -> None:
         pass
 
     def _dbt_package_snowplow(
         self,
         reflekt_plan: ReflektPlan,
-        models_subfolder: str,
     ) -> None:
         pass
 
     def _dbt_package_segment(
         self,
         reflekt_plan: ReflektPlan,
-        models_subfolder: str,
     ) -> None:
         self.db_errors = []
 
@@ -391,42 +385,42 @@ class ReflektTransformer(object):
         std_segment_tables = [
             {
                 "name": "identifies",
-                "description": "A table with identify() calls.",  # noqa: E501
+                "description": "A table with identify() calls.",
                 "unique_key": "identify_id",
                 "cdp_cols": seg_identify_cols,
                 "plan_cols": user_traits,
             },
             {
                 "name": "users",
-                "description": "A table with the latest traits for users.",  # noqa: E501
+                "description": "A table with the latest traits for users.",
                 "unique_key": "user_id",
                 "cdp_cols": seg_users_cols,
                 "plan_cols": user_traits,
             },
             {
                 "name": "groups",
-                "description": "A table with group() calls.",  # noqa: E501
+                "description": "A table with group() calls.",
                 "unique_key": "group_id",
                 "cdp_cols": seg_groups_cols,
                 "plan_cols": group_traits,
             },
             {
                 "name": "pages",
-                "description": "A table with page() calls.",  # noqa: E501
+                "description": "A table with page() calls.",
                 "unique_key": "page_id",
                 "cdp_cols": seg_pages_cols,
                 "plan_cols": page_viewed_props,
             },
             {
                 "name": "screens",
-                "description": "A table with screen() calls.",  # noqa: E501
+                "description": "A table with screen() calls.",
                 "unique_key": "screen_id",
                 "cdp_cols": seg_screens_cols,
                 "plan_cols": screen_viewed_props,
             },
             {
                 "name": "tracks",
-                "description": "A table with track() event calls.",  # noqa: E501
+                "description": "A table with track() event calls.",
                 "unique_key": "event_id",
                 "cdp_cols": seg_tracks_cols,
                 "plan_cols": [],
