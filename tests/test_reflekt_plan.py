@@ -4,8 +4,8 @@
 
 import pytest
 import yaml
-
 from reflekt.plan import ReflektPlan
+
 from tests.fixtures.reflekt_event import REFLEKT_EVENT
 from tests.fixtures.reflekt_groups import REFLEKT_GROUPS
 from tests.fixtures.reflekt_plan import REFLEKT_PLAN, REFLEKT_PLAN_BAD
@@ -25,13 +25,13 @@ def test_add_event():
     assert len(plan.events) == 1
 
 
-def test_add_identify_trait():
+def test_add_user_trait():
     plan = ReflektPlan(yaml.safe_load(REFLEKT_PLAN), "test-plan")
     yaml_obj = yaml.safe_load(REFLEKT_USERS)
     trait = yaml_obj["traits"][0]
-    plan.add_identify_trait(trait)
+    plan.add_user_trait(trait)
 
-    assert len(plan.identify_traits) == 1
+    assert len(plan.user_traits) == 1
 
 
 def test_add_group_trait():

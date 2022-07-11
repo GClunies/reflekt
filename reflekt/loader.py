@@ -32,7 +32,8 @@ class ReflektLoader(object):
             self.plan_dir = plan_dir
             self.events = events
             self._load_plan_file(plan_dir / "plan.yml")
-            self._load_events(plan_dir / "events", self.events)
+            self._load_events(plan_dir / "events")
+            # self._load_events(plan_dir / "events", self.events)
             self._load_user_traits(plan_dir / "user-traits.yml")
             self._load_group_traits(plan_dir / "group-traits.yml")
             self.plan.validate_plan()
@@ -46,12 +47,15 @@ class ReflektLoader(object):
                 schema_name=self.schema_name,
             )
 
-    def _load_events(self, dir_path: Path, events: Optional[tuple]) -> None:
+    def _load_events(self, dir_path: Path) -> None:
+        if not dir_path.exists():
+            return
+
         glob_paths = sorted(Path(dir_path).glob("**/*.yml"))
 
-        if self.events != ():
+        if self.events != () and self.events is not None:
             event_paths = []
-            for event in events:
+            for event in self.events:
                 event_paths.append(self.plan_dir / "events" / f"{event}.yml")
                 events_to_parse = []
                 for event_path in event_paths:
@@ -84,7 +88,7 @@ class ReflektLoader(object):
         else:
             parse_user_traits = True
 
-            if self.events != ():
+            if self.events != () and self.events is not None:
                 if "user-traits" in self.events:
                     parse_user_traits = True
                 else:
@@ -98,7 +102,7 @@ class ReflektLoader(object):
                 with open(path, "r") as identify_file:
                     yaml_obj = yaml.safe_load(identify_file)
                     for trait in yaml_obj.get("traits", []):
-                        self.plan.add_identify_trait(trait)
+                        self.plan.add_user_trait(trait)
 
     def _load_group_traits(self, path) -> None:
         if not path.exists():
@@ -107,7 +111,7 @@ class ReflektLoader(object):
         else:
             parse_group_traits = True
 
-            if self.events != ():
+            if self.events != () and self.events is not None:
                 if "user-traits" in self.events:
                     parse_group_traits = True
                 else:

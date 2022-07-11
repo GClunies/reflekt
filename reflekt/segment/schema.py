@@ -16,7 +16,7 @@ segment_payload_schema = {
 segment_plan_schema = {
     "display_name": "",
     "rules": {
-        "identify_traits": [],
+        "user_traits": [],
         "group_traits": [],
         "events": [],
         "global": {

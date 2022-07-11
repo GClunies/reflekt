@@ -47,7 +47,7 @@ class ReflektPlan(object):
                 self.schema_alias = None
 
             self.events: List[ReflektEvent] = []
-            self.identify_traits: List[ReflektTrait] = []
+            self.user_traits: List[ReflektTrait] = []
             self.group_traits: List[ReflektTrait] = []
 
     def _get_database(self, plan_name: str) -> list:
@@ -85,9 +85,9 @@ class ReflektPlan(object):
     def add_event(self, event_yaml_obj: dict) -> None:
         self.events.append(ReflektEvent(event_yaml_obj))
 
-    def add_identify_trait(self, trait_yaml: dict) -> None:
+    def add_user_trait(self, trait_yaml: dict) -> None:
         trait_property = ReflektProperty(trait_yaml)
-        self.identify_traits.append(trait_property)
+        self.user_traits.append(trait_property)
 
     def add_group_trait(self, trait_yaml: dict) -> None:
         trait_property = ReflektProperty(trait_yaml)

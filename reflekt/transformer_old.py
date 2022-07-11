@@ -123,8 +123,8 @@ class ReflektTransformer(object):
                 segment_event = self._build_segment_event(reflekt_event)
                 segment_plan["rules"]["events"].append(segment_event)
 
-        if reflekt_plan.user_traits != []:
-            for reflekt_identify_trait in reflekt_plan.user_traits:
+        if reflekt_plan.identify_traits != []:
+            for reflekt_identify_trait in reflekt_plan.identify_traits:
                 segment_identify_trait = self._build_segment_trait(
                     reflekt_identify_trait
                 )
@@ -277,7 +277,6 @@ class ReflektTransformer(object):
         pass
 
     def build_dbt_package(self) -> None:
-        self.db_errors = []
         logger.info(
             f"Building Reflekt dbt package:"
             f"\n        dbt package name: {self.dbt_package_name}"
@@ -330,11 +329,13 @@ class ReflektTransformer(object):
             models_subfolder_dir.mkdir(parents=True, exist_ok=True)
 
         if self.cdp_name == "rudderstack":
-            return self._dbt_package_rudderstack(self.reflekt_plan)
+            return self._dbt_package_rudderstack(
+                self.reflekt_plan, self.models_subfolder
+            )
         elif self.cdp_name == "segment":
-            return self._dbt_package_segment(self.reflekt_plan)
+            return self._dbt_package_segment(self.reflekt_plan, self.models_subfolder)
         elif self.cdp_name == "snowplow":
-            return self._dbt_package_snowplow(self.reflekt_plan)
+            return self._dbt_package_snowplow(self.reflekt_plan, self.models_subfolder)
 
     def _dbt_package_rudderstack(
         self,
@@ -352,123 +353,97 @@ class ReflektTransformer(object):
         self,
         reflekt_plan: ReflektPlan,
     ) -> None:
+        self.db_errors = []
+
+        # Setup `Page Viewed` and `Screen Viewed` events, if they exist in Reflekt plan
+        page_viewed_event = [
+            event
+            for event in reflekt_plan.events
+            if str.lower(event.name).replace("_", " ").replace("-", " ") == "page viewed"
+        ]
+
+        if page_viewed_event == []:  # Page Viewed not in tracking plan
+            page_viewed_props = []
+        else:
+            page_viewed_props = page_viewed_event[0].properties
+
+        screen_viewed_event = [
+            event
+            for event in reflekt_plan.events
+            if str.lower(event.name).replace("_", " ").replace("-", " ")
+            == "screen viewed"
+        ]
+
+        if screen_viewed_event == []:  # Screen Viewed not in tracking plan
+            screen_viewed_props = []
+        else:
+            screen_viewed_props = screen_viewed_event[0].properties
+
+        user_traits = [trait for trait in reflekt_plan.identify_traits]
+        group_traits = [trait for trait in reflekt_plan.group_traits]
+
+        std_segment_tables = [
+            {
+                "name": "identifies",
+                "description": "A table with identify() calls.",
+                "unique_key": "identify_id",
+                "cdp_cols": seg_identify_cols,
+                "plan_cols": user_traits,
+            },
+            {
+                "name": "users",
+                "description": "A table with the latest traits for users.",
+                "unique_key": "user_id",
+                "cdp_cols": seg_users_cols,
+                "plan_cols": user_traits,
+            },
+            {
+                "name": "groups",
+                "description": "A table with group() calls.",
+                "unique_key": "group_id",
+                "cdp_cols": seg_groups_cols,
+                "plan_cols": group_traits,
+            },
+            {
+                "name": "pages",
+                "description": "A table with page() calls.",
+                "unique_key": "page_id",
+                "cdp_cols": seg_pages_cols,
+                "plan_cols": page_viewed_props,
+            },
+            {
+                "name": "screens",
+                "description": "A table with screen() calls.",
+                "unique_key": "screen_id",
+                "cdp_cols": seg_screens_cols,
+                "plan_cols": screen_viewed_props,
+            },
+            {
+                "name": "tracks",
+                "description": "A table with track() event calls.",
+                "unique_key": "event_id",
+                "cdp_cols": seg_tracks_cols,
+                "plan_cols": [],
+            },
+        ]
+
         dbt_src = self._template_dbt_source(reflekt_plan=reflekt_plan)
 
-        std_segment_tables = []
-        if self.reflekt_plan.user_traits:
-            std_segment_tables.append(
-                {
-                    "name": "identifies",
-                    "description": "A table with identify() calls.",
-                    "unique_key": "identify_id",
-                    "cdp_cols": seg_identify_cols,
-                    "plan_cols": reflekt_plan.user_traits,
-                }
-            )
-            std_segment_tables.append(
-                {
-                    "name": "users",
-                    "description": "A table with the latest traits for users.",
-                    "unique_key": "user_id",
-                    "cdp_cols": seg_users_cols,
-                    "plan_cols": reflekt_plan.user_traits,
-                }
-            )
-
-        if self.reflekt_plan.group_traits:
-            std_segment_tables.append(
-                {
-                    "name": "groups",
-                    "description": "A table with group() calls.",
-                    "unique_key": "group_id",
-                    "cdp_cols": seg_groups_cols,
-                    "plan_cols": reflekt_plan.group_traits,
-                }
-            )
-
-        if self.reflekt_plan.events:
-            std_segment_tables.append(
-                {
-                    "name": "tracks",
-                    "description": "A table with event track() calls.",
-                    "unique_key": "event_id",
-                    "cdp_cols": seg_tracks_cols,
-                    "plan_cols": [],
-                }
-            )
-
         for std_segment_table in std_segment_tables:
-            db_columns, error_msg = self.db_engine.get_columns(
-                self.schema, std_segment_table["name"]
-            )
-            if error_msg is not None:
-                self.db_errors.append(error_msg)
+            if self.plan_type == "avo" and std_segment_table["name"] in [
+                "identifies",
+                "users",
+                "groups",
+            ]:
+                pass
             else:
-                table_name = std_segment_table["name"]
-                model_name = (
-                    f"{self.model_prefix}{self.schema}__{table_name}"
-                    if self.schema_alias is None
-                    else f"{self.model_prefix}{self.schema_alias}__{table_name}"
-                )
-                doc_name = (
-                    f"{self.docs_prefix}{self.schema}__{table_name}"
-                    if self.schema_alias is None
-                    else f"{self.docs_prefix}{self.schema_alias}__{table_name}"
-                )
-                self._template_dbt_table(
-                    dbt_src=dbt_src,
-                    table_name=table_name,
-                    table_description=std_segment_table["description"],
-                )
-                self._template_dbt_model(
-                    models_subfolder=self.models_subfolder,
-                    materialized=self.materialized,
-                    unique_key=std_segment_table["unique_key"],
-                    table_name=table_name,
-                    model_name=model_name,
-                    db_columns=db_columns,
-                    cdp_cols=std_segment_table["cdp_cols"],
-                    plan_cols=std_segment_table["plan_cols"],
-                )
-                self._template_dbt_doc(
-                    models_subfolder=self.models_subfolder,
-                    doc_name=doc_name,
-                    model_name=model_name,
-                    model_description=std_segment_table["description"],
-                    db_columns=db_columns,
-                    cdp_cols=std_segment_table["cdp_cols"],
-                    plan_cols=std_segment_table["plan_cols"],
-                )
-
-        for event in self.reflekt_plan.events:
-            event_name_lower = str.lower(event.name).replace("_", " ").replace("-", " ")
-            if event_name_lower == "page viewed":
-                table_name = "pages"
-                unique_key = "page_id"
-                cdp_cols = seg_pages_cols
-            elif event_name_lower == "screen viewed":
-                table_name = "screens"
-                unique_key = "screen_id"
-                cdp_cols = seg_screens_cols
-            else:
-                table_name = segment_2_snake(event.name)
-                unique_key = "event_id"
-                cdp_cols = seg_tracks_cols
-
-            # Get event versions
-            multi_version_event_list = [
-                x for x in reflekt_plan.events if x.name == event.name
-            ]
-            event_versions = [event.version for event in multi_version_event_list]
-
-            # Only template latest version of event
-            if event.version == max(event_versions):
                 db_columns, error_msg = self.db_engine.get_columns(
-                    self.schema, table_name
+                    self.schema, std_segment_table["name"]
                 )
                 if error_msg is not None:
                     self.db_errors.append(error_msg)
                 else:
+                    table_name = std_segment_table["name"]
                     model_name = (
                         f"{self.model_prefix}{self.schema}__{table_name}"
                         if self.schema_alias is None
@@ -482,33 +457,90 @@ class ReflektTransformer(object):
                     self._template_dbt_table(
                         dbt_src=dbt_src,
                         table_name=table_name,
-                        table_description=event.description,
+                        table_description=std_segment_table["description"],
                     )
                     self._template_dbt_model(
                         models_subfolder=self.models_subfolder,
                         materialized=self.materialized,
-                        unique_key=unique_key,
+                        unique_key=std_segment_table["unique_key"],
                         table_name=table_name,
                         model_name=model_name,
                         db_columns=db_columns,
-                        cdp_cols=cdp_cols,
-                        plan_cols=event.properties,
-                        event_name=event.name,
+                        cdp_cols=std_segment_table["cdp_cols"],
+                        plan_cols=std_segment_table["plan_cols"],
                     )
                     self._template_dbt_doc(
                         models_subfolder=self.models_subfolder,
                         doc_name=doc_name,
                         model_name=model_name,
-                        model_description=event.description,
+                        model_description=std_segment_table["description"],
                         db_columns=db_columns,
-                        cdp_cols=cdp_cols,
-                        plan_cols=event.properties,
+                        cdp_cols=std_segment_table["cdp_cols"],
+                        plan_cols=std_segment_table["plan_cols"],
                     )
+
+        for event in reflekt_plan.events:
+            if event.name.lower() in ["page viewed", "screen viewed"]:
+                pass  # Already handled above by std_segment_tables for loop
+            else:
+                # Get event versions
+                multi_version_event_list = [
+                    x for x in reflekt_plan.events if x.name == event.name
+                ]
+                event_versions = [event.version for event in multi_version_event_list]
+
+                # Only template latest version of event
+                if event.version == max(event_versions):
+                    db_columns, error_msg = self.db_engine.get_columns(
+                        self.schema, segment_2_snake(event.name)
+                    )
+                    if error_msg is not None:
+                        self.db_errors.append(error_msg)
+                    else:
+                        table_name = segment_2_snake(event.name)
+                        model_name = (
+                            f"{self.model_prefix}{self.schema}__{table_name}"
+                            if self.schema_alias is None
+                            else f"{self.model_prefix}{self.schema_alias}__{table_name}"
+                        )
+                        doc_name = (
+                            f"{self.docs_prefix}{self.schema}__{table_name}"
+                            if self.schema_alias is None
+                            else f"{self.docs_prefix}{self.schema_alias}__{table_name}"
+                        )
+                        self._template_dbt_table(
+                            dbt_src=dbt_src,
+                            table_name=table_name,
+                            table_description=event.description,
+                        )
+                        self._template_dbt_model(
+                            models_subfolder=self.models_subfolder,
+                            materialized=self.materialized,
+                            unique_key="event_id",
+                            table_name=table_name,
+                            model_name=model_name,
+                            db_columns=db_columns,
+                            cdp_cols=seg_event_cols,
+                            plan_cols=event.properties,
+                            event_name=event.name,
+                        )
+                        self._template_dbt_doc(
+                            models_subfolder=self.models_subfolder,
+                            doc_name=doc_name,
+                            model_name=model_name,
+                            model_description=event.description,
+                            db_columns=db_columns,
+                            cdp_cols=seg_event_cols,
+                            plan_cols=event.properties,
+                        )
 
         src_name = (
             f"{self.src_prefix}{self.schema}"
             if self.schema_alias is None
             else f"{self.src_prefix}{self.schema_alias}"
+        )
+        dbt_src_path = (
+            self.tmp_pkg_dir / "models" / self.models_subfolder / f"{src_name}.yml"
         )
 
         if self.docs_in_folder:
@@ -572,39 +604,16 @@ class ReflektTransformer(object):
         reflekt_plan: ReflektPlan,
     ) -> dict:
         logger.info(f"Initializing template for dbt source {self.schema}")
-        src_name = (
-            f"{self.src_prefix}{self.schema}"
-            if self.schema_alias is None
-            else f"{self.src_prefix}{self.schema_alias}"
+        dbt_src = copy.deepcopy(dbt_src_schema)
+        dbt_src["sources"][0]["name"] = (
+            self.schema_alias if self.schema_alias is not None else self.schema
         )
-
-        if self.docs_in_folder:
-            docs_folder_str = (
-                str(self.tmp_pkg_dir) + f"/models/{self.models_subfolder}/docs"
-            )
-            docs_folder_path = Path(docs_folder_str)
-            docs_folder_path.mkdir(exist_ok=True)
-            dbt_src_path = docs_folder_path / f"{src_name}.yml"
-        else:
-            dbt_src_path = (
-                self.tmp_pkg_dir / "models" / self.models_subfolder / f"{src_name}.yml"
-            )
-
-        if dbt_src_path.exists():
-            with open(dbt_src_path, "r") as f:
-                dbt_src = yaml.safe_load(f)
-
-        else:
-            dbt_src = copy.deepcopy(dbt_src_schema)
-            dbt_src["sources"][0]["name"] = (
-                self.schema_alias if self.schema_alias is not None else self.schema
-            )
-            dbt_src["sources"][0]["schema"] = self.schema
-            dbt_src["sources"][0]["database"] = self.database
-            dbt_src["sources"][0]["description"] = (
-                f"Schema in {titleize(self.warehouse_type)} where data for the "
-                f"{reflekt_plan.name} {titleize(self.cdp_name)} source is stored."
-            )
+        dbt_src["sources"][0]["schema"] = self.schema
+        dbt_src["sources"][0]["database"] = self.database
+        dbt_src["sources"][0]["description"] = (
+            f"Schema in {titleize(self.warehouse_type)} where data for the "
+            f"{reflekt_plan.name} {titleize(self.cdp_name)} source is stored."
+        )
 
         return dbt_src
 
