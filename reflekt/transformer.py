@@ -28,7 +28,6 @@ from reflekt.plan import ReflektPlan
 from reflekt.project import ReflektProject
 from reflekt.property import ReflektProperty
 from reflekt.segment.columns import (
-    seg_event_cols,
     seg_groups_cols,
     seg_identify_cols,
     seg_pages_cols,

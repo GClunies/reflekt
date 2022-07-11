@@ -4,7 +4,6 @@
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
 
-from asyncio import events
 from pathlib import Path
 from typing import Optional
 
