@@ -37,7 +37,7 @@ def test_loader_reflekt_event(tmpdir):
 def test_loader_identify(tmpdir):
     plan_dir = build_reflekt_plan_dir(tmpdir)
     loader = ReflektLoader(plan_dir, "test-plan")
-    traits = loader.plan.identify_traits
+    traits = loader.plan.user_traits
 
     assert len(traits) == 4
 

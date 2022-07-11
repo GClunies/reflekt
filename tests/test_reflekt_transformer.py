@@ -17,7 +17,7 @@ def test_reflekt_transformer_segment(tmpdir):
     segment_plan = transformer.build_cdp_plan(plan_type="segment")
 
     segment_plan_name = segment_plan["tracking_plan"]["display_name"]
-    segment_plan_identify_traits = segment_plan["tracking_plan"]["rules"]["identify"][
+    segment_plan_user_traits = segment_plan["tracking_plan"]["rules"]["identify"][
         "properties"
     ]["traits"]["properties"]
     segment_plan_group_traits = segment_plan["tracking_plan"]["rules"]["group"][
@@ -29,25 +29,23 @@ def test_reflekt_transformer_segment(tmpdir):
     ]
 
     assert segment_plan_name == "test-plan"
+    assert segment_plan_user_traits["user_trait_one"]["description"] == "A user trait."
+    assert segment_plan_user_traits["user_trait_one"]["type"] == ["string"]
     assert (
-        segment_plan_identify_traits["user_trait_one"]["description"] == "A user trait."
-    )
-    assert segment_plan_identify_traits["user_trait_one"]["type"] == ["string"]
-    assert (
-        segment_plan_identify_traits["user_trait_two"]["description"]
+        segment_plan_user_traits["user_trait_two"]["description"]
         == "Another user trait."
     )
-    assert segment_plan_identify_traits["user_trait_two"]["type"] == ["boolean"]
+    assert segment_plan_user_traits["user_trait_two"]["type"] == ["boolean"]
     assert (
-        segment_plan_identify_traits["user_trait_three"]["description"]
+        segment_plan_user_traits["user_trait_three"]["description"]
         == "One more user trait."
     )
-    assert segment_plan_identify_traits["user_trait_three"]["type"] == ["number", "null"]
+    assert segment_plan_user_traits["user_trait_three"]["type"] == ["number", "null"]
     assert (
-        segment_plan_identify_traits["user_trait_four"]["description"]
+        segment_plan_user_traits["user_trait_four"]["description"]
         == "An object user trait."
     )
-    assert segment_plan_identify_traits["user_trait_four"]["type"] == ["object"]
+    assert segment_plan_user_traits["user_trait_four"]["type"] == ["object"]
 
     assert segment_plan_group_traits["group_trait_one"]["description"] == "A group trait"
     assert segment_plan_group_traits["group_trait_two"]["type"] == ["string"]
