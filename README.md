@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 # Reflekt
 Reflekt enables product & data teams to:
-- **Define tracking plans as `code`**, encouraging tracking design using software engineering principles (version control, branches, pull requests, reviews, and CI/CD).
-- **Automagically build a dbt package that models and documents the events in a tracking plan**, pulled from an Analytics Governance tool, ready for use in a dbt project.
+- Define tracking plans (from [Avo]([url](https://www.avo.app/)) or [Segment Protocols]([url](https://segment.com/docs/protocols/))) as `code`.
+- Automagically template a dbt package that models and documents the events in a tracking plan, ready for use in a dbt project.
 
 Each Reflekt dbt package includes:
 - A dbt [source](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in the warehouse where the raw event data is loaded.
