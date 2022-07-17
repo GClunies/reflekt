@@ -737,11 +737,14 @@ if __name__ == "__main__":
     dbt(
         [
             "--name",
-            "test-plan",
+            "my-plan",
+            # "-e",
+            # "order-completed",
             "--schema",
             "my_app_web",
             "--force-version",
             "0.1.0",
+            "--skip-git",
         ]
     )
     # pull(["--name", "tracking-plan-example"])
