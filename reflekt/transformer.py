@@ -196,7 +196,7 @@ class ReflektTransformer(object):
         reflekt_property: Union[ReflektProperty, ReflektTrait],
         segment_property: dict,
     ) -> dict:
-        # NOTE - ReflektTrait is a child class of ReflektProperty, so this
+        # ReflektTrait is a child class of ReflektProperty, so this
         # instance method will parse Reflekt properties and traits
         updated_segment_property = copy.deepcopy(segment_property)
         if hasattr(reflekt_property, "allow_null") and reflekt_property.allow_null:
@@ -601,8 +601,8 @@ class ReflektTransformer(object):
             dbt_src["sources"][0]["schema"] = self.schema
             dbt_src["sources"][0]["database"] = self.database
             dbt_src["sources"][0]["description"] = (
-                f"Schema in {titleize(self.warehouse_type)} where data for the "
-                f"{reflekt_plan.name} {titleize(self.cdp_name)} source is stored."
+                f"Schema in {titleize(self.warehouse_type)} where raw event data for "
+                f"the {reflekt_plan.name} tracking plan is loaded."
             )
 
         return dbt_src
@@ -613,9 +613,21 @@ class ReflektTransformer(object):
         table_name: str,
         table_description: str,
     ) -> None:
-        # Check that table does not already exist in dbt source. This can happen
-        # for Segment events with multiple versions
-        if table_name not in dbt_src["sources"][0]["tables"]:
+        # Get list of tables already in dbt source (if any)
+        table_names = [dbt_tbl["name"] for dbt_tbl in dbt_src["sources"][0]["tables"]]
+
+        # Table already defined in dbt source
+        if table_name in table_names:
+            logger.info("")  # Terminal newline
+            logger.info(f"Templating table '{table_name}' in dbt source {self.schema}")
+
+            for dbt_tbl in dbt_src["sources"][0]["tables"]:
+                # Find existing table entry with matching name, update name & description
+                if table_name == dbt_tbl["name"]:
+                    dbt_tbl["name"] = table_name
+                    dbt_tbl["description"] = table_description
+
+        else:
             logger.info("")  # Terminal newline
             logger.info(f"Templating table '{table_name}' in dbt source {self.schema}")
             dbt_tbl = copy.deepcopy(dbt_table_schema)
