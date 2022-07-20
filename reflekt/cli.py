@@ -628,18 +628,6 @@ def dbt(
             logger.info("")  # Terminal newline
             version = existing_version
 
-    # # TODO: move this logic. Setup temporary dbt pkg
-    # if dbt_pkg_dir.exists():
-    #     # If dbt pk exists, use it as template
-    #     if tmp_pkg_dir.exists():
-    #         shutil.rmtree(tmp_pkg_dir)
-    #     shutil.copytree(dbt_pkg_dir, str(tmp_pkg_dir))
-    # else:
-    #     if tmp_pkg_dir.exists():  # ensure tmp dir is empty
-    #         shutil.rmtree(tmp_pkg_dir)
-    #     # If dbt pkg doesn't exist, use blank template
-    #     shutil.copytree(blank_pkg_template, str(tmp_pkg_dir))
-
     # Load Reflekt plan from 'tracking-plans/'
     logger.info(f"Loading Reflekt tracking plan {plan_name}")
     loader = ReflektLoader(
