@@ -42,7 +42,7 @@ class ReflektConfig:
                 f" See the Reflekt docs (https://bit.ly/reflekt-profile-config) on "
                 f"profile configuration."
             )
-            SystemExit(1)
+            raise SystemExit(1)
 
     def _get_warehouse_type(self) -> str:
         if len(self.warehouse.keys()) > 1:
@@ -52,7 +52,7 @@ class ReflektConfig:
                 f"one warehouse can be defined per profile. See the Reflekt docs "
                 f"(https://bit.ly/reflekt-profile-config) on profile configuration."
             )
-            SystemExit(1)
+            raise SystemExit(1)
 
         warehouse_type: str = list(self.warehouse.keys())[0]
 
@@ -61,6 +61,6 @@ class ReflektConfig:
                 f"Unknown warehouse '{warehouse_type}' specified in reflekt_config.yml "
                 f"at {self.path}. Valid warehouses: {WAREHOUSES}"
             )
-            SystemExit(1)
+            raise SystemExit(1)
 
         return warehouse_type
