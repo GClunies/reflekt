@@ -369,7 +369,6 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
         logger.success(f"Built Reflekt tracking plan '{plan_name}'")
 
 
-@click.command()
 @click.option(
     "-n",
     "--name",
@@ -380,9 +379,21 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
 @click.option(
     "--dry",
     is_flag=True,
+    required=False,
     help="Output JSON to be synced, without actually syncing it.",
 )
-def push(plan_name, dry) -> None:
+@click.option(
+    "--dev",
+    "dev",
+    is_flag=True,
+    required=False,
+    help=(
+        "When syncing plan, add suffix '-dev' to the plan name, for use in "
+        "dev/staging/QA environments."
+    ),
+)
+@click.command()
+def push(plan_name, dry, dev) -> None:
     """Sync tracking plan to CDP or Analytics Governance tool."""
     api = ReflektApiHandler().get_api()
     if api.type.lower() in ["avo", "iteratively"]:
@@ -391,13 +402,35 @@ def push(plan_name, dry) -> None:
 
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Loading Reflekt tracking plan '{plan_name}'")
-    loader = ReflektLoader(plan_dir=plan_dir, plan_name=plan_name)
+
+    # Load the plan using the ORIGINAL name
+    loader = ReflektLoader(
+        plan_dir=plan_dir,
+    )
     reflekt_plan = loader.plan
-    transformer = ReflektTransformer(reflekt_plan)
+
+    if dev:
+        # Append '-dev' to the tracking plan name when syncing. This creates a
+        # separate tracking plan that can be used for dev/staging/qa environments
+        reflekt_plan.name = reflekt_plan.name + "-dev"
+        sync_name = reflekt_plan.name
+        transformer = ReflektTransformer(reflekt_plan)
+        logger.info("")  # Terminal newline
+        logger.warning(
+            f"Detected '--dev' argument, tracking plan '{plan_name}' will be "
+            f"synced to {titleize(transformer.plan_type)} as '{sync_name}' "
+            f"for use in dev/staging/qa environments."
+        )
+
+    else:
+        sync_name = reflekt_plan.name
+        transformer = ReflektTransformer(reflekt_plan)
+
     cdp_plan = transformer.build_cdp_plan()
 
     if dry:
-        payload = api.sync(plan_name, cdp_plan, dry=True)
+        payload = api.sync(sync_name, cdp_plan, dry=True)
+        logger.info("")  # Terminal newline
         logger.info(
             f"[DRY RUN] The following JSON would be sent to {transformer.plan_type}"
         )
@@ -405,18 +438,18 @@ def push(plan_name, dry) -> None:
     else:
         logger.info("")  # Terminal newline
         logger.info(
-            f"Syncing converted tracking plan '{plan_name}' to "
+            f"Syncing converted tracking plan '{sync_name}' to "
             f"{titleize(transformer.plan_type)}"
         )
-        api.sync(plan_name, cdp_plan)
+
+        api.sync(sync_name, cdp_plan)
         logger.info("")  # Terminal newline
         logger.success(
-            f"Synced Reflekt tracking plan '{plan_name}' to "
+            f"Synced Reflekt tracking plan '{sync_name}' to "
             f"{titleize(transformer.plan_type)}"
         )
 
 
-@click.command()
 @click.option(
     "-e",
     "--event",
@@ -434,14 +467,17 @@ def push(plan_name, dry) -> None:
     required=True,
     help="Name of tracking plan to be tested (in kebab-case).",
 )
+@click.command()
 def test(plan_name, events) -> None:
     """Test tracking plan schema for naming, data types, and metadata."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Testing Reflekt tracking plan '{plan_name}'")
 
     # Initialize ReflektLoader() always runs checks. Simple, not elegant.
-    ReflektLoader(plan_dir=plan_dir, plan_name=plan_name, events=events)
-
+    ReflektLoader(
+        plan_dir=plan_dir,
+        events=events,
+    )
     # If no errors are thrown, passed tests
     logger.info("")
     logger.success("Testing completed. No errors detected")
@@ -592,23 +628,10 @@ def dbt(
             logger.info("")  # Terminal newline
             version = existing_version
 
-    # # TODO: move this logic. Setup temporary dbt pkg
-    # if dbt_pkg_dir.exists():
-    #     # If dbt pk exists, use it as template
-    #     if tmp_pkg_dir.exists():
-    #         shutil.rmtree(tmp_pkg_dir)
-    #     shutil.copytree(dbt_pkg_dir, str(tmp_pkg_dir))
-    # else:
-    #     if tmp_pkg_dir.exists():  # ensure tmp dir is empty
-    #         shutil.rmtree(tmp_pkg_dir)
-    #     # If dbt pkg doesn't exist, use blank template
-    #     shutil.copytree(blank_pkg_template, str(tmp_pkg_dir))
-
     # Load Reflekt plan from 'tracking-plans/'
     logger.info(f"Loading Reflekt tracking plan {plan_name}")
     loader = ReflektLoader(
         plan_dir=plan_dir,
-        plan_name=plan_name,
         schema_name=schema,
         events=events,
     )
@@ -734,19 +757,20 @@ if __name__ == "__main__":
     #         "product-added",
     #     ]
     # )
-    dbt(
-        [
-            "--name",
-            "my-plan",
-            # "-e",
-            # "order-completed",
-            "--schema",
-            "my_app_web",
-            "--force-version",
-            "0.1.0",
-            "--skip-git",
-        ]
-    )
+    # dbt(
+    #     [
+    #         "--name",
+    #         "my-plan",
+    #         # "-e",
+    #         # "order-completed",
+    #         "--schema",
+    #         "my_app_web",
+    #         "--force-version",
+    #         "0.1.0",
+    #         "--skip-git",
+    #     ]
+    # )
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
+    push(["--name", "tracking-plan-example", "--dev"])
