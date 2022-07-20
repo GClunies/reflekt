@@ -48,7 +48,7 @@ class ReflektEvent(object):
                     f"\n\nSee the Reflekt docs (bit.ly/reflekt-event-metadata) on "
                     f"metadata configuration."
                 )
-                SystemExit(1)
+                raise SystemExit(1)
 
     def _check_event_name_case(self) -> None:
         case_rule: str = self._project.events_case
