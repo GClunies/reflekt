@@ -21,12 +21,10 @@ class ReflektLoader(object):
     def __init__(
         self,
         plan_dir: Path,
-        # plan_name: str,
         schema_name: Optional[str] = None,
         events: Optional[tuple] = None,
     ) -> None:
         if ReflektProject().exists:
-            # self.plan_name = plan_name
             self.schema_name = schema_name
             self.plan_dir = plan_dir
             self.events = events

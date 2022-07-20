@@ -406,7 +406,6 @@ def push(plan_name, dry, dev) -> None:
     # Load the plan using the ORIGINAL name
     loader = ReflektLoader(
         plan_dir=plan_dir,
-        # plan_name=plan_name,
     )
     reflekt_plan = loader.plan
 
@@ -477,7 +476,6 @@ def test(plan_name, events) -> None:
     # Initialize ReflektLoader() always runs checks. Simple, not elegant.
     ReflektLoader(
         plan_dir=plan_dir,
-        # plan_name=plan_name,
         events=events,
     )
     # If no errors are thrown, passed tests
@@ -646,7 +644,6 @@ def dbt(
     logger.info(f"Loading Reflekt tracking plan {plan_name}")
     loader = ReflektLoader(
         plan_dir=plan_dir,
-        # plan_name=plan_name,
         schema_name=schema,
         events=events,
     )

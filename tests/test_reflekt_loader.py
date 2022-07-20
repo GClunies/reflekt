@@ -14,10 +14,7 @@ from tests.fixtures.reflekt_plan import REFLEKT_PLAN
 
 def test_loader_reflekt_plan(tmpdir):
     plan_dir = build_reflekt_plan_dir(tmpdir)
-    loader = ReflektLoader(
-        plan_dir,
-        # "test-plan",
-    )
+    loader = ReflektLoader(plan_dir)
     yaml_obj = yaml.safe_load(REFLEKT_PLAN)
     expected = ReflektPlan(yaml_obj, "test-plan")
     actual = loader.plan
@@ -27,10 +24,7 @@ def test_loader_reflekt_plan(tmpdir):
 
 def test_loader_reflekt_event(tmpdir):
     plan_dir = build_reflekt_plan_dir(tmpdir)
-    loader = ReflektLoader(
-        plan_dir,
-        # "test-plan",
-    )
+    loader = ReflektLoader(plan_dir)
     yaml_obj = yaml.safe_load(REFLEKT_EVENT)
     expected = ReflektEvent(yaml_obj[0])
     events = loader.plan.events
@@ -42,10 +36,7 @@ def test_loader_reflekt_event(tmpdir):
 
 def test_loader_identify(tmpdir):
     plan_dir = build_reflekt_plan_dir(tmpdir)
-    loader = ReflektLoader(
-        plan_dir,
-        # "test-plan",
-    )
+    loader = ReflektLoader(plan_dir)
     traits = loader.plan.user_traits
 
     assert len(traits) == 4
@@ -53,10 +44,7 @@ def test_loader_identify(tmpdir):
 
 def test_loader_group(tmpdir):
     plan_dir = build_reflekt_plan_dir(tmpdir)
-    loader = ReflektLoader(
-        plan_dir,
-        # "test-plan",
-    )
+    loader = ReflektLoader(plan_dir)
     traits = loader.plan.group_traits
 
     assert len(traits) == 2
