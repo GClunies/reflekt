@@ -21,12 +21,12 @@ class ReflektLoader(object):
     def __init__(
         self,
         plan_dir: Path,
-        plan_name: str,
+        # plan_name: str,
         schema_name: Optional[str] = None,
         events: Optional[tuple] = None,
     ) -> None:
         if ReflektProject().exists:
-            self.plan_name = plan_name
+            # self.plan_name = plan_name
             self.schema_name = schema_name
             self.plan_dir = plan_dir
             self.events = events
@@ -40,6 +40,7 @@ class ReflektLoader(object):
     def _load_plan_file(self, path: Path) -> None:
         with open(path, "r") as plan_file:
             yaml_obj = yaml.safe_load(plan_file)
+            self.plan_name = yaml_obj["name"]  # Set plan name from plan.yml
             self.plan = ReflektPlan(
                 plan_yaml_obj=yaml_obj,
                 plan_name=self.plan_name,

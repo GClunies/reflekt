@@ -5,12 +5,16 @@
 
 from reflekt.loader import ReflektLoader
 from reflekt.transformer import ReflektTransformer
+
 from tests.build import build_reflekt_plan_dir
 
 
 def test_reflekt_transformer_segment(tmpdir):
     plan_dir = build_reflekt_plan_dir(tmpdir)
-    loader = ReflektLoader(plan_dir, "test-plan")
+    loader = ReflektLoader(
+        plan_dir,
+        # "test-plan",
+    )
     reflekt_plan = loader.plan
     transformer = ReflektTransformer(reflekt_plan)
     # Override plan type for testing
