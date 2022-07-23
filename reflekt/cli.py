@@ -747,16 +747,14 @@ if __name__ == "__main__":
     # new(["--project-dir", "test-plan"])
     # pull(["--name", "my-plan"])
     # push(["--name", "my-plan"])
-    # test(
-    #     [
-    #         "--name",
-    #         "test-plan",
-    #         "-e",
-    #         "cart-viewed",
-    #         "-e",
-    #         "product-added",
-    #     ]
-    # )
+    test(
+        [
+            "--name",
+            "surfline-web",
+            "-e",
+            "order-completed",
+        ]
+    )
     # dbt(
     #     [
     #         "--name",
@@ -773,4 +771,4 @@ if __name__ == "__main__":
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
-    push(["--name", "tracking-plan-example", "--dev"])
+    # push(["--name", "tracking-plan-example", "--dev"])
