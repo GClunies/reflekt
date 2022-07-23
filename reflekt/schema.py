@@ -49,6 +49,8 @@ if reflekt_project.exists:
         "enum": {"required": False, "type": "list"},
         "pattern": {"required": False, "type": "string"},
         "datetime": {"required": False, "type": "boolean"},
+        "object_properties": {"required": False, "type": "list"},
+        "array_item_schema": {"required": False, "type": "list"},
     }
 
     reflekt_nested_property_schema = {
