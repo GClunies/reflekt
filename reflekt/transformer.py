@@ -99,7 +99,7 @@ class ReflektTransformer(object):
             return self._build_plan_segment(self.reflekt_plan)
         elif plan_type.lower() == "snowplow":
             return self._build_plan_snowplow(self.reflekt_plan)
-        # 'reflekt push' not supported for Avo or Iteratively.
+        # 'reflekt push' not supported for Avo.
 
     def _build_plan_rudderstack(self):
         pass
