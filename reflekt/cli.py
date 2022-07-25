@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import copy
 import json
 import shutil
 import subprocess
@@ -10,7 +11,7 @@ from pathlib import Path
 import click
 import pkg_resources
 import yaml
-from inflection import titleize
+from inflection import dasherize, titleize
 from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
@@ -23,7 +24,9 @@ from reflekt.loader import ReflektLoader
 from reflekt.logger import logger_config
 from reflekt.project import ReflektProject
 from reflekt.segment.plan import SegmentPlan
+from reflekt.segment.schema import segment_payload_schema, segment_plan_schema
 from reflekt.transformer import ReflektTransformer
+from reflekt.utils import segment_2_snake
 
 
 @click.group()
@@ -392,44 +395,133 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
         "dev/staging/QA environments."
     ),
 )
+@click.option(
+    "-u",
+    "--update",
+    "update_events",
+    type=str,
+    multiple=True,
+    required=False,
+    help=(
+        "Update/add specified event (kebab-case) to the tracking plan. "
+        "Checks all event versions."
+    ),
+)
+@click.option(
+    "-r",
+    "--remove",
+    "remove_events",
+    type=str,
+    multiple=True,
+    required=False,
+    help=(
+        "Remove specified event (kebab-case) to the tracking plan. "
+        "Removes all versions of event."
+    ),
+)
 @click.command()
-def push(plan_name, dry, dev) -> None:
+def push(plan_name, dry, dev, update_events, remove_events) -> None:
     """Sync tracking plan to CDP or Analytics Governance tool."""
     api = ReflektApiHandler().get_api()
+    config = ReflektConfig()
+
     if api.type.lower() in ["avo", "iteratively"]:
         logger.error(f"'reflekt push' not supported for {titleize(api.type)}.")
         raise click.Abort()
 
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
-    logger.info(f"Loading Reflekt tracking plan '{plan_name}'")
 
-    # Load the plan using the ORIGINAL name
-    loader = ReflektLoader(
-        plan_dir=plan_dir,
-    )
-    reflekt_plan = loader.plan
-
-    if dev:
-        # Append '-dev' to the tracking plan name when syncing. This creates a
-        # separate tracking plan that can be used for dev/staging/qa environments
-        reflekt_plan.name = reflekt_plan.name + "-dev"
-        sync_name = reflekt_plan.name
-        transformer = ReflektTransformer(reflekt_plan)
-        logger.info("")  # Terminal newline
+    if update_events != ():
         logger.warning(
-            f"Detected '--dev' argument, tracking plan '{plan_name}' will be "
-            f"synced to {titleize(transformer.plan_type)} as '{sync_name}' "
-            f"for use in dev/staging/qa environments."
+            f"--update flag detected. Searching {titleize(config.plan_type)} for "
+            f"existing tracking plan '{plan_name}'"
         )
+        existing_plan_json = api.get(plan_name)  # Get the existing plan
+        logger.info("")  # Terminal newline
+        logger.info(f"Found existing tracking plan '{plan_name}'")
+        update_str = ", ".join("'" + event + "'" for event in update_events)
+        logger.info("")  # Terminal newline
+        logger.info(f"Updating event(s): {update_str}, to tracking plan {plan_name}")
+        loader = ReflektLoader(plan_dir=plan_dir, events=update_events)
+        reflekt_plan = loader.plan
+        transformer = ReflektTransformer(reflekt_plan)
+        proposed_plan_json = transformer.build_cdp_plan()
+        sync_events = []  # Events to sync
+
+        # For all existing events
+        for existing_event in existing_plan_json["rules"]["events"]:
+            match_found = False
+            match_event = None
+            for proposed_event in proposed_plan_json["tracking_plan"]["rules"]["events"]:
+                # If proposed event name + version matches, update existing with proposed
+                if (
+                    proposed_event["name"] == existing_event["name"]
+                    and proposed_event["version"] == existing_event["version"]
+                ):
+                    match_found = True
+                    match_event = proposed_event
+
+            if match_found:  # Add the proposed event to list of events to sync
+                sync_events.append(match_event)
+            else:  # Add existing event to list of events to sync
+                sync_events.append(existing_event)
+
+        # For all proposed events
+        for proposed_event in proposed_plan_json["tracking_plan"]["rules"]["events"]:
+            match_found = False
+            for existing_event in existing_plan_json["rules"]["events"]:
+                # If we find a match for the proposed event, make note
+                if (
+                    proposed_event["name"] == existing_event["name"]
+                    and proposed_event["version"] == existing_event["version"]
+                ):
+                    match_found = True
+
+            if not match_found:  # Add proposed event to sync if not in existing
+                sync_events.append(proposed_event)
+
+        # Set the events to sync
+        sync_plan_json = copy.deepcopy(proposed_plan_json)
+        sync_plan_json["tracking_plan"]["rules"]["events"] = sync_events
+        cdp_plan = sync_plan_json
+
+    elif remove_events != ():
+        remove_str = ", ".join("'" + event + "'" for event in remove_events)
+        logger.warning(
+            f"--remove flag detected. Removing event(s): {remove_str}, from "
+            f"tracking plan {plan_name} in {titleize(config.plan_type)}"
+        )
+        # Get the existing plan and delete events from existing
+        existing_plan_json = api.get(plan_name)
+        existing_identify = existing_plan_json["rules"]["identify"]
+        existing_group = existing_plan_json["rules"]["group"]
+        existing_events = existing_plan_json["rules"]["events"]
+        sync_events = []  # Events to sync
+
+        for existing_event in existing_events:
+            if dasherize(segment_2_snake(existing_event["name"])) not in remove_events:
+                sync_events.append(existing_event)
+
+        cdp_plan = copy.deepcopy(segment_payload_schema)
+        cdp_plan["tracking_plan"].update(segment_plan_schema)
+        cdp_plan["tracking_plan"]["rules"]["events"] = sync_events
+        cdp_plan["tracking_plan"]["rules"]["identify"] = existing_identify
+        cdp_plan["tracking_plan"]["rules"]["group"] = existing_group
 
     else:
-        sync_name = reflekt_plan.name
-        transformer = ReflektTransformer(reflekt_plan)
+        logger.info(f"Loading Reflekt tracking plan '{plan_name}'")
 
-    cdp_plan = transformer.build_cdp_plan()
+        # Load the plan using the ORIGINAL name
+        loader = ReflektLoader(
+            plan_dir=plan_dir,
+        )
+        reflekt_plan = loader.plan
+        transformer = ReflektTransformer(reflekt_plan)
+        proposed_plan_json = transformer.build_cdp_plan()
+        cdp_plan = proposed_plan_json
 
     if dry:
-        payload = api.sync(sync_name, cdp_plan, dry=True)
+        payload = api.sync(plan_name, cdp_plan, dry=True)
         logger.info("")  # Terminal newline
         logger.info(
             f"[DRY RUN] The following JSON would be sent to {transformer.plan_type}"
@@ -438,15 +530,15 @@ def push(plan_name, dry, dev) -> None:
     else:
         logger.info("")  # Terminal newline
         logger.info(
-            f"Syncing converted tracking plan '{sync_name}' to "
-            f"{titleize(transformer.plan_type)}"
+            f"Syncing converted tracking plan '{plan_name}' to "
+            f"{titleize(config.plan_type)}"
         )
 
-        api.sync(sync_name, cdp_plan)
+        api.sync(plan_name, cdp_plan)
         logger.info("")  # Terminal newline
         logger.success(
-            f"Synced Reflekt tracking plan '{sync_name}' to "
-            f"{titleize(transformer.plan_type)}"
+            f"Synced Reflekt tracking plan '{plan_name}' to "
+            f"{titleize(config.plan_type)}"
         )
 
 
@@ -747,14 +839,14 @@ if __name__ == "__main__":
     # new(["--project-dir", "test-plan"])
     # pull(["--name", "my-plan"])
     # push(["--name", "my-plan"])
-    test(
-        [
-            "--name",
-            "surfline-web",
-            "-e",
-            "order-completed",
-        ]
-    )
+    # test(
+    #     [
+    #         "--name",
+    #         "surfline-web",
+    #         "-e",
+    #         "order-completed",
+    #     ]
+    # )
     # dbt(
     #     [
     #         "--name",
@@ -771,4 +863,19 @@ if __name__ == "__main__":
     # pull(["--name", "tracking-plan-example"])
     # push(["--name", "tracking-plan-example"])
     # test(["--name", "tracking-plan-example"])
-    # push(["--name", "tracking-plan-example", "--dev"])
+    # push(
+    #     [
+    #         "--name",
+    #         "tracking-plan-example-dev",
+    #         "-u",
+    #         "test-event-four",
+    #     ]
+    # )
+    push(
+        [
+            "--name",
+            "tracking-plan-example-dev",
+            "-r",
+            "test-event-four",
+        ]
+    )
