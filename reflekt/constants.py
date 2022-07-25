@@ -24,7 +24,6 @@ PLANS = [
     "avo",
     # "rudderstack",
     # "snowplow",
-    # "iteratively",
 ]
 
 PLAN_INIT_STRING = (
@@ -32,7 +31,6 @@ PLAN_INIT_STRING = (
     "\n[2] Avo"
     # "\n[3] Rudderstack"
     # "\n[4] Snowplow"
-    # "\n[5] Iteratively"
 )
 
 PLAN_MAP = {
@@ -40,7 +38,6 @@ PLAN_MAP = {
     "2": "avo",
     # "3": "rudderstack",
     # "4": "snowplow",
-    # "5": "iteratively",
 }
 
 CDPS = [

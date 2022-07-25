@@ -145,8 +145,6 @@ def init(project_dir_str: str) -> None:
         #     pass
         # elif plan_type == "snowplow":
         #     pass
-        # elif plan_type == "iteratively":
-        #     pass
 
         cdp_num_prompt = click.prompt(
             f"How do you collect first-party data?"
@@ -359,8 +357,6 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
         elif api.type.lower() == "segment":
             plan = SegmentPlan(plan_json)
         # TODO: Add support for other tracking plan types
-        # elif config.plan_type.lower() == "iteratively":
-        #     plan = IterativelyPlan(plan_json)
         # elif config.plan_type.lower() == "rudderstack":
         #     plan = RudderstackPlan(plan_json)
         # elif config.plan_type.lower() == "snowplow":
@@ -425,7 +421,7 @@ def push(plan_name, dry, dev, update_events, remove_events) -> None:
     api = ReflektApiHandler().get_api()
     config = ReflektConfig()
 
-    if api.type.lower() in ["avo", "iteratively"]:
+    if api.type.lower() in ["avo"]:
         logger.error(f"'reflekt push' not supported for {titleize(api.type)}.")
         raise click.Abort()
 
@@ -652,8 +648,6 @@ def dbt(
     pkg_name = f"reflekt_{project_name}_{cdp}"
     project_dir / "dbt-packages" / pkg_name
     dbt_project_yml = project.project_dir / "dbt_project.yml"
-    # blank_pkg_template = pkg_resources.resource_filename("reflekt", "templates/dbt/")
-    # tmp_pkg_dir = project_dir / ".reflekt" / "tmp" / pkg_name
     config.warehouse_type
 
     # Determine dbt pkg version to pass to ReflektTransformer

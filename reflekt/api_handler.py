@@ -23,8 +23,6 @@ class ReflektApiHandler:
             return AvoCli(  # Not CLI (not API), but called via get_api for consistency
                 avo_branch
             )
-        elif self._config.plan_type == "iteratively":
-            pass
         elif self._config.plan_type == "rudderstack":
             pass
         elif self._config.plan_type == "segment":
