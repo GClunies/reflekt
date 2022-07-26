@@ -81,11 +81,3 @@ segment_property_schema = {
     "description": "",
     "type": "",
 }
-
-segment_items_schema = {
-    "items": {
-        "type": "object",
-        "properties": {},
-        "required": [],
-    }
-}

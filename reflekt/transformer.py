@@ -37,7 +37,6 @@ from reflekt.segment.columns import (
 )
 from reflekt.segment.schema import (
     segment_event_schema,
-    segment_items_schema,
     segment_payload_schema,
     segment_plan_schema,
     segment_property_schema,
@@ -180,7 +179,9 @@ class ReflektTransformer(object):
 
         return segment_event
 
-    def _build_segment_property(self, reflekt_property: ReflektProperty) -> dict:
+    def _build_segment_property(
+        self, reflekt_property: Union[ReflektProperty, ReflektTrait]
+    ) -> dict:
         # If self._build_segment_property() is called recursively to build array or
         # object properties, need to convert the array_item_schema or object_properties
         # attribute, which is a dict, to a ReflektProperty
