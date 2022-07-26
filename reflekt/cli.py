@@ -869,8 +869,8 @@ if __name__ == "__main__":
         [
             "--name",
             "tracking-plan-example-dev",
-            "-u",
-            "test-event-two",
+            # "-u",
+            # "test-event-four",
             "--dry",
         ]
     )

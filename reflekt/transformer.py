@@ -99,7 +99,6 @@ class ReflektTransformer(object):
             return self._build_plan_segment(self.reflekt_plan)
         elif plan_type.lower() == "snowplow":
             return self._build_plan_snowplow(self.reflekt_plan)
-        # 'reflekt push' not supported for Avo.
 
     def _build_plan_rudderstack(self):
         pass
@@ -182,108 +181,85 @@ class ReflektTransformer(object):
         return segment_event
 
     def _build_segment_property(self, reflekt_property: ReflektProperty) -> dict:
+        # If self._build_segment_property() is called recursively to build array or
+        # object properties, need to convert the array_item_schema or object_properties
+        # attribute, which is a dict, to a ReflektProperty
+        if isinstance(reflekt_property, dict):
+            reflekt_property = ReflektProperty(reflekt_property)
+
+        # For each Reflekt property, create a fresh segment property object
         segment_property = copy.deepcopy(segment_property_schema)
+        # Update the segment property description and name
         segment_property["description"] = reflekt_property.description
         segment_property["type"] = [reflekt_property.type]
-        segment_property = self._parse_reflekt_property(
-            reflekt_property, segment_property
-        )
 
-        return segment_property
-
-    def _parse_reflekt_property(
-        self,
-        reflekt_property: Union[ReflektProperty, ReflektTrait],
-        segment_property: dict,
-    ) -> dict:
-        # ReflektTrait is a child class of ReflektProperty, so this
-        # instance method will parse Reflekt properties and traits
-        updated_segment_property = copy.deepcopy(segment_property)
-        if hasattr(reflekt_property, "allow_null") and reflekt_property.allow_null:
-            updated_segment_property["type"].append("null")
-        elif hasattr(reflekt_property, "type") and reflekt_property.type == "any":
+        # Check for property configurations and set accordingly
+        if hasattr(reflekt_property, "type") and reflekt_property.type == "any":
             # If data type is 'any', delete type key. Otherwise, triggers
             # 'invalid argument' from Segment API
-            updated_segment_property.pop("type", None)
+            segment_property.pop("type", None)
+        elif hasattr(reflekt_property, "allow_null") and reflekt_property.allow_null:
+            segment_property["type"].append("null")
         elif (
             hasattr(reflekt_property, "pattern") and reflekt_property.pattern is not None
         ):
-            updated_segment_property["pattern"] = reflekt_property.pattern
+            segment_property["pattern"] = reflekt_property.pattern
         elif hasattr(reflekt_property, "enum") and reflekt_property.enum is not None:
-            updated_segment_property["enum"] = reflekt_property.enum
+            segment_property["enum"] = reflekt_property.enum
         elif hasattr(reflekt_property, "datetime") and reflekt_property.datetime:
-            updated_segment_property["format"] = "date-time"
-
-        if (
+            segment_property["format"] = "date-time"
+        elif (
             hasattr(reflekt_property, "array_item_schema")
             and reflekt_property.array_item_schema is not None
         ):
-            self._parse_array_items(
-                reflekt_property.array_item_schema, updated_segment_property
-            )
+            # segment_array_items = copy.deepcopy(segment_items_schema)
+            segment_property["items"] = {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            }
+            for reflekt_array_item_property in reflekt_property.array_item_schema:
+                segment_item_property = self._build_segment_property(  # Recursion!
+                    reflekt_array_item_property
+                )
+                segment_property["items"]["properties"].update(
+                    {reflekt_array_item_property["name"]: segment_item_property}
+                )
 
-        if (
+                if (
+                    "required" in reflekt_array_item_property
+                    and reflekt_array_item_property["required"]
+                ):
+                    segment_property["items"]["required"].append(
+                        reflekt_array_item_property["name"]
+                    )
+        elif (
             hasattr(reflekt_property, "object_properties")
             and reflekt_property.object_properties is not None
         ):
-            self._parse_object_properties(
-                reflekt_property.object_properties, updated_segment_property
-            )
+            segment_property["properties"] = {}
+            segment_property["required"] = []
 
-        return updated_segment_property
-
-    def _parse_array_items(self, reflekt_array_item_schema, updated_segment_property):
-        segment_array_items = copy.deepcopy(segment_items_schema)
-        for array_item_property in reflekt_array_item_schema:
-            segment_item_property = copy.deepcopy(segment_property_schema)
-            segment_item_property["description"] = array_item_property["description"]
-            segment_item_property["type"] = [array_item_property["type"]]
-            segment_item_property = self._parse_reflekt_property(
-                array_item_property, segment_item_property
-            )
-
-            segment_array_items["items"]["properties"].update(
-                {array_item_property["name"]: segment_item_property}
-            )
-            updated_segment_property.update(segment_array_items)
-
-            if "required" in array_item_property and array_item_property["required"]:
-                segment_array_items["items"]["required"].append(
-                    array_item_property["name"]
+            for reflekt_object_property in reflekt_property.object_properties:
+                segment_object_property = self._build_segment_property(  # Recursion!
+                    reflekt_object_property
+                )
+                segment_property["properties"].update(
+                    {reflekt_object_property["name"]: segment_object_property}
                 )
 
-    def _parse_object_properties(
-        self, reflekt_property_object_properties, updated_segment_property
-    ):
-        updated_segment_property["properties"] = {}
-        updated_segment_property["required"] = []
+                if (
+                    "required" in reflekt_object_property
+                    and reflekt_object_property["required"]
+                ):
+                    segment_property["required"].append(reflekt_object_property["name"])
 
-        for object_property in reflekt_property_object_properties:
-            segment_object_property = copy.deepcopy(segment_property_schema)
-            segment_object_property["description"] = object_property["description"]
-            segment_object_property["type"] = object_property["type"]
-            segment_object_property = self._parse_reflekt_property(
-                object_property, segment_object_property
-            )
-
-            updated_segment_property["properties"].update(
-                {object_property["name"]: segment_object_property}
-            )
-
-            if "required" in object_property and object_property["required"]:
-                updated_segment_property["required"].append(object_property["name"])
+        return segment_property
 
     def _build_segment_trait(self, reflekt_trait: ReflektTrait) -> dict:
-        segment_trait = copy.deepcopy(segment_property_schema)
-        segment_trait["description"] = reflekt_trait.description
-        segment_trait["type"] = [reflekt_trait.type]
-        # _parse_reflekt_property works on traits too
-        segment_trait = self._parse_reflekt_property(reflekt_trait, segment_trait)
-
-        return segment_trait
-
-    def check_for_schema_match(self) -> None:
-        pass
+        # Although conceptually different, ReflektProperty and ReflektTrait are
+        # structurally the same. Therefore, we can reuse self._build_segment_property()
+        return self._build_segment_property(reflekt_trait)
 
     def build_dbt_package(self) -> None:
         self.db_errors = []
