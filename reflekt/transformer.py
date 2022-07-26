@@ -218,50 +218,60 @@ class ReflektTransformer(object):
             hasattr(reflekt_property, "array_item_schema")
             and reflekt_property.array_item_schema is not None
         ):
-            segment_array_items = copy.deepcopy(segment_items_schema)
-            for reflekt_item_property in reflekt_property.array_item_schema:
-                segment_item_property = copy.deepcopy(segment_property_schema)
-                segment_item_property["description"] = reflekt_item_property[
-                    "description"
-                ]
-                segment_item_property["type"] = [reflekt_item_property["type"]]
-                segment_item_property = self._parse_reflekt_property(
-                    reflekt_item_property, segment_item_property
-                )
-
-                if (
-                    "required" in reflekt_item_property
-                    and reflekt_item_property["required"]
-                ):
-                    segment_array_items["items"]["required"].append(
-                        reflekt_item_property["name"]
-                    )
-
-                segment_array_items["items"]["properties"].update(
-                    {reflekt_item_property["name"]: segment_item_property}
-                )
-
-            updated_segment_property.update(segment_array_items)
+            self._parse_array_items(
+                reflekt_property.array_item_schema, updated_segment_property
+            )
 
         if (
             hasattr(reflekt_property, "object_properties")
             and reflekt_property.object_properties is not None
         ):
-            updated_segment_property["properties"] = {}
-            updated_segment_property["required"] = []
-
-            for object_property in reflekt_property.object_properties:
-                segment_property = copy.deepcopy(segment_property_schema)
-                segment_property["description"] = object_property["description"]
-                segment_property["type"] = object_property["type"]
-                updated_segment_property["properties"].update(
-                    {object_property["name"]: segment_property}
-                )
-
-                if "required" in object_property and object_property["required"]:
-                    updated_segment_property["required"].append(object_property["name"])
+            self._parse_object_properties(
+                reflekt_property.object_properties, updated_segment_property
+            )
 
         return updated_segment_property
+
+    def _parse_array_items(self, reflekt_array_item_schema, updated_segment_property):
+        segment_array_items = copy.deepcopy(segment_items_schema)
+        for array_item_property in reflekt_array_item_schema:
+            segment_item_property = copy.deepcopy(segment_property_schema)
+            segment_item_property["description"] = array_item_property["description"]
+            segment_item_property["type"] = [array_item_property["type"]]
+            segment_item_property = self._parse_reflekt_property(
+                array_item_property, segment_item_property
+            )
+
+            segment_array_items["items"]["properties"].update(
+                {array_item_property["name"]: segment_item_property}
+            )
+            updated_segment_property.update(segment_array_items)
+
+            if "required" in array_item_property and array_item_property["required"]:
+                segment_array_items["items"]["required"].append(
+                    array_item_property["name"]
+                )
+
+    def _parse_object_properties(
+        self, reflekt_property_object_properties, updated_segment_property
+    ):
+        updated_segment_property["properties"] = {}
+        updated_segment_property["required"] = []
+
+        for object_property in reflekt_property_object_properties:
+            segment_object_property = copy.deepcopy(segment_property_schema)
+            segment_object_property["description"] = object_property["description"]
+            segment_object_property["type"] = object_property["type"]
+            segment_object_property = self._parse_reflekt_property(
+                object_property, segment_object_property
+            )
+
+            updated_segment_property["properties"].update(
+                {object_property["name"]: segment_object_property}
+            )
+
+            if "required" in object_property and object_property["required"]:
+                updated_segment_property["required"].append(object_property["name"])
 
     def _build_segment_trait(self, reflekt_trait: ReflektTrait) -> dict:
         segment_trait = copy.deepcopy(segment_property_schema)
