@@ -5,6 +5,7 @@
 
 from reflekt.loader import ReflektLoader
 from reflekt.transformer import ReflektTransformer
+
 from tests.build import build_reflekt_plan_dir
 
 
@@ -108,20 +109,18 @@ def test_reflekt_transformer_segment(tmpdir):
         ]
         == "The 1st key in the object dictionary."
     )
-    assert (
-        segment_plan_event_props["property_seven"]["properties"]["key_one"]["type"]
-        == "string"
-    )
+    assert segment_plan_event_props["property_seven"]["properties"]["key_one"][
+        "type"
+    ] == ["string"]
     assert (
         segment_plan_event_props["property_seven"]["properties"]["key_two"][
             "description"
         ]
         == "The 2nd key in the object dictionary."
     )
-    assert (
-        segment_plan_event_props["property_seven"]["properties"]["key_two"]["type"]
-        == "number"
-    )
+    assert segment_plan_event_props["property_seven"]["properties"]["key_two"][
+        "type"
+    ] == ["number"]
     assert (
         segment_plan_event_props["property_eight"]["description"]
         == "A date-time property."
