@@ -28,7 +28,7 @@ class ReflektEvent(object):
             self.name: str = self._event_yaml_obj.get("name")
             self.description: str = self._event_yaml_obj.get("description")
             self.metadata: dict = self._event_yaml_obj.get("metadata")
-            self.properties: list = [
+            self.properties: list[ReflektProperty] = [
                 ReflektProperty(property)
                 for property in self._event_yaml_obj["properties"]
             ]
