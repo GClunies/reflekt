@@ -121,6 +121,7 @@ class ReflektTransformer(object):
                 segment_plan["rules"]["events"].append(segment_event)
 
         if reflekt_plan.user_traits != []:
+            logger.info("    Converting user traits")
             for reflekt_identify_trait in reflekt_plan.user_traits:
                 segment_identify_trait = self._build_segment_trait(
                     reflekt_identify_trait
@@ -136,6 +137,7 @@ class ReflektTransformer(object):
                 ].update({reflekt_identify_trait.name: segment_identify_trait})
 
         if reflekt_plan.group_traits != []:
+            logger.info("    Converting group traits")
             for reflekt_group_trait in reflekt_plan.group_traits:
                 segment_group_trait = self._build_segment_trait(reflekt_group_trait)
 
