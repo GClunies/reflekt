@@ -828,49 +828,29 @@ cli.add_command(dbt)
 
 # Used for CLI debugging
 if __name__ == "__main__":
-    # Call CLI command here with arguments as a list
+
+    # ----- GENERAL -----
     # init(["--project-dir", "~/Repos/test-repo"])
-    # new(["--project-dir", "test-plan"])
-    # pull(["--name", "my-plan"])
-    # push(["--name", "my-plan"])
-    # test(
-    #     [
-    #         "--name",
-    #         "surfline-web",
-    #         "-e",
-    #         "order-completed",
-    #     ]
-    # )
-    # dbt(
-    #     [
-    #         "--name",
-    #         "my-plan",
-    #         # "-e",
-    #         # "order-completed",
-    #         "--schema",
-    #         "my_app_web",
-    #         "--force-version",
-    #         "0.1.0",
-    #         "--skip-git",
-    #     ]
-    # )
-    # pull(["--name", "tracking-plan-example"])
-    # push(["--name", "tracking-plan-example"])
-    # test(["--name", "tracking-plan-example"])
-    # push(
-    #     [
-    #         "--name",
-    #         "tracking-plan-example-dev",
-    #         "-u",
-    #         "test-event-four",
-    #     ]
-    # )
-    push(
-        [
-            "--name",
-            "tracking-plan-example-dev",
-            # "-u",
-            # "test-event-four",
-            "--dry",
-        ]
-    )
+    # new(["--project-dir", "my-new-plan"])
+
+    # ----- AVO -----
+    # pull(["-n", "my-avo-plan"])
+    # pull(["-n", "my-avo-plan"], "--raw")
+    # pull(["-n", "my-avo-plan", "--avo-branch", "staging"])
+
+    # ----- SEGMENT -----
+    # pull(["-n", "my-segment-plan"])
+    # pull(["-n", "my-segment-plan"], "--raw")
+    # push(["-n", "my-segment-plan"])
+    # push(["-n", "my-segment-plan", "--dry"])
+    # push(["-n", "my-segment-plan", "-u", "new-event"])
+    # push(["-n", "my-segment-plan", "-r", "new-event"])
+
+    # ----- REFLEKT -----
+    test(["-n", "my-segment-plan"])
+    # test(["-n", "my-segment-plan", "-e", "order-completed"])
+
+    # dbt(["-n", "my-segment-plan"])
+    # dbt(["-n", "my-segment-plan", "-e", "order-completed")]
+    # dbt(["-n", "my-segment-plan", "-e", "user-traits"])
+    # dbt(["-n", "my-segment-plan", "-e", "group-traits"])
