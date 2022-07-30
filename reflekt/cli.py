@@ -429,7 +429,7 @@ def push(plan_name, dry, update_events, remove_events, update_traits) -> None:
 
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
 
-    # Check for compatible arguments
+    # Check for incompatible arguments
     if (
         (update_events != () and remove_events != ())
         or (update_events != () and update_traits != ())
