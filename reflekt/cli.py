@@ -414,7 +414,7 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
     required=False,
     help=(
         "Update user or group traits. Specify traits using kebab-case "
-        "(e.g. user-traits)."
+        "(e.g. user-traits, group-traits)."
     ),
 )
 @click.command()

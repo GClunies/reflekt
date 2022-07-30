@@ -82,9 +82,7 @@ class ReflektLoader(object):
             events_to_parse = glob_paths
 
         for file in events_to_parse:
-            logger.info(
-                f"    Parsing event file {file.name}",
-            )
+            logger.info(f"    Parsing event file {file.name}")
 
             with open(file, "r") as event_file:
                 yaml_event_obj = yaml.safe_load(event_file)
