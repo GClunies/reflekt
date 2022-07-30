@@ -429,6 +429,15 @@ def push(plan_name, dry, update_events, remove_events, update_traits) -> None:
 
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
 
+    # Check for compatible arguments
+    if (
+        (update_events != () and remove_events != ())
+        or (update_events != () and update_traits != ())
+        or (remove_events != () and update_traits != ())
+    ):
+        logger.error("--update, --remove, and --traits arguments cannot be combined!")
+        raise SystemExit(1)
+
     if update_events != ():
         logger.warning(
             f"--update flag detected. Searching {titleize(config.plan_type)} for "
