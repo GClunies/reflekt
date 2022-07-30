@@ -515,6 +515,29 @@ def push(plan_name, dry, update_events, remove_events, update_traits) -> None:
         cdp_plan["tracking_plan"]["rules"]["identify"] = existing_identify
         cdp_plan["tracking_plan"]["rules"]["group"] = existing_group
 
+    elif update_traits != ():
+        logger.warning(
+            f"--traits flag detected. Searching {titleize(config.plan_type)} for "
+            f"existing tracking plan '{plan_name}'"
+        )
+        existing_plan_json = api.get(plan_name)  # Get the existing plan
+        logger.info("")  # Terminal newline
+        logger.info(f"Found existing tracking plan '{plan_name}'")
+        update_str = ", ".join("'" + trait + "'" for trait in update_traits)
+        logger.info("")  # Terminal newline
+        logger.info(f"Updating traits(s): {update_str}, to tracking plan {plan_name}")
+        loader = ReflektLoader(plan_dir=plan_dir, traits=update_traits)
+        reflekt_plan = loader.plan
+        transformer = ReflektTransformer(reflekt_plan)
+        proposed_plan_json = (  # This will only have traits. No events
+            transformer.build_cdp_plan()
+        )
+
+        cdp_plan = copy.deepcopy(proposed_plan_json)
+        cdp_plan["tracking_plan"]["rules"]["events"] = existing_plan_json["rules"][
+            "events"
+        ]
+
     else:
         logger.info(f"Loading Reflekt tracking plan '{plan_name}'")
 
@@ -856,9 +879,10 @@ if __name__ == "__main__":
     # push(["-n", "my-segment-plan", "--dry"])
     # push(["-n", "my-segment-plan", "-u", "new-event"])
     # push(["-n", "my-segment-plan", "-r", "new-event"])
+    push(["-n", "test-plan", "-t", "user-traits"])
 
     # ----- REFLEKT -----
-    test(["-n", "my-segment-plan"])
+    # test(["-n", "my-segment-plan"])
     # test(["-n", "my-segment-plan", "-e", "order-completed"])
 
     # dbt(["-n", "my-segment-plan"])

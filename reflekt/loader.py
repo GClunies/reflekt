@@ -32,9 +32,8 @@ class ReflektLoader(object):
             self.traits = traits
             if self.traits != () and self.traits is not None:
                 if (
-                    self.traits != ("user-traits")
-                    or self.traits != ("group-traits")
-                    or self.traits != ("user-traits", "group-traits")
+                    "user-traits" not in self.traits
+                    and "group-traits" not in self.traits
                 ):
                     logger.error(
                         "--traits argument must specify 'user-traits' "
@@ -61,13 +60,18 @@ class ReflektLoader(object):
         if not dir_path.exists():
             return
 
+        if self.traits != () and self.traits is not None:
+            return  # Don't parse events if traits are explicitly provided
+
         glob_paths = sorted(Path(dir_path).glob("**/*.yml"))
 
         if self.events != () and self.events is not None:
             event_paths = []
+
             for event in self.events:
                 event_paths.append(self.plan_dir / "events" / f"{event}.yml")
                 events_to_parse = []
+
                 for event_path in event_paths:
                     if event_path not in glob_paths:
                         logger.error(
@@ -77,7 +81,6 @@ class ReflektLoader(object):
                         raise SystemExit(1)
 
                     events_to_parse.append(event_path)
-
         else:
             events_to_parse = glob_paths
 
@@ -92,6 +95,9 @@ class ReflektLoader(object):
     def _load_user_traits(self, path: Path) -> None:
         if not path.exists():
             return
+
+        if self.events != () and self.events is not None:
+            return  # Don't parse traits if events are explicitly provided
 
         parse_user_traits = True
 
@@ -110,6 +116,9 @@ class ReflektLoader(object):
     def _load_group_traits(self, path) -> None:
         if not path.exists():
             return
+
+        if self.events != () and self.events is not None:
+            return  # Don't parse traits if events are explicitly provided
 
         parse_group_traits = True
 
