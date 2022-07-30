@@ -30,7 +30,6 @@ class ReflektLoader(object):
             self.events = events
             self._load_plan_file(plan_dir / "plan.yml")
             self._load_events(plan_dir / "events")
-            # self._load_events(plan_dir / "events", self.events)
             self._load_user_traits(plan_dir / "user-traits.yml")
             self._load_group_traits(plan_dir / "group-traits.yml")
             self.plan.validate_plan()

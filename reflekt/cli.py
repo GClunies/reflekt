@@ -382,16 +382,6 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
     help="Output JSON to be synced, without actually syncing it.",
 )
 @click.option(
-    "--dev",
-    "dev",
-    is_flag=True,
-    required=False,
-    help=(
-        "When syncing plan, add suffix '-dev' to the plan name, for use in "
-        "dev/staging/QA environments."
-    ),
-)
-@click.option(
     "-u",
     "--update",
     "update_events",
@@ -416,7 +406,7 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
     ),
 )
 @click.command()
-def push(plan_name, dry, dev, update_events, remove_events) -> None:
+def push(plan_name, dry, update_events, remove_events) -> None:
     """Sync tracking plan to CDP or Analytics Governance tool."""
     api = ReflektApiHandler().get_api()
     config = ReflektConfig()
