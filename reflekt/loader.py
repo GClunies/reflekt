@@ -23,23 +23,16 @@ class ReflektLoader(object):
         plan_dir: Path,
         schema_name: Optional[str] = None,
         events: Optional[tuple] = None,
-        traits: Optional[tuple] = None,
+        user_traits: Optional[tuple] = None,
+        group_traits: Optional[tuple] = None,
     ) -> None:
         if ReflektProject().exists:
             self.schema_name = schema_name
             self.plan_dir = plan_dir
             self.events = events
-            self.traits = traits
-            if self.traits != () and self.traits is not None:
-                if (
-                    "user-traits" not in self.traits
-                    and "group-traits" not in self.traits
-                ):
-                    logger.error(
-                        "--traits argument must specify 'user-traits' "
-                        "and/or 'group-traits'"
-                    )
-                    raise SystemExit(1)
+            self.user_traits = user_traits
+            self.group_traits = group_traits
+
             self._load_plan_file(plan_dir / "plan.yml")
             self._load_events(plan_dir / "events")
             self._load_user_traits(plan_dir / "user-traits.yml")
@@ -60,8 +53,8 @@ class ReflektLoader(object):
         if not dir_path.exists():
             return
 
-        if self.traits != () and self.traits is not None:
-            return  # Don't parse events if traits are explicitly provided
+        if self.events == ():
+            return
 
         glob_paths = sorted(Path(dir_path).glob("**/*.yml"))
 
@@ -96,13 +89,13 @@ class ReflektLoader(object):
         if not path.exists():
             return
 
-        if self.events != () and self.events is not None:
-            return  # Don't parse traits if events are explicitly provided
+        if self.user_traits == ():
+            return
 
         parse_user_traits = True
 
-        if self.traits != () and self.traits is not None:
-            if "user-traits" not in self.traits:
+        if self.user_traits != () and self.user_traits is not None:
+            if "user-traits" not in self.user_traits:
                 parse_user_traits = False
 
         if parse_user_traits:
@@ -117,13 +110,13 @@ class ReflektLoader(object):
         if not path.exists():
             return
 
-        if self.events != () and self.events is not None:
-            return  # Don't parse traits if events are explicitly provided
+        if self.group_traits == ():
+            return
 
         parse_group_traits = True
 
-        if self.traits != () and self.traits is not None:
-            if "group-traits" not in self.traits:
+        if self.group_traits != () and self.group_traits is not None:
+            if "group-traits" not in self.group_traits:
                 parse_group_traits = False
 
         if parse_group_traits:
