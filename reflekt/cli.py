@@ -24,7 +24,10 @@ from reflekt.loader import ReflektLoader
 from reflekt.logger import logger_config
 from reflekt.project import ReflektProject
 from reflekt.segment.plan import SegmentPlan
-from reflekt.segment.schema import segment_payload_schema, segment_plan_schema
+from reflekt.segment.schema import (  # TODO: Likely need a handler for these schema if build out Rudderstack & Snowplow  # noqa: E501
+    segment_payload_schema,
+    segment_plan_schema,
+)
 from reflekt.transformer import ReflektTransformer
 from reflekt.utils import segment_2_snake
 
