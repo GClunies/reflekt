@@ -413,8 +413,8 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
     multiple=True,
     required=False,
     help=(
-        "Update traits based on  specified event (kebab-case) to the tracking plan. "
-        "Removes all versions of event."
+        "Update user or group traits. Specify traits using kebab-case "
+        "(e.g. user-traits)."
     ),
 )
 @click.command()

@@ -23,11 +23,24 @@ class ReflektLoader(object):
         plan_dir: Path,
         schema_name: Optional[str] = None,
         events: Optional[tuple] = None,
+        traits: Optional[tuple] = None,
     ) -> None:
         if ReflektProject().exists:
             self.schema_name = schema_name
             self.plan_dir = plan_dir
             self.events = events
+            self.traits = traits
+            if self.traits != () and self.traits is not None:
+                if (
+                    self.traits != ("user-traits")
+                    or self.traits != ("group-traits")
+                    or self.traits != ("user-traits", "group-traits")
+                ):
+                    logger.error(
+                        "--traits argument must specify 'user-traits' "
+                        "and/or 'group-traits'"
+                    )
+                    raise SystemExit(1)
             self._load_plan_file(plan_dir / "plan.yml")
             self._load_events(plan_dir / "events")
             self._load_user_traits(plan_dir / "user-traits.yml")
@@ -82,44 +95,34 @@ class ReflektLoader(object):
         if not path.exists():
             return
 
-        else:
-            parse_user_traits = True
+        parse_user_traits = True
 
-            if self.events != () and self.events is not None:
-                if "user-traits" in self.events:
-                    parse_user_traits = True
-                else:
-                    parse_user_traits = False
+        if self.traits != () and self.traits is not None:
+            if "user-traits" not in self.traits:
+                parse_user_traits = False
 
-            if parse_user_traits:
-                logger.info(
-                    "    Parsing user traits file user-traits.yml",
-                )
+        if parse_user_traits:
+            logger.info("    Parsing user traits file user-traits.yml")
 
-                with open(path, "r") as identify_file:
-                    yaml_obj = yaml.safe_load(identify_file)
-                    for trait in yaml_obj.get("traits", []):
-                        self.plan.add_user_trait(trait)
+            with open(path, "r") as identify_file:
+                yaml_obj = yaml.safe_load(identify_file)
+                for trait in yaml_obj.get("traits", []):
+                    self.plan.add_user_trait(trait)
 
     def _load_group_traits(self, path) -> None:
         if not path.exists():
             return
 
-        else:
-            parse_group_traits = True
+        parse_group_traits = True
 
-            if self.events != () and self.events is not None:
-                if "user-traits" in self.events:
-                    parse_group_traits = True
-                else:
-                    parse_group_traits = False
+        if self.traits != () and self.traits is not None:
+            if "group-traits" not in self.traits:
+                parse_group_traits = False
 
-            if parse_group_traits:
-                logger.info(
-                    "    Parsing group traits file user-traits.yml",
-                )
+        if parse_group_traits:
+            logger.info("    Parsing group traits file group-traits.yml")
 
-                with open(path, "r") as group_file:
-                    yaml_obj = yaml.safe_load(group_file)
-                    for trait in yaml_obj.get("traits", []):
-                        self.plan.add_group_trait(trait)
+            with open(path, "r") as group_file:
+                yaml_obj = yaml.safe_load(group_file)
+                for trait in yaml_obj.get("traits", []):
+                    self.plan.add_group_trait(trait)
