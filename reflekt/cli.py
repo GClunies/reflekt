@@ -306,7 +306,7 @@ def new(plan_name: str) -> None:
     with open(plan_yml_file, "r") as f:
         doc = yaml.safe_load(f)
 
-    doc["display_name"] = plan_name
+    doc["name"] = plan_name
 
     with open(plan_yml_file, "w") as f:
         yaml.dump(doc, f)
@@ -405,8 +405,20 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
         "Removes all versions of event."
     ),
 )
+@click.option(
+    "-t",
+    "--traits",
+    "update_traits",
+    type=str,
+    multiple=True,
+    required=False,
+    help=(
+        "Update traits based on  specified event (kebab-case) to the tracking plan. "
+        "Removes all versions of event."
+    ),
+)
 @click.command()
-def push(plan_name, dry, update_events, remove_events) -> None:
+def push(plan_name, dry, update_events, remove_events, update_traits) -> None:
     """Sync tracking plan to CDP or Analytics Governance tool."""
     api = ReflektApiHandler().get_api()
     config = ReflektConfig()

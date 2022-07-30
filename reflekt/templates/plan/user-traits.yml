@@ -1,5 +1,5 @@
 # Identify traits spec. Modify/add/delete traits below for your tracking needs.
-traits:
+traits:  # Can be empty list
   - name: trait_one
     description: Example identify trait 1
     type: string
