@@ -39,8 +39,11 @@ class ReflektLoader(object):
             self._load_group_traits(plan_dir / "group-traits.yml")
             self.plan.validate_plan()
 
-    def _load_plan_file(self, path: Path) -> None:
-        with open(path, "r") as plan_file:
+    def _load_plan_file(self, plan_path: Path) -> None:
+        if not plan_path.exists():
+            logger.error(f"Tracking plan missing plan file. Should be at: {plan_path}")
+
+        with open(plan_path, "r") as plan_file:
             yaml_obj = yaml.safe_load(plan_file)
             self.plan_name = yaml_obj["name"]  # Set plan name from plan.yml
             self.plan = ReflektPlan(
@@ -49,14 +52,18 @@ class ReflektLoader(object):
                 schema_name=self.schema_name,
             )
 
-    def _load_events(self, dir_path: Path) -> None:
-        if not dir_path.exists():
-            return
+    def _load_events(self, events_path: Path) -> None:
+        if not events_path.exists():
+            logger.error(
+                f"Tracking plan missing events. Events should be "
+                f"defined at (one file per event): {events_path}"
+            )
+            raise SystemExit(1)
 
         if self.events == ():
             return
 
-        glob_paths = sorted(Path(dir_path).glob("**/*.yml"))
+        glob_paths = sorted(Path(events_path).glob("**/*.yml"))
 
         if self.events != () and self.events is not None:
             event_paths = []
@@ -85,9 +92,13 @@ class ReflektLoader(object):
                 for event_version in yaml_event_obj:
                     self.plan.add_event(event_version)
 
-    def _load_user_traits(self, path: Path) -> None:
-        if not path.exists():
-            return
+    def _load_user_traits(self, user_traits_path: Path) -> None:
+        if not user_traits_path.exists():
+            logger.error(
+                f"Tracking plan missing user traits. User traits should be "
+                f"defined in: {user_traits_path}"
+            )
+            raise SystemExit(1)
 
         if self.user_traits == ():
             return
@@ -101,14 +112,18 @@ class ReflektLoader(object):
         if parse_user_traits:
             logger.info("    Parsing user traits file user-traits.yml")
 
-            with open(path, "r") as identify_file:
+            with open(user_traits_path, "r") as identify_file:
                 yaml_obj = yaml.safe_load(identify_file)
                 for trait in yaml_obj.get("traits", []):
                     self.plan.add_user_trait(trait)
 
-    def _load_group_traits(self, path) -> None:
-        if not path.exists():
-            return
+    def _load_group_traits(self, group_traits_path) -> None:
+        if not group_traits_path.exists():
+            logger.error(
+                f"Tracking plan missing group traits. Group traits should be "
+                f"defined in: {group_traits_path}"
+            )
+            raise SystemExit(1)
 
         if self.group_traits == ():
             return
@@ -122,7 +137,7 @@ class ReflektLoader(object):
         if parse_group_traits:
             logger.info("    Parsing group traits file group-traits.yml")
 
-            with open(path, "r") as group_file:
+            with open(group_traits_path, "r") as group_file:
                 yaml_obj = yaml.safe_load(group_file)
                 for trait in yaml_obj.get("traits", []):
                     self.plan.add_group_trait(trait)
