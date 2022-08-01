@@ -6,10 +6,12 @@
 
 from pathlib import Path
 from typing import Optional
+from xmlrpc.client import boolean
 
 import yaml
 from loguru import logger
 
+from reflekt.config import ReflektConfig
 from reflekt.plan import ReflektPlan
 from reflekt.project import ReflektProject
 
@@ -21,14 +23,17 @@ class ReflektLoader(object):
     def __init__(
         self,
         plan_dir: Path,
+        parse_all: boolean = True,
         schema_name: Optional[str] = None,
         events: Optional[tuple] = None,
         user_traits: Optional[tuple] = None,
         group_traits: Optional[tuple] = None,
     ) -> None:
         if ReflektProject().exists:
-            self.schema_name = schema_name
+            self.config = ReflektConfig()
             self.plan_dir = plan_dir
+            self.parse_all = parse_all
+            self.schema_name = schema_name
             self.events = events
             self.user_traits = user_traits
             self.group_traits = group_traits
@@ -55,17 +60,16 @@ class ReflektLoader(object):
     def _load_events(self, events_path: Path) -> None:
         if not events_path.exists():
             logger.error(
-                f"Tracking plan missing events. Events should be "
+                f"Tracking plan missing events/ directory. Events should be "
                 f"defined at (one file per event): {events_path}"
             )
             raise SystemExit(1)
 
-        if self.events == ():
-            return
-
         glob_paths = sorted(Path(events_path).glob("**/*.yml"))
 
-        if self.events != () and self.events is not None:
+        if self.parse_all:
+            events_to_parse = glob_paths
+        elif self.events != () and self.events is not None:
             event_paths = []
 
             for event in self.events:
@@ -81,60 +85,49 @@ class ReflektLoader(object):
                         raise SystemExit(1)
 
                     events_to_parse.append(event_path)
-        else:
-            events_to_parse = glob_paths
+        else:  # No events found. Return None
+            return
 
-        for file in events_to_parse:
-            logger.info(f"    Parsing event file {file.name}")
+        if events_to_parse != []:
+            for file in events_to_parse:
+                logger.info(f"    Parsing event file {file.name}")
 
-            with open(file, "r") as event_file:
-                yaml_event_obj = yaml.safe_load(event_file)
-                for event_version in yaml_event_obj:
-                    self.plan.add_event(event_version)
+                with open(file, "r") as event_file:
+                    yaml_event_obj = yaml.safe_load(event_file)
+                    for event_version in yaml_event_obj:
+                        self.plan.add_event(event_version)
 
     def _load_user_traits(self, user_traits_path: Path) -> None:
-        if not user_traits_path.exists():
+        if self.config.plan_type == "avo":  # Avo plans have no user trait for now
+            return
+        elif not user_traits_path.exists():
             logger.error(
                 f"Tracking plan missing user traits. User traits should be "
                 f"defined in: {user_traits_path}"
             )
             raise SystemExit(1)
-
-        if self.user_traits == ():
-            return
-
-        parse_user_traits = True
-
-        if self.user_traits != () and self.user_traits is not None:
-            if "user-traits" not in self.user_traits:
-                parse_user_traits = False
-
-        if parse_user_traits:
+        elif self.parse_all or (self.user_traits != () and self.user_traits is not None):
             logger.info("    Parsing user traits file user-traits.yml")
 
             with open(user_traits_path, "r") as identify_file:
                 yaml_obj = yaml.safe_load(identify_file)
                 for trait in yaml_obj.get("traits", []):
                     self.plan.add_user_trait(trait)
+        else:  # No user traits found. Return None
+            return
 
     def _load_group_traits(self, group_traits_path) -> None:
-        if not group_traits_path.exists():
+        if self.config.plan_type == "avo":  # Avo plans have no user trait for now
+            return
+        elif not group_traits_path.exists():
             logger.error(
                 f"Tracking plan missing group traits. Group traits should be "
                 f"defined in: {group_traits_path}"
             )
             raise SystemExit(1)
-
-        if self.group_traits == ():
-            return
-
-        parse_group_traits = True
-
-        if self.group_traits != () and self.group_traits is not None:
-            if "group-traits" not in self.group_traits:
-                parse_group_traits = False
-
-        if parse_group_traits:
+        elif self.parse_all or (
+            self.group_traits != () and self.group_traits is not None
+        ):
             logger.info("    Parsing group traits file group-traits.yml")
 
             with open(group_traits_path, "r") as group_file:
