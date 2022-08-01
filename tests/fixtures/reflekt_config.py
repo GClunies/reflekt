@@ -2,10 +2,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+# String below is set as a GitHub secret, used to run pytest in Github Actions
+
 REFLEKT_CONFIG = """
-my_app:
+my_app_segment:
   cdp: segment
-  plan_type: avo
+  plan_type: segment
   warehouse:
     snowflake:
       account: dummy_account

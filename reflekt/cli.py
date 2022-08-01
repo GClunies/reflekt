@@ -450,6 +450,7 @@ def push(plan_name, dry, updates, removes) -> None:
         logger.info(f"Updating tracking plan {plan_name}")
         loader = ReflektLoader(
             plan_dir=plan_dir,
+            parse_all=False,
             events=update_events,
             user_traits=update_user_traits,
             group_traits=update_group_traits,
@@ -572,13 +573,13 @@ def push(plan_name, dry, updates, removes) -> None:
 
 
 @click.option(
-    "-e",
-    "--event",
-    "events",
+    "-s",
+    "--select",
+    "selection",
     type=str,
     multiple=True,
     required=False,
-    help="Name of a single event to be tested (in kebab-case).",
+    help="Selected event or traits to be tested (specified in kebab-case).",
 )
 @click.option(
     "-n",
@@ -586,22 +587,41 @@ def push(plan_name, dry, updates, removes) -> None:
     "plan_name",
     type=str,
     required=True,
-    help="Name of tracking plan to be tested (in kebab-case).",
+    help="Name of tracking plan to be tested (specified in kebab-case).",
 )
 @click.command()
-def test(plan_name, events) -> None:
+def test(plan_name, selection) -> None:
     """Test tracking plan schema for naming, data types, and metadata."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
     logger.info(f"Testing Reflekt tracking plan '{plan_name}'")
 
-    # Initialize ReflektLoader() always runs checks. Simple, not elegant.
-    ReflektLoader(
-        plan_dir=plan_dir,
-        events=events,
-    )
+    if selection != ():
+        # Determine what needs to be updated based on --update arg
+        selected_events = tuple(
+            selected
+            for selected in selection
+            if selected not in ("user-traits", "group-traits")
+        )
+        selected_user_traits = tuple(
+            selected for selected in selection if selected == "user-traits"
+        )
+        selected_group_traits = tuple(
+            selected for selected in selection if selected == "group-traits"
+        )
+
+        # Initialize ReflektLoader() always runs checks. Simple, not elegant.
+        ReflektLoader(
+            plan_dir=plan_dir,
+            parse_all=False,
+            events=selected_events,
+            user_traits=selected_user_traits,
+            group_traits=selected_group_traits,
+        )
+    else:
+        ReflektLoader(plan_dir=plan_dir)
     # If no errors are thrown, passed tests
     logger.info("")
-    logger.success("Testing completed. No errors detected")
+    logger.success("Test complete. No errors.")
 
 
 @click.option(
