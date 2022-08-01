@@ -1,5 +1,5 @@
 # Group traits spec. Modify/add/delete traits below for your tracking needs.
-traits:
+traits:  # Can be empty list
   - name: trait_one
     description: Example group trait 1
     type: string

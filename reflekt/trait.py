@@ -5,7 +5,7 @@
 from reflekt.property import ReflektProperty
 
 
-# Traits behave the same way as properties, but traits capture attributes of a
+# Traits are structurally the same as properties, but capture attributes of a
 # user, not an event.
 class ReflektTrait(ReflektProperty):
     pass

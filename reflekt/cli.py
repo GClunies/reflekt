@@ -24,7 +24,10 @@ from reflekt.loader import ReflektLoader
 from reflekt.logger import logger_config
 from reflekt.project import ReflektProject
 from reflekt.segment.plan import SegmentPlan
-from reflekt.segment.schema import segment_payload_schema, segment_plan_schema
+from reflekt.segment.schema import (  # TODO: Likely need a handler for these schema if build out Rudderstack & Snowplow  # noqa: E501
+    segment_payload_schema,
+    segment_plan_schema,
+)
 from reflekt.transformer import ReflektTransformer
 from reflekt.utils import segment_2_snake
 
@@ -306,7 +309,7 @@ def new(plan_name: str) -> None:
     with open(plan_yml_file, "r") as f:
         doc = yaml.safe_load(f)
 
-    doc["display_name"] = plan_name
+    doc["name"] = plan_name
 
     with open(plan_yml_file, "w") as f:
         yaml.dump(doc, f)
@@ -382,41 +385,31 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
     help="Output JSON to be synced, without actually syncing it.",
 )
 @click.option(
-    "--dev",
-    "dev",
-    is_flag=True,
-    required=False,
-    help=(
-        "When syncing plan, add suffix '-dev' to the plan name, for use in "
-        "dev/staging/QA environments."
-    ),
-)
-@click.option(
     "-u",
     "--update",
-    "update_events",
+    "updates",
     type=str,
     multiple=True,
     required=False,
     help=(
-        "Update/add specified event (kebab-case) to the tracking plan. "
-        "Checks all event versions."
+        "Update/add specified (using kebab-case) event, all user traits, or all "
+        "group traits to a tracking plan. "
     ),
 )
 @click.option(
     "-r",
     "--remove",
-    "remove_events",
+    "removes",
     type=str,
     multiple=True,
     required=False,
     help=(
-        "Remove specified event (kebab-case) to the tracking plan. "
-        "Removes all versions of event."
+        "Remove specified (using kebab-case) event, all user traits, or all group "
+        "traits from a tracking plan."
     ),
 )
 @click.command()
-def push(plan_name, dry, dev, update_events, remove_events) -> None:
+def push(plan_name, dry, updates, removes) -> None:
     """Sync tracking plan to CDP or Analytics Governance tool."""
     api = ReflektApiHandler().get_api()
     config = ReflektConfig()
@@ -427,7 +420,23 @@ def push(plan_name, dry, dev, update_events, remove_events) -> None:
 
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
 
-    if update_events != ():
+    # Check for incompatible arguments
+    if updates != () and removes != ():
+        logger.error("--update and --remove arguments cannot be combined!")
+        raise SystemExit(1)
+
+    if updates != ():
+        # Determine what needs to be updated based on --update arg
+        update_events = tuple(
+            update for update in updates if update not in ("user-traits", "group-traits")
+        )
+        update_user_traits = tuple(
+            update for update in updates if update == "user-traits"
+        )
+        update_group_traits = tuple(
+            update for update in updates if update == "group-traits"
+        )
+        # Get the existing tracking plan that will be updated
         logger.warning(
             f"--update flag detected. Searching {titleize(config.plan_type)} for "
             f"existing tracking plan '{plan_name}'"
@@ -435,62 +444,78 @@ def push(plan_name, dry, dev, update_events, remove_events) -> None:
         existing_plan_json = api.get(plan_name)  # Get the existing plan
         logger.info("")  # Terminal newline
         logger.info(f"Found existing tracking plan '{plan_name}'")
-        update_str = ", ".join("'" + event + "'" for event in update_events)
+
+        # Load a Reflekt tracking, only including items from the --update arg
         logger.info("")  # Terminal newline
-        logger.info(f"Updating event(s): {update_str}, to tracking plan {plan_name}")
-        loader = ReflektLoader(plan_dir=plan_dir, events=update_events)
+        logger.info(f"Updating tracking plan {plan_name}")
+        loader = ReflektLoader(
+            plan_dir=plan_dir,
+            events=update_events,
+            user_traits=update_user_traits,
+            group_traits=update_group_traits,
+        )
         reflekt_plan = loader.plan
         transformer = ReflektTransformer(reflekt_plan)
-        proposed_plan_json = transformer.build_cdp_plan()
+        plan_updates_json = transformer.build_cdp_plan()
         sync_events = []  # Events to sync
 
-        # For all existing events
+        # For existing events - check if they need to be updated
         for existing_event in existing_plan_json["rules"]["events"]:
             match_found = False
             match_event = None
-            for proposed_event in proposed_plan_json["tracking_plan"]["rules"]["events"]:
-                # If proposed event name + version matches, update existing with proposed
+            for updated_event in plan_updates_json["tracking_plan"]["rules"]["events"]:
+                # If updated event name+version matches existing event, use updated event
                 if (
-                    proposed_event["name"] == existing_event["name"]
-                    and proposed_event["version"] == existing_event["version"]
+                    updated_event["name"] == existing_event["name"]
+                    and updated_event["version"] == existing_event["version"]
                 ):
                     match_found = True
-                    match_event = proposed_event
+                    match_event = updated_event
 
-            if match_found:  # Add the proposed event to list of events to sync
+            if match_found:  # If match found, add updated event to sync list
                 sync_events.append(match_event)
-            else:  # Add existing event to list of events to sync
+            else:  # If no match found, add existing event to sync list
                 sync_events.append(existing_event)
 
-        # For all proposed events
-        for proposed_event in proposed_plan_json["tracking_plan"]["rules"]["events"]:
+        # For proposed events - check if they need to be added (not in existing events)
+        for updated_event in plan_updates_json["tracking_plan"]["rules"]["events"]:
             match_found = False
             for existing_event in existing_plan_json["rules"]["events"]:
-                # If we find a match for the proposed event, make note
+                # Check if updated event is already in existing events
                 if (
-                    proposed_event["name"] == existing_event["name"]
-                    and proposed_event["version"] == existing_event["version"]
+                    updated_event["name"] == existing_event["name"]
+                    and updated_event["version"] == existing_event["version"]
                 ):
                     match_found = True
 
-            if not match_found:  # Add proposed event to sync if not in existing
-                sync_events.append(proposed_event)
+            if not match_found:  # Only ADD updated event if NOT found in existing events
+                sync_events.append(updated_event)
 
         # Set the events to sync
-        sync_plan_json = copy.deepcopy(proposed_plan_json)
+        sync_plan_json = copy.deepcopy(plan_updates_json)
         sync_plan_json["tracking_plan"]["rules"]["events"] = sync_events
         cdp_plan = sync_plan_json
 
-    elif remove_events != ():
-        remove_str = ", ".join("'" + event + "'" for event in remove_events)
+    elif removes != ():
+        # Determine what needs to be removed based on --remvoe arg
+        remove_events = tuple(
+            remove
+            for remove in removes
+            if remove != "user-traits" or remove != "group-traits"
+        )
+        remove_user_traits = tuple(
+            remove for remove in removes if remove == "user-traits"
+        )
+        remove_group_traits = tuple(
+            remove for remove in removes if remove == "group-traits"
+        )
+        # Get the existing plan that will have events/traits removed
+        remove_event_str = ", ".join("'" + event + "'" for event in remove_events)
         logger.warning(
-            f"--remove flag detected. Removing event(s): {remove_str}, from "
+            f"--remove flag detected. Removing event(s): {remove_event_str}, from "
             f"tracking plan {plan_name} in {titleize(config.plan_type)}"
         )
-        # Get the existing plan and delete events from existing
         existing_plan_json = api.get(plan_name)
-        existing_identify = existing_plan_json["rules"]["identify"]
-        existing_group = existing_plan_json["rules"]["group"]
         existing_events = existing_plan_json["rules"]["events"]
         sync_events = []  # Events to sync
 
@@ -501,8 +526,16 @@ def push(plan_name, dry, dev, update_events, remove_events) -> None:
         cdp_plan = copy.deepcopy(segment_payload_schema)
         cdp_plan["tracking_plan"].update(segment_plan_schema)
         cdp_plan["tracking_plan"]["rules"]["events"] = sync_events
-        cdp_plan["tracking_plan"]["rules"]["identify"] = existing_identify
-        cdp_plan["tracking_plan"]["rules"]["group"] = existing_group
+
+        if remove_user_traits != ():
+            cdp_plan["tracking_plan"]["rules"]["identify"]["properties"]["traits"][
+                "properties"
+            ] = []
+
+        if remove_group_traits != ():
+            cdp_plan["tracking_plan"]["rules"]["group"]["properties"]["traits"][
+                "properties"
+            ] = []
 
     else:
         logger.info(f"Loading Reflekt tracking plan '{plan_name}'")
@@ -513,8 +546,8 @@ def push(plan_name, dry, dev, update_events, remove_events) -> None:
         )
         reflekt_plan = loader.plan
         transformer = ReflektTransformer(reflekt_plan)
-        proposed_plan_json = transformer.build_cdp_plan()
-        cdp_plan = proposed_plan_json
+        plan_updates_json = transformer.build_cdp_plan()
+        cdp_plan = plan_updates_json
 
     if dry:
         payload = api.sync(plan_name, cdp_plan, dry=True)
@@ -845,9 +878,10 @@ if __name__ == "__main__":
     # push(["-n", "my-segment-plan", "--dry"])
     # push(["-n", "my-segment-plan", "-u", "new-event"])
     # push(["-n", "my-segment-plan", "-r", "new-event"])
+    push(["-n", "test-plan", "-u", "user-traits"])
 
     # ----- REFLEKT -----
-    test(["-n", "my-segment-plan"])
+    # test(["-n", "my-segment-plan"])
     # test(["-n", "my-segment-plan", "-e", "order-completed"])
 
     # dbt(["-n", "my-segment-plan"])

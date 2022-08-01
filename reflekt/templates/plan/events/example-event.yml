@@ -4,7 +4,7 @@
 #    - A template for new events. Copy this file and place in
 #      <my-plan-name>/events/<new-event-name>.yml. Edit as needed.
 - version: 1
-  name: Test Event One
+  name: Example Event
   description: Some description of the event.
   metadata:  # Metadata is optional
     owner: product
