@@ -4,12 +4,14 @@
 
 # flake8: noqa
 
+# String below is set as a GitHub secret, used to run pytest in Github Actions
+
 REFLEKT_PROJECT = """
 name: my_app                            # Set by 'reflekt init'. Reflekt project name
 
-# config_profile: my_app_avo              # Set by 'reflekt init'. Config profile in reflekt_config.yml
-config_profile: my_app_segment
-# config_path: [directorypath]          # OPTIONAL - overrides default path '~/.reflekt/reflekt_config.yml'
+config_profile: my_app_segment          # USE SEGMENT FOR PYTEST - Set by 'reflekt init'. Config profile in reflekt_config.yml
+
+config_path: /home/runner/work/Reflekt/Reflekt/.reflekt/reflekt_config.yml  # OPTIONAL - overrides default path '~/.reflekt/reflekt_config.yml'
 
 tracking_plans:                         # Tracking plan configurations
   warehouse:                            # Specify where event data is in warehouse
@@ -85,5 +87,4 @@ dbt:                                    # dbt configuration
         not_null: true
         unique: true
       in_folder: false            # Write docs in models/docs/ folder?
-
 """
