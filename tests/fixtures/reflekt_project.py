@@ -11,7 +11,7 @@ name: my_app                            # Set by 'reflekt init'. Reflekt project
 
 config_profile: my_app_segment          # USE SEGMENT FOR PYTEST - Set by 'reflekt init'. Config profile in reflekt_config.yml
 
-config_path: /home/runner/work/Reflekt/Reflekt/.reflekt/reflekt_config.yml  # OPTIONAL - overrides default path '~/.reflekt/reflekt_config.yml'
+config_path: /home/runner/work/Reflekt/Reflekt/.reflekt/reflekt_config.yml  # REQUIRED FOR CI SUITE - CASE SENSITIVE PATH
 
 tracking_plans:                         # Tracking plan configurations
   warehouse:                            # Specify where event data is in warehouse
