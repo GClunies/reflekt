@@ -7,21 +7,20 @@
 REFLEKT_PROJECT = """
 name: my_app                            # Set by 'reflekt init'. Reflekt project name
 
-config_profile: my_app                  # Set by 'reflekt init'. Config profile in reflekt_config.yml
+# config_profile: my_app_avo              # Set by 'reflekt init'. Config profile in reflekt_config.yml
+config_profile: my_app_segment
 # config_path: [directorypath]          # OPTIONAL - overrides default path '~/.reflekt/reflekt_config.yml'
 
 tracking_plans:                         # Tracking plan configurations
   warehouse:                            # Specify where event data is in warehouse
     database:                           # Database configuration
-      my-plan: raw                      # Specify database where event data is loaded
-      test-plan: raw
+      my-avo-plan: raw                  # Specify database where event data is loaded
+      my-segment-plan: raw
     schema:                             # Schema configuration
-      my-plan:                          # Config events in tracking plan 'my-plan'
+      my-avo-plan:                          # Config events in tracking plan 'my-plan'
         - schema: my_app_web            # Specify schema where event data is loaded
-        - schema: my_app_web_staging    # Specify schema where event data is loaded
-      my-other-plan:                    # Config events in tracking plan 'test-plan'
-        - schema: bad_schema_name       # Specify schema where event data is loaded
-          schema_alias: my_app_ios      # OPTIONAL - rename 'poorly_named_schema' -> 'my_app_ios' when templating dbt package
+      my-segment-plan:
+        - schema: my_app_web
 
   events:                               # Event configurations
     naming:                             # Naming convention config
@@ -29,30 +28,27 @@ tracking_plans:                         # Tracking plan configurations
       allow_numbers: false              # true|false
       reserved: []                      # Reserved event names (casing matters)
 
-    # OPTIONAL (expected_metadata:)
-    # Define a schema for expected event metadata. Tested when running:
-    #     reflekt test --name <plan-name>
-    expected_metadata:                  # OPTIONAL metadata configuration
-      # Define a schema for expected event metadata. Tested when running:
-      #     reflekt test --name <plan-name>
-      product_owner:
-        type: string
-        required: true
-        allowed:
-          - Maura
-          - Greg
-      code_owner:
-        required: true
-        type: string
-        allowed:
-          - Maura
-          - Greg
-      stakeholders:
-        type: string
-        allowed:
-          - Product
-          - Engineering
-          - Data
+    # expected_metadata:                  # OPTIONAL metadata configuration
+    #   # Define a schema for expected event metadata. Tested when running:
+    #   #     reflekt test --name <plan-name>
+    #   product_owner:
+    #     type: string
+    #     required: true
+    #     allowed:
+    #       - Maura
+    #       - Greg
+    #   code_owner:
+    #     required: true
+    #     type: string
+    #     allowed:
+    #       - Maura
+    #       - Greg
+    #   stakeholders:
+    #     type: string
+    #     allowed:
+    #       - Product
+    #       - Engineering
+    #       - Data
 
   properties:                           # Event Property configurations
     naming:                             # Naming convention config
@@ -89,4 +85,5 @@ dbt:                                    # dbt configuration
         not_null: true
         unique: true
       in_folder: false            # Write docs in models/docs/ folder?
+
 """

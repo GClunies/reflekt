@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 REFLEKT_CONFIG = """
-my_app:
+my_app_segment:
   cdp: segment
-  plan_type: avo
+  plan_type: segment
   warehouse:
     snowflake:
       account: dummy_account
