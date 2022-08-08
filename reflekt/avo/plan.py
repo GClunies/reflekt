@@ -9,8 +9,7 @@ from pathlib import Path
 import yaml
 from inflection import dasherize, underscore
 from loguru import logger
-
-from reflekt.avo.parser import parse_avo_event
+from reflekt.avo.parser import parse_avo_event, parse_avo_property
 from reflekt.dumper import ReflektYamlDumper
 
 
@@ -32,15 +31,35 @@ class AvoPlan(object):
 
     def build_reflekt(self, plan_dir: Path) -> None:
         events_dir = plan_dir / "events"
-        # If plan directory already exists, remove it.
-        if plan_dir.is_dir():
+
+        if plan_dir.is_dir():  # Always start from a clean Reflekt plan
             shutil.rmtree(plan_dir)
-        # Re-make directories for Reflekt tracking plan(s)
-        for dir in [plan_dir, events_dir]:
+
+        for dir in [plan_dir, events_dir]:  # Remake Reflekt plan directories
             if not dir.exists():
                 dir.mkdir()
 
         self._build_reflekt_plan_file(plan_dir)
+        user_traits_json = None  # TODO - remove when Reflekt pulls from Avo Export API
+        # user_traits_json = (
+        #     self.plan_json.get("rules")  # Segment logic, update once using Export API
+        #     .get("identify", {})
+        #     .get("properties", {})
+        #     .get("traits", {})
+        #     .get("properties")
+        # )
+        logger.info("    Writing Reflekt user traits to user-traits.yml")
+        self._build_reflekt_user_traits(plan_dir, user_traits_json)
+        group_traits_json = None  # TODO - remove when Reflekt pulls from Avo Export API
+        # group_traits_json = (
+        #     self.plan_json.get("rules")  # Segment logic, update once using Export API
+        #     .get("group", {})
+        #     .get("properties", {})
+        #     .get("traits", {})
+        #     .get("properties")
+        # )
+        logger.info("    Writing Reflekt group traits to group-traits.yml")
+        self._build_reflekt_group_traits(plan_dir, group_traits_json)
 
         for event_json in self.plan_json.get("events", []):
             self._build_reflekt_event_file(events_dir, event_json)
@@ -71,6 +90,58 @@ class AvoPlan(object):
         with open(event_file, "w") as f:
             yaml.dump(
                 [event_obj_with_version],
+                f,
+                indent=2,
+                width=70,
+                Dumper=ReflektYamlDumper,
+                sort_keys=False,
+                default_flow_style=False,
+                allow_unicode=True,
+                encoding=("utf-8"),
+            )
+
+    # TODO - update when Reflekt pulls from Avo Export API
+    def _build_reflekt_user_traits(self, plan_dir: Path, user_traits_json: dict):
+        if user_traits_json is None:
+            traits = []
+        else:
+            traits = [
+                parse_avo_property(name, prop_json)
+                for (name, prop_json) in sorted(user_traits_json.items())
+            ]
+
+        traits_obj = {"traits": traits}
+        traits_file = plan_dir / "user-traits.yml"
+
+        with open(traits_file, "w") as f:
+            yaml.dump(
+                traits_obj,
+                f,
+                indent=2,
+                width=70,
+                Dumper=ReflektYamlDumper,
+                sort_keys=False,
+                default_flow_style=False,
+                allow_unicode=True,
+                encoding=("utf-8"),
+            )
+
+    # TODO - update this when Reflekt pulls from Avo Export API
+    def _build_reflekt_group_traits(self, plan_dir: Path, group_traits_json: dict):
+        if group_traits_json is None:
+            traits = []
+        else:
+            traits = [
+                parse_avo_property(name, prop_json)
+                for (name, prop_json) in sorted(group_traits_json.items())
+            ]
+
+        traits_obj = {"traits": traits}
+        traits_file = plan_dir / "group-traits.yml"
+
+        with open(traits_file, "w") as f:
+            yaml.dump(
+                traits_obj,
                 f,
                 indent=2,
                 width=70,

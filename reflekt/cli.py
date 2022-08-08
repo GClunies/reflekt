@@ -892,13 +892,13 @@ if __name__ == "__main__":
     # pull(["-n", "my-avo-plan", "--avo-branch", "staging"])
 
     # ----- SEGMENT -----
-    # pull(["-n", "my-segment-plan"])
+    pull(["-n", "my-segment-plan"])
     # pull(["-n", "my-segment-plan"], "--raw")
     # push(["-n", "my-segment-plan"])
     # push(["-n", "my-segment-plan", "--dry"])
     # push(["-n", "my-segment-plan", "-u", "new-event"])
     # push(["-n", "my-segment-plan", "-r", "new-event"])
-    push(["-n", "test-plan", "-u", "user-traits"])
+    # push(["-n", "test-plan", "-u", "user-traits"])
 
     # ----- REFLEKT -----
     # test(["-n", "my-segment-plan"])
