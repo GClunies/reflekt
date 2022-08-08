@@ -12,7 +12,6 @@ import funcy
 import yaml
 from inflection import dasherize, underscore
 from loguru import logger
-
 from reflekt.dumper import ReflektYamlDumper
 from reflekt.segment.parser import parse_segment_event, parse_segment_property
 
@@ -46,9 +45,10 @@ class SegmentPlan(object):
 
     def build_reflekt(self, plan_dir: Path):
         events_dir = plan_dir / "events"
-        # Always start from a clean Reflekt plan
-        if plan_dir.is_dir():
+
+        if plan_dir.is_dir():  # Always start from a clean Reflekt plan
             shutil.rmtree(plan_dir)
+
         for dir in [plan_dir, events_dir]:
             if not dir.exists():
                 dir.mkdir()
@@ -61,11 +61,8 @@ class SegmentPlan(object):
             .get("traits", {})
             .get("properties")
         )
-
-        if traits_json:
-            logger.info("    Writing Reflekt identify traits to identify.yml")
-            self._build_reflekt_identify_file(plan_dir, traits_json)
-
+        logger.info("    Writing Reflekt user traits to user-traits.yml")
+        self._build_reflekt_user_traits(plan_dir, traits_json)
         group_traits_json = (
             self.plan_json.get("rules")
             .get("group", {})
@@ -73,10 +70,8 @@ class SegmentPlan(object):
             .get("traits", {})
             .get("properties")
         )
-
-        if group_traits_json:
-            logger.info("   Writing Reflekt group traits to group.yml")
-            self._build_reflekt_group_file(plan_dir, group_traits_json)
+        logger.info("    Writing Reflekt group traits to group-traits.yml")
+        self._build_reflekt_group_traits(plan_dir, group_traits_json)
 
         for event_json in self.plan_json.get("rules", {}).get("events", []):
             self._build_reflekt_event_file(events_dir, event_json)
@@ -137,11 +132,15 @@ class SegmentPlan(object):
                     encoding=("utf-8"),
                 )
 
-    def _build_reflekt_identify_file(self, plan_dir: Path, traits_json: dict):
-        traits = [
-            parse_segment_property(name, prop_json)
-            for (name, prop_json) in sorted(traits_json.items())
-        ]
+    def _build_reflekt_user_traits(self, plan_dir: Path, traits_json: dict):
+        if traits_json is None:
+            traits = []
+        else:
+            traits = [
+                parse_segment_property(name, prop_json)
+                for (name, prop_json) in sorted(traits_json.items())
+            ]
+
         traits_obj = {"traits": traits}
         traits_file = plan_dir / "user-traits.yml"
 
@@ -158,11 +157,15 @@ class SegmentPlan(object):
                 encoding=("utf-8"),
             )
 
-    def _build_reflekt_group_file(self, plan_dir: Path, group_traits_json: dict):
-        traits = [
-            parse_segment_property(name, prop_json)
-            for (name, prop_json) in sorted(group_traits_json.items())
-        ]
+    def _build_reflekt_group_traits(self, plan_dir: Path, group_traits_json: dict):
+        if group_traits_json is None:
+            traits = []
+        else:
+            traits = [
+                parse_segment_property(name, prop_json)
+                for (name, prop_json) in sorted(group_traits_json.items())
+            ]
+
         traits_obj = {"traits": traits}
         traits_file = plan_dir / "group-traits.yml"
 
