@@ -16,7 +16,7 @@ REFLEKT_INJECTED_COLUMNS = [  # Columns Reflekt injects when templating
 
 # Columns reserved by Reflekt templater. If found in table, prefix with underscore (_)
 REFLEKT_TEMPLATED_COLUMNS = [
-    "_id",
+    "id",
     "user_id",
     "anonymous_id",
     "user_id",
