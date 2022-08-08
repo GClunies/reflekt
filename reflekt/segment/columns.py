@@ -11,7 +11,6 @@ seg_event_cols = {
             "source_name": "id",
             "schema_name": "event_id",
             "description": "The unique identifier of the event call.",
-            # "tests": ["not_null", "unique"],
             "sql": "id as event_id",
         }
     ],
@@ -165,17 +164,6 @@ seg_event_cols = {
             "description": "The URL of the page that referred the user to the page where the call was invoked.",
             "sql": "context_page_referrer as page_referrer",
         },
-        # {
-        #     "source_name": None,
-        #     "schema_name": "referrer_host",
-        #     "description": "The hostname of the page that referred the user to the page where the call was invoked.",
-        #     "sql": """
-        #     cast(
-        #         replace( {{ dbt_utils.get_url_host('context_page_referrer') }}, 'www.', '')
-        #         as varchar
-        #     ) as referrer_host
-        #     """,
-        # },
     ],
     # Mobile columns
     "context_app_name": [
@@ -234,25 +222,6 @@ seg_event_cols = {
             "description": "The user agent string of the device generating the event.",
             "sql": "context_user_agent as user_agent",
         },
-        # {
-        #     "source_name": None,
-        #     "schema_name": "device",
-        #     "description": "The device that invoked the call.",
-        #     "sql": """
-        #     cast(
-        #         case
-        #             when lower(context_user_agent) like '%android%'
-        #                 then 'Android'
-        #             else replace(
-        #                 {{ dbt_utils.split_part(dbt_utils.split_part('context_user_agent', "'('", 2), "' '", 1) }},
-        #             ';',
-        #             ''
-        #             )
-        #         end
-        #         as varchar
-        #     ) as device
-        #     """,
-        # }
     ],
     "context_device_id": [  # Mobile
         {
@@ -285,18 +254,6 @@ seg_event_cols = {
             "description": "The device that invoked the call.",
             "sql": "context_device_model as device_model",
         },
-        # {
-        #     "source_name": "context_device_model",
-        #     "schema_name": "device",
-        #     "description": "The device that invoked the call.",
-        #     "sql": "regexp_substr(context_device_model, '[a-zA-Z]+') as device",
-        # },
-        # {
-        #     "source_name": None,
-        #     "schema_name": "device_version",
-        #     "description": "The version of the device that invoked the call.",
-        #     "sql": "regexp_replace(regexp_replace(context_device_model, '[a-zA-Z]', ''), ',', '.') as device_version",
-        # },
     ],
     "context_timezone": [  # Mobile
         {
@@ -465,7 +422,7 @@ seg_event_cols = {
         {
             "source_name": "context_protocols_violations",
             "schema_name": "segment_protocols_violations",
-            "description": "A list of Segment Protocols violation (if any) detected when the call was invoked.",
+            "description": "A list of Segment Protocols violations (if any) detected when the call was invoked.",
             "sql": "context_protocols_violations as segment_protocols_violations",
         }
     ],
@@ -640,17 +597,6 @@ seg_tracks_cols = {
             "description": "The URL of the page that referred the user to the page where the call was invoked.",
             "sql": "context_page_referrer as page_referrer",
         },
-        # {
-        #     "source_name": None,
-        #     "schema_name": "referrer_host",
-        #     "description": "The hostname of the page that referred the user to the page where the call was invoked.",
-        #     "sql": """
-        #     cast(
-        #         replace( {{ dbt_utils.get_url_host('context_page_referrer') }}, 'www.', '')
-        #         as varchar
-        #     ) as referrer_host
-        #     """,
-        # },
     ],
     # Mobile columns
     "context_app_name": [
@@ -709,25 +655,6 @@ seg_tracks_cols = {
             "description": "The user agent string of the device generating the event.",
             "sql": "context_user_agent as user_agent",
         },
-        # {
-        #     "source_name": None,
-        #     "schema_name": "device",
-        #     "description": "The device that invoked the call.",
-        #     "sql": """
-        #     cast(
-        #         case
-        #             when lower(context_user_agent) like '%android%'
-        #                 then 'Android'
-        #             else replace(
-        #                 {{ dbt_utils.split_part(dbt_utils.split_part('context_user_agent', "'('", 2), "' '", 1) }},
-        #             ';',
-        #             ''
-        #             )
-        #         end
-        #         as varchar
-        #     ) as device
-        #     """,
-        # }
     ],
     "context_device_id": [  # Mobile
         {
@@ -760,18 +687,6 @@ seg_tracks_cols = {
             "description": "The device that invoked the call.",
             "sql": "context_device_model as device_model",
         },
-        # {
-        #     "source_name": "context_device_model",
-        #     "schema_name": "device",
-        #     "description": "The device that invoked the call.",
-        #     "sql": "regexp_substr(context_device_model, '[a-zA-Z]+') as device",
-        # },
-        # {
-        #     "source_name": None,
-        #     "schema_name": "device_version",
-        #     "description": "The version of the device that invoked the call.",
-        #     "sql": "regexp_replace(regexp_replace(context_device_model, '[a-zA-Z]', ''), ',', '.') as device_version",
-        # },
     ],
     "context_timezone": [  # Mobile
         {
@@ -1196,25 +1111,6 @@ seg_pages_cols = {
             "description": "The user agent string of the device generating the event.",
             "sql": "context_user_agent as user_agent",
         },
-        # {
-        #     "source_name": None,
-        #     "schema_name": "device",
-        #     "description": "The device that invoked the call.",
-        #     "sql": """
-        #     cast(
-        #         case
-        #             when lower(context_user_agent) like '%android%'
-        #                 then 'Android'
-        #             else replace(
-        #                 {{ dbt_utils.split_part(dbt_utils.split_part('context_user_agent', "'('", 2), "' '", 1) }},
-        #             ';',
-        #             ''
-        #             )
-        #         end
-        #         as varchar
-        #     ) as device
-        #     """,
-        # }
     ],
     "context_locale": [
         {
@@ -1443,18 +1339,6 @@ seg_screens_cols = {
             "description": "The device that invoked the call.",
             "sql": "context_device_model as device_model",
         },
-        # {
-        #     "source_name": "context_device_model",
-        #     "schema_name": "device",
-        #     "description": "The device that invoked the call.",
-        #     "sql": "regexp_substr(context_device_model, '[a-zA-Z]+') as device",
-        # },
-        # {
-        #     "source_name": None,
-        #     "schema_name": "device_version",
-        #     "description": "The version of the device that invoked the call.",
-        #     "sql": "regexp_replace(regexp_replace(context_device_model, '[a-zA-Z]', ''), ',', '.') as device_version",
-        # },
     ],
     "context_timezone": [
         {
@@ -1728,22 +1612,6 @@ seg_users_cols = {
             "sql": '"timestamp" as tstamp',
         },
     ],
-    # "anonymous_id": [
-    #     {
-    #         "source_name": "anonymous_id",
-    #         "schema_name": "anonymous_id",
-    #         "description": "A pseudo-unique substitute for a User ID, for cases when we don’t have an absolutely unique identifier.",
-    #         "sql": "anonymous_id",
-    #     },
-    # ],
-    # "user_id": [
-    #     {
-    #         "source_name": "user_id",
-    #         "schema_name": "user_id",
-    #         "description": "Unique identifier for the user.",
-    #         "sql": "user_id",
-    #     },
-    # ],
 }
 
 seg_groups_cols = {
@@ -1812,20 +1680,4 @@ seg_groups_cols = {
             "sql": '"timestamp" as tstamp',
         },
     ],
-    # "anonymous_id": [
-    #     {
-    #         "source_name": "anonymous_id",
-    #         "schema_name": "anonymous_id",
-    #         "description": "A pseudo-unique substitute for a User ID, for cases when we don’t have an absolutely unique identifier.",
-    #         "sql": "anonymous_id",
-    #     },
-    # ],
-    # "group_id": [
-    #     {
-    #         "source_name": "group_id",
-    #         "schema_name": "group_id",
-    #         "description": "Unique identifier for the group.",
-    #         "sql": "group_id",
-    #     },
-    # ],
 }

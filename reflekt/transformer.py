@@ -14,7 +14,7 @@ from loguru import logger
 from packaging.version import Version
 
 from reflekt.config import ReflektConfig
-from reflekt.constants import REFLEKT_RESERVED_COLUMNS, REFLEKT_TEMPLATE_COLUMNS
+from reflekt.constants import REFLEKT_INJECTED_COLUMNS, REFLEKT_TEMPLATED_COLUMNS
 from reflekt.dbt import (
     dbt_column_schema,
     dbt_doc_schema,
@@ -662,11 +662,11 @@ class ReflektTransformer(object):
         mdl_sql += "renamed as (\n\n" "    select"
 
         for column, mapped_columns in cdp_cols.items():
-            if column in db_columns or column in REFLEKT_TEMPLATE_COLUMNS:
+            if column in db_columns or column in REFLEKT_INJECTED_COLUMNS:
                 for mapped_column in mapped_columns:
                     if (
                         mapped_column["source_name"] in db_columns
-                        or column in REFLEKT_TEMPLATE_COLUMNS
+                        or column in REFLEKT_INJECTED_COLUMNS
                     ) and mapped_column["schema_name"] is not None:
                         logger.info(
                             f"    Adding column '{mapped_column['schema_name']}' to "
@@ -685,19 +685,23 @@ class ReflektTransformer(object):
                         mdl_sql += "\n        " + col_sql + ","
 
         for column in plan_cols:
-            if (
-                segment_2_snake(column.name) in db_columns
-                and segment_2_snake(column.name) not in REFLEKT_RESERVED_COLUMNS
-            ):
-                # If the columns is named 'interval', surround in double quotes
+            if segment_2_snake(column.name) in db_columns:
                 column_name = (
                     segment_2_snake(column.name)
-                    if column.name != "interval"  # Handle columns named "interval"
+                    if column.name != "interval"  # Handle column named "interval"
                     else '"interval"'
                 )
-                logger.info(f"    Adding column '{column_name}' to model SQL")
-                col_sql = column_name
-                mdl_sql += "\n        " + col_sql + ","
+
+                if segment_2_snake(column.name) in REFLEKT_TEMPLATED_COLUMNS:
+                    logger.warning(
+                        f"Column {column_name} collides with reserved Reflekt column "
+                        "with the same name. Prefixing with underscore."
+                    )
+                    logger.info(f"    Adding column '_{column_name}' to model SQL")
+                    mdl_sql += f"\n        {column_name} as _{column_name},"
+                else:
+                    logger.info(f"    Adding column '{column_name}' to model SQL")
+                    mdl_sql += f"\n        {column_name},"
 
         mdl_sql = mdl_sql[:-1]  # Remove final trailing comma
         # fmt: off
@@ -806,7 +810,7 @@ class ReflektTransformer(object):
         dbt_mdl_doc["description"] = model_description
 
         for column, mapped_columns in cdp_cols.items():
-            if column in db_columns or column in REFLEKT_TEMPLATE_COLUMNS:
+            if column in db_columns or column in REFLEKT_INJECTED_COLUMNS:
                 for mapped_column in mapped_columns:
                     if mapped_column["schema_name"] is not None:
                         logger.info(
@@ -832,15 +836,25 @@ class ReflektTransformer(object):
                         dbt_mdl_doc["columns"].append(mdl_col)
 
         for column in plan_cols:
-            if (
-                segment_2_snake(column.name) in db_columns
-                and segment_2_snake(column.name) not in REFLEKT_RESERVED_COLUMNS
-            ):
-                logger.info(
-                    f"    Adding column '{segment_2_snake(column.name)}' to docs"
-                )
+            if segment_2_snake(column.name) in db_columns:
                 mdl_col = copy.deepcopy(dbt_column_schema)
-                mdl_col["name"] = segment_2_snake(column.name)
+
+                if segment_2_snake(column.name) in REFLEKT_TEMPLATED_COLUMNS:
+                    logger.warning(
+                        f"Column {segment_2_snake(column.name)} collides with reserved "
+                        f"Reflekt column with the same name. Prefixing with with "
+                        f"underscore."
+                    )
+                    logger.info(
+                        f"    Adding column '_{segment_2_snake(column.name)}' to docs"
+                    )
+                    mdl_col["name"] = f"_{segment_2_snake(column.name)}"
+                else:
+                    logger.info(
+                        f"    Adding column '{segment_2_snake(column.name)}' to docs"
+                    )
+                    mdl_col["name"] = f"{segment_2_snake(column.name)}"
+
                 mdl_col["description"] = column.description
                 dbt_mdl_doc["columns"].append(mdl_col)
 
