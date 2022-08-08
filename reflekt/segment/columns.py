@@ -422,7 +422,7 @@ seg_event_cols = {
         {
             "source_name": "context_protocols_violations",
             "schema_name": "segment_protocols_violations",
-            "description": "A list of Segment Protocols violation (if any) detected when the call was invoked.",
+            "description": "A list of Segment Protocols violations (if any) detected when the call was invoked.",
             "sql": "context_protocols_violations as segment_protocols_violations",
         }
     ],

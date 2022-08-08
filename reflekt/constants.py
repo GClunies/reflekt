@@ -6,7 +6,7 @@ TITLE_CASE_RE = r"[A-Z][a-z]+"
 CAMEL_CASE_RE = r"(^[a-z]|[A-Z])[a-z]*"
 SNAKE_CASE_RE = r"^[a-z._]+$"
 
-REFLEKT_TEMPLATE_COLUMNS = [
+REFLEKT_INJECTED_COLUMNS = [  # Columns Reflekt injects when templating
     "source_schema",
     "source_table",
     "tracking_plan",
@@ -14,9 +14,21 @@ REFLEKT_TEMPLATE_COLUMNS = [
     "call_type",
 ]
 
-REFLEKT_RESERVED_COLUMNS = [
+# Columns reserved by Reflekt templater. If found in table, prefix with underscore (_)
+REFLEKT_TEMPLATED_COLUMNS = [
+    "_id",
     "user_id",
     "anonymous_id",
+    "user_id",
+    "group_id",
+    "page_id",
+    "screen_id",
+    "event_id",
+    "source_schema",
+    "source_table",
+    "tracking_plan",
+    "event_name",
+    "call_type",
 ]
 
 PLANS = [
