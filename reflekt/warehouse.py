@@ -63,13 +63,12 @@ class WarehouseConnection:
         with self.engine.connect() as conn:
             try:
                 conn.detach()
-                columns = (
-                    conn.execute(f"select * from {schema}.{table_name} limit 0")
-                    .keys()
-                    ._keys
-                )
+                query = conn.execute(f"select * from {schema}.{table_name} limit 0")
+                columns = query.keys()._keys
                 error_msg = None
+
                 return columns, error_msg
+
             except sqlalchemy.exc.ProgrammingError as e:
                 columns = None
 

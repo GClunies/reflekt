@@ -892,7 +892,7 @@ if __name__ == "__main__":
     # pull(["-n", "my-avo-plan", "--avo-branch", "staging"])
 
     # ----- SEGMENT -----
-    pull(["-n", "my-segment-plan"])
+    # pull(["-n", "my-segment-plan"])
     # pull(["-n", "my-segment-plan"], "--raw")
     # push(["-n", "my-segment-plan"])
     # push(["-n", "my-segment-plan", "--dry"])
@@ -904,7 +904,7 @@ if __name__ == "__main__":
     # test(["-n", "my-segment-plan"])
     # test(["-n", "my-segment-plan", "-e", "order-completed"])
 
-    # dbt(["-n", "my-segment-plan"])
-    # dbt(["-n", "my-segment-plan", "-e", "order-completed")]
-    # dbt(["-n", "my-segment-plan", "-e", "user-traits"])
-    # dbt(["-n", "my-segment-plan", "-e", "group-traits"])
+    dbt(["-n", "my-segment-plan", "-s", "my_app_web"])
+    # dbt(["-n", "my-segment-plan", "-s", "my_app_web", "-e", "order-completed")]
+    # dbt(["-n", "my-segment-plan", "-s", "my_app_web", "-e", "user-traits"])
+    # dbt(["-n", "my-segment-plan", "-s", "my_app_web", "-e", "group-traits"])
