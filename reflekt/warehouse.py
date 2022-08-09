@@ -62,8 +62,12 @@ class WarehouseConnection:
     ) -> Tuple[Optional[list], Optional[str]]:
         with self.engine.connect() as conn:
             try:
+                # TODO - try different approach to columns.
+                # Maybe: https://stackoverflow.com/questions/38940682/how-can-i-get-column-name-and-type-from-an-existing-table-in-sqlalchemy  # noqa: E501
                 conn.detach()
-                query = conn.execute(f"select * from {schema}.{table_name} limit 0")
+                query = conn.execute(  # This only gets the columns with non-null values
+                    f"select * from {schema}.{table_name} limit 0"
+                )
                 columns = query.keys()._keys
                 error_msg = None
 
