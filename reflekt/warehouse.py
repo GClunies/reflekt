@@ -60,14 +60,15 @@ class WarehouseConnection:
     def get_columns(
         self, schema: str, table_name: str
     ) -> Tuple[Optional[list], Optional[str]]:
+        # NOTE: Tried below to get columns with all null values. Did not work.
+        # inspector = sqlalchemy.inspect(self.engine)
+        # columns = inspector.get_columns(table_name, schema)
+
         with self.engine.connect() as conn:
             try:
-                # TODO - try different approach to columns.
-                # Maybe: https://stackoverflow.com/questions/38940682/how-can-i-get-column-name-and-type-from-an-existing-table-in-sqlalchemy  # noqa: E501
-                conn.detach()
-                query = conn.execute(  # This only gets the columns with non-null values
-                    f"select * from {schema}.{table_name} limit 0"
-                )
+                # This only gets the columns with non-null values, If column is all
+                # nulls, it won't get picked up.
+                query = conn.execute(f"select * from {schema}.{table_name} limit 0")
                 columns = query.keys()._keys
                 error_msg = None
 
