@@ -444,6 +444,8 @@ def push(plan_name, dry, updates, removes, target) -> None:
             raise SystemExit(1)
         else:
             target_name = target[0]
+    else:
+        target_name = None
 
     if updates != ():
         # Determine what needs to be updated based on --update arg
@@ -457,7 +459,7 @@ def push(plan_name, dry, updates, removes, target) -> None:
             update for update in updates if update == "group-traits"
         )
 
-        if target_name:
+        if target_name is not None:
             api_plan_name = target_name
             logger.warning(
                 f"--target flag detected. Syncing Reflekt plan {reflekt_plan_name} to "
@@ -547,7 +549,7 @@ def push(plan_name, dry, updates, removes, target) -> None:
             remove for remove in removes if remove == "group-traits"
         )
 
-        if target_name:
+        if target_name is not None:
             api_plan_name = target_name
             logger.warning(
                 f"--target flag detected. Syncing Reflekt plan {reflekt_plan_name} to "
@@ -594,7 +596,7 @@ def push(plan_name, dry, updates, removes, target) -> None:
         plan_updates_json = transformer.build_cdp_plan()
         cdp_plan = plan_updates_json
 
-        if target_name:
+        if target_name is not None:
             api_plan_name = target_name
             logger.warning(
                 f"--target flag detected. Syncing Reflekt plan {reflekt_plan_name} to "
