@@ -408,22 +408,42 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
         "traits from a tracking plan."
     ),
 )
+@click.option(
+    "-t",
+    "--target",
+    "target",
+    type=str,
+    multiple=True,
+    required=False,
+    help=(
+        "Syncs the plan provided in the --name arg to an alternative plan name provided "
+        "the --target arg. Useful when managing staging vs production tracking plans."
+    ),
+)
 @click.command()
-def push(plan_name, dry, updates, removes) -> None:
+def push(plan_name, dry, updates, removes, target) -> None:
     """Sync tracking plan to CDP or Analytics Governance tool."""
     api = ReflektApiHandler().get_api()
     config = ReflektConfig()
+    plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
+    # Set defaults
+    reflekt_plan_name = plan_name
+    api_plan_name = plan_name
 
     if api.type.lower() in ["avo"]:
         logger.error(f"'reflekt push' not supported for {titleize(api.type)}.")
         raise click.Abort()
 
-    plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
-
-    # Check for incompatible arguments
-    if updates != () and removes != ():
+    if updates != () and removes != ():  # Check for incompatible arguments
         logger.error("--update and --remove arguments cannot be combined!")
         raise SystemExit(1)
+
+    if target != ():
+        if len(target) > 1:
+            logger.error("--target only accepts one argument")
+            raise SystemExit(1)
+        else:
+            target_name = target[0]
 
     if updates != ():
         # Determine what needs to be updated based on --update arg
@@ -436,18 +456,31 @@ def push(plan_name, dry, updates, removes) -> None:
         update_group_traits = tuple(
             update for update in updates if update == "group-traits"
         )
-        # Get the existing tracking plan that will be updated
-        logger.warning(
+
+        if target_name:
+            api_plan_name = target_name
+            logger.warning(
+                f"--target flag detected. Syncing Reflekt plan {reflekt_plan_name} to "
+                f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
+            )
+
+        logger.warning(  # Get the existing tracking plan that will be updated
             f"--update flag detected. Searching {titleize(config.plan_type)} for "
-            f"existing tracking plan '{plan_name}'"
+            f"existing tracking plan '{api_plan_name}' to update."
         )
-        existing_plan_json = api.get(plan_name)  # Get the existing plan
+
+        existing_plan_json = api.get(api_plan_name)  # Get the existing plan
         logger.info("")  # Terminal newline
-        logger.info(f"Found existing tracking plan '{plan_name}'")
+        logger.info(
+            f"Found existing {titleize(config.plan_type)} tracking plan "
+            f"'{api_plan_name}'"
+        )
 
         # Load a Reflekt tracking, only including items from the --update arg
         logger.info("")  # Terminal newline
-        logger.info(f"Updating tracking plan {plan_name}")
+        logger.info(
+            f"Loading Reflekt tracking plan {reflekt_plan_name} and specified events."
+        )
         loader = ReflektLoader(
             plan_dir=plan_dir,
             parse_all=False,
@@ -497,8 +530,11 @@ def push(plan_name, dry, updates, removes) -> None:
         sync_plan_json["tracking_plan"]["rules"]["events"] = sync_events
         cdp_plan = sync_plan_json
 
+        if target and str.lower(config.plan_type) == "segment":
+            cdp_plan["tracking_plan"]["display_name"] = api_plan_name
+
     elif removes != ():
-        # Determine what needs to be removed based on --remvoe arg
+        # Determine what needs to be removed based on --remove arg
         remove_events = tuple(
             remove
             for remove in removes
@@ -510,13 +546,22 @@ def push(plan_name, dry, updates, removes) -> None:
         remove_group_traits = tuple(
             remove for remove in removes if remove == "group-traits"
         )
+
+        if target_name:
+            api_plan_name = target_name
+            logger.warning(
+                f"--target flag detected. Syncing Reflekt plan {reflekt_plan_name} to "
+                f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
+            )
+
         # Get the existing plan that will have events/traits removed
         remove_event_str = ", ".join("'" + event + "'" for event in remove_events)
         logger.warning(
             f"--remove flag detected. Removing event(s): {remove_event_str}, from "
-            f"tracking plan {plan_name} in {titleize(config.plan_type)}"
+            f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
         )
-        existing_plan_json = api.get(plan_name)
+
+        existing_plan_json = api.get(api_plan_name)
         existing_events = existing_plan_json["rules"]["events"]
         sync_events = []  # Events to sync
 
@@ -539,9 +584,8 @@ def push(plan_name, dry, updates, removes) -> None:
             ] = []
 
     else:
+        # Sync the plan as specified by the --name arg
         logger.info(f"Loading Reflekt tracking plan '{plan_name}'")
-
-        # Load the plan using the ORIGINAL name
         loader = ReflektLoader(
             plan_dir=plan_dir,
         )
@@ -550,8 +594,18 @@ def push(plan_name, dry, updates, removes) -> None:
         plan_updates_json = transformer.build_cdp_plan()
         cdp_plan = plan_updates_json
 
+        if target_name:
+            api_plan_name = target_name
+            logger.warning(
+                f"--target flag detected. Syncing Reflekt plan {reflekt_plan_name} to "
+                f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
+            )
+
+            if str.lower(config.plan_type) == "segment":
+                cdp_plan["tracking_plan"]["display_name"] = api_plan_name
+
     if dry:
-        payload = api.sync(plan_name, cdp_plan, dry=True)
+        payload = api.sync(api_plan_name, cdp_plan, dry=True)
         logger.info("")  # Terminal newline
         logger.info(
             f"[DRY RUN] The following JSON would be sent to {transformer.plan_type}"
@@ -560,15 +614,15 @@ def push(plan_name, dry, updates, removes) -> None:
     else:
         logger.info("")  # Terminal newline
         logger.info(
-            f"Syncing converted tracking plan '{plan_name}' to "
-            f"{titleize(config.plan_type)}"
+            f"Syncing Reflekt tracking plan '{reflekt_plan_name}' to "
+            f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
         )
 
-        api.sync(plan_name, cdp_plan)
+        api.sync(api_plan_name, cdp_plan)
         logger.info("")  # Terminal newline
         logger.success(
-            f"Synced Reflekt tracking plan '{plan_name}' to "
-            f"{titleize(config.plan_type)}"
+            f"Synced Reflekt tracking plan '{reflekt_plan_name}' to "
+            f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
         )
 
 
@@ -892,10 +946,12 @@ if __name__ == "__main__":
     # pull(["-n", "my-avo-plan", "--avo-branch", "staging"])
 
     # ----- SEGMENT -----
-    pull(["-n", "my-segment-plan"])
+    # pull(["-n", "my-segment-plan"])
     # pull(["-n", "my-segment-plan"], "--raw")
+
     # push(["-n", "my-segment-plan"])
     # push(["-n", "my-segment-plan", "--dry"])
+    push(["-n", "my-segment-plan", "--target", "my-segment-plan-qa"])
     # push(["-n", "my-segment-plan", "-u", "new-event"])
     # push(["-n", "my-segment-plan", "-r", "new-event"])
     # push(["-n", "test-plan", "-u", "user-traits"])
@@ -904,7 +960,7 @@ if __name__ == "__main__":
     # test(["-n", "my-segment-plan"])
     # test(["-n", "my-segment-plan", "-e", "order-completed"])
 
-    # dbt(["-n", "my-segment-plan"])
-    # dbt(["-n", "my-segment-plan", "-e", "order-completed")]
-    # dbt(["-n", "my-segment-plan", "-e", "user-traits"])
-    # dbt(["-n", "my-segment-plan", "-e", "group-traits"])
+    # dbt(["-n", "my-segment-plan", "-s", "my_app_web"])
+    # dbt(["-n", "my-segment-plan", "-s", "my_app_web", "-e", "order-completed")]
+    # dbt(["-n", "my-segment-plan", "-s", "my_app_web", "-e", "user-traits"])
+    # dbt(["-n", "my-segment-plan", "-s", "my_app_web", "-e", "group-traits"])

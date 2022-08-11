@@ -60,16 +60,20 @@ class WarehouseConnection:
     def get_columns(
         self, schema: str, table_name: str
     ) -> Tuple[Optional[list], Optional[str]]:
+        # NOTE: Tried below to get columns with all null values. Did not work.
+        # inspector = sqlalchemy.inspect(self.engine)
+        # columns = inspector.get_columns(table_name, schema)
+
         with self.engine.connect() as conn:
             try:
-                conn.detach()
-                columns = (
-                    conn.execute(f"select * from {schema}.{table_name} limit 0")
-                    .keys()
-                    ._keys
-                )
+                # This only gets the columns with non-null values, If column is all
+                # nulls, it won't get picked up.
+                query = conn.execute(f"select * from {schema}.{table_name} limit 0")
+                columns = query.keys()._keys
                 error_msg = None
+
                 return columns, error_msg
+
             except sqlalchemy.exc.ProgrammingError as e:
                 columns = None
 
