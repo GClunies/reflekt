@@ -14,10 +14,9 @@ Reflekt enables Data, Engineering, and Product teams to:
   - dbt [docs](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every modeled event that *reflekt* the context in the tracking plan.
 
 **Product analytics is a team sport.** With Reflekt:
--  Product & Data teams can plan what they want to track.
--  Engineering teams have clear contracts to guide and validate event instrumentation.
+-  Product & Data teams can plan what they want to track using *human-readable* code.
+-  Engineering teams have clear contracts to develop and validate events.
 -  Data teams can build and maintain models and docs that *reflekt* the latest product analytics events in a fraction of the time.
-
 
 https://user-images.githubusercontent.com/28986302/174643122-a38ef58b-bf98-451c-b9da-09d3554794b2.mp4
 
