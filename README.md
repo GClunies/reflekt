@@ -7,15 +7,17 @@ SPDX-License-Identifier: Apache-2.0
 # Reflekt
 Reflekt enables Data, Engineering, and Product teams to:
 - Define tracking plans as `code` (see [supported tracking plans](https://www.notion.so/reflekt-ci/Reflekt-Docs-a27c2dd7006b4584b6a451819b09cdb7#725dd17834dd4f13b5966c6cbf4e5369)).
-- Manage tracking plans using version control and CI/CD.
-- Build a dbt package to model and document events in your tracking plan, ready to use in your dbt project.
+- Manage and update tracking plans using version control and CI/CD.
+- Automagically build a dbt package that models the data for tracking plan events for use in a dbt project. Reflekt dbt packages include:
+  - dbt [sources](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and table in the warehouse where the raw event data is loaded.
+  - dbt [models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for each event in the tracking plan.
+  - dbt [docs](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every modeled event that *reflekt* the context in the tracking plan.
 
-A Reflekt dbt package includes:
-- A dbt [source](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources) pointing to the schema and tables in the warehouse where raw event data is loaded.
-- A dbt [model](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) for each event in the tracking plan.
-- A dbt [doc](https://docs.getdbt.com/docs/building-a-dbt-project/documentation) for every modeled event that perfectly *reflekts* the tracking plan.
+**Product analytics is a team sport.** With Reflekt:
+-  Product & Data teams can plan what they want to track.
+-  Engineering teams have clear contracts to guide and validate event instrumentation.
+-  Data teams can build and maintain models and docs that *reflekt* the latest product analytics events in a fraction of the time.
 
-**Product analytics is a team sport.** With Reflekt, your Data, Engineering, and Product teams are aligned on what event data is tracked, how it should be instrumented, how it is modeled, and documentation on what it all means.
 
 https://user-images.githubusercontent.com/28986302/174643122-a38ef58b-bf98-451c-b9da-09d3554794b2.mp4
 
