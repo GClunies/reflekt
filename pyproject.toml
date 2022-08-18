@@ -4,7 +4,7 @@
 
 [tool.poetry]
 name = "reflekt"
-version = "0.2.12"
+version = "0.2.13"
 description = "Reflekt lets data teams: 1) Define tracking plans as code; 2) Template dbt packages that model and document tracking plan events, ready for use in dbt."
 authors = ["Greg Clunies <greg.clunies@gmail.com>"]
 license = "Apache-2.0"
