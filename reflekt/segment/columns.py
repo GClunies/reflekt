@@ -1533,7 +1533,7 @@ seg_identify_cols = {
             "source_name": "timestamp",
             "schema_name": "tstamp",
             "description": "When the call was invoked. Calculated by Segment to correct client-device clock skew. Use for analysis when chronology DOES matter.",
-            "sql": '"timestamp" as tstamp',
+            "sql": 'timestamp as tstamp',
         },
     ],
     "anonymous_id": [
@@ -1609,7 +1609,7 @@ seg_users_cols = {
             "source_name": "timestamp",
             "schema_name": "tstamp",
             "description": "When the call was invoked. Calculated by Segment to correct client-device clock skew. Use for analysis when chronology DOES matter.",
-            "sql": '"timestamp" as tstamp',
+            "sql": 'timestamp as tstamp',
         },
     ],
 }
@@ -1677,7 +1677,7 @@ seg_groups_cols = {
             "source_name": "timestamp",
             "schema_name": "tstamp",
             "description": "When the call was invoked. Calculated by Segment to correct client-device clock skew. Use timestamp for analysis when chronology DOES matter.",
-            "sql": '"timestamp" as tstamp',
+            "sql": 'timestamp as tstamp',
         },
     ],
 }
