@@ -42,12 +42,11 @@ class ReflektProject:
                 ],
             }
             logger.configure(**logger_config)
-
             self.project_yml = self.project_dir / "reflekt_project.yml"
             self.exists = True if self.project_yml.exists() else False
 
             with open(self.project_yml, "r") as f:
-                self.project = yaml.safe_load(f)
+                self.project: dict = yaml.safe_load(f)
 
             self.validate_project()
 
@@ -55,6 +54,7 @@ class ReflektProject:
         self._get_project_name()
         self._get_config_profile()
         self._get_config_path()
+        self._get_tracking_plans_obj()
         self._get_events_case()
         self._get_events_allow_numbers()
         self._get_events_reserved()
@@ -123,9 +123,9 @@ class ReflektProject:
             self.name = self.project["name"]
         except KeyError:
             logger.error(
-                "Project 'name:' config not defined in reflekt_project.yml. See Reflekt "
-                "docs for details on project name configuration: "
-                # noqa: E501
+                "Project 'name:' config not defined in reflekt_project.yml. "
+                "\n\nSee Reflekt docs (https://bit.ly/reflekt-project-config) "
+                "for details on project name configuration."
             )
             raise SystemExit(1)
 
@@ -134,9 +134,9 @@ class ReflektProject:
             self.config_profile = self.project["config_profile"]
         except KeyError:
             logger.error(
-                "No 'config_profile:' defined in reflekt_project.yml. See Reflekt "
-                "docs for details on 'config_profile:' configuration: "
-                # noqa: E501
+                "No 'config_profile:' defined in reflekt_project.yml. \n\nSee Reflekt "
+                "docs (https://bit.ly/reflekt-project-config) for details on "
+                "'config_profile:' configuration."
             )
             raise SystemExit(1)
 
@@ -148,19 +148,30 @@ class ReflektProject:
 
             if not self.config_path.exists():
                 logger.error(
-                    "The 'config_path: {str(self.config_path)}' defined in "
-                    "reflekt_project.yml does not exist."
+                    f"The 'config_path: {str(self.config_path)}' defined in "
+                    f"reflekt_project.yml does not exist."
                 )
                 raise SystemExit(1)
 
             if not self.config_path.is_absolute():
                 logger.error(
-                    "The 'config_path: {str(self.config_path)}' defined in "
-                    "reflekt_project.yml must be an absolute path."
+                    f"The 'config_path: {str(self.config_path)}' defined in "
+                    f"reflekt_project.yml must be an absolute path."
                 )
                 raise SystemExit(1)
         else:
             self.config_path = None
+
+    def _get_tracking_plans_obj(self) -> None:
+        try:
+            self.tracking_plans = self.project["tracking_plans"]
+        except KeyError:
+            logger.error(
+                "Missing 'tracking_plans:' config in reflekt_project.yml. \n\nSee the "
+                "Reflekt docs (https://bit.ly/reflekt-project-config) for details on "
+                "tracking plan configuration."
+            )
+            raise SystemExit(1)
 
     def _get_events_case(self) -> None:
         try:

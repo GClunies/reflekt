@@ -26,8 +26,14 @@ class ReflektConfig:
             self.config: dict = self._get_config()
             self.plan_type: str = self.config.get("plan_type")
             self.cdp_name: str = self.config.get("cdp")
+            # Segment
             self.access_token: str = self.config.get("access_token")
             self.workspace_name: str = self.config.get("workspace_name")
+            # Avo
+            self.workspace_id: str = self.config.get("workspace_id")
+            self.service_account_name: str = self.config.get("service_account_name")
+            self.service_account_secret: str = self.config.get("service_account_secret")
+            # Warehouse
             self.warehouse: str = self.config.get("warehouse")
             self.warehouse_type: str = self._get_warehouse_type()
 
