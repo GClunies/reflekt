@@ -6,16 +6,13 @@ import json
 from typing import Optional
 
 import requests
-from requests import Response
-
-from reflekt.config import ReflektConfig
 from reflekt.segment.errors import SegmentApiError
+from requests import Response
 
 
 class SegmentApi:
     def __init__(self, workspace_name: str, access_token: str):
-        self._config = ReflektConfig()
-        self.type = self._config.plan_type
+        self.type = "segment"
         self.workspace_name = workspace_name
         self.access_token = access_token
         self.base_url = (

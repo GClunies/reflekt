@@ -40,14 +40,14 @@ def cli():
 @click.option(
     "--project-dir",
     "project_dir_str",
-    # default=".",
+    default=".",
     required=True,
-    help="Path where Reflekt project will be created. Defaults to current directory.",
+    help="Path where Reflekt project will be created. Default is the current directory.",
 )
 @click.command()
 def init(project_dir_str: str) -> None:
     """Create a Reflekt project at the provide directory."""
-    project_dir = Path(project_dir_str).resolve()
+    project_dir = Path(project_dir_str).expanduser()
     project_name = click.prompt(
         "Enter your project name (letters, digits, underscore)", type=str
     )
@@ -113,7 +113,7 @@ def init(project_dir_str: str) -> None:
 
     if collect_config:
         plan_type_prompt = click.prompt(
-            f"What Analytics Governance tool do you use to manage your tracking plan(s)?"
+            f"What tracking plan tool do you use to manage your tracking plan(s)?"
             f"{constants.PLAN_INIT_STRING}"
             f"\nEnter a number",
             type=int,
@@ -137,11 +137,40 @@ def init(project_dir_str: str) -> None:
             )
             reflekt_config_obj[config_name]["access_token"] = access_token
         elif plan_type == "avo":
-            avo_end_msg = (
-                "You've selected Avo as your Analytics Governance tool which requires "
-                "additional setup steps. Please see the docs for additional guidance:\n"
-                "    https://reflekt-ci.notion.site/Connect-Reflekt-to-Avo-489158cf319f43c491470c54b37e3b13"  # noqa: E501
+            workspace_id = click.prompt(
+                "Enter your Avo workspace ID. See the Avo docs "
+                "(https://www.avo.app/docs/public-api/export-tracking-plan) on how to "
+                "find your workspace ID. This requires Avo API access "
+                "(https://www.avo.app/docs/public-api/export-tracking-plan). Contact "
+                "Avo support for access if you do not have it.",
+                type=str,
+                hide_input=True,
             )
+            reflekt_config_obj[config_name]["workspace_id"] = workspace_id
+            service_account_name = click.prompt(
+                "Enter your Avo service account name. See the Avo docs "
+                "(https://www.avo.app/docs/public-api/authentication#creating-service-accounts) "  # noqa: E501
+                "on creating your service account credentials. This requires Avo API "
+                "access (https://www.avo.app/docs/public-api/export-tracking-plan). "
+                "Contact Avo support for access if you do not have it.",
+                type=str,
+                hide_input=True,
+            )
+            reflekt_config_obj[config_name][
+                "service_account_name"
+            ] = service_account_name
+            service_account_secret = click.prompt(
+                "Enter your Avo service account secret. See the Avo docs "
+                "(https://www.avo.app/docs/public-api/authentication#creating-service-accounts) "  # noqa: E501
+                "on creating your service account credentials. This requires Avo API "
+                "access (https://www.avo.app/docs/public-api/export-tracking-plan). "
+                "Contact Avo support for access if you do not have it.",
+                type=str,
+                hide_input=True,
+            )
+            reflekt_config_obj[config_name][
+                "service_account_secret"
+            ] = service_account_secret
 
         # TODO - Enable support for other CDPs below as developed
         # elif plan_type == "rudderstack":
@@ -276,10 +305,6 @@ def init(project_dir_str: str) -> None:
         f"        Template dbt package with sources, models, and docs for all events in tracking plan."  # noqa: E501
     )
 
-    if plan_type == "avo":
-        logger.info("")  # Terminal newline
-        logger.info(avo_end_msg)
-
 
 @click.command()
 @click.option(
@@ -339,12 +364,17 @@ def new(plan_name: str) -> None:
 )
 def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
     """Generate tracking plan as code using the Reflekt schema."""
-    api = ReflektApiHandler().get_api(avo_branch=avo_branch)
+    api = ReflektApiHandler().get_api()
     config = ReflektConfig()
     logger.info(
         f"Searching {titleize(config.plan_type)} for tracking plan '{plan_name}'"
     )
-    plan_json = api.get(plan_name)
+
+    if api.type == "segment":  # Segment supports multiple plans, no branches
+        plan_json = api.get(plan_name)
+    elif api.type == "avo":  # Avo supports one plan, multiple branches
+        plan_json = api.get(avo_branch)
+
     logger.info(f"Found tracking plan '{plan_name}'")
 
     if raw:
@@ -939,7 +969,7 @@ cli.add_command(dbt)
 if __name__ == "__main__":
 
     # ----- GENERAL -----
-    # init(["--project-dir", "~/Repos/test-repo"])
+    init(["--project-dir", "~/Repos/test-repo"])
     # new(["--project-dir", "my-new-plan"])
 
     # ----- AVO -----
@@ -953,7 +983,7 @@ if __name__ == "__main__":
 
     # push(["-n", "my-segment-plan"])
     # push(["-n", "my-segment-plan", "--dry"])
-    push(["-n", "my-segment-plan", "--target", "my-segment-plan-qa"])
+    # push(["-n", "my-segment-plan", "--target", "my-segment-plan-qa"])
     # push(["-n", "my-segment-plan", "-u", "new-event"])
     # push(["-n", "my-segment-plan", "-r", "new-event"])
     # push(["-n", "test-plan", "-u", "user-traits"])
