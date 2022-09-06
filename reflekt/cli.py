@@ -3,7 +3,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import copy
+import hashlib
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -16,6 +18,7 @@ from loguru import logger
 from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
 
+import reflekt.tracking
 from reflekt import constants
 from reflekt.api_handler import ReflektApiHandler
 from reflekt.avo.plan import AvoPlan
@@ -30,6 +33,14 @@ from reflekt.segment.schema import (  # TODO: Likely need a handler for these sc
 )
 from reflekt.transformer import ReflektTransformer
 from reflekt.utils import segment_2_snake
+
+__version__ = "0.2.14"  # Set by bumpversion
+
+reflekt.tracking.initialize_tracking()
+
+if ReflektProject().exists:
+    if ReflektConfig().do_not_track:
+        reflekt.tracking.do_not_track()
 
 
 @click.group()
@@ -305,6 +316,23 @@ def init(project_dir_str: str) -> None:
         f"        Template dbt package with sources, models, and docs for all events in tracking plan."  # noqa: E501
     )
 
+    reflekt.tracking.track_event(
+        "project_created",
+        properties={
+            "project_id": hashlib.md5(project_name.encode("utf-8")).hexdigest(),
+            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+            "cdp_type": cdp,
+            "warehouse_type": warehouse,
+            "plan_type": plan_type,
+        },
+        context={
+            "app": {
+                "name": "reflekt",
+                "version": __version__,
+            }
+        },
+    )
+
 
 @click.command()
 @click.option(
@@ -341,6 +369,24 @@ def new(plan_name: str) -> None:
 
     logger.info("")  # Terminal newline
     logger.success(f"Created Reflekt tracking plan '{plan_name}'")
+
+    reflekt.tracking.track_event(
+        "plan_created",
+        properties={
+            "project_id": hashlib.md5(ReflektProject().name.encode("utf-8")).hexdigest(),
+            "plan_id": hashlib.md5(plan_name.encode("utf-8")).hexdigest(),
+            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+            "cdp_type": ReflektConfig().cdp_name,
+            "warehouse_type": ReflektConfig().warehouse_type,
+            "plan_type": ReflektConfig().plan_type,
+        },
+        context={
+            "app": {
+                "name": "reflekt",
+                "version": __version__,
+            }
+        },
+    )
 
 
 @click.command()
@@ -399,6 +445,24 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
         plan.build_reflekt(plan_dir)
         logger.info("")  # Terminal newline
         logger.success(f"Built Reflekt tracking plan '{plan_name}'")
+
+    reflekt.tracking.track_event(
+        "plan_pulled",
+        properties={
+            "project_id": hashlib.md5(ReflektProject().name.encode("utf-8")).hexdigest(),
+            "plan_id": hashlib.md5(plan_name.encode("utf-8")).hexdigest(),
+            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+            "cdp_type": ReflektConfig().cdp_name,
+            "warehouse_type": ReflektConfig().warehouse_type,
+            "plan_type": ReflektConfig().plan_type,
+        },
+        context={
+            "app": {
+                "name": "reflekt",
+                "version": __version__,
+            }
+        },
+    )
 
 
 @click.option(
@@ -657,6 +721,24 @@ def push(plan_name, dry, updates, removes, target) -> None:
             f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
         )
 
+    reflekt.tracking.track_event(
+        "plan_pushed",
+        properties={
+            "project_id": hashlib.md5(ReflektProject().name.encode("utf-8")).hexdigest(),
+            "plan_id": hashlib.md5(plan_name.encode("utf-8")).hexdigest(),
+            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+            "cdp_type": ReflektConfig().cdp_name,
+            "warehouse_type": ReflektConfig().warehouse_type,
+            "plan_type": ReflektConfig().plan_type,
+        },
+        context={
+            "app": {
+                "name": "reflekt",
+                "version": __version__,
+            }
+        },
+    )
+
 
 @click.option(
     "-s",
@@ -682,7 +764,7 @@ def test(plan_name, selection) -> None:
     logger.info(f"Testing Reflekt tracking plan '{plan_name}'")
 
     if selection != ():
-        # Determine what needs to be updated based on --update arg
+        # Determine what needs to be test based on --select arg
         selected_events = tuple(
             selected
             for selected in selection
@@ -705,9 +787,28 @@ def test(plan_name, selection) -> None:
         )
     else:
         ReflektLoader(plan_dir=plan_dir)
-    # If no errors are thrown, passed tests
+
+    # If no errors are thrown by ReflektLoader, passed tests
     logger.info("")
     logger.success("Test complete. No errors.")
+
+    reflekt.tracking.track_event(
+        "plan_tested",
+        properties={
+            "project_id": hashlib.md5(ReflektProject().name.encode("utf-8")).hexdigest(),
+            "plan_id": hashlib.md5(plan_name.encode("utf-8")).hexdigest(),
+            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+            "cdp_type": ReflektConfig().cdp_name,
+            "warehouse_type": ReflektConfig().warehouse_type,
+            "plan_type": ReflektConfig().plan_type,
+        },
+        context={
+            "app": {
+                "name": "reflekt",
+                "version": __version__,
+            }
+        },
+    )
 
 
 @click.option(
@@ -903,9 +1004,7 @@ def dbt(
             )
             if create_tag:
                 tag_str = click.prompt(
-                    "Git tag",
-                    type=str,
-                    default=f"v{str(version)}__{pkg_name}",
+                    "Git tag", type=str, default=f"v{str(version)}__{pkg_name}"
                 )
             else:
                 tag_str = None
@@ -917,43 +1016,43 @@ def dbt(
             if plan_type == "avo":
                 rel_avo_json_path = ".reflekt/avo/avo.json"
                 subprocess.call(
-                    args=[
-                        git_executable,
-                        "add",
-                        rel_pkg_path,
-                        rel_avo_json_path,
-                    ],
+                    args=[git_executable, "add", rel_pkg_path, rel_avo_json_path],
                     cwd=project_dir,
                 )
             else:
                 subprocess.call(
-                    args=[
-                        git_executable,
-                        "add",
-                        rel_pkg_path,
-                    ],
+                    args=[git_executable, "add", rel_pkg_path],
                     cwd=project_dir,
                 )
 
             subprocess.call(
-                args=[
-                    git_executable,
-                    "commit",
-                    "-m",
-                    commit_str,
-                ],
+                args=[git_executable, "commit", "-m", commit_str],
                 cwd=project_dir,
             )
 
         if tag_str is not None:
             subprocess.call(
-                args=[
-                    git_executable,
-                    "tag",
-                    tag_str,
-                ],
+                args=[git_executable, "tag", tag_str],
                 cwd=project_dir,
             )
+
+    reflekt.tracking.track_event(
+        "dbt_package_built",
+        properties={
+            "project_id": hashlib.md5(ReflektProject().name.encode("utf-8")).hexdigest(),
+            "plan_id": hashlib.md5(plan_name.encode("utf-8")).hexdigest(),
+            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+            "cdp_type": ReflektConfig().cdp_name,
+            "warehouse_type": ReflektConfig().warehouse_type,
+            "plan_type": ReflektConfig().plan_type,
+        },
+        context={
+            "app": {
+                "name": "reflekt",
+                "version": __version__,
+            }
+        },
+    )
 
 
 # Add CLI commands to CLI group
@@ -969,7 +1068,7 @@ cli.add_command(dbt)
 if __name__ == "__main__":
 
     # ----- GENERAL -----
-    init(["--project-dir", "~/Repos/test-repo"])
+    # init(["--project-dir", "~/Repos/test-repo"])
     # new(["--project-dir", "my-new-plan"])
 
     # ----- AVO -----
@@ -989,7 +1088,7 @@ if __name__ == "__main__":
     # push(["-n", "test-plan", "-u", "user-traits"])
 
     # ----- REFLEKT -----
-    # test(["-n", "my-segment-plan"])
+    test(["-n", "my-segment-plan"])
     # test(["-n", "my-segment-plan", "-e", "order-completed"])
 
     # dbt(["-n", "my-segment-plan", "-s", "my_app_web"])

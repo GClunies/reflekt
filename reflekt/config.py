@@ -36,6 +36,10 @@ class ReflektConfig:
             # Warehouse
             self.warehouse: str = self.config.get("warehouse")
             self.warehouse_type: str = self._get_warehouse_type()
+            # Tracking
+            self.do_not_track: bool = (
+                True if self.config.get("send_anonymous_usage_stats") is False else False
+            )
 
     def _get_config(self) -> dict:
         try:
