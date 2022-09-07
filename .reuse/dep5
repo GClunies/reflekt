@@ -10,3 +10,11 @@ License: Apache-2.0
 Files: docs/*
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
 License: Apache-2.0
+
+Files: poetry.lock
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
+Files: License.md
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0

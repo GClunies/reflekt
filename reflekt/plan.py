@@ -3,6 +3,14 @@
 #
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
+#
+# This file contains derivative works based on:
+# https://github.com/bufferapp/tracking-plan-kit/blob/master/tracking_plan/yaml_tracking_plan.py
+#
+# Relevant License and Copyright information for this code is found in the
+# comment headers above and the ./reuse directory of this repository. All changes are
+# licensed under Apache-2.0.
+
 
 from typing import Counter, List, Optional
 
@@ -17,16 +25,12 @@ from reflekt.schema import reflekt_plan_schema
 from reflekt.trait import ReflektTrait
 
 
-# The class ReflektPlan is a derivative work based on the class
-# YamlTrackingPlan from project tracking-plan-kit licensed under MIT. All
-# changes are licensed under Apache-2.0.
 class ReflektPlan(object):
     def __init__(
         self,
         plan_yaml_obj: dict,
         plan_name: str,
         schema_name: Optional[str] = None,
-        # events: Optional[tuple] = None,
     ) -> None:
         if ReflektProject().exists:
             self._config = ReflektConfig()

@@ -3,6 +3,14 @@
 #
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
+#
+# This file contains derivative works based on:
+# https://github.com/bufferapp/tracking-plan-kit/blob/master/tracking_plan/plan_loader.py
+#
+# Relevant License and Copyright information for this code is found in the
+# comment headers above and the ./reuse directory of this repository. All changes are
+# licensed under Apache-2.0.
+
 
 from pathlib import Path
 from typing import Optional
@@ -16,9 +24,6 @@ from reflekt.plan import ReflektPlan
 from reflekt.project import ReflektProject
 
 
-# The class ReflektLoader is a derivative work based on the class
-# PlanLoader from project tracking-plan-kit licensed under MIT. All
-# changes are licensed under Apache-2.0.
 class ReflektLoader(object):
     def __init__(
         self,
