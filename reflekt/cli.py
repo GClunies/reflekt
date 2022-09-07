@@ -19,7 +19,7 @@ from packaging.version import InvalidVersion
 from packaging.version import parse as parse_version
 
 import reflekt.tracking
-from reflekt import constants
+from reflekt import __version__, constants
 from reflekt.api_handler import ReflektApiHandler
 from reflekt.avo.plan import AvoPlan
 from reflekt.config import ReflektConfig
@@ -33,8 +33,6 @@ from reflekt.segment.schema import (  # TODO: Likely need a handler for these sc
 )
 from reflekt.transformer import ReflektTransformer
 from reflekt.utils import segment_2_snake
-
-__version__ = "0.2.14"  # Set by bumpversion
 
 reflekt.tracking.initialize_tracking()
 
