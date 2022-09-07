@@ -652,17 +652,6 @@ python-versions = ">=3.5"
 chardet = "*"
 
 [[package]]
-name = "python-dotenv"
-version = "0.21.0"
-description = "Read key-value pairs from a .env file and set them as environment variables"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.extras]
-cli = ["click (>=5.0)"]
-
-[[package]]
 name = "pytz"
 version = "2022.1"
 description = "World timezone definitions, modern and historical"
@@ -735,7 +724,7 @@ requests = "*"
 
 [[package]]
 name = "rudder-sdk-python"
-version = "1.0.5"
+version = "1.0.6"
 description = "RudderStack is an open-source Segment alternative written in Go, built for the enterprise."
 category = "main"
 optional = false
@@ -756,7 +745,7 @@ test = ["mock (==2.0.0)", "pylint (==1.9.3)", "flake8 (==3.7.9)", "coverage (==4
 type = "git"
 url = "https://github.com/GClunies/rudder-sdk-python.git"
 reference = "master"
-resolved_reference = "1b2c548f2a3f774b3b30ba66791c83d06bb7e95e"
+resolved_reference = "dcfc1f37de6a91de29ed542caabed9b2191e1f1d"
 
 [[package]]
 name = "s3transfer"
@@ -965,7 +954,7 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "60779cf2d41e3380e4f5c153d722a961538b71b7f0aa473f3dbf826b897055b4"
+content-hash = "2fee605ff51bc8a239c1c2845f0f2f747937d7037ed21429cfb3c0b00dff0c5b"
 
 [metadata.files]
 arrow = []
@@ -1026,7 +1015,6 @@ pyparsing = []
 pytest = []
 python-dateutil = []
 python-debian = []
-python-dotenv = []
 pytz = []
 pyyaml = []
 redshift-connector = []
