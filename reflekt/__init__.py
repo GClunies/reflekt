@@ -2,4 +2,4 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-__version__ = "0.2.14"  # Set by bumpversion
+__version__ = "0.2.15"  # Set by bumpversion
