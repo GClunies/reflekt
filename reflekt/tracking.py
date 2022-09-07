@@ -18,11 +18,11 @@ from typing import Optional
 
 import rudder_analytics
 import yaml
-from dotenv import load_dotenv
 
 import segment.analytics as segment_analytics
 
-load_dotenv()  # Load environment variables from .env (used for development)
+# For some unknown reason, Vscode debugger only works with import below
+# import analytics as segment_analytics
 
 
 # Tracking error handling (Segment/Rudderstack)
