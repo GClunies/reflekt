@@ -19,10 +19,7 @@ from typing import Optional
 import rudder_analytics
 import yaml
 
-import segment.analytics as segment_analytics
-
-# For some unknown reason, Vscode debugger only works with import below
-# import analytics as segment_analytics
+import segment.analytics as segment_analytics  # FOR DEBUGGING, use 'import analytics as segment_analytics'  # noqa: E501
 
 
 # Tracking error handling (Segment/Rudderstack)
