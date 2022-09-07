@@ -43,8 +43,10 @@ if ReflektProject().exists:
         reflekt.tracking.do_not_track()
 
 
+# Use main() + @main.command decorator so that CLI does not require 'poetry run' prefix
+# reference: https://stackoverflow.com/a/55065934
 @click.group()
-def cli():
+def main():
     logger.configure(**logger_config)
 
 
@@ -55,7 +57,7 @@ def cli():
     required=True,
     help="Path where Reflekt project will be created. Default is the current directory.",
 )
-@click.command()
+@main.command()
 def init(project_dir_str: str) -> None:
     """Create a Reflekt project at the provide directory."""
     project_dir = Path(project_dir_str).expanduser()
@@ -334,7 +336,7 @@ def init(project_dir_str: str) -> None:
     )
 
 
-@click.command()
+@main.command()
 @click.option(
     "-n",
     "--name",
@@ -389,7 +391,7 @@ def new(plan_name: str) -> None:
     )
 
 
-@click.command()
+@main.command()
 @click.option(
     "-n",
     "--name",
@@ -514,7 +516,7 @@ def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
         "the --target arg. Useful when managing staging vs production tracking plans."
     ),
 )
-@click.command()
+@main.command()
 def push(plan_name, dry, updates, removes, target) -> None:
     """Sync tracking plan to CDP or Analytics Governance tool."""
     api = ReflektApiHandler().get_api()
@@ -757,7 +759,7 @@ def push(plan_name, dry, updates, removes, target) -> None:
     required=True,
     help="Name of tracking plan to be tested (specified in kebab-case).",
 )
-@click.command()
+@main.command()
 def test(plan_name, selection) -> None:
     """Test tracking plan schema for naming, data types, and metadata."""
     plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
@@ -867,7 +869,7 @@ def test(plan_name, selection) -> None:
     required=True,
     help="Tracking plan name in your Reflekt project.",
 )
-@click.command()
+@main.command()
 def dbt(
     plan_name,
     events,
@@ -1056,12 +1058,12 @@ def dbt(
 
 
 # Add CLI commands to CLI group
-cli.add_command(init)
-cli.add_command(new)
-cli.add_command(pull)
-cli.add_command(push)
-cli.add_command(test)
-cli.add_command(dbt)
+main.add_command(init)
+main.add_command(new)
+main.add_command(pull)
+main.add_command(push)
+main.add_command(test)
+main.add_command(dbt)
 
 
 # Used for CLI debugging
