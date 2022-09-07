@@ -3,6 +3,14 @@
 #
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
+#
+# This file contains derivative works based on:
+# https://github.com/bufferapp/tracking-plan-kit/blob/master/tracking_plan/json_tracking_plan.py
+#
+# Relevant License and Copyright information for this code is found in the
+# comment headers above and the ./reuse directory of this repository. All changes are
+# licensed under Apache-2.0.
+
 
 import json
 import shutil
@@ -16,9 +24,6 @@ from reflekt.dumper import ReflektYamlDumper
 from reflekt.segment.parser import parse_segment_event, parse_segment_property
 
 
-# The class SegmentPlan is a derivative work based on the class
-# JsonTrackingPlan from project tracking-plan-kit licensed under MIT. All
-# changes are licensed under Apache-2.0.
 class SegmentPlan(object):
     def __init__(self, plan_json: dict):
         self.plan_json = plan_json

@@ -4,9 +4,12 @@
 # SPDX-FileCopyrightText: 2021 dbt Labs, inc.
 # SPDX-License-Identifier: Apache-2.0
 #
-# This file contains derivative works based on: https://bit.ly/3wXsMrp
-# Relevant License and Copyright information for this file is found in the
-# comment headers above and the ./reuse directory of this repository.
+# This file contains derivative works based on:
+# https://github.com/dbt-labs/dbt-core/blob/main/core/dbt/tracking.py
+#
+# Relevant License and Copyright information for this code is found in the
+# comment headers above and the ./reuse directory of this repository. All changes are
+# licensed under Apache-2.0.
 
 import os
 import uuid

@@ -3,6 +3,14 @@
 #
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
+#
+# This file contains derivative works based on:
+# https://github.com/bufferapp/tracking-plan-kit/blob/master/tracking_plan/yaml_event.py
+#
+# Relevant License and Copyright information for this code is found in the
+# comment headers above and the ./reuse directory of this repository. All changes are
+# licensed under Apache-2.0.
+
 
 import re
 from collections import Counter
@@ -16,9 +24,6 @@ from reflekt.property import ReflektProperty
 from reflekt.schema import reflekt_event_schema, reflekt_expected_metadata_schema
 
 
-# The class ReflektEvent is a derivative work based on the class
-# YamlEvent from project tracking-plan-kit licensed under MIT. All
-# changes are licensed under Apache-2.0.
 class ReflektEvent(object):
     def __init__(self, event_yaml_obj: dict) -> None:
         if ReflektProject().exists:

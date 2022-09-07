@@ -3,11 +3,15 @@
 #
 # SPDX-FileCopyrightText: 2021 Buffer
 # SPDX-License-Identifier: MIT
+#
+# This file contains derivative works based on:
+# https://github.com/bufferapp/tracking-plan-kit/blob/master/tracking_plan/json_utils.py
+#
+# Relevant License and Copyright information for this code is found in the
+# comment headers above and the ./reuse directory of this repository. All changes are
+# licensed under Apache-2.0.
 
 
-# The function parse_segment_property is a derivative work based on the
-# function parse_property from project tracking-plan-kit licensed under MIT.
-# All changes are licensed under Apache-2.0.
 def parse_segment_property(name: str, property_json: dict, required: list = []):
     p_types = property_json.get("type")
     if not isinstance(p_types, (list,)):
@@ -80,9 +84,6 @@ def parse_segment_property(name: str, property_json: dict, required: list = []):
         return p
 
 
-# The function parse_segment_event is a derivative work based on the
-# function parse_event from project tracking-plan-kit licensed under MIT.
-# All changes are licensed under Apache-2.0.
 def parse_segment_event(event_json: dict):
     metadata_raw = event_json.get("rules").get("labels")
 
