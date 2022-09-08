@@ -109,14 +109,14 @@ python-versions = "*"
 
 [[package]]
 name = "boto3"
-version = "1.24.67"
+version = "1.24.68"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = ">=1.27.67,<1.28.0"
+botocore = ">=1.27.68,<1.28.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -125,7 +125,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.27.67"
+version = "1.27.68"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -723,31 +723,6 @@ python-debian = "*"
 requests = "*"
 
 [[package]]
-name = "rudder-sdk-python"
-version = "1.0.6"
-description = "RudderStack is an open-source Segment alternative written in Go, built for the enterprise."
-category = "main"
-optional = false
-python-versions = "*"
-develop = false
-
-[package.dependencies]
-backoff = ">=2.1"
-monotonic = ">=1.5"
-python-dateutil = ">2.1"
-requests = ">=2.7,<3.0"
-six = ">=1.4"
-
-[package.extras]
-test = ["mock (==2.0.0)", "pylint (==1.9.3)", "flake8 (==3.7.9)", "coverage (==4.5.4)"]
-
-[package.source]
-type = "git"
-url = "https://github.com/GClunies/rudder-sdk-python.git"
-reference = "master"
-resolved_reference = "dcfc1f37de6a91de29ed542caabed9b2191e1f1d"
-
-[[package]]
 name = "s3transfer"
 version = "0.6.0"
 description = "An Amazon S3 Transfer Manager"
@@ -954,7 +929,7 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "2fee605ff51bc8a239c1c2845f0f2f747937d7037ed21429cfb3c0b00dff0c5b"
+content-hash = "f58f647040e5909dcc76a9349777edad9704e419a9773cbac7dd7d79562a26f7"
 
 [metadata.files]
 arrow = []
@@ -1020,7 +995,6 @@ pyyaml = []
 redshift-connector = []
 requests = []
 reuse = []
-rudder-sdk-python = []
 s3transfer = []
 scramp = []
 segment-analytics-python = []
