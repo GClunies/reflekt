@@ -16,7 +16,7 @@ import uuid
 from pathlib import Path
 from typing import Optional
 
-import rudder_analytics
+# import rudder_analytics
 import yaml
 
 import segment.analytics as segment_analytics  # FOR DEBUGGING, use 'import analytics as segment_analytics'  # noqa: E501
@@ -36,13 +36,13 @@ if os.getenv("REFLEKT_DEV_SEGMENT_WRITE_KEY") is not None:
 else:
     segment_analytics.write_key = "2r0G0DfAXeRZ9ZUhfa9Xk1Hk3FnO2GnW"
 
-# Setup Rudderstack
-if os.getenv("REFLEKT_DEV_RUDDERSTACK_WRITE_KEY") is not None:
-    rudder_analytics.write_key = os.getenv("REFLEKT_DEV_RUDDERSTACK_WRITE_KEY")
-else:
-    rudder_analytics.write_key = "2EGTUMSUXYUpSRS4uO2sSgfDntI"
+# Setup Rudderstack  #TODO - enable after rudderstack merges this PR: https://github.com/rudderlabs/rudder-sdk-python/pull/12  # noqa: E501
+# if os.getenv("REFLEKT_DEV_RUDDERSTACK_WRITE_KEY") is not None:
+#     rudder_analytics.write_key = os.getenv("REFLEKT_DEV_RUDDERSTACK_WRITE_KEY")
+# else:
+#     rudder_analytics.write_key = "2EGTUMSUXYUpSRS4uO2sSgfDntI"
 
-rudder_analytics.data_plane_url = "https://reflektgrwicz.dataplane.rudderstack.com"
+# rudder_analytics.data_plane_url = "https://reflektgrwicz.dataplane.rudderstack.com"
 
 
 class ReflektUser:
@@ -133,4 +133,4 @@ def track_event(event_name: str, properties: dict, context: dict):
     global active_user
     if active_user.id is not None:
         segment_analytics.track(active_user.id, event_name, properties, context)
-        rudder_analytics.track(active_user.id, event_name, properties, context)
+        # rudder_analytics.track(active_user.id, event_name, properties, context)
