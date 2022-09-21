@@ -381,11 +381,7 @@ class ReflektProject:
 
     def _get_dbt_model_where_logic(self) -> None:
         if self.materialized == "incremental":
-            if (
-                self.where_logic
-                == self.project["dbt"]["templater"]["models"].get("where_logic")
-                is not None
-            ):
+            if self.project["dbt"]["templater"]["models"].get("where_logic") is not None:
                 logger.error(
                     "dbt templating config 'materialized: incremental' is not "
                     "compatible with 'where_logic: ...' config. Options: "
