@@ -6,8 +6,9 @@ from typing import Optional
 
 import requests
 from loguru import logger
-from reflekt.project import ReflektProject
 from requests.auth import HTTPBasicAuth
+
+from reflekt.project import ReflektProject
 
 
 class AvoApi:

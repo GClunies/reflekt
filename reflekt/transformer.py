@@ -83,6 +83,7 @@ class ReflektTransformer(object):
             self.model_prefix = self.reflekt_project.model_prefix
             self.materialized = self.reflekt_project.materialized
             self.incremental_logic = self.reflekt_project.incremental_logic
+            self.where_logic = self.reflekt_project.where_logic
             self.docs_prefix = self.reflekt_project.docs_prefix
             self.docs_test_not_null = self.reflekt_project.docs_test_not_null
             self.docs_test_unique = self.reflekt_project.docs_test_unique
@@ -652,6 +653,7 @@ class ReflektTransformer(object):
             source_schema=source_schema,
             source_table=table_name,
             incremental_logic=self.incremental_logic,
+            where_logic=self.where_logic,
         )
 
         logger.info("    Adding renamed CTE to model SQL")
@@ -764,23 +766,36 @@ class ReflektTransformer(object):
         source_schema: str,
         source_table: str,
         incremental_logic: Optional[str] = None,
+        where_logic: Optional[str] = None,
     ) -> str:
-        if incremental_logic is None:
-            incremental_logic = ""
+        if incremental_logic is None and where_logic is None:
+            logic = ""
+        elif incremental_logic is not None and where_logic is None:
+            logic = incremental_logic
+        elif where_logic is not None and incremental_logic is None:
+            logic = where_logic
+        else:  # Both logics exist (error)
+            logger.error(
+                "Cannot have 'incremental_logic: ...' (used with "
+                "'materialized: incremental') and 'where_logic: ...' (used with "
+                "'materialized: view')"
+                "configurations defined simultaneously in reflekt_project.yml."
+            )
+            raise SystemExit(1)
 
-        # Format incremental_logic from reflekt_project.yml so it templates
+        # Format incremental_logic / where_logic from reflekt_project.yml so it templates
         # according to dbt-labs style guide https://bit.ly/383kG7l
-        incremental_logic_list = incremental_logic.splitlines()
-        incremental_logic_str = ""
-        for line in incremental_logic_list:
-            incremental_logic_str += f"    {line}\n"
+        logic_list = logic.splitlines()
+        logic_str = ""
+        for line in logic_list:
+            logic_str += f"    {line}\n"
 
         source_cte = (
             "with\n\n"
             "source as (\n\n"
             f"    select *\n\n"
             f"    from {{{{ source('{underscore(source_schema)}', '{source_table}') }}}}\n"  # noqa: E501
-            f"{incremental_logic_str}\n"
+            f"{logic_str}\n"
             "),\n\n"
         )
 

@@ -16,10 +16,10 @@ import uuid
 from pathlib import Path
 from typing import Optional
 
+import segment.analytics as segment_analytics  # FOR DEBUGGING, use 'import analytics as segment_analytics'  # noqa: E501
+
 # import rudder_analytics
 import yaml
-
-import segment.analytics as segment_analytics  # FOR DEBUGGING, use 'import analytics as segment_analytics'  # noqa: E501
 
 
 # Tracking error handling (Segment/Rudderstack)
