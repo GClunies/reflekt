@@ -768,7 +768,9 @@ class ReflektTransformer(object):
         incremental_logic: Optional[str] = None,
         where_logic: Optional[str] = None,
     ) -> str:
-        if incremental_logic is None and where_logic is None:
+        if source_table in ["users", "groups"]:  # These tables are dimensions, not facts
+            logic = ""
+        elif incremental_logic is None and where_logic is None:
             logic = ""
         elif incremental_logic is not None and where_logic is None:
             logic = incremental_logic
