@@ -6,8 +6,9 @@ import json
 from typing import Optional
 
 import requests
-from reflekt.segment.errors import SegmentApiError
 from requests import Response
+
+from reflekt.segment.errors import SegmentApiError
 
 
 class SegmentApi:

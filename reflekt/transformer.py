@@ -14,22 +14,33 @@ from loguru import logger
 from packaging.version import Version
 
 from reflekt.config import ReflektConfig
-from reflekt.constants import (REFLEKT_INJECTED_COLUMNS,
-                               REFLEKT_TEMPLATED_COLUMNS)
-from reflekt.dbt import (dbt_column_schema, dbt_doc_schema, dbt_model_schema,
-                         dbt_src_schema, dbt_table_schema)
+from reflekt.constants import REFLEKT_INJECTED_COLUMNS, REFLEKT_TEMPLATED_COLUMNS
+from reflekt.dbt import (
+    dbt_column_schema,
+    dbt_doc_schema,
+    dbt_model_schema,
+    dbt_src_schema,
+    dbt_table_schema,
+)
 from reflekt.dumper import ReflektYamlDumper
 from reflekt.event import ReflektEvent
 from reflekt.plan import ReflektPlan
 from reflekt.project import ReflektProject
 from reflekt.property import ReflektProperty
-from reflekt.segment.columns import (seg_groups_cols, seg_identify_cols,
-                                     seg_pages_cols, seg_screens_cols,
-                                     seg_tracks_cols, seg_users_cols)
-from reflekt.segment.schema import (segment_event_schema,
-                                    segment_payload_schema,
-                                    segment_plan_schema,
-                                    segment_property_schema)
+from reflekt.segment.columns import (
+    seg_groups_cols,
+    seg_identify_cols,
+    seg_pages_cols,
+    seg_screens_cols,
+    seg_tracks_cols,
+    seg_users_cols,
+)
+from reflekt.segment.schema import (
+    segment_event_schema,
+    segment_payload_schema,
+    segment_plan_schema,
+    segment_property_schema,
+)
 from reflekt.trait import ReflektTrait
 from reflekt.utils import segment_2_snake
 from reflekt.warehouse import WarehouseConnection
