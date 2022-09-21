@@ -69,6 +69,7 @@ class ReflektProject:
         self._get_dbt_model_prefix()
         self._get_dbt_model_materialized()
         self._get_dbt_model_incremental_logic()
+        self._get_dbt_model_where_logic()
         self._get_dbt_docs_prefix()
         self._get_dbt_docs_tests()
         self._get_dbt_docs_in_folder()
@@ -377,6 +378,28 @@ class ReflektProject:
 
         else:
             self.incremental_logic = None
+
+    def _get_dbt_model_where_logic(self) -> None:
+        if self.materialized == "incremental":
+            if (
+                self.where_logic
+                == self.project["dbt"]["templater"]["models"].get("where_logic")
+                is not None
+            ):
+                logger.error(
+                    "dbt templating config 'materialized: incremental' is not "
+                    "compatible with 'where_logic: ...' config. Options: "
+                    "\n    1. Use 'materialized: incremental' + 'incremental_logic: ...' configurations"  # noqa: E501
+                    "\n    2. Use 'materialized: view' + 'where_logic: ...' configurations"  # noqa: E501
+                    "\n\nSee the Reflekt docs (https://bit.ly/reflekt-project-config) "
+                    "for details on materialization configuration."
+                )
+                raise SystemExit(1)
+            pass  #
+        elif self.materialized == "view":
+            self.where_logic = self.project["dbt"]["templater"]["models"].get(
+                "where_logic"
+            )
 
     def _get_dbt_docs_prefix(self) -> None:
         try:
