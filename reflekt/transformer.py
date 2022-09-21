@@ -343,47 +343,43 @@ class ReflektTransformer(object):
         dbt_src = self._template_dbt_source(reflekt_plan=reflekt_plan)
 
         std_segment_tables = []
-        if self.reflekt_plan.user_traits:
-            std_segment_tables.append(
-                {
-                    "name": "identifies",
-                    "description": "A table with identify() calls.",
-                    "unique_key": "identify_id",
-                    "cdp_cols": seg_identify_cols,
-                    "plan_cols": reflekt_plan.user_traits,
-                }
-            )
-            std_segment_tables.append(
-                {
-                    "name": "users",
-                    "description": "A table with the latest traits for users.",
-                    "unique_key": "user_id",
-                    "cdp_cols": seg_users_cols,
-                    "plan_cols": reflekt_plan.user_traits,
-                }
-            )
-
-        if self.reflekt_plan.group_traits:
-            std_segment_tables.append(
-                {
-                    "name": "groups",
-                    "description": "A table with group() calls.",
-                    "unique_key": "group_id",
-                    "cdp_cols": seg_groups_cols,
-                    "plan_cols": reflekt_plan.group_traits,
-                }
-            )
-
-        if self.reflekt_plan.events:
-            std_segment_tables.append(
-                {
-                    "name": "tracks",
-                    "description": "A table with event track() calls.",
-                    "unique_key": "event_id",
-                    "cdp_cols": seg_tracks_cols,
-                    "plan_cols": [],
-                }
-            )
+        # ALWAYS try to template standard tables. If they don't exist, Reflekt will skip
+        std_segment_tables.append(
+            {
+                "name": "identifies",
+                "description": "A table with identify() calls.",
+                "unique_key": "identify_id",
+                "cdp_cols": seg_identify_cols,
+                "plan_cols": reflekt_plan.user_traits,
+            }
+        )
+        std_segment_tables.append(
+            {
+                "name": "users",
+                "description": "A table with the latest traits for users.",
+                "unique_key": "user_id",
+                "cdp_cols": seg_users_cols,
+                "plan_cols": reflekt_plan.user_traits,
+            }
+        )
+        std_segment_tables.append(
+            {
+                "name": "groups",
+                "description": "A table with group() calls.",
+                "unique_key": "group_id",
+                "cdp_cols": seg_groups_cols,
+                "plan_cols": reflekt_plan.group_traits,
+            }
+        )
+        std_segment_tables.append(
+            {
+                "name": "tracks",
+                "description": "A table with event track() calls.",
+                "unique_key": "event_id",
+                "cdp_cols": seg_tracks_cols,
+                "plan_cols": [],
+            }
+        )
 
         for std_segment_table in std_segment_tables:
             db_columns, error_msg = self.db_engine.get_columns(
