@@ -46,7 +46,7 @@ class RegistryError(Exception):
 
         Args:
             message (str): Error message.
-            type (Registry): Type of schema registry.
+            type (RegistryEnum): Type of schema registry.
             profile (Profile): Reflekt profile object.
         """
         self.message = message
