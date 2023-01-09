@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "reflekt"
 version = "0.3.0"
-description = "CLI to design, collect, validate, stream, model, and document event data."
+description = "A CLI tool to define event schemas, lint them, sync them to/from schema registries, and build corresponding data artifacts (e.g., dbt package)."
 authors = ["Gregory Clunies <greg.clunies@gmail.com>"]
 readme = "README.md"
 include = ["reflekt/_templates/**/*"]
