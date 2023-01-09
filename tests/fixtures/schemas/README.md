@@ -1,0 +1,1 @@
+This folder exists so that the test suite has access to internal schemas required by reflekt to validate reflekt_project.yml and reflekt_profiles.yml files. These schemas are not intended to be used by end users of reflekt.

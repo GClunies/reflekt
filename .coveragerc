@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+[run]
+branch = false
+source = ["reflekt]
+omit =
+    reflekt/cli.py
+    reflekt/constants.py
+    reflekt/dumper.py
+    reflekt/logger.py
+
+[report]
+show_missing = true
+fail_under = 10

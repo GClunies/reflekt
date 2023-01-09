@@ -1,0 +1,3 @@
+# Never commit reflekt_profiles.yml or .reflekt/ to repo!
+reflekt_profiles.yml
+/.logs/**

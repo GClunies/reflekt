@@ -3,11 +3,15 @@ Upstream-Name: reflekt
 Upstream-Contact: Gregory Clunies <greg@reflekt-ci.com>
 Source: https://github.com/reflekt-ci/reflekt
 
-Files: reflekt/templates/*
+Files: .vscode/*
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
 License: Apache-2.0
 
-Files: docs/*
+Files: reflekt/_templates/*
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
+Files: tests/fixtures/*
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
 License: Apache-2.0
 
@@ -15,6 +19,14 @@ Files: poetry.lock
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
 License: Apache-2.0
 
-Files: License.md
+Files: pyproject.toml
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
+Files: LICENSE
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
+Files: reflekt_project.yml
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
 License: Apache-2.0

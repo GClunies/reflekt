@@ -1,0 +1,47 @@
+# THIS FILE (./reflekt_project.yml) IS FOR DEVELOPMENT PURPOSES ONLY
+
+# GENERAL CONFIG ----------------------------------------------------------------------
+version: 1.0
+
+name: test_project
+vendor: com.reflekt
+profile: test_profile
+profiles_path: ./tests/fixtures/reflekt_profiles.yml  # Used for test suite
+
+# SCHEMAS CONFIG ----------------------------------------------------------------------
+# Define conventions for schemas. Used by `reflekt lint`
+schemas:
+  conventions:
+    event:
+      casing: title             # title | snake | camel | any
+      capitalize_camel: true    # Only used if 'casing: camel'
+      numbers: false
+      reserved: []
+    property:
+      casing: snake             # title | snake | camel | any
+      capitalize_camel: true    # Only used if 'casing: camel'
+      numbers: false
+      reserved: []
+    data_types: [string, integer, number, boolean, object, array, any, 'null']
+
+# REGISTRY CONFIG ---------------------------------------------------------------------
+# Avo registries require additional configuration. Used by `reflekt pull`
+registry:
+  avo:
+    branches:
+      staging: abc123
+      main: main
+
+# ARTIFACTS CONFIG -----------------------------------------------------------------------
+# Config controlling how data artifacts are generated
+artifacts:
+  dbt:
+    sources:
+      prefix: __src_
+    models:
+      prefix: stg_
+    docs:
+      prefix: _stg_
+      in_folder: false
+      tests:
+        id: [unique, not_null]

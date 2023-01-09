@@ -2,1096 +2,458 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import copy
-import hashlib
+# flake8: noqa  -- Readability is more important than style here
 import json
 import os
 import shutil
-import subprocess
 from pathlib import Path
+from typing import Optional
 
 import click
 import pkg_resources
-import yaml
-from inflection import dasherize, titleize
+import typer
 from loguru import logger
-from packaging.version import InvalidVersion
-from packaging.version import parse as parse_version
+from rich import print
+from rich.console import Console
+from rich.logging import RichHandler
+from rich.table import Table
+from rich.traceback import install
 
-import reflekt.tracking
-from reflekt import __version__, constants
-from reflekt.api_handler import ReflektApiHandler
-from reflekt.avo.plan import AvoPlan
-from reflekt.config import ReflektConfig
-from reflekt.loader import ReflektLoader
-from reflekt.logger import logger_config
-from reflekt.project import ReflektProject
-from reflekt.segment.plan import SegmentPlan
-from reflekt.segment.schema import (  # TODO: Likely need a handler for these schema if build out Rudderstack & Snowplow  # noqa: E501
-    segment_payload_schema,
-    segment_plan_schema,
+from reflekt import SHOW_LOCALS, __version__
+from reflekt.builder.dbt import DbtBuilder
+from reflekt.builder.handler import BuilderHandler
+from reflekt.constants import (
+    REGISTRY,
+    WAREHOUSE,
+    ArtifactEnum,
+    RegistryEnum,
+    SdkEnum,
 )
-from reflekt.transformer import ReflektTransformer
-from reflekt.utils import segment_2_snake
-
-reflekt.tracking.initialize_tracking()
-
-if ReflektProject().exists:
-    if ReflektConfig().do_not_track:
-        reflekt.tracking.do_not_track()
+from reflekt.errors import SelectArgError
+from reflekt.linter import lint_schema
+from reflekt.profile import Profile
+from reflekt.project import Project
+from reflekt.registry.handler import RegistryHandler
 
 
-# Use main() + @main.command decorator so that CLI does not require 'poetry run' prefix
-# reference: https://stackoverflow.com/a/55065934
-@click.group()
-def main():
-    logger.configure(**logger_config)
+# Prettify traceback messages
+app = typer.Typer(pretty_exceptions_show_locals=SHOW_LOCALS)  # Typer app
+install(show_locals=SHOW_LOCALS)  # Any other uncaught exceptions
 
 
-@click.option(
-    "--project-dir",
-    "project_dir_str",
-    default=".",
-    required=True,
-    help="Path where Reflekt project will be created. Default is the current directory.",
-)
-@main.command()
-def init(project_dir_str: str) -> None:
-    """Create a Reflekt project at the provide directory."""
-    project_dir = Path(project_dir_str).expanduser()
-    project_name = click.prompt(
-        "Enter your project name (letters, digits, underscore)", type=str
+class ExistingProjectError(Exception):
+    """Custom error raised when Reflekt project already exists in directory.
+
+    Occurs when project is initialized, which is why it can't go in reflekt.errors
+    """
+
+    def __init__(self, project_path: Path, message: str) -> None:
+        """Initialize SegmentApiError class.
+
+        Args:
+            project_path (Path): Path to existing reflekt_project.yml.
+            message (str): Error message.
+        """
+        self.project_path = project_path
+        self.message = message
+        super().__init__(self.message)
+
+
+def clean_select(select: str) -> str:
+    """Removes hanging '/' and '.json' from --select argument.
+
+    Args:
+        select (str): The --select argument passed to the Reflekt CLI.
+
+    Returns:
+        str: --select argument without '.json' extension.
+    """
+    cleaned = select.strip().replace(".json", "")
+
+    if cleaned.endswith("/"):
+        cleaned = cleaned[:-1]
+
+    return str(cleaned)
+
+
+@app.command()
+def init(
+    dir: str = typer.Option(
+        ".", "--dir", help="Directory where project will be initialized."
     )
-    project_yml = project_dir / "reflekt_project.yml"
-    readme_md = project_dir / "README.md"
-
-    if project_yml.exists():
-        with open(project_yml, "r") as f:
-            reflekt_project_obj = yaml.safe_load(f)
-
-        if reflekt_project_obj["name"] == project_name:
-            logger.error(
-                f"A Reflekt project named {project_name} already exists in "
-                f"{Path.cwd()}"
-            )
-            raise click.Abort()
-
-    reflekt_config_dir = click.prompt(
-        "Enter path to the DIRECTORY where Reflekt will write your "
-        "reflekt_config.yml to be use by this Reflekt project",
-        type=str,
-        default=str(Path.home() / ".reflekt"),
-    )
-    reflekt_config_dir = Path(reflekt_config_dir)
-    reflekt_config_path = reflekt_config_dir / "reflekt_config.yml"
-    reflekt_config_path = Path(reflekt_config_path)
-    collect_config = True  # Default to collect config from user
-    config_name = click.prompt(
-        "Enter a config profile name for the reflekt_config.yml", type=str
-    )
-
-    if not reflekt_config_path.exists():
-        if not reflekt_config_dir.exists():
-            reflekt_config_dir.mkdir(parents=True)
-        reflekt_config_path.touch()
-        reflekt_config_obj = {
-            config_name: {
-                "plan_type": "",
-                "cdp": "",
-                "warehouse": {},
-            }
-        }
-    else:
-        with open(reflekt_config_path, "r") as f:
-            reflekt_config_obj = yaml.safe_load(f)
-
-        if config_name in reflekt_config_obj:
-            logger.error(
-                f"A Reflekt config profile named {config_name} already exists in "
-                f"{reflekt_config_path}"
-            )
-            raise click.Abort()
-        else:
-            reflekt_config_obj.update(
-                {
-                    config_name: {
-                        "plan_type": "",
-                        "cdp": "",
-                        "warehouse": {},
-                    }
-                }
-            )
-
-    if collect_config:
-        plan_type_prompt = click.prompt(
-            f"What tracking plan tool do you use to manage your tracking plan(s)?"
-            f"{constants.PLAN_INIT_STRING}"
-            f"\nEnter a number",
-            type=int,
-        )
-        plan_type = constants.PLAN_MAP[str(plan_type_prompt)]
-        reflekt_config_obj[config_name]["plan_type"] = plan_type
-
-        if plan_type == "segment":
-            # workspace_name and access_token required for Segment API use
-            workspace_name = click.prompt(
-                "Enter your Segment workspace name. You can find this in your Segment "
-                "account URL (i.e. https://app.segment.com/your-workspace-name/)",
-                type=str,
-            )
-            reflekt_config_obj[config_name]["workspace_name"] = workspace_name
-            access_token = click.prompt(
-                "Enter your Segment Config API access token (To generate a "
-                "token, see Segment's documentation https://segment.com/docs/config-api/authentication/#create-an-access-token)",  # noqa: E501
-                type=str,
-                hide_input=True,
-            )
-            reflekt_config_obj[config_name]["access_token"] = access_token
-        elif plan_type == "avo":
-            workspace_id = click.prompt(
-                "Enter your Avo workspace ID. See the Avo docs "
-                "(https://www.avo.app/docs/public-api/export-tracking-plan) on how to "
-                "find your workspace ID. This requires Avo API access "
-                "(https://www.avo.app/docs/public-api/export-tracking-plan). Contact "
-                "Avo support for access if you do not have it.",
-                type=str,
-                hide_input=True,
-            )
-            reflekt_config_obj[config_name]["workspace_id"] = workspace_id
-            service_account_name = click.prompt(
-                "Enter your Avo service account name. See the Avo docs "
-                "(https://www.avo.app/docs/public-api/authentication#creating-service-accounts) "  # noqa: E501
-                "on creating your service account credentials. This requires Avo API "
-                "access (https://www.avo.app/docs/public-api/export-tracking-plan). "
-                "Contact Avo support for access if you do not have it.",
-                type=str,
-                hide_input=True,
-            )
-            reflekt_config_obj[config_name][
-                "service_account_name"
-            ] = service_account_name
-            service_account_secret = click.prompt(
-                "Enter your Avo service account secret. See the Avo docs "
-                "(https://www.avo.app/docs/public-api/authentication#creating-service-accounts) "  # noqa: E501
-                "on creating your service account credentials. This requires Avo API "
-                "access (https://www.avo.app/docs/public-api/export-tracking-plan). "
-                "Contact Avo support for access if you do not have it.",
-                type=str,
-                hide_input=True,
-            )
-            reflekt_config_obj[config_name][
-                "service_account_secret"
-            ] = service_account_secret
-
-        # TODO - Enable support for other CDPs below as developed
-        # elif plan_type == "rudderstack":
-        #     pass
-        # elif plan_type == "snowplow":
-        #     pass
-
-        cdp_num_prompt = click.prompt(
-            f"How do you collect first-party data?"
-            f"{constants.CDP_INIT_STRING}"
-            f"\nEnter a number",
-            type=int,
-        )
-        cdp = constants.CDP_MAP[str(cdp_num_prompt)]
-        reflekt_config_obj[config_name]["cdp"] = cdp
-        warehouse_num = click.prompt(
-            f"Which data warehouse do you use?"
-            f"{constants.WAREHOUSE_INIT_STRING}"
-            f"\nEnter a number",
-            type=int,
-        )
-        warehouse = constants.WAREHOUSE_MAP[str(warehouse_num)]
-        reflekt_config_obj[config_name]["warehouse"].update({warehouse: {}})
-
-        if warehouse == "snowflake":
-            account = click.prompt("account", type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"account": account}
-            )
-            user = click.prompt("user", type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"user": user}
-            )
-            password = click.prompt("password", hide_input=True, type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"password": password}
-            )
-            role = click.prompt("role", type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"role": role}
-            )
-            database = click.prompt(
-                "database (where raw event data is stored)", type=str
-            )
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"database": database}
-            )
-            snowflake_warehouse = click.prompt("warehouse", type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"warehouse": snowflake_warehouse}
-            )
-        elif warehouse == "redshift":
-            host_url = click.prompt(
-                "host_url (hostname.region.redshift.amazonaws.com)", type=str
-            )
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"host_url": host_url}
-            )
-            port = click.prompt("port", default=5439, type=int)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"port": port}
-            )
-            user = click.prompt("user", type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"user": user}
-            )
-            password = click.prompt("password", hide_input=True, type=str)
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"password": password}
-            )
-            db_name = click.prompt(
-                "db_name (database where raw event data is stored)",
-                type=str,
-            )
-            reflekt_config_obj[config_name]["warehouse"][warehouse].update(
-                {"db_name": db_name}
-            )
-        # TODO - Enable support for other warehouses below as developed
-        # elif warehouse == "bigquery":
-        #     pass
-
-        with open(reflekt_config_path, "w") as f:
-            yaml.dump(reflekt_config_obj, f, indent=2)
-
-    click.echo(
-        f"Configured to use Reflekt config profile '{config_name}' at "
-        f"{reflekt_config_path}"
-    )
-    project_template_dir = pkg_resources.resource_filename(
-        "reflekt", "templates/project/"
-    )
-    shutil.copytree(project_template_dir, project_dir, dirs_exist_ok=True)
-
-    # Template reflekt_project.yml
-    with open(project_yml, "r") as f:
-        project_yml_str = f.read()
-
-    project_yml_str = (
-        project_yml_str.replace("default_project", project_name)
-        .replace("default_profile", config_name)
-        .replace(
-            "# config_path: [directorypath]", f"config_path: {str(reflekt_config_path)}"
-        )
-    )
-
-    with open(project_yml, "w") as f:
-        f.write(project_yml_str)
-
-    # Template Reflekt project README
-    with open(readme_md, "r") as f:
-        readme_md_str = f.read()
-
-    readme_md_str = readme_md_str.replace("PROJECT_NAME", project_name).replace(
-        "default_profile", config_name
-    )
-
-    with open(readme_md, "w") as f:
-        f.write(readme_md_str)
-
-    logger.info(
-        f"Your Reflekt project '{project_name}' has been created!"
-        f"\n\nWith reflekt, you can:\n\n"
-        f"    reflekt new --name <plan-name>\n"
-        f"        Create a new tracking plan, defined as code.\n\n"  # noqa: E501
-        f"    reflekt pull --name <plan-name>\n"
-        f"        Get tracking plan from Analytics Governance tool and convert it to code.\n\n"  # noqa: E501
-        f"    reflekt push --name <plan-name>\n"
-        f"        Sync tracking plan code to Analytics Governance tool. Reflekt handles conversion.\n\n"  # noqa: E501
-        f"    reflekt test --name <plan-name>\n"
-        f"        Test tracking plan code for naming and metadata conventions (defined in reflect_project.yml).\n\n"  # noqa: E501
-        f"    reflekt dbt --name <plan-name>\n"
-        f"        Template dbt package with sources, models, and docs for all events in tracking plan."  # noqa: E501
-    )
-
-    reflekt.tracking.track_event(
-        "project_created",
-        properties={
-            "project_id": hashlib.md5(project_name.encode("utf-8")).hexdigest(),
-            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
-            "cdp_type": cdp,
-            "warehouse_type": warehouse,
-            "plan_type": plan_type,
-        },
-        context={
-            "app": {
-                "name": "reflekt",
-                "version": __version__,
-            }
-        },
-    )
-
-
-@main.command()
-@click.option(
-    "-n",
-    "--name",
-    "plan_name",
-    required=True,
-    help="Name of the tracking plan you want to create.",
-)
-def new(plan_name: str) -> None:
-    """Create a new empty tracking plan using provided name."""
-    plan_template_dir = pkg_resources.resource_filename("reflekt", "templates/plan/")
-    plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
-
-    try:
-        logger.info(f"Creating new tracking plan '{plan_name}' in '{plan_dir}'")
-        shutil.copytree(plan_template_dir, plan_dir)
-    except FileExistsError:
-        logger.error(
-            f"Tracking plan {plan_name} already exists! Please provide a "
-            f"different name."
-        )
-        raise click.Abort()
-
-    plan_yml_file = plan_dir / "plan.yml"
-
-    with open(plan_yml_file, "r") as f:
-        doc = yaml.safe_load(f)
-
-    doc["name"] = plan_name
-
-    with open(plan_yml_file, "w") as f:
-        yaml.dump(doc, f)
-
-    logger.info("")  # Terminal newline
-    logger.success(f"Created Reflekt tracking plan '{plan_name}'")
-
-    reflekt.tracking.track_event(
-        "plan_created",
-        properties={
-            "project_id": hashlib.md5(ReflektProject().name.encode("utf-8")).hexdigest(),
-            "plan_id": hashlib.md5(plan_name.encode("utf-8")).hexdigest(),
-            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
-            "cdp_type": ReflektConfig().cdp_name,
-            "warehouse_type": ReflektConfig().warehouse_type,
-            "plan_type": ReflektConfig().plan_type,
-        },
-        context={
-            "app": {
-                "name": "reflekt",
-                "version": __version__,
-            }
-        },
-    )
-
-
-@main.command()
-@click.option(
-    "-n",
-    "--name",
-    "plan_name",
-    required=True,
-    help="Tracking plan name in CDP or Analytics Governance tool.",
-)
-@click.option(
-    "--raw",
-    flag_value=True,
-    help="Pull raw tracking plan JSON (not in Reflekt schema) from CDP.",
-)
-@click.option(
-    "--avo-branch",
-    "avo_branch",
-    default=None,
-    help=("Specify the branch name you want to pull your Avo tracking plan from."),
-)
-def pull(plan_name: str, raw: bool, avo_branch: str) -> None:
-    """Generate tracking plan as code using the Reflekt schema."""
-    api = ReflektApiHandler().get_api()
-    config = ReflektConfig()
-    logger.info(
-        f"Searching {titleize(config.plan_type)} for tracking plan '{plan_name}'"
-    )
-
-    if api.type == "segment":  # Segment supports multiple plans, no branches
-        plan_json = api.get(plan_name)
-    elif api.type == "avo":  # Avo supports one plan, multiple branches
-        plan_json = api.get(avo_branch)
-
-    logger.info(f"Found tracking plan '{plan_name}'")
-
-    if raw:
-        logger.info(
-            f"Displaying raw {titleize(config.plan_type)} tracking plan '{plan_name}'\n"
-        )
-        click.echo(json.dumps(plan_json, indent=2))
-    else:
-        plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
-
-        if api.type.lower() == "avo":
-            plan = AvoPlan(plan_json, plan_name)
-        elif api.type.lower() == "segment":
-            plan = SegmentPlan(plan_json)
-        # TODO: Add support for other tracking plan types
-        # elif config.plan_type.lower() == "rudderstack":
-        #     plan = RudderstackPlan(plan_json)
-        # elif config.plan_type.lower() == "snowplow":
-        #     plan = SnowplowPlan(plan_json)
-
-        logger.info(f"Building Reflekt tracking plan '{plan_name}' at {plan_dir}")
-        plan.build_reflekt(plan_dir)
-        logger.info("")  # Terminal newline
-        logger.success(f"Built Reflekt tracking plan '{plan_name}'")
-
-    reflekt.tracking.track_event(
-        "plan_pulled",
-        properties={
-            "project_id": hashlib.md5(ReflektProject().name.encode("utf-8")).hexdigest(),
-            "plan_id": hashlib.md5(plan_name.encode("utf-8")).hexdigest(),
-            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
-            "cdp_type": ReflektConfig().cdp_name,
-            "warehouse_type": ReflektConfig().warehouse_type,
-            "plan_type": ReflektConfig().plan_type,
-        },
-        context={
-            "app": {
-                "name": "reflekt",
-                "version": __version__,
-            }
-        },
-    )
-
-
-@click.option(
-    "-n",
-    "--name",
-    "plan_name",
-    required=True,
-    help="Tracking plan name in CDP or Analytics Governance tool.",
-)
-@click.option(
-    "--dry",
-    is_flag=True,
-    required=False,
-    help="Output JSON to be synced, without actually syncing it.",
-)
-@click.option(
-    "-u",
-    "--update",
-    "updates",
-    type=str,
-    multiple=True,
-    required=False,
-    help=(
-        "Update/add specified (using kebab-case) event, all user traits, or all "
-        "group traits to a tracking plan. "
-    ),
-)
-@click.option(
-    "-r",
-    "--remove",
-    "removes",
-    type=str,
-    multiple=True,
-    required=False,
-    help=(
-        "Remove specified (using kebab-case) event, all user traits, or all group "
-        "traits from a tracking plan."
-    ),
-)
-@click.option(
-    "-t",
-    "--target",
-    "target",
-    type=str,
-    multiple=True,
-    required=False,
-    help=(
-        "Syncs the plan provided in the --name arg to an alternative plan name provided "
-        "the --target arg. Useful when managing staging vs production tracking plans."
-    ),
-)
-@main.command()
-def push(plan_name, dry, updates, removes, target) -> None:
-    """Sync tracking plan to CDP or Analytics Governance tool."""
-    api = ReflektApiHandler().get_api()
-    config = ReflektConfig()
-    plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
-    # Set defaults
-    reflekt_plan_name = plan_name
-    api_plan_name = plan_name
-
-    if api.type.lower() in ["avo"]:
-        logger.error(f"'reflekt push' not supported for {titleize(api.type)}.")
-        raise click.Abort()
-
-    if updates != () and removes != ():  # Check for incompatible arguments
-        logger.error("--update and --remove arguments cannot be combined!")
-        raise SystemExit(1)
-
-    if target != ():
-        if len(target) > 1:
-            logger.error("--target only accepts one argument")
-            raise SystemExit(1)
-        else:
-            target_name = target[0]
-    else:
-        target_name = None
-
-    if updates != ():
-        # Determine what needs to be updated based on --update arg
-        update_events = tuple(
-            update for update in updates if update not in ("user-traits", "group-traits")
-        )
-        update_user_traits = tuple(
-            update for update in updates if update == "user-traits"
-        )
-        update_group_traits = tuple(
-            update for update in updates if update == "group-traits"
-        )
-
-        if target_name is not None:
-            api_plan_name = target_name
-            logger.warning(
-                f"--target flag detected. Syncing Reflekt plan {reflekt_plan_name} to "
-                f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
-            )
-
-        logger.warning(  # Get the existing tracking plan that will be updated
-            f"--update flag detected. Searching {titleize(config.plan_type)} for "
-            f"existing tracking plan '{api_plan_name}' to update."
-        )
-
-        existing_plan_json = api.get(api_plan_name)  # Get the existing plan
-        logger.info("")  # Terminal newline
-        logger.info(
-            f"Found existing {titleize(config.plan_type)} tracking plan "
-            f"'{api_plan_name}'"
-        )
-
-        # Load a Reflekt tracking, only including items from the --update arg
-        logger.info("")  # Terminal newline
-        logger.info(
-            f"Loading Reflekt tracking plan {reflekt_plan_name} and specified events."
-        )
-        loader = ReflektLoader(
-            plan_dir=plan_dir,
-            parse_all=False,
-            events=update_events,
-            user_traits=update_user_traits,
-            group_traits=update_group_traits,
-        )
-        reflekt_plan = loader.plan
-        transformer = ReflektTransformer(reflekt_plan)
-        plan_updates_json = transformer.build_cdp_plan()
-        sync_events = []  # Events to sync
-
-        # For existing events - check if they need to be updated
-        for existing_event in existing_plan_json["rules"]["events"]:
-            match_found = False
-            match_event = None
-            for updated_event in plan_updates_json["tracking_plan"]["rules"]["events"]:
-                # If updated event name+version matches existing event, use updated event
-                if (
-                    updated_event["name"] == existing_event["name"]
-                    and updated_event["version"] == existing_event["version"]
-                ):
-                    match_found = True
-                    match_event = updated_event
-
-            if match_found:  # If match found, add updated event to sync list
-                sync_events.append(match_event)
-            else:  # If no match found, add existing event to sync list
-                sync_events.append(existing_event)
-
-        # For proposed events - check if they need to be added (not in existing events)
-        for updated_event in plan_updates_json["tracking_plan"]["rules"]["events"]:
-            match_found = False
-            for existing_event in existing_plan_json["rules"]["events"]:
-                # Check if updated event is already in existing events
-                if (
-                    updated_event["name"] == existing_event["name"]
-                    and updated_event["version"] == existing_event["version"]
-                ):
-                    match_found = True
-
-            if not match_found:  # Only ADD updated event if NOT found in existing events
-                sync_events.append(updated_event)
-
-        # Set the events to sync
-        sync_plan_json = copy.deepcopy(plan_updates_json)
-        sync_plan_json["tracking_plan"]["rules"]["events"] = sync_events
-        cdp_plan = sync_plan_json
-
-        if target and str.lower(config.plan_type) == "segment":
-            cdp_plan["tracking_plan"]["display_name"] = api_plan_name
-
-    elif removes != ():
-        # Determine what needs to be removed based on --remove arg
-        remove_events = tuple(
-            remove
-            for remove in removes
-            if remove != "user-traits" or remove != "group-traits"
-        )
-        remove_user_traits = tuple(
-            remove for remove in removes if remove == "user-traits"
-        )
-        remove_group_traits = tuple(
-            remove for remove in removes if remove == "group-traits"
-        )
-
-        if target_name is not None:
-            api_plan_name = target_name
-            logger.warning(
-                f"--target flag detected. Syncing Reflekt plan {reflekt_plan_name} to "
-                f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
-            )
-
-        # Get the existing plan that will have events/traits removed
-        remove_event_str = ", ".join("'" + event + "'" for event in remove_events)
-        logger.warning(
-            f"--remove flag detected. Removing event(s): {remove_event_str}, from "
-            f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
-        )
-
-        existing_plan_json = api.get(api_plan_name)
-        existing_events = existing_plan_json["rules"]["events"]
-        sync_events = []  # Events to sync
-
-        for existing_event in existing_events:
-            if dasherize(segment_2_snake(existing_event["name"])) not in remove_events:
-                sync_events.append(existing_event)
-
-        cdp_plan = copy.deepcopy(segment_payload_schema)
-        cdp_plan["tracking_plan"].update(segment_plan_schema)
-        cdp_plan["tracking_plan"]["rules"]["events"] = sync_events
-
-        if remove_user_traits != ():
-            cdp_plan["tracking_plan"]["rules"]["identify"]["properties"]["traits"][
-                "properties"
-            ] = []
-
-        if remove_group_traits != ():
-            cdp_plan["tracking_plan"]["rules"]["group"]["properties"]["traits"][
-                "properties"
-            ] = []
-
-    else:
-        # Sync the plan as specified by the --name arg
-        logger.info(f"Loading Reflekt tracking plan '{plan_name}'")
-        loader = ReflektLoader(
-            plan_dir=plan_dir,
-        )
-        reflekt_plan = loader.plan
-        transformer = ReflektTransformer(reflekt_plan)
-        plan_updates_json = transformer.build_cdp_plan()
-        cdp_plan = plan_updates_json
-
-        if target_name is not None:
-            api_plan_name = target_name
-            logger.warning(
-                f"--target flag detected. Syncing Reflekt plan {reflekt_plan_name} to "
-                f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
-            )
-
-            if str.lower(config.plan_type) == "segment":
-                cdp_plan["tracking_plan"]["display_name"] = api_plan_name
-
-    if dry:
-        payload = api.sync(api_plan_name, cdp_plan, dry=True)
-        logger.info("")  # Terminal newline
-        logger.info(
-            f"[DRY RUN] The following JSON would be sent to {transformer.plan_type}"
-        )
-        click.echo(json.dumps(payload, indent=2))
-    else:
-        logger.info("")  # Terminal newline
-        logger.info(
-            f"Syncing Reflekt tracking plan '{reflekt_plan_name}' to "
-            f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
-        )
-
-        api.sync(api_plan_name, cdp_plan)
-        logger.info("")  # Terminal newline
-        logger.success(
-            f"Synced Reflekt tracking plan '{reflekt_plan_name}' to "
-            f"{titleize(config.plan_type)} tracking plan '{api_plan_name}'"
-        )
-
-    reflekt.tracking.track_event(
-        "plan_pushed",
-        properties={
-            "project_id": hashlib.md5(ReflektProject().name.encode("utf-8")).hexdigest(),
-            "plan_id": hashlib.md5(plan_name.encode("utf-8")).hexdigest(),
-            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
-            "cdp_type": ReflektConfig().cdp_name,
-            "warehouse_type": ReflektConfig().warehouse_type,
-            "plan_type": ReflektConfig().plan_type,
-        },
-        context={
-            "app": {
-                "name": "reflekt",
-                "version": __version__,
-            }
-        },
-    )
-
-
-@click.option(
-    "-s",
-    "--select",
-    "selection",
-    type=str,
-    multiple=True,
-    required=False,
-    help="Selected event or traits to be tested (specified in kebab-case).",
-)
-@click.option(
-    "-n",
-    "--name",
-    "plan_name",
-    type=str,
-    required=True,
-    help="Name of tracking plan to be tested (specified in kebab-case).",
-)
-@main.command()
-def test(plan_name, selection) -> None:
-    """Test tracking plan schema for naming, data types, and metadata."""
-    plan_dir = ReflektProject().project_dir / "tracking-plans" / plan_name
-    logger.info(f"Testing Reflekt tracking plan '{plan_name}'")
-
-    if selection != ():
-        # Determine what needs to be test based on --select arg
-        selected_events = tuple(
-            selected
-            for selected in selection
-            if selected not in ("user-traits", "group-traits")
-        )
-        selected_user_traits = tuple(
-            selected for selected in selection if selected == "user-traits"
-        )
-        selected_group_traits = tuple(
-            selected for selected in selection if selected == "group-traits"
-        )
-
-        # Initialize ReflektLoader() always runs checks. Simple, not elegant.
-        ReflektLoader(
-            plan_dir=plan_dir,
-            parse_all=False,
-            events=selected_events,
-            user_traits=selected_user_traits,
-            group_traits=selected_group_traits,
-        )
-    else:
-        ReflektLoader(plan_dir=plan_dir)
-
-    # If no errors are thrown by ReflektLoader, passed tests
-    logger.info("")
-    logger.success("Test complete. No errors.")
-
-    reflekt.tracking.track_event(
-        "plan_tested",
-        properties={
-            "project_id": hashlib.md5(ReflektProject().name.encode("utf-8")).hexdigest(),
-            "plan_id": hashlib.md5(plan_name.encode("utf-8")).hexdigest(),
-            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
-            "cdp_type": ReflektConfig().cdp_name,
-            "warehouse_type": ReflektConfig().warehouse_type,
-            "plan_type": ReflektConfig().plan_type,
-        },
-        context={
-            "app": {
-                "name": "reflekt",
-                "version": __version__,
-            }
-        },
-    )
-
-
-@click.option(
-    "--tag",
-    "force_tag",
-    is_flag=True,
-    required=False,
-    help="The git tag Reflekt should add after templating. Tag format = 'v<semantic_version>__reflekt_<project_name>_<cdp>'",  # noqa: E501
-)
-@click.option(
-    "--commit",
-    "force_commit",
-    is_flag=True,
-    required=False,
-    help="The git commit Reflekt should add after templating. Commit format = 'build: reflekt_<project_name>_<cdp>/models/<schema_or_alias>/'",  # noqa: E501
-)
-@click.option(
-    "--skip-git",
-    "skip_git",
-    is_flag=True,
-    required=False,
-    help="Skip prompts at the end of templating to create Git commit and tag.",
-)
-@click.option(
-    "--force-version",
-    "force_version",
-    type=str,
-    required=False,
-    help="Force Reflekt to template the dbt package with a specified semantic version.",
-)
-@click.option(
-    "-s",
-    "--schema",
-    "schema",
-    type=str,
-    required=True,
-    help=(
-        "Schema Reflekt will search to look for raw event tables that match "
-        "tracking plan events."
-    ),
-)
-@click.option(
-    "-e",
-    "--event",
-    "events",
-    type=str,
-    multiple=True,
-    required=False,
-    help="Name of a single event to be tested (in kebab-case).",
-)
-@click.option(
-    "-n",
-    "--name",
-    "plan_name",
-    type=str,
-    required=True,
-    help="Tracking plan name in your Reflekt project.",
-)
-@main.command()
-def dbt(
-    plan_name,
-    events,
-    schema,
-    force_version=None,
-    skip_git=None,
-    force_commit=None,
-    force_tag=None,
 ) -> None:
-    """Build dbt package with sources, models, and docs based on tracking plan."""
-    project = ReflektProject()
-    project_name = project.name
-    project_dir = project.project_dir
-    config = ReflektConfig()
-    cdp = config.cdp_name
-    plan_type = str.lower(config.plan_type)
-    plan_dir = project_dir / "tracking-plans" / plan_name
-    pkg_name = f"reflekt_{project_name}_{cdp}"
-    project_dir / "dbt-packages" / pkg_name
-    dbt_project_yml = project.project_dir / "dbt_project.yml"
-    config.warehouse_type
+    """Initialize a Reflekt project.
 
-    # Determine dbt pkg version to pass to ReflektTransformer
-    if force_version:  # If user has forced version, use that
-        try:
-            version = parse_version(force_version)
-        except InvalidVersion:
-            logger.error(
-                f"[ERROR] Invalid semantic version provided by --force-version: "
-                f"{force_version}"
-            )
-            raise click.Abort()
-    # If we don't find a dbt_project.yml -> package does not exist -> v0.1.0
-    elif not dbt_project_yml.exists():
-        version = parse_version("0.1.0")
-    else:  # Package already exists!
-        with dbt_project_yml.open() as f:
-            dbt_project_yml = yaml.safe_load(f)
+    Raises:
+        SystemExit: A Reflekt project already exists in the directory.
+    """
+    project = Project(use_defaults=True)
+    project.dir = Path(dir).expanduser()
+    project.path = project.dir / "reflekt_project.yml"
 
-        existing_version = parse_version(dbt_project_yml["version"])
-
-        if existing_version:
-            logger.info(
-                f"[WARNING] Existing dbt package found:\n"
-                f"    Package name: {pkg_name}\n"
-                f"    Existing version: {existing_version}\n"
-            )
-
-        bump = click.confirm(
-            "Do you want to bump dbt package version?",
-            default=True,
+    if project.path.exists():
+        raise ExistingProjectError(
+            project_path=project.path,
+            message=f"Reflekt project configuration already defined at: {project.path}!",
         )
-        major_bump = f"{existing_version.major + 1}.{existing_version.minor}.{existing_version.micro}"  # noqa: E501
-        minor_bump = f"{existing_version.major}.{existing_version.minor + 1}.{existing_version.micro}"  # noqa: E501
-        patch_bump = f"{existing_version.major}.{existing_version.minor}.{existing_version.micro + 1}"  # noqa: E501
 
-        if bump:
-            bump_type = click.prompt(
-                f"Select the semantic version you would like to bump to:\n"
-                f"[1] Major: v{major_bump}\n"
-                f"[2] Minor: v{minor_bump}\n"
-                f"[3] Patch: v{patch_bump}\n"
-                f"\nEnter a number",
-                type=int,
-            )
+    project.name = typer.prompt("Project name [letters, digits, underscore]", type=str)
+    project.vendor = typer.prompt("Schema vendor [e.g com.yourcompany]", type=str)
 
-            if bump_type == 1:
-                version = parse_version(f"{major_bump}")  # noqa: E501
-            elif bump_type == 2:
-                version = parse_version(f"{minor_bump}")  # noqa: E501
-            else:
-                version = parse_version(f"{patch_bump}")  # noqa: E501
+    if project.vendor == "":
+        raise typer.BadParameter("Vendor cannot be empty string")
 
-        else:
-            overwrite = click.confirm(
-                f"[WARNING] Reflekt will UPSERT dbt models and docs in dbt package '{pkg_name}'.\n"  # noqa: E501
-                f"    Do you want to continue?",
-                default=False,
-            )
-
-            if not overwrite:
-                raise click.Abort()
-
-            logger.info("")  # Terminal newline
-            version = existing_version
-
-    # Load Reflekt plan from 'tracking-plans/'
-    logger.info(f"Loading Reflekt tracking plan {plan_name}")
-    loader = ReflektLoader(
-        plan_dir=plan_dir,
-        schema_name=schema,
-        events=events,
+    profile_path = typer.prompt(
+        "Path for 'reflekt_profiles.yml' [stores connection credentials].",
+        type=str,
+        default=str(Path.home() / ".reflekt/reflekt_profiles.yml"),
+        show_default=True,
     )
-    reflekt_plan = loader.plan
-    logger.info(f"Loaded Reflekt tracking plan {plan_name}\n")
+    profile_name = typer.prompt(
+        "Profile name [identifies profile in 'reflekt_profiles.yml']",
+        type=str,
+    )
+    project.profiles_path = Path(profile_path)
+    project.profile = profile_name
 
-    models_subfolder: str = (
-        reflekt_plan.schema_alias
-        if reflekt_plan.schema_alias is not None
-        else reflekt_plan.schema
+    profile = Profile(project=project)
+    profile.path = Path(profile_path)
+    profile.name = profile_name
+    profile.registry[0]["type"] = str.lower(
+        typer.prompt(
+            "Schema Registry [where event schemas are hosted]",
+            type=click.Choice(REGISTRY, case_sensitive=False),
+            show_choices=True,
+        )
     )
 
-    transformer = ReflektTransformer(
-        reflekt_plan=reflekt_plan,
-        models_subfolder=models_subfolder,
-        dbt_package_version=version,
+    if profile.registry[0]["type"] == RegistryEnum.segment:
+        profile.registry[0]["api_token"] = typer.prompt(
+            "Segment API token [requires 'Tracking Plan Admin' access. Segment docs: "
+            "https://bit.ly/segment-api-token]",
+            type=str,
+            hide_input=True,
+        )
+    elif profile.registry[0]["type"] == RegistryEnum.avo:
+        profile.registry[0]["workspace_id"] = typer.prompt(
+            "Avo workspace ID [see Avo docs: https://bit.ly/avo-workspace-id]",
+            type=str,
+        )
+        profile.registry[0]["service_account_name"] = typer.prompt(
+            "Avo service account name [Avo docs: https://bit.ly/avo-service-acct]",
+            type=str,
+        )
+        profile.registry[0]["service_account_secret"] = typer.prompt(
+            "Avo service account secret [Avo docs: https://bit.ly/avo-service-acct]",
+            type=str,
+            hide_input=True,
+        )
+    # elif profile.registry["type"] == "rudderstack_govern":
+    #     pass
+    # elif profile.registry["type"] == "snowplow_iglu":
+    #     pass
+    # elif profile.registry["type"] == "amplitude_data":
+    #     pass
+
+    target_credentials = {}
+    target_credentials["type"] = str.lower(
+        typer.prompt(
+            "Target Data Warehouse [where raw event data is loaded]",
+            type=click.Choice(WAREHOUSE),
+            show_choices=True,
+        )
     )
-    transformer.build_dbt_package()
-
-    if not skip_git:
-        if force_commit:
-            commit_str = f"build: {pkg_name}/models/{models_subfolder}/"
-        else:
-            create_commit = click.confirm(
-                "Would you like Reflekt to create a Git commit after templating?",
-                default=False,
-            )
-            if create_commit:
-                commit_str = click.prompt(
-                    "Git commit message",
-                    type=str,
-                    default=f"build: {pkg_name}/models/{models_subfolder}/",
-                )
-            else:
-                commit_str = None
-
-        if force_tag:
-            tag_str = f"v{str(version)}__{pkg_name}"
-        else:
-            create_tag = click.confirm(
-                f"Would you like Reflekt to create a Git tag to easily reference "
-                f"dbt package {pkg_name} in your dbt project?",
-                default=False,
-            )
-            if create_tag:
-                tag_str = click.prompt(
-                    "Git tag", type=str, default=f"v{str(version)}__{pkg_name}"
-                )
-            else:
-                tag_str = None
-
-        git_executable = shutil.which("git")
-        rel_pkg_path = f"dbt-packages/{pkg_name}"
-
-        if commit_str is not None:
-            if plan_type == "avo":
-                rel_avo_json_path = ".reflekt/avo/avo.json"
-                subprocess.call(
-                    args=[git_executable, "add", rel_pkg_path, rel_avo_json_path],
-                    cwd=project_dir,
-                )
-            else:
-                subprocess.call(
-                    args=[git_executable, "add", rel_pkg_path],
-                    cwd=project_dir,
-                )
-
-            subprocess.call(
-                args=[git_executable, "commit", "-m", commit_str],
-                cwd=project_dir,
-            )
-
-        if tag_str is not None:
-            subprocess.call(
-                args=[git_executable, "tag", tag_str],
-                cwd=project_dir,
-            )
-
-    reflekt.tracking.track_event(
-        "dbt_package_built",
-        properties={
-            "project_id": hashlib.md5(ReflektProject().name.encode("utf-8")).hexdigest(),
-            "plan_id": hashlib.md5(plan_name.encode("utf-8")).hexdigest(),
-            "ci": os.getenv("CI") if os.getenv("CI") is True else False,
-            "cdp_type": ReflektConfig().cdp_name,
-            "warehouse_type": ReflektConfig().warehouse_type,
-            "plan_type": ReflektConfig().plan_type,
-        },
-        context={
-            "app": {
-                "name": "reflekt",
-                "version": __version__,
-            }
-        },
+    target_credentials["name"] = str.lower(
+        typer.prompt(
+            "Target name [identifies target data warehouse in 'reflekt_profiles.yml']",
+            type=str,
+        )
     )
 
+    if target_credentials["type"] == "snowflake":
+        target_credentials["account"] = typer.prompt("account", type=str)
+        target_credentials["database"] = typer.prompt("database", type=str)
+        target_credentials["warehouse"] = typer.prompt("warehouse", type=str)
+        target_credentials["role"] = typer.prompt("role", type=str)
+        target_credentials["user"] = typer.prompt("user", type=str)
+        target_credentials["password"] = typer.prompt(
+            "password", type=str, hide_input=True
+        )
+        profile.target.append(target_credentials)
+    elif target_credentials["type"] == "bigquery":
+        target_credentials["method"] = typer.prompt("method", type=str)
+        target_credentials["project"] = typer.prompt(
+            "project (GCP project id)", type=str
+        )
+        profile.target.append(target_credentials)
+    elif target_credentials["type"] == "redshift":
+        target_credentials["database"] = typer.prompt("database", type=str)
+        target_credentials["host_url"] = typer.prompt("host_url", type=str)
+        target_credentials["port"] = typer.prompt("port", type=int)
+        target_credentials["user"] = typer.prompt("user", type=str)
+        target_credentials["password"] = typer.prompt(
+            "password", type=str, hide_input=True
+        )
+        profile.target.append(target_credentials)
 
-# Add CLI commands to CLI group
-main.add_command(init)
-main.add_command(new)
-main.add_command(pull)
-main.add_command(push)
-main.add_command(test)
-main.add_command(dbt)
+    project_folders = pkg_resources.resource_filename(  # Get template folder
+        "reflekt", "_templates/reflekt_project/"
+    )
+    shutil.copytree(  # Create Reflekt project directory
+        project_folders,
+        project.dir,
+        dirs_exist_ok=True,
+    )
+
+    # Personalize project README
+    readme_file = project.dir / "README.md"
+    with readme_file.open("r") as f:
+        readme = f.read()
+    readme = readme.replace("PROJECT_NAME", project.name)
+    with readme_file.open("w") as f:
+        f.write(readme)
+
+    # Create reflekt_project.yml and reflekt_profiles.yml in project dir
+    project.to_yaml()
+    profile.to_yaml()
+
+    # Success msg and get started table
+    print("")
+    logger.info(
+        f"Created Reflekt project '{project.name}' "
+        f"at {project.dir.resolve().expanduser()}!"
+    )
+    print("")
+    logger.info("To get started, see the command descriptions below")
+
+    # Table for getting started message
+    table = Table(show_header=True, header_style="bold light_sea_green")
+    table.add_column("Command", no_wrap=True)
+    table.add_column("Description", no_wrap=True)
+    table.add_column("Example", no_wrap=True)
+    table.add_row(
+        "init",
+        "Initialize a Reflekt project.",
+        "reflekt init --dir ./in/this/dir",
+    )
+    table.add_row(
+        "pull",
+        "Pull schemas from a schema registry.",
+        "reflekt pull --select segment/ecommerce",
+    )
+    table.add_row(
+        "push",
+        "Push schemas to a schema registry.",
+        "reflekt push --select segment/ecommerce/CartViewed",
+    )
+    table.add_row(
+        "lint",
+        "Lint schemas against naming and metadata conventions in reflekt_project.yml.",
+        "reflekt lint --select segment/ecommerce/CartViewed/1-0",
+    )
+    table.add_row(
+        "build",
+        "Build dbt package modeling Segment event data stored at the specified target.",
+        "reflekt build dbt --select segment/ecommerce --sdk segment --target snowflake.raw.segment_prod",
+    )
+    console = Console()
+    console.print(table)
+    print("")
 
 
-# Used for CLI debugging
+@app.command()
+def pull(
+    select: str = typer.Option(
+        ..., "--select", "-s", help="Schema(s) to pull from schema registry."
+    )
+):
+    """Pull schema(s) from a schema registry."""
+    project = Project()
+    profile = Profile(project=project)
+    registry = RegistryHandler(select=select, profile=profile).get_registry()
+    registry.pull(select=select)
+
+
+@app.command()
+def push(
+    select: str = typer.Option(
+        ..., "--select", "-s", help="Schema(s) to push to schema registry."
+    ),
+    delete: bool = typer.Option(
+        False,
+        "--delete",
+        "-d",
+        help="Delete schema(s) from schema registry. Prompts for confirmation",
+    ),
+    force: bool = typer.Option(
+        False, "--force", "-f", help="Force command to run without confirmation."
+    ),
+):
+    """Push schema(s) to a schema registry."""
+    select = clean_select(select)
+    project = Project()
+    profile = Profile(project=project)
+    registry = RegistryHandler(select=select, profile=profile).get_registry()
+
+    if registry.type == RegistryEnum.avo:
+        raise SelectArgError(
+            message=(
+                "'reflekt push' is not supported for Avo. Use the Avo UI to define and "
+                "manage your event schemas. Then you can run:\n"
+                "    reflekt pull --select avo/main                                     # Pull schemas from Avo\n"  # noqa: E501
+                "    reflekt build --artifact dbt --select avo/main --target db_schema  # Build dbt pkg"  # noqa: E501
+            ),
+            select=select,
+        )
+
+    if delete and not force:
+        delete_confirmed = typer.confirm(
+            f"Are you sure you want to delete the schema(s) selected by:\n"
+            f"   --select {select}\n",
+        )
+        if delete_confirmed:
+            registry.push(select=select, delete=delete)  # delete=True
+    else:
+        registry.push(select=select, delete=delete)
+
+
+@app.command()
+def lint(
+    select: str = typer.Option(..., "--select", "-s", help="Schema(s) to lint."),
+):
+    """Lint schema(s) against schemas/.reflekt/meta/1-0.json and conventions in reflekt_project.yml."""
+    errors = []
+    schema_paths = []  # List of schema IDs (Paths) to pull
+    select = clean_select(select)
+    project = Project()
+    select_path = project.dir / "schemas" / select
+    logger.info(f"Searching for JSON schemas in: {str(select_path)}")
+    print("")
+
+    if select_path.is_dir():  # Get all schemas in directory
+        for root, _, files in os.walk(select_path):
+            for file in files:
+                if file.endswith(".json"):
+                    schema_paths.append(Path(root) / file)
+    else:  # Get single schema file
+        if select_path.exists():
+            schema_paths.append(select_path)
+
+    logger.info(f"Found {len(schema_paths)} schema(s) to lint")
+    print("")
+
+    for i, schema_path in enumerate(schema_paths, start=1):  # Get all Reflekt schemas
+        with schema_path.open("r") as f:
+            r_schema = json.load(f)
+
+        logger.info(
+            f"{i} of {len(schema_paths)} Linting [magenta]{schema_path}[magenta/]"
+        )
+        lint_schema(r_schema, errors)
+
+    if errors:
+        print("")
+        logger.info(f"[red]Linting failed with {len(errors)} errors[/red]")
+        raise typer.Exit(code=1)
+    else:
+        print("")
+        logger.info("[green]Completed successfully[green/]")
+
+
+@app.command()
+def build(
+    artifact: ArtifactEnum = typer.Argument(
+        ..., help="Type of data artifact to build."
+    ),
+    select: str = typer.Option(
+        ..., "--select", "-s", help="Schema(s) to build data artifacts for."
+    ),
+    sdk: SdkEnum = typer.Option(
+        ..., "--sdk", "-sdk", help="The type of SDK that generated the data."
+    ),
+    target: str = typer.Option(
+        ..., "--target", "-t", help="Schema in database where event data is loaded."
+    ),
+):
+    """Build data artifact(s) based on schema(s)."""
+    select = clean_select(select)
+    project = Project()
+    profile = Profile(project=project)
+    builder = BuilderHandler(
+        artifact=artifact,
+        select=select,
+        sdk=sdk,
+        target=target,
+    ).get_builder()
+    builder.build()
+
+
+def version_callback(value: bool):
+    if value:
+        print(f"Reflekt CLI Version: {__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def main(
+    version: Optional[bool] = typer.Option(
+        None, "--version", callback=version_callback, is_eager=True
+    ),
+):
+    """CLI tool to develop, lint, validate, model, and document events using JSON schema."""
+    project = Project()
+
+    # Configure logging
+    if not project.exists:
+        logger.configure(
+            handlers=[
+                {
+                    "sink": RichHandler(
+                        rich_tracebacks=True,
+                        markup=True,
+                        show_path=False,
+                        log_time_format="[%X]",
+                        omit_repeated_times=False,
+                        tracebacks_show_locals=SHOW_LOCALS,
+                    ),
+                    "format": "{message}",
+                }
+            ],
+        )
+    else:
+        logger.configure(
+            handlers=[
+                {
+                    "sink": RichHandler(
+                        rich_tracebacks=True,
+                        markup=True,
+                        show_path=False,
+                        log_time_format="[%X]",
+                        omit_repeated_times=False,
+                        tracebacks_show_locals=SHOW_LOCALS,
+                    ),
+                    "format": "{message}",
+                },
+                {
+                    "sink": str(project.dir)
+                    + "/.logs/reflekt_{time:YYYY-MM-DD_HH-mm-ss}.log",
+                    "format": "{time:HH:mm:ss} | {level} | {message}",
+                },
+            ],
+        )
+
+    logger.info(f"Running with reflekt={__version__}")
+    print("")
+
+
 if __name__ == "__main__":
+    # push(select="segment/ecommerce", delete=False)
+    # lint(select="segment/ecommerce")
 
-    # ----- GENERAL -----
-    # init(["--project-dir", "~/Repos/test-repo"])
-    # new(["--project-dir", "my-new-plan"])
-
-    # ----- AVO -----
-    # pull(["-n", "my-avo-plan"])
-    # pull(["-n", "my-avo-plan"], "--raw")
-    # pull(["-n", "my-avo-plan", "--avo-branch", "staging"])
-
-    # ----- SEGMENT -----
-    # pull(["-n", "my-segment-plan"])
-    # pull(["-n", "my-segment-plan"], "--raw")
-
-    # push(["-n", "my-segment-plan"])
-    # push(["-n", "my-segment-plan", "--dry"])
-    # push(["-n", "my-segment-plan", "--target", "my-segment-plan-qa"])
-    # push(["-n", "my-segment-plan", "-u", "new-event"])
-    # push(["-n", "my-segment-plan", "-r", "new-event"])
-    # push(["-n", "test-plan", "-u", "user-traits"])
-
-    # ----- REFLEKT -----
-    test(["-n", "my-segment-plan"])
-    # test(["-n", "my-segment-plan", "-e", "order-completed"])
-
-    # dbt(["-n", "my-segment-plan", "-s", "my_app_web"])
-    # dbt(["-n", "my-segment-plan", "-s", "my_app_web", "-e", "order-completed")]
-    # dbt(["-n", "my-segment-plan", "-s", "my_app_web", "-e", "user-traits"])
-    # dbt(["-n", "my-segment-plan", "-s", "my_app_web", "-e", "group-traits"])
+    # reflekt build dbt --select segment/ecommerce --sdk segment --target snowflake.raw.schema_name
+    build(
+        artifact="dbt",
+        select="segment/ecommerce",
+        sdk="segment",
+        target="snowflake.raw.my_app_web",
+    )

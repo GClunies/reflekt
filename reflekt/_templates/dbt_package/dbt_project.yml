@@ -1,0 +1,11 @@
+
+# Private dbt package built by Reflekt (https://github.com/gclunies/reflekt)
+# Since this is a private package, the version is always 0.1.0
+# Use git tags to version different builds of this package as your schemas evolve
+name: package_name
+
+version: '0.1.0'
+
+require-dbt-version: [">=1.0.0", "<2.0.0"]
+
+config-version: 2

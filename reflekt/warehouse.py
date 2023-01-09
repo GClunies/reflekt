@@ -5,82 +5,109 @@
 from typing import Optional, Tuple
 
 import sqlalchemy
-from loguru import logger
 from snowflake.sqlalchemy import URL as snow_url
 from sqlalchemy.engine.url import URL as redshift_url
 
-from reflekt.config import ReflektConfig
+from reflekt.errors import TargetArgError
+from reflekt.profile import Profile
+from reflekt.project import Project
 
 
-class WarehouseConnection:
-    """Class that handles connection to the data warehouse specified in
-    reflekt_config.yml
-    """
+class Warehouse:
+    """Handles connection to data warehouse based on --target argument."""
 
-    def __init__(self) -> None:
-        self._config = ReflektConfig()
-        self.warehouse = self._config.warehouse
-        self.warehouse_type = self._config.warehouse_type
+    def __init__(self, target: str) -> None:
+        """Initialize DataWarehouse class.
 
-        if self.warehouse_type == "redshift":
+        Args:
+            target (str): The --target argument passed to Reflekt CLI.
+        """
+        self._target = target
+        self._profile = Profile(project=Project())
+        self.credentials: Optional[dict] = None
+        self._get_warehouse_connection(target)
+
+    def _get_warehouse_connection(self, target: str) -> None:
+        """Get target argument.
+
+        Args:
+            target (str): The --target argument passed to Reflekt CLI.
+
+        Raises:
+            TargetArgError: Raised when an invalid --target argument is provided.
+        """
+        self._match_found = False
+        self.target_name = self._target.split(".")[0]
+        self.database = self._target.split(".")[1]
+        self.schema = self._target.split(".")[2]
+
+        for profile_target in self._profile.target:
+            if self.target_name == profile_target["name"]:
+                self._match_found = True
+                self.type = profile_target["type"]
+                self.credentials = profile_target
+
+        if not self._match_found:
+            raise TargetArgError(
+                message=(
+                    f"Invalid argument '--target {self._target}'. Target name "
+                    f"'{self.target_name}' does not match a 'target:' configuration in "
+                    f"{self._profile.path}. Target argument must follow the format: "
+                    f"<target_name>.<database>.<schema>\n"
+                ),
+                target=self._target,
+            )
+
+        if self.type == "snowflake":
+            self.engine = sqlalchemy.create_engine(
+                snow_url(
+                    account=self.credentials.get("account"),
+                    database=self.credentials.get("database"),
+                    warehouse=self.credentials.get("warehouse"),
+                    role=self.credentials.get("role"),
+                    user=self.credentials.get("user"),
+                    password=self.credentials.get("password"),
+                )
+            )
+        elif self.type == "redshift":
             self.engine = sqlalchemy.create_engine(
                 redshift_url.create(
                     drivername="redshift+redshift_connector",
-                    host=self.warehouse.get("redshift").get("host_url"),
-                    port=self.warehouse.get("redshift").get("port"),
-                    database=self.warehouse.get("redshift").get("db_name"),
-                    username=self.warehouse.get("redshift").get("user"),
-                    password=self.warehouse.get("redshift").get("password"),
+                    host=self.credentials.get("host_url"),
+                    port=self.credentials.get("port"),
+                    database=self.credentials.get("db_name"),
+                    username=self.credentials.get("user"),
+                    password=self.credentials.get("password"),
                 ),
                 connect_args={
                     "sslmode": "prefer",
                 },
             )
-        elif self.warehouse_type == "snowflake":
-            self.engine = sqlalchemy.create_engine(
-                snow_url(
-                    account=self.warehouse.get("snowflake").get("account"),
-                    user=self.warehouse.get("snowflake").get("user"),
-                    password=self.warehouse.get("snowflake").get("password"),
-                    role=self.warehouse.get("snowflake").get("role"),
-                    database=self.warehouse.get("snowflake").get("database"),
-                    warehouse=self.warehouse.get("snowflake").get("warehouse"),
-                )
-            )
+        # elif self.type == "bigquery":
+        #     pass
 
-        else:
-            logger.error(
-                f"Invalid warehouse type specified in {self._config.path}. See the "
-                f"Reflekt profile configuration docs "
-                f"(https://bit.ly/reflekt-profile-config) for details on profile "
-                f"configuration."
-            )
-            raise SystemExit(1)
+    def get_columns(self, table: str) -> Tuple[Optional[list], Optional[str]]:
+        """Get column names for a table.
 
-    def get_columns(
-        self, schema: str, table_name: str
-    ) -> Tuple[Optional[list], Optional[str]]:
-        # NOTE: Tried below to get columns with all null values. Did not work.
-        # inspector = sqlalchemy.inspect(self.engine)
-        # columns = inspector.get_columns(table_name, schema)
+        Args:
+            table (str): Table name.
 
+        Returns:
+            List[str]: List of column names.
+        """
         with self.engine.connect() as conn:
             try:
-                # This only gets the columns with non-null values, If column is all
-                # nulls, it won't get picked up.
-                query = conn.execute(f"select * from {schema}.{table_name} limit 0")
+                # Get columns. Columns that are ALL null are not included in result
+                query = conn.execute(f"select * from {self.schema}.{table} limit 0")
                 columns = query.keys()._keys
                 error_msg = None
-
-                return columns, error_msg
 
             except sqlalchemy.exc.ProgrammingError as e:
                 columns = None
 
-                # Handle error according to warehouse type
-                if self.warehouse_type == "redshift":
-                    error_msg = e.orig.args[0]["M"]
-                elif self.warehouse_type == "snowflake":
+                if self.type == "snowflake":  # Handle error according to warehouse type
                     error_msg = e.orig.msg
+                elif self.type == "redshift":
+                    error_msg = e.orig.args[0]["M"]
 
-                return columns, error_msg
+            return columns, error_msg
