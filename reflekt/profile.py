@@ -116,4 +116,3 @@ if __name__ == "__main__":  # pragma: no cover
     project = Project()
     profile = Profile(project=project)
     profile.validate_profile()
-    pass

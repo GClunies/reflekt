@@ -20,7 +20,6 @@ from rich.table import Table
 from rich.traceback import install
 
 from reflekt import SHOW_LOCALS, __version__
-from reflekt.builder.dbt import DbtBuilder
 from reflekt.builder.handler import BuilderHandler
 from reflekt.constants import (
     REGISTRY,
