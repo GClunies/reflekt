@@ -6,6 +6,7 @@ license = "Apache-2.0"
 authors = ["Gregory Clunies <greg.clunies@gmail.com>"]
 readme = "README.md"
 repository = "https://github.com/GClunies/Reflekt"
+keywords = ["events", "jsonchema", "analytics", "business-intelligence", "data-modeling", "dbt", "snowflake", "redshift", "segment", "avo"]
 include = ["reflekt/_templates/**/*"]
 
 [tool.poetry.scripts]
