@@ -37,7 +37,7 @@ jobs:
 
       - name: Run linters
         run: |
-          poetry make lint
+          poetry run make lint
 
   test:
     needs: lint
