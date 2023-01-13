@@ -1,12 +1,9 @@
 [tool.poetry]
 name = "reflekt"
 version = "0.3.0"
-description = "A CLI tool to define event schemas, lint them, sync them to/from schema registries, and build corresponding data artifacts (e.g., dbt package)."
-license = "Apache-2.0"
+description = "CLI to design, collect, validate, stream, model, and document event data."
 authors = ["Gregory Clunies <greg.clunies@gmail.com>"]
 readme = "README.md"
-repository = "https://github.com/GClunies/Reflekt"
-keywords = ["events", "jsonchema", "analytics", "business-intelligence", "data-modeling", "dbt", "snowflake", "redshift", "segment", "avo"]
 include = ["reflekt/_templates/**/*"]
 
 [tool.poetry.scripts]
@@ -23,7 +20,8 @@ jsonschema = "^4.16.0"
 python-dotenv = "^0.21.0"
 inflection = "^0.5.1"
 redshift-connector = "^2.0.909"
-snowflake-sqlalchemy = "^1.4.4"
+snowflake-sqlalchemy = "1.4.5"
+snowflake-connector-python = "^2.9.0"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "^1.6.0"
@@ -74,9 +72,8 @@ testpaths = ["tests"]
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py38,py39,py310
 isolated_build = true
-skip_missing_interpreters = true
+envlist = py38,py39,py310
 
 [testenv]
 whitelist_externals = poetry

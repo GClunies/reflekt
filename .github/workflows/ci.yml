@@ -76,6 +76,6 @@ jobs:
           python -m pip install poetry
           poetry install --no-interaction
 
-      - name: Test with tox
+      - name: Tests & Coverage
         run: |
-          poetry run tox
+          poetry run pytest --cov=reflekt tests/
