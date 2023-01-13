@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/ecommerce/Identify/1-0.json",
+    "description": "Segment identify() call.",
+    "self": {
+        "vendor": "com.reflekt",
+        "name": "Identify",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {},
+    "type": "object",
+    "properties": {
+        "email": {
+            "description": "The user's email address.",
+            "type": "string"
+        },
+        "first_name": {
+            "description": "The user's first name.",
+            "type": "string"
+        },
+        "last_name": {
+            "description": "The user's last name.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

@@ -144,8 +144,6 @@ dmypy.json
 /.logs/
 /.reflekt/
 /.reflekt_cache/
-/artifacts/
-/schemas/
 /reflekt_profiles.yml
 TODO.md
 .DS_Store

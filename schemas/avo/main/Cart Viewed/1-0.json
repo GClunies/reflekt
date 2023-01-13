@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "avo/main/Cart Viewed/1-0.json",
+    "description": "User viewed their shopping cart.",
+    "self": {
+        "vendor": "com.reflekt",
+        "name": "Cart Viewed",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": [
+        "code_owner: Maura",
+        "product_owner: Greg"
+    ],
+    "type": "object",
+    "properties": {
+        "cart_id": {
+            "description": "Cart ID to which the product was added to",
+            "type": "string"
+        },
+        "products": {
+            "description": "Products in the order",
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        }
+    },
+    "required": [
+        "cart_id",
+        "products"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

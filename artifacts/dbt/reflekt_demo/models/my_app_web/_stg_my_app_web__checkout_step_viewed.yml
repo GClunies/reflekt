@@ -1,0 +1,53 @@
+version: 2
+models:
+  - name: checkout_step_viewed
+    description: User viewed a checkout step.
+    columns:
+      - name: id
+        description: Automatically collected by Segment (renamed to `id`
+          in data warehouse), a unique identifier for each message that
+          lets you find an individual message across the API.
+        tests:
+          - unique
+          - not_null
+      - name: original_tstamp
+        description: Time on the client device when call was invoked; OR
+          The timestamp value manually passed in through server-side libraries.
+          originalTimestamp is not useful for analysis since it’s not always
+          trustworthy as it can be easily adjusted and affected by clock
+          skew.
+      - name: sent_at
+        description: Timestamp of when a message is sent to Segment, used
+          for clock skew correction. It is set automatically by the Segment
+          tracking libraries. sentAt is not useful for analysis since it’s
+          not always trustworthy as it can be easily adjusted and affected
+          by clock skew.
+      - name: received_at
+        description: Automatically set by Segment, the timestamp of when
+          a message is received by Segment. It is set automatically by the
+          Segment tracking libraries. Used as sort key in Warehouses when
+          loading raw data.
+      - name: tstamp
+        description: Timestamp when the message itself took place, defaulted
+          to the current time by the Segment Tracking API. Used by Segment
+          to send to downstream destinations, and used for historical replays.
+          Recommended timestamp for analysis when chronology does matter.
+      - name: anonymous_id
+        description: A pseudo-unique substitute for a User ID, for cases
+          when you don’t have an absolutely unique identifier. A userId
+          or an anonymousId is required. See the Identities docs for more
+          details.
+      - name: user_id
+        description: Unique identifier for the user in your database. A
+          userId or an anonymousId is required. See the Identities docs
+          for more details.
+      - name: library_name
+        description: The name of the library.
+      - name: library_version
+        description: The version of the library.
+      - name: checkout_id
+        description: Checkout transaction ID
+      - name: shipping_method
+        description: The shipping method chosen
+      - name: step
+        description: Number representing a step in the checkout process
