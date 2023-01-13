@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-name: Lint & Test
+name: CI Suite
 
 on: pull_request
 
@@ -63,6 +63,12 @@ jobs:
       #     path: ~/.cache/pip
       #     key: ${{ runner.os }}-pip
       #     restore-keys: ${{ runner.os }}-pip
+
+      - name: Show folders
+        run: |
+          ls -la
+          echo "----------------"
+          ls -la tests
 
       - name: Install Poetry & dependencies
         run: |  # Poetry installed via pip for simplicity, then install deps via poetry (including Reflekt)
