@@ -74,8 +74,9 @@ testpaths = ["tests"]
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-isolated_build = true
 envlist = py38,py39,py310
+isolated_build = true
+skip_missing_interpreters = true
 
 [testenv]
 whitelist_externals = poetry
