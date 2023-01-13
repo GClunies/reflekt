@@ -64,11 +64,11 @@ jobs:
       #     key: ${{ runner.os }}-pip
       #     restore-keys: ${{ runner.os }}-pip
 
-      - name: Show folders
+      - name: Working directory
         run: |
-          ls -la
+          pwd
           echo "----------------"
-          ls -la tests
+          ls -la
 
       - name: Install Poetry & dependencies
         run: |  # Poetry installed via pip for simplicity, then install deps via poetry (including Reflekt)
