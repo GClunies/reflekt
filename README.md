@@ -212,7 +212,7 @@ An example `ProductClicked` event schema, based on Segment's [Ecommerce Spec](ht
 
 ## Project Configuration
 
-Reflekt is configured using the following files. Click the files below to expand and see example configurations with descriptions.
+Reflekt is configured using the following files. Click the examples below to expand and see example configurations with descriptions.
 
 <details>
 <summary><code>reflekt_project.yml</code> - general project settings, linting config, data artifacts config. </summary>
