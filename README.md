@@ -216,7 +216,7 @@ An example `ProductClicked` event schema, based on Segment's [Ecommerce Spec](ht
 Reflekt is configured using the following files. Click the examples below to expand and see example configurations with descriptions.
 
 <details>
-<summary><code>reflekt_project.yml</code> - general project settings, linting config, data artifacts config. </summary>
+<summary><code>reflekt_project.yml</code> - general project settings, linting configuration, data artifacts configuration. </summary>
 <br>
 
 ```yaml
@@ -269,7 +269,7 @@ artifacts:              # Configure how data artifacts are built
 <br>
 
 <details>
-<summary><code>reflekt_profile.yml</code> - connection to schema registries. Connection to targets (i.e., data warehouse) where event data is stored. </summary>
+<summary><code>reflekt_profile.yml</code> - Defines connection to schema registries and targets (i.e., data warehouse) where event data is stored. </summary>
 <br>
 
 ```yaml
@@ -306,7 +306,7 @@ dev_reflekt:
 <br>
 
 <details>
-<summary><code>schemas/.reflekt/event-meta/1-0.json</code> - OPTIONAL: modify `metadata` schema to required specific metadata for all events. Default: no metadata.</summary>
+<summary><code>schemas/.reflekt/event-meta/1-0.json</code> - OPTIONAL: modify `metadata` object in this schema define required metadata for all events (default: no metadata).</summary>
 <br>
 
 ```json
