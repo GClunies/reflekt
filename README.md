@@ -15,8 +15,8 @@ A CLI tool to help Data, Engineering, and Product teams:
 - Interact with schema registries
   - Sync schema(s) to a schema registry where they can be used for event data validation.
   - Pull schema(s) from a schema registry to into a Reflekt project.
-- Leverage schemas to build data artifacts (e.g., dbt packages) that model and document event data.
-  - Keep data artifacts in sync with instrumentation - Ready for use by engineers, analysts, and the business.
+- Use schemas to build data artifacts (e.g., dbt packages) that model and document event data.
+  - Keep data artifacts in sync with instrumentation - ready for use by engineers, analysts, and the business.
   - Reduce errors, improve data quality, and automate important (but boring) data tasks.
 
 ---
@@ -285,7 +285,7 @@ dev_reflekt:
   target:              # Define target(s) (i.e., data warehouses) where event data is stored
     - name: snowflake  # Target name used in --target target_name.database_name.schema_name argument. Does not have to match `type:` config
       type: snowflake  # Snowflake data warehouse. Credentials follow.
-      account: yta05625
+      account: abc12345
       database: raw
       warehouse: transforming
       role: transformer
