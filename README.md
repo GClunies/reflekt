@@ -306,7 +306,7 @@ dev_reflekt:
 <br>
 
 <details>
-<summary><code>schemas/.reflekt/event-meta/1-0.json</code> - OPTIONAL: modify `metadata` object in this schema define required metadata for all events (default = no required metadata).</summary>
+<summary><code>schemas/.reflekt/event-meta/1-0.json</code> - OPTIONAL: modify the <code>metadata</code> object in this schema to define required metadata for all events (default = no required metadata).</summary>
 <br>
 
 ```json
