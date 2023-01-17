@@ -23,7 +23,7 @@ A CLI tool to help Data, Engineering, and Product teams:
 
 ## Commands
 A full list of commands and their arguments can be accessed in the CLI using `reflekt --help`. Each command has a `--help` flag with information about the command and its arguments/options.
- See the [argument syntax](#argument-syntax) section for more information on how to use arguments and the [schemas](artifacts/dbt/reflekt_demo/dbt_project.yml) section for more information on how schemas are identified, version, and structured.
+ See the [argument syntax](#argument-syntax) section on how to use command argument. The [schemas](artifacts/dbt/reflekt_demo/dbt_project.yml) section details how schemas are identified, version, and structured.
 
 ### `init`
 Initialize a new Reflekt project.
