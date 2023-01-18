@@ -13,10 +13,10 @@ source as (
 renamed as (
     select
         id,
-        original_timestamp as original_tstamp
-        sent_at as sent_at_tstamp
-        received_at as received_at_tstamp
-        timestamp as tstamp
+        original_timestamp as original_tstamp,
+        sent_at as sent_at_tstamp,
+        received_at as received_at_tstamp,
+        timestamp as tstamp,
         anonymous_id,
         user_id,
         context_ip as ip,

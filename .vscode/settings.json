@@ -9,5 +9,8 @@
     "editor.rulers": [
         88
     ],
+    "cSpell.words": [
+        "schemafile"
+    ],
     // "yaml.schemas": {}
 }

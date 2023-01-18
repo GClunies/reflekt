@@ -155,7 +155,7 @@ class DbtBuilder:
                     alias_name = col_name.replace("timestamp", "tstamp").replace(
                         "_at", "_at_tstamp"
                     )
-                    col_sql = f"\n        {col_name} as {alias_name}"
+                    col_sql = f"\n        {col_name} as {alias_name},"
                 elif "context_" in col_name:
                     alias_name = f"{col_name.replace('context_', '')},"
                     col_sql = f"\n        {col_name} as {alias_name}"
@@ -209,11 +209,11 @@ class DbtBuilder:
 
         for col in columns:
             col_name = (
-                underscore(col["name"]).replace("timestamp", "tstamp")
-                if "context_" not in underscore(col["name"])
-                else underscore(col["name"])
-                .replace("context_", "")
+                underscore(col["name"])
                 .replace("timestamp", "tstamp")
+                .replace("_at", "_at_tstamp")
+                if "context_" not in underscore(col["name"])
+                else underscore(col["name"]).replace("context_", "")
             )
             dbt_col = {
                 "name": col_name,
