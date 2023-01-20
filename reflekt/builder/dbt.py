@@ -106,26 +106,26 @@ class DbtBuilder:
 
         return dbt_source
 
-    def _build_dbt_table(self, source: Dict, name: str, description: str) -> None:
+    def _build_dbt_table(self, source: Dict, table_name: str, description: str) -> None:
         """Build dbt table.
 
         Args:
             source (Dict): dbt source object.
-            name (str): Table name.
+            table_name (str): Table name.
             description (str): Table description.
         """
-        dbt_table = {"name": name, "description": description}
+        dbt_table = {"name": table_name, "description": description}
         source["sources"][0]["tables"].append(dbt_table)
-        logger.info(f"Building dbt table '{name}' in source '{self._schema}'")
+        logger.info(f"Building dbt table '{table_name}' in source '{self._schema}'")
 
-    def _build_dbt_model(self, name: str, columns: List[Dict]) -> None:
+    def _build_dbt_model(self, table_name: str, columns: List[Dict]) -> None:
         """Build dbt model.
 
         Args:
-            name (str): Model name.
+            table_name (str): Table name.
             columns (List[Dict]): List of column dicts (with name, description, etc).
         """
-        model_file: str = f"{self._mdl_prefix}{self._schema}__{name}.sql"
+        model_file: str = f"{self._mdl_prefix}{self._schema}__{table_name}.sql"
         model_path: Path = self._tmp_pkg_dir / "models" / self._schema / model_file
         mdl_sql = (  # Config
             "{{\n"
@@ -137,7 +137,7 @@ class DbtBuilder:
         mdl_sql += (  # Import CTE
             f"with\n\n"
             f"source as (\n"
-            f"    select * from {{{{ source('{underscore(self._schema)}', '{name}') }}}}\n"  # noqa: E501
+            f"    select * from {{{{ source('{underscore(self._schema)}', '{table_name}') }}}}\n"  # noqa: E501
             f"),\n\n"
         )
         mdl_sql += "renamed as (\n" "    select"  # Rename CTE
@@ -146,7 +146,22 @@ class DbtBuilder:
             for col in columns:
                 col_name = underscore(col["name"])
 
-                if col_name in [
+                if col_name == "id":
+                    if table_name == "identifies":
+                        col_sql = f"\n        {col_name} as identify_id,"
+                    elif table_name == "users":
+                        col_sql = f"\n        {col_name} as user_id,"
+                    elif table_name == "groups":
+                        col_sql = f"\n        {col_name} as group_id,"
+                    elif table_name == "pages":
+                        col_sql = f"\n        {col_name} as page_id,"
+                    elif table_name == "screens":
+                        col_sql = f"\n        {col_name} as screen_id,"
+                    elif table_name == "tracks":
+                        col_sql = f"\n        {col_name} as event_id,"
+                    else:  # Custom events
+                        col_sql = f"\n        {col_name} as event_id,"
+                elif col_name in [
                     "original_timestamp",
                     "sent_at",
                     "received_at",
@@ -179,15 +194,17 @@ class DbtBuilder:
         """Build dbt metric."""
         pass  # TODO - reserved for later use
 
-    def _build_dbt_doc(self, name: str, description: str, columns: List[Dict]) -> None:
+    def _build_dbt_doc(
+        self, table_name: str, description: str, columns: List[Dict]
+    ) -> None:
         """Build dbt documentation for model.
 
         Args:
-            name (str): Model name.
+            table_name (str): Table name.
             description (str): Model description.
             columns (List[Dict]): List of column dicts (with name, description, etc).
         """
-        doc_file = f"{self._doc_prefix}{self._schema}__{name}.yml"
+        doc_file = f"{self._doc_prefix}{self._schema}__{table_name}.yml"
         doc_path = (
             self._tmp_pkg_dir
             / "models"
@@ -199,7 +216,7 @@ class DbtBuilder:
             "version": 2,
             "models": [
                 {
-                    "name": name,
+                    "name": table_name,
                     "description": description,
                     "columns": [],
                 }
@@ -208,13 +225,30 @@ class DbtBuilder:
         test_cols = list(self._project.artifacts["dbt"]["docs"]["tests"].keys())
 
         for col in columns:
-            col_name = (
-                underscore(col["name"])
-                .replace("timestamp", "tstamp")
-                .replace("_at", "_at_tstamp")
-                if "context_" not in underscore(col["name"])
-                else underscore(col["name"]).replace("context_", "")
-            )
+            if col["name"] == "id":
+                if table_name == "identifies":
+                    col_name = "identify_id"
+                elif table_name == "users":
+                    col_name = "user_id"
+                elif table_name == "groups":
+                    col_name = "group_id"
+                elif table_name == "pages":
+                    col_name = "page_id"
+                elif table_name == "screens":
+                    col_name = "screen_id"
+                elif table_name == "tracks":
+                    col_name = "event_id"
+                else:  # Custom events
+                    col_name = "event_id"
+            else:
+                col_name = (
+                    underscore(col["name"])
+                    .replace("timestamp", "tstamp")
+                    .replace("_at", "_at_tstamp")
+                    if "context_" not in underscore(col["name"])
+                    else underscore(col["name"]).replace("context_", "")
+                )
+
             dbt_col = {
                 "name": col_name,
                 "description": col["description"],
@@ -373,15 +407,15 @@ class DbtBuilder:
                     ]
                     self._build_dbt_table(
                         source=source_obj,
-                        name=table_name,
+                        table_name=table_name,
                         description=event_desc,
                     )
                     self._build_dbt_model(
-                        name=table_name,
+                        table_name=table_name,
                         columns=columns,
                     )
                     self._build_dbt_doc(
-                        name=table_name,
+                        table_name=table_name,
                         description=event_desc,
                         columns=columns,
                     )
@@ -390,15 +424,15 @@ class DbtBuilder:
                         # Build Segment users table/model/doc
                         self._build_dbt_table(
                             source=source_obj,
-                            name="users",
+                            table_name="users",
                             description="User traits set by identify() calls.",
                         )
                         self._build_dbt_model(
-                            name="users",
+                            table_name="users",
                             columns=columns,
                         )
                         self._build_dbt_doc(
-                            name="users",
+                            table_name="users",
                             description="User traits set by identify() calls.",
                             columns=columns,
                         )
@@ -407,18 +441,18 @@ class DbtBuilder:
             # Build Segment users table/model/doc
             self._build_dbt_table(
                 source=source_obj,
-                name="tracks",
+                table_name="tracks",
                 description=(
                     "A summary of track() calls from all events. Properties unique "
                     "to each event's track() call are omitted."
                 ),
             )
             self._build_dbt_model(
-                name="tracks",
+                table_name="tracks",
                 columns=common_columns,
             )
             self._build_dbt_doc(
-                name="tracks",
+                table_name="tracks",
                 description=(
                     "A summary of track() calls from all events. Properties unique "
                     "to each event's track() call are omitted."

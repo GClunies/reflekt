@@ -12,7 +12,7 @@ source as (
 
 renamed as (
     select
-        id,
+        id as identify_id,
         original_timestamp as original_tstamp,
         sent_at as sent_at_tstamp,
         received_at as received_at_tstamp,
