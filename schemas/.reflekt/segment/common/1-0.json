@@ -1,12 +1,12 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": ".reflekt/segment/common/1-0-0.json",
+    "$id": ".reflekt/segment/common/1-0.json",
     "description": "Schema for Segment common fields. See Segment docs for more info: https://segment.com/docs/connections/spec/common/",
     "self": {
         "vendor": "reflekt",
         "name": "common",
         "format": "jsonschema",
-        "version": "1-0-0"
+        "version": "1-0"
     },
     "type": "object",
     "properties": {

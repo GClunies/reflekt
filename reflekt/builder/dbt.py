@@ -30,7 +30,7 @@ class DbtBuilder:
         select: str,
         schema_paths: List[Path],
         sdk: str,
-        target: str,
+        source: str,
     ) -> None:
         """Initialize dbt builder class.
 
@@ -38,7 +38,7 @@ class DbtBuilder:
             select (str): The --select argument passed to Reflekt CLI.
             schema_paths (List[Path]): List of schema paths to build.
             sdk (str): The --sdk argument passed to Reflekt CLI.
-            target (str): The --target argument passed to Reflekt CLI.
+            source (str): The --source argument passed to Reflekt CLI.
         """
 
         self._project = Project()
@@ -59,8 +59,8 @@ class DbtBuilder:
         self._select = select
         self._schema_paths = schema_paths
         self._sdk = sdk
-        self._target = target
-        self._warehouse = Warehouse(self._target)
+        self._source = source
+        self._warehouse = Warehouse(self._source)
         self._warehouse_type = self._warehouse.type
         self._database = self._warehouse.database
         self._schema = self._warehouse.schema
@@ -78,7 +78,7 @@ class DbtBuilder:
             / f"{self._src_prefix}{self._schema}.yml"
         )
 
-        # If source already exists in temp dbt pkg (copied from existing pkg), use it
+        # If dbt source exists in temp dbt pkg (copied from existing pkg), use it
         if src_path.exists():
             with src_path.open("r") as f:
                 dbt_source = yaml.safe_load(f)
@@ -279,7 +279,7 @@ class DbtBuilder:
             f"\n    dir: {self._pkg_dir}"
             f"\n    --select: {self._select}"
             f"\n    --sdk: {self._sdk}"
-            f"\n    --target: {self._target}"
+            f"\n    --source: {self._source}"
         )
         print("")
 
@@ -477,9 +477,9 @@ class DbtBuilder:
             print("")
             logger.warning(
                 f"The following data warehouse error(s) occurred while building "
-                f"the dbt package. NOTE - 'Object ... does not exist' errors are "
+                f"the dbt package. NOTE: 'Object ... does not exist' errors are "
                 f"expected for schemas that have not produced data at the specified "
-                f"'--target'. These errors DO NOT prevent successful package build. "
+                f"'--source'. These errors do not prevent successful build. "
                 f"\n\n{wh_errors_str}"
             )
 

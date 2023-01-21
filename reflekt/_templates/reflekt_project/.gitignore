@@ -1,3 +1,5 @@
-# Never commit reflekt_profiles.yml or .reflekt/ to repo!
+# Never commit reflekt_profiles.yml or .reflekt_cache/ to repo!
 reflekt_profiles.yml
 /.logs/**
+/.reflekt_cache/**
+

@@ -13,25 +13,25 @@ from reflekt.project import Project
 
 
 class BuilderHandler:
-    """Handler to initialize a builder based on artifact, select, and target arguments.
+    """Handler to initialize a builder based on artifact, select, and source arguments.
 
     Handler passes the schemas to be built to the builder.
     """
 
-    def __init__(self, artifact: str, select: str, sdk: str, target: str) -> None:
+    def __init__(self, artifact: str, select: str, sdk: str, source: str) -> None:
         """Initialize BuilderHandler class.
 
         Args:
             artifact (str): The --artifact argument passed to Reflekt CLI.
             select (str): The --select argument passed to Reflekt CLI.
             sdk (str): The --sdk argument passed to Reflekt CLI.
-            target (str): The --target argument passed to Reflekt CLI.
+            source (str): The --source argument passed to Reflekt CLI.
         """
         self.select = select
         self.artifact = self._parse_artifact(artifact)
         self.schema_paths = self._parse_select(select)
         self.sdk = sdk
-        self.target = target
+        self.source = source
 
     def _parse_artifact(self, artifact: str) -> None:
         """Parse the artifact argument.
@@ -90,7 +90,7 @@ class BuilderHandler:
                 select=self.select,
                 schema_paths=self.schema_paths,
                 sdk=self.sdk,
-                target=self.target,
+                source=self.source,
             )
 
         return builder

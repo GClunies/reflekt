@@ -3,7 +3,7 @@
     "$id": "segment/ecommerce/Group/1-0.json",
     "description": "Segment group() call.",
     "self": {
-        "vendor": "com.reflekt",
+        "vendor": "com.reflekt-ci",
         "name": "Group",
         "format": "jsonschema",
         "version": "1-0"

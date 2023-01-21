@@ -1,12 +1,12 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": ".reflekt/project/1-0-0.json",
+    "$id": ".reflekt/project/1-0.json",
     "description": "Schema for Reflekt projects",
     "self": {
-        "vendor": "com.reflekt-ci",
+        "vendor": "com.reflekt-ci-ci",
         "name": "project",
         "format": "jsonschema",
-        "version": "1-0-0"
+        "version": "1-0"
     },
     "type": "object",
     "properties": {
@@ -49,20 +49,6 @@
                     "required": ["event", "property", "data_types"],
                     "additionalProperties": false
                 }
-            }
-        },
-        "targets": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {"type": "string"},
-                    "type": {"type": "string", "enum": ["snowflake", "bigquery", "redshift"]},
-                    "database": {"type": "string"},
-                    "schema": {"type": "string"}
-                },
-                "required": ["type", "database", "schema"],
-                "additionalProperties": false
             }
         },
         "registry": {

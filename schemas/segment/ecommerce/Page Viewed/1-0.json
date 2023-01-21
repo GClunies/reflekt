@@ -3,7 +3,7 @@
     "$id": "segment/ecommerce/Page Viewed/1-0.json",
     "description": "User viewed a page on the website.",
     "self": {
-        "vendor": "com.reflekt",
+        "vendor": "com.reflekt-ci",
         "name": "Page Viewed",
         "format": "jsonschema",
         "version": "1-0"

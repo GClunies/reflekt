@@ -1,12 +1,12 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": ".reflekt/profile/1-0-0.json",
+    "$id": ".reflekt/profile/1-0.json",
     "description": "Schema for Reflekt profiles",
     "self": {
-        "vendor": "com.reflekt-ci",
+        "vendor": "com.reflekt-ci-ci",
         "name": "profile",
         "format": "jsonschema",
-        "version": "1-0-0"
+        "version": "1-0"
     },
     "type": "object",
     "properties": {
@@ -85,7 +85,7 @@
                 ]
             }
         },
-        "target": {
+        "source": {
             "type": "array",
             "items": {
                 "type": "object",
@@ -150,5 +150,5 @@
         },
         "do_not_track": {"type": "boolean"}
     },
-    "required": ["registry", "target"]
+    "required": ["registry", "source"]
 }

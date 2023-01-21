@@ -8,8 +8,8 @@ test_profile:
       workspace_id: test_workspace_id
       service_account_name: test_service_account_name
       service_account_secret: test_secret
-  target:
-    - name: test_target
+  source:
+    - name: test_source
       type: snowflake
       account: test_account
       database: test_database

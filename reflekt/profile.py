@@ -41,7 +41,7 @@ class Profile:
         self.config: dict = {}
         self.do_not_track = False
         self.registry: List = []
-        self.target: List = []
+        self.source: List = []
 
         if self.project.exists:  # False when running 'reflekt init'
             if not self.path.exists():
@@ -64,7 +64,7 @@ class Profile:
 
             self.do_not_track = self.config.get("do_not_track")
             self.registry = self.config.get("registry")
-            self.target = self.config.get("target")
+            self.source = self.config.get("source")
 
     def to_yaml(self):
         """Convert Profile class to YAML and write to reflekt_profiles.yml."""
@@ -75,7 +75,7 @@ class Profile:
             profile = {
                 self.name: {
                     "registry": self.registry,
-                    "target": self.target,
+                    "source": self.source,
                 },
             }
             profiles.update(profile)
@@ -85,7 +85,7 @@ class Profile:
                 "version": self.version,
                 self.name: {
                     "registry": self.registry,
-                    "target": self.target,
+                    "source": self.source,
                 },
             }
 

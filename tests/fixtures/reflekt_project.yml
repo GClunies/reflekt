@@ -4,7 +4,7 @@
 version: 1.0
 
 name: test_project
-vendor: com.reflekt
+vendor: com.reflekt-ci
 profile: test_profile
 profiles_path: ./tests/fixtures/reflekt_profiles.yml  # Used for test suite
 

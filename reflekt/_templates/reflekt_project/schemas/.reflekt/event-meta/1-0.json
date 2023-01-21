@@ -43,15 +43,8 @@
                 "metadata": {
                     "type": "object",
                     "description": "Required metadata for all event schemas",
-                    "properties": {
-                        "code_owner": {
-                            "type": "string"
-                        },
-                        "product_owner": {
-                            "type": "string"
-                        }
-                    },
-                    "required": ["code_owner", "product_owner"],
+                    "properties": {},
+                    "required": [],
                     "additionalProperties": false
                 },
                 "properties": {},

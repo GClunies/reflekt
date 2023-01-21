@@ -3,7 +3,7 @@
     "$id": ".reflekt/project/1-0.json",
     "description": "Schema for Reflekt projects",
     "self": {
-        "vendor": "com.reflekt-ci",
+        "vendor": "com.reflekt-ci-ci",
         "name": "project",
         "format": "jsonschema",
         "version": "1-0"
@@ -51,7 +51,7 @@
                 }
             }
         },
-        "targets": {
+        "sources": {
             "type": "array",
             "items": {
                 "type": "object",

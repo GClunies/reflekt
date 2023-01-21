@@ -154,46 +154,46 @@ def init(
     # elif profile.registry["type"] == "amplitude_data":
     #     pass
 
-    target_credentials = {}
-    target_credentials["type"] = str.lower(
+    source_credentials = {}
+    source_credentials["type"] = str.lower(
         typer.prompt(
-            "Target Data Warehouse [where raw event data is loaded]",
+            "source Data Warehouse [where raw event data is loaded]",
             type=click.Choice(WAREHOUSE),
             show_choices=True,
         )
     )
-    target_credentials["name"] = str.lower(
+    source_credentials["name"] = str.lower(
         typer.prompt(
-            "Target name [identifies target data warehouse in 'reflekt_profiles.yml']",
+            "source name [identifies source data warehouse in 'reflekt_profiles.yml']",
             type=str,
         )
     )
 
-    if target_credentials["type"] == "snowflake":
-        target_credentials["account"] = typer.prompt("account", type=str)
-        target_credentials["database"] = typer.prompt("database", type=str)
-        target_credentials["warehouse"] = typer.prompt("warehouse", type=str)
-        target_credentials["role"] = typer.prompt("role", type=str)
-        target_credentials["user"] = typer.prompt("user", type=str)
-        target_credentials["password"] = typer.prompt(
+    if source_credentials["type"] == "snowflake":
+        source_credentials["account"] = typer.prompt("account", type=str)
+        source_credentials["database"] = typer.prompt("database", type=str)
+        source_credentials["warehouse"] = typer.prompt("warehouse", type=str)
+        source_credentials["role"] = typer.prompt("role", type=str)
+        source_credentials["user"] = typer.prompt("user", type=str)
+        source_credentials["password"] = typer.prompt(
             "password", type=str, hide_input=True
         )
-        profile.target.append(target_credentials)
-    elif target_credentials["type"] == "bigquery":
-        target_credentials["method"] = typer.prompt("method", type=str)
-        target_credentials["project"] = typer.prompt(
+        profile.source.append(source_credentials)
+    elif source_credentials["type"] == "bigquery":
+        source_credentials["method"] = typer.prompt("method", type=str)
+        source_credentials["project"] = typer.prompt(
             "project (GCP project id)", type=str
         )
-        profile.target.append(target_credentials)
-    elif target_credentials["type"] == "redshift":
-        target_credentials["database"] = typer.prompt("database", type=str)
-        target_credentials["host_url"] = typer.prompt("host_url", type=str)
-        target_credentials["port"] = typer.prompt("port", type=int)
-        target_credentials["user"] = typer.prompt("user", type=str)
-        target_credentials["password"] = typer.prompt(
+        profile.source.append(source_credentials)
+    elif source_credentials["type"] == "redshift":
+        source_credentials["database"] = typer.prompt("database", type=str)
+        source_credentials["host_url"] = typer.prompt("host_url", type=str)
+        source_credentials["port"] = typer.prompt("port", type=int)
+        source_credentials["user"] = typer.prompt("user", type=str)
+        source_credentials["password"] = typer.prompt(
             "password", type=str, hide_input=True
         )
-        profile.target.append(target_credentials)
+        profile.source.append(source_credentials)
 
     project_folders = pkg_resources.resource_filename(  # Get template folder
         "reflekt", "_templates/reflekt_project/"
@@ -252,8 +252,8 @@ def init(
     )
     table.add_row(
         "build",
-        "Build dbt package modeling Segment event data stored at the specified target.",
-        "reflekt build dbt --select segment/ecommerce --sdk segment --target snowflake.raw.segment_prod",
+        "Build dbt package modeling Segment event data stored at the specified source.",
+        "reflekt build dbt --select segment/ecommerce --sdk segment --source snowflake.raw.segment_prod",
     )
     console = Console()
     console.print(table)
@@ -300,7 +300,7 @@ def push(
                 "'reflekt push' is not supported for Avo. Use the Avo UI to define and "
                 "manage your event schemas. Then you can run:\n"
                 "    reflekt pull --select avo/main                                     # Pull schemas from Avo\n"  # noqa: E501
-                "    reflekt build --artifact dbt --select avo/main --target db_schema  # Build dbt pkg"  # noqa: E501
+                "    reflekt build --artifact dbt --select avo/main --source db_schema  # Build dbt pkg"  # noqa: E501
             ),
             select=select,
         )
@@ -370,8 +370,8 @@ def build(
     sdk: SdkEnum = typer.Option(
         ..., "--sdk", "-sdk", help="The type of SDK that generated the data."
     ),
-    target: str = typer.Option(
-        ..., "--target", "-t", help="Schema in database where event data is loaded."
+    source: str = typer.Option(
+        ..., "--source", "-t", help="Schema in database where event data is loaded."
     ),
 ):
     """Build data artifact(s) based on schema(s)."""
@@ -382,7 +382,7 @@ def build(
         artifact=artifact,
         select=select,
         sdk=sdk,
-        target=target,
+        source=source,
     ).get_builder()
     builder.build()
 
@@ -449,10 +449,10 @@ if __name__ == "__main__":
     # push(select="segment/ecommerce", delete=False)
     # lint(select="segment/ecommerce")
 
-    # reflekt build dbt --select segment/ecommerce --sdk segment --target snowflake.raw.schema_name
+    # reflekt build dbt --select segment/ecommerce --sdk segment --source snowflake.raw.schema_name
     build(
         artifact="dbt",
         select="segment/ecommerce",
         sdk="segment",
-        target="snowflake.raw.my_app_web",
+        source="snowflake.raw.my_app_web",
     )

@@ -3,7 +3,7 @@
     "$id": ".reflekt/project/1-0.json",
     "description": "Schema for Reflekt projects",
     "self": {
-        "vendor": "com.reflekt-ci",
+        "vendor": "com.reflekt-ci-ci",
         "name": "project",
         "format": "jsonschema",
         "version": "1-0"
@@ -51,20 +51,6 @@
                 }
             }
         },
-        "targets": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {"type": "string"},
-                    "type": {"type": "string", "enum": ["snowflake", "bigquery", "redshift"]},
-                    "database": {"type": "string"},
-                    "schema": {"type": "string"}
-                },
-                "required": ["type", "database", "schema"],
-                "additionalProperties": false
-            }
-        },
         "registry": {
             "type": "object",
             "properties": {
@@ -86,7 +72,7 @@
                 }
             }
         },
-        "models": {
+        "artifacts": {
             "type": "object",
             "properties": {
                 "dbt": {
@@ -102,26 +88,23 @@
                         "models": {
                             "type": "object",
                             "properties": {
-                                "prefix": {"type": "string"},
-                                "materialized": {"type": "string", "enum": ["view", "incremental"]},
-                                "filter_logic": {"type": "string"}
+                                "prefix": {"type": "string"}
                             },
-                            "required": ["prefix", "materialized"]
+                            "required": ["prefix"]
                         },
                         "docs": {
                             "type": "object",
                             "properties": {
                                 "prefix": {"type": "string"},
                                 "in_folder": {"type": "boolean"},
-                                "test_not_null": {"type": "boolean"},
-                                "test_unique": {"type": "boolean"}
+                                "tests": { "type": "object"}
                             },
-                            "required": ["prefix", "in_folder", "test_not_null", "test_unique"]
+                            "required": ["prefix", "in_folder", "tests"]
                         }
                     }
                 }
             }
         }
     },
-    "required": ["version", "name", "profile", "profiles_path", "schemas", "targets", "models"]
+    "required": ["version", "name", "profile", "profiles_path", "schemas", "artifacts"]
 }

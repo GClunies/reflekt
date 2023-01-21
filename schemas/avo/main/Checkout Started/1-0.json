@@ -3,7 +3,7 @@
     "$id": "avo/main/Checkout Started/1-0.json",
     "description": "User initiated the order process (a transaction is created).",
     "self": {
-        "vendor": "com.reflekt",
+        "vendor": "com.github/reflekt",
         "name": "Checkout Started",
         "format": "jsonschema",
         "version": "1-0"

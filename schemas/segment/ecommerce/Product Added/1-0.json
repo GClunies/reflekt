@@ -3,7 +3,7 @@
     "$id": "segment/ecommerce/Product Added/1-0.json",
     "description": "User adds a product to their shopping cart.",
     "self": {
-        "vendor": "com.reflekt",
+        "vendor": "com.reflekt-ci",
         "name": "Product Added",
         "format": "jsonschema",
         "version": "1-0"

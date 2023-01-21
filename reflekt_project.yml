@@ -1,47 +1,45 @@
-# THE CONFIGURATION IN THIS reflekt_project.yml IS FOR DEVELOPMENT PURPOSES ONLY
-
+# NOTE: this repo is a Reflekt project itself, so you can see how it's configured
 # GENERAL CONFIG ----------------------------------------------------------------------
 version: 1.0
 
-name: reflekt_demo
-vendor: com.reflekt
-profile: dev_reflekt
-profiles_path: ./reflekt_profiles.yml  # Optional - used here for dev purposes
+name: reflekt_demo               # Project name
+vendor: com.reflekt-ci           # Default vendor for schemas in reflekt project
+profile: dev_reflekt             # Profile to use from reflekt_profiles.yml
+profiles_path: ./reflekt_profiles.yml  # Optional, defaults to ~/.reflekt/reflekt_profiles.yml
 
 # SCHEMAS CONFIG ----------------------------------------------------------------------
-# Define schema conventions.
-schemas:
+schemas:                        # Define schema conventions
   conventions:
     event:
       casing: title             # title | snake | camel | any
       capitalize_camel: true    # Only used if 'casing: camel'
-      numbers: false
-      reserved: []
+      numbers: false            # Allow numbers in event names
+      reserved: []              # Reserved event names
     property:
       casing: snake             # title | snake | camel | any
       capitalize_camel: true    # Only used if 'casing: camel'
-      numbers: false
-      reserved: []
-    data_types: [string, integer, number, boolean, object, array, any, 'null']
+      numbers: false            # Allow numbers in property names
+      reserved: []              # Reserved property names
+    data_types: [               # Allowed data types
+        string, integer, number, boolean, object, array, any, 'null'
+    ]
 
 # REGISTRY CONFIG ---------------------------------------------------------------------
-# Additional config for schema registries (i.e. branch IDs). Safe to version control.
-registry:
-  avo:
-    branches:
-      staging: HqC13KbRJ
-      main: main
+registry:                       # Additional config for schema registry if needed
+  avo:                          # Avo specific config
+    branches:                   # Provide ID for Avo branches for `reflekt pull` to work
+      staging: HqC13KbRJ        # Safe to version control (See Avo docs to find branch ID: https://bit.ly/avo-docs-branch-id)
+      main: main                # 'main' always refers to the main branch
 
 # ARTIFACTS CONFIG -----------------------------------------------------------------------
-# Control how data artifacts are built.
-artifacts:
-  dbt:
+artifacts:                      # Configure how data artifacts are built
+  dbt:                          # dbt package config
     sources:
-      prefix: __src_
+      prefix: __src_            # Source files start with this prefix
     models:
-      prefix: stg_
+      prefix: stg_              # Model files start with this prefix
     docs:
-      prefix: _stg_
-      in_folder: false
-      tests:
+      prefix: _stg_             # Docs files start with this prefix
+      in_folder: false          # Docs files in separate folder?
+      tests:                    # Add generic dbt tests for columns found in schemas
         id: [unique, not_null]

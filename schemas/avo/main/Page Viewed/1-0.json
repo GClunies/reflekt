@@ -3,7 +3,7 @@
     "$id": "avo/main/Page Viewed/1-0.json",
     "description": "User viewed a page on the website.",
     "self": {
-        "vendor": "com.reflekt",
+        "vendor": "com.github/reflekt",
         "name": "Page Viewed",
         "format": "jsonschema",
         "version": "1-0"

@@ -23,18 +23,18 @@ class SelectArgError(Exception):
         super().__init__(self.message)
 
 
-class TargetArgError(Exception):
-    """Raised when an invalid --target argument is provided."""
+class sourceArgError(Exception):
+    """Raised when an invalid --source argument is provided."""
 
-    def __init__(self, message: str, target: str) -> None:
-        """Initialize TargetArgError class.
+    def __init__(self, message: str, source: str) -> None:
+        """Initialize sourceArgError class.
 
         Args:
             message (str): Error message.
-            target (str): The invalid --target argument.
+            source (str): The invalid --source argument.
         """
         self.message = message
-        self.target = target
+        self.source = source
         super().__init__(self.message)
 
 

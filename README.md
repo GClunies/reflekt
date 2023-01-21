@@ -65,12 +65,12 @@ Build a data artifacts based on events schemas. Save time, reduce errors, and im
 # Build a dbt package for:
 #   - Events collected using the Segment SDK
 #   - Event schemas defined in my_reflekt_project/schemas/segment/ecommerce/
-#   - Raw event data stored at specified target (snowflake.raw.segment_prod)
-reflekt build dbt --select segment/ecommerce --target snowflake.raw.segment_prod --sdk segment
+#   - Raw event data stored at specified source (snowflake.raw.segment_prod)
+reflekt build dbt --select segment/ecommerce --source snowflake.raw.segment_prod --sdk segment
 ```
 
 **Supported data artifacts**:
-- [dbt package](https://docs.getdbt.com/docs/build/packages) - define dbt sources, models, and documentation for selected schemas and event data found in specified [--target](#targets).
+- [dbt package](https://docs.getdbt.com/docs/build/packages) - define dbt sources, models, and documentation for selected schemas and event data found in specified [--source](#sources).
 
 
 ## Argument syntax
@@ -91,11 +91,11 @@ The `--select` / `-s` argument specifies what schema(s) a [command](#commands) i
 
 More examples of the `--select` syntax are shown in the [commands](#commands) section.
 
-### --target
-The `--target` / `-t` argument specifies where Reflekt should search for event data when building data artifacts (e.g., dbt packages). The `--target` argument always follows the `target_name.database_name.schema_name` format. Targets are defined in the [reflekt_profile.yml](#reflekt_profileyml) file.
+### --source
+The `--source` / `-t` argument specifies where Reflekt should search for event data when building data artifacts (e.g., dbt packages). The `--source` argument always follows the `source_type.database_name.schema_name` format. sources are defined in the [reflekt_profile.yml](#reflekt_profileyml) file.
 
 ### --sdk
-Different teams use different SDKs to collect event data. When [building a data artifact](#build), the `--sdk` / `-sdk` argument tells Reflekt how the data is structured in the [target](#--target) so that it can build the data artifact accordingly. Currently supported SDKs include:
+Different teams use different SDKs to collect event data. When [building a data artifact](#build), the `--sdk` / `-sdk` argument tells Reflekt how the data is structured in the [source](#--source) so that it can build the data artifact accordingly. Currently supported SDKs include:
 - [`segment`](https://segment.com/)
 
 ---
@@ -138,14 +138,14 @@ An example `ProductClicked` event schema, based on Segment's [Ecommerce Spec](ht
   "$id": "segment/ecommerce/ProductClicked/1-0.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "self": {
-      "vendor": "com.my_company",
+      "vendor": "com.company_name",
       "name": "ProductClicked",
       "format": "jsonschema",
       "version": "1-0"
   },
   "metadata": {
       "code_owner": "engineering/ecommerce-squad",
-      "product_owner": "product_manager_name@my_company.com",
+      "product_owner": "product_manager_name@company_name.com",
   },
   "type": "object",
   "properties": {
@@ -229,10 +229,10 @@ Reflekt is configured using the following files. Click the examples below to exp
 # GENERAL CONFIG ----------------------------------------------------------------------
 version: 1.0
 
-name: reflekt_demo      # Project name
-vendor: com.my_company  # Default vendor for schemas in reflekt project
-profile: dev_reflekt    # Profile to use from reflekt_profiles.yml
-# profiles_path: path/to/reflekt_profiles.yml  # Optional. Default: ~/.reflekt/reflekt_profiles.yml
+name: reflekt_demo               # Project name
+vendor: com.company_name         # Default vendor for schemas in reflekt project
+profile: dev_reflekt             # Profile to use from reflekt_profiles.yml
+# profiles_path: optional/path/to/reflekt_profiles.yml  # Optional, defaults to ~/.reflekt/reflekt_profiles.yml
 
 # SCHEMAS CONFIG ----------------------------------------------------------------------
 schemas:                        # Define schema conventions
@@ -247,26 +247,28 @@ schemas:                        # Define schema conventions
       capitalize_camel: true    # Only used if 'casing: camel'
       numbers: false            # Allow numbers in property names
       reserved: []              # Reserved property names
-    data_types: [string, integer, number, boolean, object, array, any, 'null']
+    data_types: [               # Allowed data types
+        string, integer, number, boolean, object, array, any, 'null'
+    ]
 
 # REGISTRY CONFIG ---------------------------------------------------------------------
-registry:                 # Additional config for schema registries (i.e. branch IDs)
-  avo:
-    branches:
-      staging: HqC13KbRJ  # Branch ID for staging tracking plan. Safe to version control. Used by `reflekt pull`
-      main: main
+registry:                       # Additional config for schema registry if needed
+  avo:                          # Avo specific config
+    branches:                   # Provide ID for Avo branches for `reflekt pull` to work
+      staging: AbC12dEfG        # Safe to version control (See Avo docs to find branch ID: https://bit.ly/avo-docs-branch-id)
+      main: main                # 'main' always refers to the main branch
 
 # ARTIFACTS CONFIG -----------------------------------------------------------------------
-artifacts:              # Configure how data artifacts are built
-  dbt:                  # dbt package config
+artifacts:                      # Configure how data artifacts are built
+  dbt:                          # dbt package config
     sources:
-      prefix: __src_    # Source files start with this prefix
+      prefix: __src_            # Source files start with this prefix
     models:
-      prefix: stg_      # Model files start with this prefix
+      prefix: stg_              # Model files start with this prefix
     docs:
-      prefix: _stg_     # Docs files start with this prefix
-      in_folder: false  # Docs files in separate folder?
-      tests:            # Add tests for specific columns
+      prefix: _stg_             # Docs files start with this prefix
+      in_folder: false          # Docs files in separate folder?
+      tests:                    # Add generic dbt tests for columns found in schemas
         id: [unique, not_null]
 
 ```
@@ -275,12 +277,13 @@ artifacts:              # Configure how data artifacts are built
 <br>
 
 <details>
-<summary><code>reflekt_profile.yml</code> - Defines connection to schema registries and targets (i.e., data warehouse) where event data is stored. </summary>
+<summary><code>reflekt_profile.yml</code> - Defines connection to schema registries and sources (i.e., data warehouse) where event data is stored. </summary>
 <br>
 
 ```yaml
 version: 1.0
-dev_reflekt:
+
+dev_reflekt:                                               # Profile name (multiple profiles can be defined)
   registry:
     - type: segment
       api_token: segment_api_token                        # https://docs.segmentapis.com/tag/Getting-Started#section/Get-an-API-token
@@ -288,9 +291,8 @@ dev_reflekt:
       workspace_id: avo_workspace_id                      # https://www.avo.app/docs/public-api/export-tracking-plan#endpoint
       service_account_name: avo_service_account_name      # https://www.avo.app/docs/public-api/authentication#creating-service-accounts
       service_account_secret: avo_service_account_secret
-  target:              # Define target(s) (i.e., data warehouses) where event data is stored
-    - name: snowflake  # Target name used in --target target_name.database_name.schema_name argument. Does not have to match `type:` config
-      type: snowflake  # Snowflake data warehouse. Credentials follow.
+  source:                                                 # Define source(s) where event data is stored
+    - type: snowflake                                     # Snowflake DWH. Credentials follow.
       account: abc12345
       database: raw
       warehouse: transforming
@@ -298,8 +300,7 @@ dev_reflekt:
       user: reflekt_user
       password: reflekt_user_password
 
-    - name: redshift
-      type: redshift   # Redshift data warehouse. Credentials follow.
+    - type: redshift                                      # Redshift DWH. Credentials follow.
       host: example-redshift-cluster-1.abc123.us-west-1.redshift.amazonaws.com
       database: raw
       port: 5439

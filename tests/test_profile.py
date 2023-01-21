@@ -32,8 +32,8 @@ def test_profile():
             "service_account_secret": "test_secret",
         },
     ]
-    assert profile.target[0] == {
-        "name": "test_target",
+    assert profile.source[0] == {
+        "name": "test_source",
         "type": "snowflake",
         "account": "test_account",
         "database": "test_database",
@@ -85,9 +85,9 @@ def test_add_profile_to_new_yaml():
                     "service_account_secret": "test_secret",
                 },
             ],
-            "target": [
+            "source": [
                 {
-                    "name": "test_target",
+                    "name": "test_source",
                     "type": "snowflake",
                     "account": "test_account",
                     "database": "test_database",
@@ -131,9 +131,9 @@ def test_add_profile_to_existing_yaml():
                     "service_account_secret": "test_secret",
                 },
             ],
-            "target": [
+            "source": [
                 {
-                    "name": "test_target",
+                    "name": "test_source",
                     "type": "snowflake",
                     "account": "test_account",
                     "database": "test_database",
@@ -154,9 +154,9 @@ def test_add_profile_to_existing_yaml():
                     "service_account_secret": "test_secret",
                 },
             ],
-            "target": [
+            "source": [
                 {
-                    "name": "test_target",
+                    "name": "test_source",
                     "type": "snowflake",
                     "account": "test_account",
                     "database": "test_database",

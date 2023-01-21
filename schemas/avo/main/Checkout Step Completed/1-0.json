@@ -3,7 +3,7 @@
     "$id": "avo/main/Checkout Step Completed/1-0.json",
     "description": "Checkout step completed by the user.",
     "self": {
-        "vendor": "com.reflekt",
+        "vendor": "com.github/reflekt",
         "name": "Checkout Step Completed",
         "format": "jsonschema",
         "version": "1-0"

@@ -8,54 +8,54 @@ import sqlalchemy
 from snowflake.sqlalchemy import URL as snow_url
 from sqlalchemy.engine.url import URL as redshift_url
 
-from reflekt.errors import TargetArgError
+from reflekt.errors import sourceArgError
 from reflekt.profile import Profile
 from reflekt.project import Project
 
 
 class Warehouse:
-    """Handles connection to data warehouse based on --target argument."""
+    """Handles connection to data warehouse based on --source argument."""
 
-    def __init__(self, target: str) -> None:
+    def __init__(self, source: str) -> None:
         """Initialize DataWarehouse class.
 
         Args:
-            target (str): The --target argument passed to Reflekt CLI.
+            source (str): The --source argument passed to Reflekt CLI.
         """
-        self._target = target
+        self._source = source
         self._profile = Profile(project=Project())
         self.credentials: Optional[dict] = None
-        self._get_warehouse_connection(target)
+        self._get_warehouse_connection(source)
 
-    def _get_warehouse_connection(self, target: str) -> None:
-        """Get target argument.
+    def _get_warehouse_connection(self, source: str) -> None:
+        """Get source argument.
 
         Args:
-            target (str): The --target argument passed to Reflekt CLI.
+            source (str): The --source argument passed to Reflekt CLI.
 
         Raises:
-            TargetArgError: Raised when an invalid --target argument is provided.
+            sourceArgError: Raised when an invalid --source argument is provided.
         """
         self._match_found = False
-        self.target_name = self._target.split(".")[0]
-        self.database = self._target.split(".")[1]
-        self.schema = self._target.split(".")[2]
+        self.source_type = self._source.split(".")[0]
+        self.database = self._source.split(".")[1]
+        self.schema = self._source.split(".")[2]
 
-        for profile_target in self._profile.target:
-            if self.target_name == profile_target["name"]:
+        for profile_source in self._profile.source:
+            if self.source_type == profile_source["type"]:
+                self.type = profile_source["type"]
                 self._match_found = True
-                self.type = profile_target["type"]
-                self.credentials = profile_target
+                self.credentials = profile_source
 
         if not self._match_found:
-            raise TargetArgError(
+            raise sourceArgError(
                 message=(
-                    f"Invalid argument '--target {self._target}'. Target name "
-                    f"'{self.target_name}' does not match a 'target:' configuration in "
-                    f"{self._profile.path}. Target argument must follow the format: "
-                    f"<target_name>.<database>.<schema>\n"
+                    f"Invalid argument '--source {self._source}'. source name "
+                    f"'{self.source_type}' does not match a 'source:' configuration in "
+                    f"{self._profile.path}. source argument must follow the format: "
+                    f"<source_type>.<database>.<schema>\n"
                 ),
-                target=self._target,
+                source=self._source,
             )
 
         if self.type == "snowflake":

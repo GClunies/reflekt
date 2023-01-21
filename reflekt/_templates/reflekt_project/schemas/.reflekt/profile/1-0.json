@@ -3,7 +3,7 @@
     "$id": ".reflekt/profile/1-0.json",
     "description": "Schema for Reflekt profiles",
     "self": {
-        "vendor": "com.reflekt-ci",
+        "vendor": "com.reflekt-ci-ci",
         "name": "profile",
         "format": "jsonschema",
         "version": "1-0"
@@ -85,7 +85,7 @@
                 ]
             }
         },
-        "target": {
+        "source": {
             "type": "array",
             "items": {
                 "type": "object",
@@ -150,5 +150,5 @@
         },
         "do_not_track": {"type": "boolean"}
     },
-    "required": ["registry", "target"]
+    "required": ["registry", "source"]
 }

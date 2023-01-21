@@ -44,7 +44,7 @@ class Project:
         self.profiles_path: Path = None
         self.schemas: dict = {}
         self.conventions: dict = {}  # Nested in self.schemas
-        self.targets: dict = {}
+        self.sources: dict = {}
         self.registry: dict = {}
         self.artifacts: dict = {}
 
@@ -112,7 +112,7 @@ class Project:
             )
             self.schemas = self.config.get("schemas")
             self.conventions = self.schemas["conventions"]
-            self.targets = self.config.get("targets")
+            self.sources = self.config.get("sources")
             self.registry = self.config.get("registry")
             self.artifacts = self.config.get("artifacts")
 
@@ -124,7 +124,7 @@ class Project:
             "profile": self.profile,
             "profiles_path": str(self.profiles_path),
             "schemas": self.schemas,
-            "targets": self.targets,
+            "sources": self.sources,
             "registry": self.registry,
             "artifacts": self.artifacts,
         }
