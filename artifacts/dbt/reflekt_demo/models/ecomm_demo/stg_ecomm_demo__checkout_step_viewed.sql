@@ -7,7 +7,7 @@
 with
 
 source as (
-    select * from {{ source('my_app_web', 'cart_viewed') }}
+    select * from {{ source('ecomm_demo', 'checkout_step_viewed') }}
 ),
 
 renamed as (
@@ -19,12 +19,11 @@ renamed as (
         timestamp as tstamp,
         anonymous_id,
         user_id,
-        context_ip as ip,
         context_library_name as library_name,
         context_library_version as library_version,
-        context_user_agent as user_agent,
-        cart_id,
-        products
+        checkout_id,
+        shipping_method,
+        step
     from source
 )
 

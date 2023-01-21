@@ -7,7 +7,7 @@
 with
 
 source as (
-    select * from {{ source('my_app_web', 'checkout_step_completed') }}
+    select * from {{ source('ecomm_demo', 'checkout_started') }}
 ),
 
 renamed as (
@@ -22,7 +22,11 @@ renamed as (
         context_library_name as library_name,
         context_library_version as library_version,
         checkout_id,
-        step
+        currency,
+        products,
+        revenue,
+        shipping,
+        tax
     from source
 )
 

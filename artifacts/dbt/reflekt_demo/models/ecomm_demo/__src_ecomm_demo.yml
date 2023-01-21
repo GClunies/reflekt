@@ -1,7 +1,7 @@
 version: 2
 sources:
-  - name: my_app_web
-    schema: my_app_web
+  - name: ecomm_demo
+    schema: ecomm_demo
     database: raw
     description: Schema in snowflake with raw Segment event data.
     tables:

@@ -7,7 +7,7 @@
 with
 
 source as (
-    select * from {{ source('my_app_web', 'tracks') }}
+    select * from {{ source('ecomm_demo', 'tracks') }}
 ),
 
 renamed as (
