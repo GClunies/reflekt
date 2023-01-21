@@ -6,7 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 
 # Reflekt
 
-A CLI tool to help Data, Engineering, and Product teams:
+A tool to help Data, Engineering, and Product teams:
 - Define event schemas as `code` using [JSON Schema](https://json-schema.org/), providing a version controlled source of truth for events.
 - Lint schemas to enforce agreed-upon conventions (configurable). Run `reflekt lint` in a CI/CD pipeline to check:
     - Naming conventions (snake_case, camelCase, Title Case, etc.)
@@ -22,7 +22,7 @@ A CLI tool to help Data, Engineering, and Product teams:
 ---
 
 ## Commands
-A full list of commands and their arguments can be accessed in the CLI using `reflekt --help`. Each command has a `--help` flag with information about the command and its arguments/options.
+A full list of CLI commands and their arguments can be accessed using `reflekt --help`. Each command has a `--help` flag with information about the command and its arguments/options.
 
 See the [argument syntax](#argument-syntax) section on how to use command argument. The [schemas](artifacts/dbt/reflekt_demo/dbt_project.yml) section details how schemas are identified, version, and structured.
 
