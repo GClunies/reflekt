@@ -52,15 +52,9 @@ class DbtBuilder:
         )
         self._src_prefix = self._project.artifacts["dbt"]["sources"]["prefix"]
         self._mdl_prefix = self._project.artifacts["dbt"]["models"]["prefix"]
-        # self._mdl_materialized = self._project.artifacts["dbt"]["models"][
-        #     "materialized"
-        # ]
-        # self._mdl_where = self._project.artifacts["dbt"]["models"]["where"]
         self._doc_prefix = self._project.artifacts["dbt"]["docs"]["prefix"]
         self._doc_folder = self._project.artifacts["dbt"]["docs"]["in_folder"]
         self._doc_folder_str = "" if not self._doc_folder else "docs/"
-        # self._test_not_null = self._project.artifacts["dbt"]["docs"]["test_not_null"]
-        # self._test_unique = self._project.artifacts["dbt"]["docs"]["test_unique"]
         self.wh_errors = []
         self._select = select
         self._schema_paths = schema_paths

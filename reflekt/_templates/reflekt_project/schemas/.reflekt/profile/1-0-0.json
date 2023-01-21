@@ -10,15 +10,6 @@
     },
     "type": "object",
     "properties": {
-        "collector": {
-            "type": "object",
-            "properties": {
-                "type": {
-                    "type": "string",
-                    "enum": ["segment", "rudderstack", "snowplow", "amplitude"]
-                }
-            }
-        },
         "registry": {
             "type": "array",
             "items": {
@@ -159,5 +150,5 @@
         },
         "do_not_track": {"type": "boolean"}
     },
-    "required": ["collector", "registry", "target"]
+    "required": ["registry", "target"]
 }

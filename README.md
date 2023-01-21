@@ -69,8 +69,8 @@ Build a data artifacts based on events schemas. Save time, reduce errors, and im
 reflekt build dbt --select segment/ecommerce --target snowflake.raw.segment_prod --sdk segment
 ```
 
-Currently supported artifacts:
-- [dbt packages](https://docs.getdbt.com/docs/build/packages) - defines sources, models, and documentation for event data found in specified [target](#targets).
+**Supported data artifacts**:
+- [dbt package](https://docs.getdbt.com/docs/build/packages) - define dbt sources, models, and documentation for selected schemas and event data found in specified [--target](#targets).
 
 
 ## Argument syntax
@@ -101,7 +101,7 @@ Different teams use different SDKs to collect event data. When [building a data 
 ---
 
 ## Schemas
-Event schemas are stored as `.json` files in the `schemas/` directory. Reflekt understands how different schema registries store and structure schemas, creating a codified representation using [JSON Schema](https://json-schema.org/). When pulling/pushing schemas from/to a schema registry, Reflekt handles the conversion between the registry's format and JSON Schema.
+Event schemas are defined in `.json` files stored in the `schemas/` directory of a project. Reflekt understands how different schema registries store and structure schemas, creating a codified representation using [JSON Schema](https://json-schema.org/). When pulling/pushing schemas from/to a schema registry, Reflekt handles the conversion between the registry's format and JSON Schema.
 
 ### Schema `$id`
 Reflekt uses the JSON schema `$id` property to identify schemas, determined by their path relative to the `schemas/` directory. For example, the schema at `my_reflekt_project/schemas/segment/ecommerce/CartViewed/1-0.json` has the `$id` `segment/ecommerce/CartViewed/1-0.json`.
@@ -211,7 +211,13 @@ An example `ProductClicked` event schema, based on Segment's [Ecommerce Spec](ht
 
 ---
 
-## Project Configuration
+## Setting up a Reflekt Project
+
+### Requirements
+
+### Project Structure
+
+### Configuration
 
 Reflekt is configured using the following files. Click the examples below to expand and see example configurations with descriptions.
 
@@ -304,6 +310,8 @@ dev_reflekt:
 
 </details>
 <br>
+
+### Metadata
 
 <details>
 <summary><code>schemas/.reflekt/event-meta/1-0.json</code> - OPTIONAL: modify the <code>metadata</code> object in this schema to define required metadata for all events (default = no required metadata).</summary>
