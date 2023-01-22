@@ -151,5 +151,5 @@ TODO.md
 # TESTING
 /schemas/segment/surfline-web/**/*
 /schemas/segment/surfline-ios/**/*
-/artifacts/dbt/reflekt_demo/models/surfline-web/**/*
+/artifacts/dbt/reflekt_demo/models/surfline/**/*
 /artifacts/dbt/reflekt_demo/models/surfline-ios/**/*

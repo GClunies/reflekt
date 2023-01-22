@@ -73,7 +73,7 @@ class Warehouse:
             self.engine = sqlalchemy.create_engine(
                 redshift_url.create(
                     drivername="redshift+redshift_connector",
-                    host=self.credentials.get("host_url"),
+                    host=self.credentials.get("host"),
                     port=self.credentials.get("port"),
                     database=self.credentials.get("database"),
                     username=self.credentials.get("user"),
