@@ -367,8 +367,9 @@ class SegmentRegistry:
 
                 if properties != {}:  # Cleanup 'type:' formatting
                     for key, _ in properties.items():
-                        if len(properties[key]["type"]) == 1:  # Convert list to str
-                            properties[key]["type"] = properties[key]["type"][0]
+                        if "type" in properties[key]:
+                            if len(properties[key]["type"]) == 1:  # Convert list to str
+                                properties[key]["type"] = properties[key]["type"][0]
 
             version = f"{str(s_schema['version'])}-0"
             id = f"{self.type}/{plan_name}/{name}/{version}.json"
