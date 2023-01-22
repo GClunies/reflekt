@@ -213,19 +213,29 @@ An example `ProductClicked` event schema, based on Segment's [Ecommerce Spec](ht
 
 ## Setting up a Reflekt Project
 
-### Requirements
-
 ### Project Structure
+A Reflekt project is a Git repo with the following directory structure:
+```
+demo_reflekt_project
+├── .logs                 # Reflekt command logs
+├── .reflekt_cache        # Local cache used by Reflekt
+├── artifacts             # Data artifacts are built here
+├── schemas               # Event schemas are defined here
+├── .gitignore
+├── README.md
+└── reflekt_project.yml   # Project configuration
+```
+Sync the project with a Github to enable collaboration and version control amongst your team.
 
-### Configuration
-
-Reflekt is configured using the following files. Click the examples below to expand and see example configurations with descriptions.
+### Configuration Files
+There are 2 configuration files required to run Reflekt:
 
 <details>
-<summary><code>reflekt_project.yml</code> - general project settings, linting configuration, data artifacts configuration. </summary>
+<summary><code>reflekt_project.yml (click to expand example)</code> - General project settings, schema & linting conventions, data artifacts configuration. </summary>
 <br>
 
 ```yaml
+# reflekt_project.yml
 # GENERAL CONFIG ----------------------------------------------------------------------
 version: 1.0
 
@@ -277,13 +287,14 @@ artifacts:                      # Configure how data artifacts are built
 <br>
 
 <details>
-<summary><code>reflekt_profile.yml</code> - Defines connection to schema registries and sources (i.e., data warehouse) where event data is stored. </summary>
+<summary><code>reflekt_profile.yml (click to expand example)</code> - Defines connection to schema registries and sources (i.e., data warehouses) where event data is stored. </summary>
 <br>
 
 ```yaml
+# reflekt_profiles.yml
 version: 1.0
 
-dev_reflekt:                                               # Profile name (multiple profiles can be defined)
+dev_reflekt:                                              # Profile name (multiple profiles can be defined)
   registry:
     - type: segment
       api_token: segment_api_token                        # https://docs.segmentapis.com/tag/Getting-Started#section/Get-an-API-token
@@ -313,9 +324,10 @@ dev_reflekt:                                               # Profile name (multi
 <br>
 
 ### Metadata
+You can define globally required metadata for all events in your project by modifying the `metadata` object in the `schemas/.reflekt/event-meta/1-0.json` schema. This is optional and by default no metadata is required.
 
 <details>
-<summary><code>schemas/.reflekt/event-meta/1-0.json</code> - OPTIONAL: modify the <code>metadata</code> object in this schema to define required metadata for all events (default = no required metadata).</summary>
+<summary><code>schemas/.reflekt/event-meta/1-0.json  (click to expand example)</code></summary>
 <br>
 
 ```json
