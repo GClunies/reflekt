@@ -75,7 +75,7 @@ class Warehouse:
                     drivername="redshift+redshift_connector",
                     host=self.credentials.get("host_url"),
                     port=self.credentials.get("port"),
-                    database=self.credentials.get("db_name"),
+                    database=self.credentials.get("database"),
                     username=self.credentials.get("user"),
                     password=self.credentials.get("password"),
                 ),
