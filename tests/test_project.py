@@ -25,7 +25,7 @@ def test_project_init():
     assert project.version == 1.0
     assert project.name == "reflekt_demo"
     assert project.vendor == "com.reflekt-ci"
-    assert project.profile == "dev_reflekt"
+    assert project.default_profile == "dev_reflekt"
     assert project.profiles_path == Path("./reflekt_profiles.yml").resolve()
     assert project.schemas == {
         "conventions": {
@@ -87,7 +87,7 @@ def test_project_init_from_path():
     assert project.version == 1.0
     assert project.name == "test_project"
     assert project.vendor == "com.reflekt-ci"
-    assert project.profile == "test_profile"
+    assert project.default_profile == "test_profile"
     assert (
         project.profiles_path == Path("./tests/fixtures/reflekt_profiles.yml").resolve()
     )
@@ -204,7 +204,7 @@ def test_project_to_yaml():
 
     assert project_yaml["version"] == 1.0
     assert project_yaml["name"] == "test_project"
-    assert project_yaml["profile"] == "test_profile"
+    assert project_yaml["default_profile"] == "test_profile"
     assert project_yaml["profiles_path"] == str(
         Path("./tests/fixtures/reflekt_profiles.yml").resolve()
     )

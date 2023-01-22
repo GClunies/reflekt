@@ -56,7 +56,7 @@ def test_non_existent_profiles_path():
 def test_profile_not_found():
     """Test that a profile not found in reflekt_profiles.yml errors."""
     project = Project(path="./tests/fixtures/reflekt_project.yml")
-    project.profile = "non_existent_profile"
+    project.default_profile = "non_existent_profile"
 
     with pytest.raises(SystemExit):
         Profile(project=project)
