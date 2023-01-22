@@ -1809,6 +1809,22 @@ pymysql = ["pymysql", "pymysql (<1)"]
 sqlcipher = ["sqlcipher3-binary"]
 
 [[package]]
+name = "sqlalchemy-redshift"
+version = "0.8.12"
+description = "Amazon Redshift Dialect for sqlalchemy"
+category = "main"
+optional = false
+python-versions = ">=3.4"
+files = [
+    {file = "sqlalchemy-redshift-0.8.12.tar.gz", hash = "sha256:21635da4e6f6b0b516a923ec02508cff409ce0d757e63a1e4fff39265d0b3208"},
+    {file = "sqlalchemy_redshift-0.8.12-py2.py3-none-any.whl", hash = "sha256:06d1d208a5a0ff7be6b8f346ba0ef30450f6d59190b2ba5316349a507c6f36d9"},
+]
+
+[package.dependencies]
+packaging = "*"
+SQLAlchemy = ">=0.9.2,<2.0.0"
+
+[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -1963,4 +1979,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "65c28f6d342a52e99017abb43322b10b388f41f0b913b12ea4814e7fc7b0bac3"
+content-hash = "aea7bc570de693b98d68b0090ed4fe2f50af2af6842e028db6cba860ed6f7e31"

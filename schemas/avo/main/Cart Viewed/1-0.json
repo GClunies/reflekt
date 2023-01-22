@@ -3,7 +3,7 @@
     "$id": "avo/main/Cart Viewed/1-0.json",
     "description": "User viewed their shopping cart.",
     "self": {
-        "vendor": "com.github/reflekt",
+        "vendor": "com.reflekt-ci",
         "name": "Cart Viewed",
         "format": "jsonschema",
         "version": "1-0"

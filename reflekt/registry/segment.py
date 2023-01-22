@@ -113,6 +113,7 @@ class SegmentRegistry:
         for plan in plans:
             if plan["name"] == plan_name:
                 plan_id = plan["id"]
+                break  # Exit loop once plan ID is found
             else:
                 plan_id = None
 

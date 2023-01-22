@@ -264,7 +264,7 @@ def init(
 def pull(
     select: str = typer.Option(
         ..., "--select", "-s", help="Schema(s) to pull from schema registry."
-    )
+    ),
 ):
     """Pull schema(s) from a schema registry."""
     project = Project()
@@ -446,13 +446,14 @@ def main(
 
 
 if __name__ == "__main__":
+    pull(select="segment/surfline-web")
     # push(select="segment/ecommerce", delete=False)
     # lint(select="segment/ecommerce")
 
     # reflekt build dbt --select segment/ecommerce --sdk segment --source snowflake.raw.schema_name
-    build(
-        artifact="dbt",
-        select="segment/ecommerce",
-        sdk="segment",
-        source="snowflake.raw.my_app_web",
-    )
+    # build(
+    #     artifact="dbt",
+    #     select="segment/ecommerce",
+    #     sdk="segment",
+    #     source="snowflake.raw.my_app_web",
+    # )
