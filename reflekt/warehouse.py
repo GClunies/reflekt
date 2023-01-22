@@ -19,7 +19,8 @@ class Warehouse:
         """Initialize DataWarehouse class.
 
         Args:
-            source (str): The --source argument passed to Reflekt CLI.
+            source_arg (str): The --source argument passed to Reflekt CLI.
+            profile (Profile): Reflekt Profile object.
         """
         self._source_arg = source_arg
         self._profile = profile

@@ -30,10 +30,10 @@ class BuilderHandler:
         """Initialize BuilderHandler class.
 
         Args:
-            artifact (str): The --artifact argument passed to Reflekt CLI.
-            select (str): The --select argument passed to Reflekt CLI.
-            sdk (str): The --sdk argument passed to Reflekt CLI.
-            source (str): The --source argument passed to Reflekt CLI.
+            artifact_arg (str): The --artifact argument passed to Reflekt CLI.
+            select_arg (str): The --select argument passed to Reflekt CLI.
+            sdk_arg (str): The --sdk argument passed to Reflekt CLI.
+            source_arg (str): The --source argument passed to Reflekt CLI.
             profile (Profile): Reflekt Profile object.
         """
         self.select_arg = select_arg
