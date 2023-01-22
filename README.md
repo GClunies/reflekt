@@ -211,16 +211,16 @@ An example `ProductClicked` event schema, based on Segment's [Ecommerce Spec](ht
 
 ---
 
-## Setting up a Reflekt Project
+## Reflekt Project Setup
 
 ### Project Structure
 A Reflekt project is a Git repo with the following directory structure:
 ```
 demo_reflekt_project
-├── .logs                 # Reflekt command logs
-├── .reflekt_cache        # Local cache used by Reflekt
-├── artifacts             # Data artifacts are built here
-├── schemas               # Event schemas are defined here
+├── .logs/                # Reflekt command logs
+├── .reflekt_cache/       # Local cache used by Reflekt
+├── artifacts/            # Data artifacts are built here
+├── schemas/              # Event schemas are defined here
 ├── .gitignore
 ├── README.md
 └── reflekt_project.yml   # Project configuration
