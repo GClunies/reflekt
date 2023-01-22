@@ -9,6 +9,7 @@ from typing import List
 from loguru import logger
 
 from reflekt.builder.dbt import DbtBuilder
+from reflekt.profile import Profile
 from reflekt.project import Project
 
 
@@ -18,7 +19,14 @@ class BuilderHandler:
     Handler passes the schemas to be built to the builder.
     """
 
-    def __init__(self, artifact: str, select: str, sdk: str, source: str) -> None:
+    def __init__(
+        self,
+        artifact_arg: str,
+        select_arg: str,
+        sdk_arg: str,
+        source_arg: str,
+        profile: Profile,
+    ) -> None:
         """Initialize BuilderHandler class.
 
         Args:
@@ -26,12 +34,14 @@ class BuilderHandler:
             select (str): The --select argument passed to Reflekt CLI.
             sdk (str): The --sdk argument passed to Reflekt CLI.
             source (str): The --source argument passed to Reflekt CLI.
+            profile (Profile): Reflekt Profile object.
         """
-        self.select = select
-        self.artifact = self._parse_artifact(artifact)
-        self.schema_paths = self._parse_select(select)
-        self.sdk = sdk
-        self.source = source
+        self.select_arg = select_arg
+        self.artifact_arg = self._parse_artifact(artifact_arg)
+        self.schema_paths = self._parse_select(select_arg)
+        self.sdk_arg = sdk_arg
+        self.source_arg = source_arg
+        self.profile = profile
 
     def _parse_artifact(self, artifact: str) -> None:
         """Parse the artifact argument.
@@ -85,12 +95,13 @@ class BuilderHandler:
             DbtBuilder: Builder class for specified artifact type.
         """
 
-        if self.artifact == "dbt":
+        if self.artifact_arg == "dbt":
             builder = DbtBuilder(
-                select=self.select,
+                select_arg=self.select_arg,
                 schema_paths=self.schema_paths,
-                sdk=self.sdk,
-                source=self.source,
+                sdk_arg=self.sdk_arg,
+                source_arg=self.source_arg,
+                profile=self.profile,
             )
 
         return builder

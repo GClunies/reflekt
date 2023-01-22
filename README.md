@@ -235,13 +235,13 @@ There are 2 configuration files required to run Reflekt:
 <br>
 
 ```yaml
-# reflekt_project.yml
+# Example reflekt_project.yml
 # GENERAL CONFIG ----------------------------------------------------------------------
 version: 1.0
 
 name: reflekt_demo               # Project name
 vendor: com.company_name         # Default vendor for schemas in reflekt project
-profile: dev_reflekt             # Profile to use from reflekt_profiles.yml
+default_profile: dev_reflekt     # Default profile to use from reflekt_profiles.yml
 # profiles_path: optional/path/to/reflekt_profiles.yml  # Optional, defaults to ~/.reflekt/reflekt_profiles.yml
 
 # SCHEMAS CONFIG ----------------------------------------------------------------------
@@ -291,18 +291,19 @@ artifacts:                      # Configure how data artifacts are built
 <br>
 
 ```yaml
-# reflekt_profiles.yml
+# Example reflekt_profiles.yml
 version: 1.0
 
 dev_reflekt:                                              # Profile name (multiple profiles can be defined)
-  registry:
+  registry:                                               # Define connections to schema registries (multiple allowed)
     - type: segment
       api_token: segment_api_token                        # https://docs.segmentapis.com/tag/Getting-Started#section/Get-an-API-token
     - type: avo
       workspace_id: avo_workspace_id                      # https://www.avo.app/docs/public-api/export-tracking-plan#endpoint
       service_account_name: avo_service_account_name      # https://www.avo.app/docs/public-api/authentication#creating-service-accounts
       service_account_secret: avo_service_account_secret
-  source:                                                 # Define source(s) where event data is stored
+
+  source:                                                 # Define connections to data warehouses where event data is stored (multiple TYPES allowed. Cannot have sources of the same TYPE)
     - type: snowflake                                     # Snowflake DWH. Credentials follow.
       account: abc12345
       database: raw
@@ -313,7 +314,7 @@ dev_reflekt:                                              # Profile name (multip
 
     - type: redshift                                      # Redshift DWH. Credentials follow.
       host: example-redshift-cluster-1.abc123.us-west-1.redshift.amazonaws.com
-      database: raw
+      database: analytics
       port: 5439
       user: reflekt_user
       password: reflekt_user_password

@@ -4,7 +4,7 @@
 
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import yaml
 from jsonschema import validate
@@ -24,18 +24,25 @@ class Profile:
     Describes a Reflekt profile and its configuration from reflekt_profiles.yml.
     """
 
-    def __init__(self, project: Project) -> None:
+    def __init__(self, project: Project, profile_name: Optional[str] = None) -> None:
         """Initialize a Reflekt profile.
 
         Args:
             project (Project): A Reflekt project class object.
+            profile_name (Optional[str]): Name of profile to initialize. If None,
+                initialize default_profile in reflekt_project.yml.
 
         Raises:
             SystemExit: An error occurred while initializing the project.
         """
         self.project: Project = project
         self.path: Path = project.profiles_path
-        self.name: str = project.profile
+
+        if profile_name:
+            self.name: str = profile_name
+        else:
+            self.name: str = project.default_profile
+
         self.version: float = 1.0
         self.exists: bool = False
         self.config: dict = {}

@@ -10,54 +10,56 @@ from sqlalchemy.engine.url import URL as redshift_url
 
 from reflekt.errors import sourceArgError
 from reflekt.profile import Profile
-from reflekt.project import Project
 
 
 class Warehouse:
     """Handles connection to data warehouse based on --source argument."""
 
-    def __init__(self, source: str) -> None:
+    def __init__(self, source_arg: str, profile: Profile) -> None:
         """Initialize DataWarehouse class.
 
         Args:
             source (str): The --source argument passed to Reflekt CLI.
         """
-        self._source = source
-        self._profile = Profile(project=Project())
+        self._source_arg = source_arg
+        self._profile = profile
         self.credentials: Optional[dict] = None
-        self._get_warehouse_connection(source)
+        self._get_warehouse_connection()
 
-    def _get_warehouse_connection(self, source: str) -> None:
-        """Get source argument.
-
-        Args:
-            source (str): The --source argument passed to Reflekt CLI.
+    def _get_warehouse_connection(self) -> None:
+        """Connect to warehouse based on --source argument and 'source:' in profile.
 
         Raises:
             sourceArgError: Raised when an invalid --source argument is provided.
         """
-        self._match_found = False
-        self.source_type = self._source.split(".")[0]
-        self.database = self._source.split(".")[1]
-        self.schema = self._source.split(".")[2]
+        self._match_found = (
+            False  # Assume no match between --source argument and source: in profile
+        )
+        # Parse the source argument
+        self.source_type = self._source_arg.split(".")[0]
+        self.database = self._source_arg.split(".")[1]
+        self.schema = self._source_arg.split(".")[2]
 
+        # Check if source type matches a source: in profile. If so, set credentials.
         for profile_source in self._profile.source:
+            # TODO - assumes only one source: per type. Add 'id:' to source config later
             if self.source_type == profile_source["type"]:
                 self.type = profile_source["type"]
                 self._match_found = True
                 self.credentials = profile_source
 
-        if not self._match_found:
+        if not self._match_found:  # Raise error if no match found
             raise sourceArgError(
                 message=(
-                    f"Invalid argument '--source {self._source}'. source name "
+                    f"Invalid argument '--source {self._source_arg}'. source name "
                     f"'{self.source_type}' does not match a 'source:' configuration in "
                     f"{self._profile.path}. source argument must follow the format: "
                     f"<source_type>.<database>.<schema>\n"
                 ),
-                source=self._source,
+                source=self._source_arg,
             )
 
+        # Connect to the data warehouse based on source type
         if self.type == "snowflake":
             self.engine = sqlalchemy.create_engine(
                 snow_url(
@@ -83,11 +85,13 @@ class Warehouse:
                     "sslmode": "prefer",
                 },
             )
-        # elif self.type == "bigquery":
+        # elif self.type == "bigquery":  # TODO: Add BigQuery support later
         #     pass
 
     def get_columns(self, table: str) -> Tuple[Optional[list], Optional[str]]:
-        """Get column names for a table.
+        """Get column names for a given table.
+
+        Does not include columns that have all NULL values.
 
         Args:
             table (str): Table name.
@@ -97,7 +101,6 @@ class Warehouse:
         """
         with self.engine.connect() as conn:
             try:
-                # Get columns. Columns that are ALL null are not included in result
                 query = conn.execute(f"select * from {self.schema}.{table} limit 0")
                 columns = query.keys()._keys
                 error_msg = None
@@ -105,7 +108,7 @@ class Warehouse:
             except sqlalchemy.exc.ProgrammingError as e:
                 columns = None
 
-                if self.type == "snowflake":  # Handle error according to warehouse type
+                if self.type == "snowflake":
                     error_msg = e.orig.msg
                 elif self.type == "redshift":
                     error_msg = e.orig.args[0]["M"]

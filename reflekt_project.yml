@@ -1,11 +1,13 @@
-# NOTE: this repo is a Reflekt project itself, so you can see how it's configured
+# This repo stores the core Reflekt codebase, but is also a Reflekt project itself.
+# Explore the schemas/ and artifacts/ directories to see how we use Reflekt internally.
+
 # GENERAL CONFIG ----------------------------------------------------------------------
 version: 1.0
 
 name: reflekt_demo               # Project name
 vendor: com.reflekt-ci           # Default vendor for schemas in reflekt project
-# profile: dev_reflekt             # Profile to use from reflekt_profiles.yml
-profile: dev_redshift            # Profile to use from reflekt_profiles.yml
+
+default_profile: dev_reflekt    # Default profile to use from reflekt_profiles.yml
 profiles_path: ./reflekt_profiles.yml  # Optional, defaults to ~/.reflekt/reflekt_profiles.yml
 
 # SCHEMAS CONFIG ----------------------------------------------------------------------

@@ -97,13 +97,13 @@ def init(
         )
 
     project.name = typer.prompt("Project name [letters, digits, underscore]", type=str)
-    project.vendor = typer.prompt("Schema vendor [e.g com.yourcompany]", type=str)
+    project.vendor = typer.prompt("Schema vendor [e.g com.your_company]", type=str)
 
     if project.vendor == "":
         raise typer.BadParameter("Vendor cannot be empty string")
 
     profile_path = typer.prompt(
-        "Path for 'reflekt_profiles.yml' [stores connection credentials].",
+        "Path for 'reflekt_profiles.yml' [for connection to schema registry and data warehouse].",
         type=str,
         default=str(Path.home() / ".reflekt/reflekt_profiles.yml"),
         show_default=True,
@@ -265,10 +265,16 @@ def pull(
     select: str = typer.Option(
         ..., "--select", "-s", help="Schema(s) to pull from schema registry."
     ),
+    profile_name: str = typer.Option(
+        None,
+        "--profile",
+        "-p",
+        help="Profile in reflekt_profiles.yml to use for schema registry connection.",
+    ),
 ):
     """Pull schema(s) from a schema registry."""
     project = Project()
-    profile = Profile(project=project)
+    profile = Profile(project=project, profile_name=profile_name)
     registry = RegistryHandler(select=select, profile=profile).get_registry()
     registry.pull(select=select)
 
@@ -287,11 +293,17 @@ def push(
     force: bool = typer.Option(
         False, "--force", "-f", help="Force command to run without confirmation."
     ),
+    profile_name: str = typer.Option(
+        None,
+        "--profile",
+        "-p",
+        help="Profile in reflekt_profiles.yml to use for schema registry connection.",
+    ),
 ):
     """Push schema(s) to a schema registry."""
     select = clean_select(select)
     project = Project()
-    profile = Profile(project=project)
+    profile = Profile(project=project, profile_name=profile_name)
     registry = RegistryHandler(select=select, profile=profile).get_registry()
 
     if registry.type == RegistryEnum.avo:
@@ -373,16 +385,23 @@ def build(
     source: str = typer.Option(
         ..., "--source", "-t", help="Schema in database where event data is loaded."
     ),
+    profile_name: str = typer.Option(
+        None,
+        "--profile",
+        "-p",
+        help="Profile in reflekt_profiles.yml to use for source (i.e., data warehouse) connection.",
+    ),
 ):
     """Build data artifact(s) based on schema(s)."""
     select = clean_select(select)
     project = Project()
-    profile = Profile(project=project)
+    profile = Profile(project=project, profile_name=profile_name)
     builder = BuilderHandler(
-        artifact=artifact,
-        select=select,
-        sdk=sdk,
-        source=source,
+        artifact_arg=artifact,
+        select_arg=select,
+        sdk_arg=sdk,
+        source_arg=source,
+        profile=profile,
     ).get_builder()
     builder.build()
 

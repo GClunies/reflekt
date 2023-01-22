@@ -40,7 +40,7 @@ class Project:
         self.config: dict = {}
         self.name: str = ""
         self.vendor: str = ""
-        self.profile: str = ""
+        self.default_profile: str = ""
         self.profiles_path: Path = None
         self.schemas: dict = {}
         self.conventions: dict = {}  # Nested in self.schemas
@@ -106,7 +106,7 @@ class Project:
             self.version = self.config.get("version")
             self.name = self.config.get("name")
             self.vendor = self.config.get("vendor")
-            self.profile = self.config.get("profile")
+            self.default_profile = self.config.get("default_profile")
             self.profiles_path = (
                 Path(self.config.get("profiles_path")).resolve().expanduser()
             )
@@ -121,7 +121,7 @@ class Project:
         data = {
             "version": self.version,
             "name": self.name,
-            "profile": self.profile,
+            "default_profile": self.default_profile,
             "profiles_path": str(self.profiles_path),
             "schemas": self.schemas,
             "sources": self.sources,

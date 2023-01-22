@@ -15,6 +15,7 @@ from rich import print
 
 from reflekt.dumper import ReflektYamlDumper
 from reflekt.flatson import Flatson
+from reflekt.profile import Profile
 from reflekt.project import Project
 from reflekt.warehouse import Warehouse
 
@@ -27,20 +28,22 @@ class DbtBuilder:
 
     def __init__(
         self,
-        select: str,
+        select_arg: str,
         schema_paths: List[Path],
-        sdk: str,
-        source: str,
+        sdk_arg: str,
+        source_arg: str,
+        profile: Profile,
     ) -> None:
         """Initialize dbt builder class.
 
         Args:
-            select (str): The --select argument passed to Reflekt CLI.
+            select_arg (str): The --select argument passed to Reflekt CLI.
             schema_paths (List[Path]): List of schema paths to build.
-            sdk (str): The --sdk argument passed to Reflekt CLI.
-            source (str): The --source argument passed to Reflekt CLI.
+            sdk_arg (str): The --sdk argument passed to Reflekt CLI.
+            source_arg (str): The --source argument passed to Reflekt CLI.
+            profile (Profile): Reflekt Profile object.
         """
-
+        self._profile = profile
         self._project = Project()
         self._pkg_name = self._project.name
         self._pkg_dir = self._project.dir / "artifacts" / "dbt" / self._pkg_name
@@ -56,11 +59,11 @@ class DbtBuilder:
         self._doc_folder = self._project.artifacts["dbt"]["docs"]["in_folder"]
         self._doc_folder_str = "" if not self._doc_folder else "docs/"
         self.wh_errors = []
-        self._select = select
+        self._select_arg = select_arg
         self._schema_paths = schema_paths
-        self._sdk = sdk
-        self._source = source
-        self._warehouse = Warehouse(self._source)
+        self._sdk_arg = sdk_arg
+        self._source_arg = source_arg
+        self._warehouse = Warehouse(source_arg=self._source_arg, profile=self._profile)
         self._warehouse_type = self._warehouse.type
         self._database = self._warehouse.database
         self._schema = self._warehouse.schema
@@ -90,7 +93,7 @@ class DbtBuilder:
                         "name": self._schema,
                         "schema": self._schema,
                         "database": self._database,
-                        "description": f"Schema in {self._warehouse_type} with raw {titleize(self._sdk)} event data.",  # noqa: E501
+                        "description": f"Schema in {self._warehouse_type} with raw {titleize(self._sdk_arg)} event data.",  # noqa: E501
                         "tables": [],
                     }
                 ],
@@ -136,7 +139,7 @@ class DbtBuilder:
         )
         mdl_sql += "renamed as (\n" "    select"  # Rename CTE
 
-        if self._sdk == "segment":
+        if self._sdk_arg == "segment":
             for col in columns:
                 col_name = underscore(col["name"])
 
@@ -184,9 +187,10 @@ class DbtBuilder:
 
         logger.info(f"Building staging model '{model_file}'")
 
-    def _build_dbt_metric(self) -> None:
-        """Build dbt metric."""
-        pass  # TODO - reserved for later use
+    # TODO - reserved for later use
+    # def _build_dbt_metric(self) -> None:
+    #     """Build dbt metric."""
+    #     pass
 
     def _build_dbt_doc(
         self, table_name: str, description: str, columns: List[Dict]
@@ -277,9 +281,9 @@ class DbtBuilder:
             f"Building dbt package:"
             f"\n    name: {self._pkg_name}"
             f"\n    dir: {self._pkg_dir}"
-            f"\n    --select: {self._select}"
-            f"\n    --sdk: {self._sdk}"
-            f"\n    --source: {self._source}"
+            f"\n    --select: {self._select_arg}"
+            f"\n    --sdk_arg: {self._sdk_arg}"
+            f"\n    --source: {self._source_arg}"
         )
         print("")
 
@@ -322,7 +326,7 @@ class DbtBuilder:
         )
 
         # Get common columns based on SDK used to collect event data
-        if self._sdk == "segment":
+        if self._sdk_arg == "segment":
             common_json = (
                 self._project.dir
                 / "schemas"
@@ -331,11 +335,11 @@ class DbtBuilder:
                 / "common"
                 / "1-0.json"
             )
-        # elif self._sdk == "rudderstack":
+        # elif self._sdk_arg == "rudderstack":
         #     pass
-        # elif self._sdk == "snowplow":
+        # elif self._sdk_arg == "snowplow":
         #     pass
-        # elif self._sdk == "amplitude":
+        # elif self._sdk_arg == "amplitude":
         #     pass
 
         common_columns = [
@@ -373,7 +377,7 @@ class DbtBuilder:
                 event_desc = schema_json["description"]
                 table_name = underscore(event_name.lower().replace(" ", "_"))
 
-                if self._sdk == "segment":
+                if self._sdk_arg == "segment":
                     table_name = (
                         table_name.replace("identify", "identifies")
                         .replace("group", "groups")
@@ -414,7 +418,7 @@ class DbtBuilder:
                         columns=columns,
                     )
 
-                    if self._sdk == "segment" and table_name == "identifies":
+                    if self._sdk_arg == "segment" and table_name == "identifies":
                         # Build Segment users table/model/doc
                         self._build_dbt_table(
                             source=source_obj,
@@ -431,7 +435,7 @@ class DbtBuilder:
                             columns=columns,
                         )
 
-        if self._sdk == "segment":
+        if self._sdk_arg == "segment":
             # Build Segment users table/model/doc
             self._build_dbt_table(
                 source=source_obj,
