@@ -147,5 +147,7 @@ dmypy.json
 /reflekt_profiles.yml
 TODO.md
 .DS_Store
+
+# TESTING
 /schemas/segment/surfline-web/**/*
 /artifacts/dbt/reflekt_demo/models/surfline-web/**/*
