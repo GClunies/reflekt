@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from typing import Union
+
 from reflekt.constants import RegistryEnum
 from reflekt.errors import RegistryError
 from reflekt.profile import Profile
@@ -23,7 +25,7 @@ class RegistryHandler:
         self.type = select.split("/")[0]
         self.profile = profile
 
-    def get_registry(self) -> SegmentRegistry | AvoRegistry:
+    def get_registry(self) -> Union[SegmentRegistry, AvoRegistry]:
         """Get registry class based on specified registry type.
 
         Raises:
