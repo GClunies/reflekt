@@ -113,7 +113,7 @@ def init(
         type=str,
     )
     project.profiles_path = Path(profile_path)
-    project.profile = profile_name
+    project.default_profile = profile_name
 
     profile = Profile(project=project)
     profile.path = Path(profile_path)
