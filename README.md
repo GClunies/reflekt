@@ -15,7 +15,7 @@ A tool to help Data, Engineering, and Product teams:
 - Interact with schema registries
   - Sync schema(s) to a schema registry where they can be used for event data validation.
   - Pull schema(s) from a schema registry to into a Reflekt project.
-- Use schemas to build data artifacts (e.g., dbt packages) that model and document event data.
+- Build data artifacts (e.g., dbt packages) based on schemas that model and document event data.
   - Keep data artifacts in sync with instrumentation - ready for use by engineers, analysts, and the business.
   - Reduce errors, improve data quality, and automate important (but boring) data tasks.
 
@@ -27,7 +27,7 @@ A full list of CLI commands and their arguments can be accessed using `reflekt -
 See the [argument syntax](#argument-syntax) section on how to use command argument. The [schemas](artifacts/dbt/reflekt_demo/dbt_project.yml) section details how schemas are identified, version, and structured.
 
 ### `init`
-Initialize a new Reflekt project.
+Initialize a Reflekt project.
 ```bash
 reflekt init --dir /path/to/project
 ```
@@ -38,6 +38,9 @@ Pull schemas from a schema registry and create the corresponding structure in pr
 # Pull all versions of CartViewed schema from Segment to schemas/segment/ecommerce/CartViewed/
 reflekt pull --select segment/ecommerce/CartViewed
 ```
+**Supported schema registries:**
+- [Segment](https://segment.com/)
+- [Avo](https://avo.app/)
 
 ### `push`
 Push schemas in project `schemas/` directory to a schema registry.
@@ -45,6 +48,8 @@ Push schemas in project `schemas/` directory to a schema registry.
 # Push all schemas in schemas/segment/ecommerce/ to Segment tracking plan 'ecommerce'
 reflekt push -s segment/ecommerce/CartViewed
 ```
+**Supported schema registries:**
+- [Segment](https://segment.com/)
 
 ### `lint`
 Lint schemas in project `schemas/` directory.
@@ -68,8 +73,7 @@ Build a data artifacts based on events schemas. Save time, reduce errors, and im
 #   - Raw event data stored at specified source (snowflake.raw.segment_prod)
 reflekt build dbt --select segment/ecommerce --source snowflake.raw.segment_prod --sdk segment
 ```
-
-**Supported data artifacts**:
+**Supported data artifacts:**
 - [dbt package](https://docs.getdbt.com/docs/build/packages) - define dbt sources, models, and documentation for selected schemas and event data found in specified [--source](#sources).
 
 
@@ -225,7 +229,7 @@ demo_reflekt_project
 ├── README.md
 └── reflekt_project.yml   # Project configuration
 ```
-Sync the project with a Github to enable collaboration and version control amongst your team.
+Sync the project to Github to enable collaboration and version control amongst your team.
 
 ### Configuration Files
 There are 2 configuration files required to run Reflekt:
