@@ -33,7 +33,7 @@ def test_profile():
         },
     ]
     assert profile.source[0] == {
-        "name": "test_source",
+        "id": "test_source",
         "type": "snowflake",
         "account": "test_account",
         "database": "test_database",
@@ -87,7 +87,7 @@ def test_add_profile_to_new_yaml():
             ],
             "source": [
                 {
-                    "name": "test_source",
+                    "id": "test_source",
                     "type": "snowflake",
                     "account": "test_account",
                     "database": "test_database",
@@ -133,7 +133,7 @@ def test_add_profile_to_existing_yaml():
             ],
             "source": [
                 {
-                    "name": "test_source",
+                    "id": "test_source",
                     "type": "snowflake",
                     "account": "test_account",
                     "database": "test_database",
@@ -156,7 +156,7 @@ def test_add_profile_to_existing_yaml():
             ],
             "source": [
                 {
-                    "name": "test_source",
+                    "id": "test_source",
                     "type": "snowflake",
                     "account": "test_account",
                     "database": "test_database",
@@ -169,3 +169,16 @@ def test_add_profile_to_existing_yaml():
         },
     }
     profile.path.unlink(missing_ok=True)  # Cleanup
+
+
+def test_non_unique_source_ids():
+    """Test that non-unique source ids error."""
+    project = Project(path="./tests/fixtures/reflekt_project.yml")
+    project.profiles_path = (
+        Path("./tests/fixtures/reflekt_profiles_duplicate_source.yml")
+        .resolve()
+        .expanduser()
+    )
+
+    with pytest.raises(SystemExit):
+        Profile(project=project)

@@ -12,6 +12,7 @@ from typing import Optional
 import click
 import pkg_resources
 import typer
+from jsonschema import ValidationError
 from loguru import logger
 from rich import print
 from rich.console import Console
@@ -157,14 +158,14 @@ def init(
     source_credentials = {}
     source_credentials["type"] = str.lower(
         typer.prompt(
-            "source Data Warehouse [where raw event data is loaded]",
+            "Source type [where raw event data is stored]",
             type=click.Choice(WAREHOUSE),
             show_choices=True,
         )
     )
-    source_credentials["name"] = str.lower(
+    source_credentials["id"] = str.lower(
         typer.prompt(
-            "source name [identifies source data warehouse in 'reflekt_profiles.yml']",
+            "Source id [arbitrary ID for source in 'reflekt_profiles.yml']",
             type=str,
         )
     )
@@ -258,6 +259,16 @@ def init(
     console = Console()
     console.print(table)
     print("")
+
+
+@app.command()
+def debug():
+    """Check reflekt_project.yml and reflekt_profiles.yml are configured correctly."""
+    try:
+        project = Project()
+        profile = Profile(project=project)
+    except ValidationError or SystemExit:  # Catch exceptions, these will throw errors themselves
+        pass
 
 
 @app.command()
@@ -465,7 +476,8 @@ def main(
 
 
 if __name__ == "__main__":
-    pull(select="segment/surfline-web")
+    debug()
+    # pull(select="segment/surfline-web")
     # push(select="segment/ecommerce", delete=False)
     # lint(select="segment/ecommerce")
 

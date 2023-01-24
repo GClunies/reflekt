@@ -3,7 +3,7 @@
     "$id": ".reflekt/profile/1-0.json",
     "description": "Schema for Reflekt profiles",
     "self": {
-        "vendor": "com.reflekt-ci-ci",
+        "vendor": "com.reflekt-ci",
         "name": "profile",
         "format": "jsonschema",
         "version": "1-0"
@@ -17,7 +17,7 @@
                 "properties": {
                     "type": {
                         "type": "string",
-                        "enum": ["avo", "segment", "snowplow", "rudderstack", "amplitude"]
+                        "enum": ["avo", "segment"]
                     }
                 },
                 "allOf": [
@@ -90,10 +90,10 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "name": {"type": "string"},
+                    "id": {"type": "string"},
                     "type": {
                         "type": "string",
-                        "enum": ["snowflake", "redshift", "bigquery"]
+                        "enum": ["snowflake", "redshift"]
                     }
                 },
                 "allOf": [
@@ -129,23 +129,9 @@
                             },
                             "required": ["host", "port", "database", "user", "password"]
                         }
-                    },
-                    {
-                        "if": {
-                            "properties": {"type": {"const": "bigquery"}},
-                            "required": ["type"]
-                        },
-                        "then": {
-                            "properties": {
-                                "method": {"type": "string", "enum": ["service-account"]},
-                                "project": {"type": "string"},
-                                "dataset": {"type": "string"},
-                                "keyfile": {"type": "string"}
-                            },
-                            "required": ["method", "project", "dataset", "keyfile"]
-                        }
                     }
-                ]
+                ],
+                "required": ["id", "type"]
             }
         },
         "do_not_track": {"type": "boolean"}

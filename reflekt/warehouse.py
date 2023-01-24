@@ -25,35 +25,32 @@ class Warehouse:
         self._source_arg = source_arg
         self._profile = profile
         self.credentials: Optional[dict] = None
-        self._get_warehouse_connection()
+        self._create_warehouse_engine()
 
-    def _get_warehouse_connection(self) -> None:
-        """Connect to warehouse based on --source argument and 'source:' in profile.
+    def _create_warehouse_engine(self) -> None:
+        """Create warehouse engine based on --source argument and 'source:' in profile.
 
         Raises:
             sourceArgError: Raised when an invalid --source argument is provided.
         """
-        self._match_found = (
-            False  # Assume no match between --source argument and source: in profile
-        )
-        # Parse the source argument
-        self.source_type = self._source_arg.split(".")[0]
+        # Parse source argument
+        self.source_id = self._source_arg.split(".")[0]
         self.database = self._source_arg.split(".")[1]
         self.schema = self._source_arg.split(".")[2]
+        self._source_found = False  # Flag to check if source argument matches a profile
 
-        # Check if source type matches a source: in profile. If so, set credentials.
+        # Search profile in reflekt_profiles.yml for id. If found, set credentials.
         for profile_source in self._profile.source:
-            # TODO - assumes only one source: per type. Add 'id:' to source config later
-            if self.source_type == profile_source["type"]:
+            if self.source_id == profile_source["id"]:
                 self.type = profile_source["type"]
-                self._match_found = True
+                self._source_found = True
                 self.credentials = profile_source
 
-        if not self._match_found:  # Raise error if no match found
+        if not self._source_found:  # Raise error if no match found
             raise sourceArgError(
                 message=(
                     f"Invalid argument '--source {self._source_arg}'. source name "
-                    f"'{self.source_type}' does not match a 'source:' configuration in "
+                    f"'{self.type}' does not match a 'source:' configuration in "
                     f"{self._profile.path}. source argument must follow the format: "
                     f"<source_type>.<database>.<schema>\n"
                 ),

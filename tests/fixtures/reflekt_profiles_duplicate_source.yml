@@ -17,3 +17,12 @@ test_profile:
       role: test_role
       user: test_user
       password: test_password
+
+    - id: test_source
+      type: snowflake
+      account: test_account
+      database: test_database
+      warehouse: test_warehouse
+      role: test_role
+      user: test_user
+      password: test_password

@@ -25,9 +25,9 @@ A tool to help Data, Engineering, and Product teams:
 ---
 
 ## Commands
-A full list of CLI commands and their arguments can be accessed using `reflekt --help`. Each command has a `--help` flag with information about the command and its arguments/options.
+A list of CLI commands and arguments can be accessed by running `reflekt --help`. Commands have a `--help` flag to provide command details (arguments, options, etc.). All commands (except `init`) can be run against a single or multiple schema(s). The command examples below give a brief overview of the syntax.
 
-See the [argument syntax](#argument-syntax) section on how to use command argument. The [schemas](artifacts/dbt/reflekt_demo/dbt_project.yml) section details how schemas are identified, version, and structured.
+See the [argument syntax](#argument-syntax) section for more details on selecting [schemas](#--select), specifying [sources](#--source) and [SDKs](--sdk) used to collect event data.
 
 ### `init`
 Initialize a Reflekt project.
@@ -38,27 +38,24 @@ reflekt init --dir /path/to/project
 ### `pull`
 Pull schemas from a schema registry and create the corresponding structure in project `schemas/` directory.
 ```bash
-# Pull all versions of CartViewed schema from Segment to schemas/segment/ecommerce/CartViewed/
-reflekt pull --select segment/ecommerce/CartViewed
+# Pull all schemas from 'ecommerce' tracking plan in Segment to schemas/segment/ecommerce/
+reflekt pull --select segment/ecommerce/
 ```
-**Supported schema registries:**
-- [Segment](https://segment.com/)
-- [Avo](https://avo.app/)
+Supported registries: [Segment](https://segment.com/), [Avo](https://avo.app/)
 
 ### `push`
 Push schemas in project `schemas/` directory to a schema registry.
 ```bash
 # Push all schemas in schemas/segment/ecommerce/ to Segment tracking plan 'ecommerce'
-reflekt push -s segment/ecommerce/CartViewed
+reflekt push --select segment/ecommerce/CartViewed
 ```
-**Supported schema registries:**
-- [Segment](https://segment.com/)
+Supported registries: [Segment](https://segment.com/)
 
 ### `lint`
 Lint schemas in project `schemas/` directory.
 ```bash
 # Lint a single schema (.json is optional)
-reflekt lint -s segment/ecommerce/CartViewed/1-0.json
+reflekt lint --select segment/ecommerce/CartViewed/1-0.json
 ```
 Linting checks include:
 - Event and property names match the configured naming conventions in `reflekt_project.yml`.
@@ -77,67 +74,70 @@ Build a data artifacts based on events schemas. Save time, reduce errors, and im
 reflekt build dbt --select segment/ecommerce --source snowflake.raw.segment_prod --sdk segment
 ```
 **Supported data artifacts:**
-- [dbt package](https://docs.getdbt.com/docs/build/packages) - define dbt sources, models, and documentation for selected schemas and event data found in specified [--source](#sources).
+- [dbt packages](https://docs.getdbt.com/docs/build/packages) - defines dbt sources, models, and documentation for selected schemas and event data found in the specified [--source](#sources).
 
 
 ## Argument syntax
 
 ### --select
-The `--select` / `-s` argument specifies what schema(s) a [command](#commands) is run against using their [schema `$id`](#schema-id). Schemas can be selected from:
+The `--select` / `-s` argument specifies what schema(s) a [command](#commands) is run against. Schema's are selected using their [schema `$id`](#schema-id). Schemas can be selected from:
 1. Schema registries (e.g., Segment, Avo, etc.)
    ```bash
    # Pull schemas from 'ecommerce' tracking plan in Segment registry to my_reflekt_project/schemas/segment/ecommerce/
-   reflekt pull -s segment/ecommerce
+   reflekt pull --select segment/ecommerce
    ```
 
-2. JSON files in the `schemas/` directory of a Reflekt project.
+2. Schemas in a Reflekt project `schemas/` directory
    ```bash
    # Push my_reflekt_project/schemas/segment/ecommerce/CartViewed/1-0.json to 'ecommerce' tracking plan in Segment registry
-   reflekt push -s segment/ecommerce/CartViewed/1-0.json
+   reflekt push --select segment/ecommerce/CartViewed/1-0.json
    ```
 
-More examples of the `--select` syntax are shown in the [commands](#commands) section.
-
 ### --source
-The `--source` / `-t` argument specifies where Reflekt should search for event data when building data artifacts (e.g., dbt packages). The `--source` argument always follows the `source_type.database_name.schema_name` format. sources are defined in the [reflekt_profile.yml](#reflekt_profileyml) file.
+In Reflekt, a source defines where raw event data is stored in a data warehouse. The `--source` / `-t` argument tells Reflekt where to search for event tables when building data artifacts. It must be specified in the format:
+```
+--source source_id.database_name.schema_name
+```
+where `source_id` is the source's `id` defined in a profile found in the [reflekt_profile.yml](#reflekt_profilesyml) file.
 
 ### --sdk
-Different teams use different SDKs to collect event data. When [building a data artifact](#build), the `--sdk` / `-sdk` argument tells Reflekt how the data is structured in the [source](#--source) so that it can build the data artifact accordingly. Currently supported SDKs include:
-- [`segment`](https://segment.com/)
+Event's can be collected using different SDKs, each with their own unique ways of collecting event data and loading it into sources. The `--sdk` / `-sdk` argument tells Reflekt how the data is structured in the [source](#--source) so that it can build data artifacts accordingly. Currently supported SDKs include:
+- [Segment](https://segment.com/)
+- Others coming soon!
 
 ---
 
 ## Schemas
-Event schemas are defined in `.json` files stored in the `schemas/` directory of a project. Reflekt understands how different schema registries store and structure schemas, creating a codified representation using [JSON Schema](https://json-schema.org/). When pulling/pushing schemas from/to a schema registry, Reflekt handles the conversion between the registry's format and JSON Schema.
+Event schemas stored as JSON files in the `schemas/` directory of a project. Behind the scenes, Reflekt understands how different schema registries store and structure schemas, creating a common codified representation using [JSON Schema](https://json-schema.org/). When pulling/pushing schemas from/to a schema registry, Reflekt handles the conversion between the registry's format and JSON Schema.
 
 ### Schema `$id`
-Reflekt uses the JSON schema `$id` property to identify schemas, determined by their path relative to the `schemas/` directory. For example, the schema at `my_reflekt_project/schemas/segment/ecommerce/CartViewed/1-0.json` has the `$id` `segment/ecommerce/CartViewed/1-0.json`.
+Schemas are identified in Reflekt by their `$id` property, equal to their relative path to the `schemas/` directory. For example, the schema at `my_reflekt_project/schemas/segment/ecommerce/CartViewed/1-0.json` has the `$id` of `segment/ecommerce/CartViewed/1-0.json`.
 
 See the [--select](#--select) syntax docs for more details on selecting schemas when running commands.
 
 ### Schema version
 Schema changes are captured using a `MAJOR-MINOR` version spec (inspired by [SchemaVer](https://docs.snowplow.io/docs/pipeline-components-and-applications/iglu/common-architecture/schemaver/)). Schema versions start at `1-0` and are incremented as follows:
 
-- **MAJOR** - Breaking schema change that is incompatible with previous data. Examples:
+- **MAJOR** - Breaking schema changes incompatible with previous data. Examples:
   - Add/remove/rename a required property
   - Change a property from *optional to required*
   - Change a property's type
-- **MINOR** - Non-breaking schema change that is compatible with previous data. Examples:
+- **MINOR** - Non-breaking schema changes compatible with previous data. Examples:
   - Add/remove/rename an optional property
   - Change a property from *required to optional*
 
 ### Schema registries
-Reflekt supports the following schema registries. While Reflekt uses the `MAJOR-MINOR` versioning spec, each registry handles schema versions differently. Compatibility with Reflekt's `MAJOR-MINOR` spec is included in the table below.
+Reflekt supports the following schema registries. While Reflekt uses the `MAJOR-MINOR` versioning spec, registries handle schema versions differently. Compatibility with Reflekt's `MAJOR-MINOR` spec is included in the table below.
 | Schema Registry   | `MODEL` | `ADDITION` | Notes     |
 |-------------------|:-------:|:----------:|:----------|
 | Segment Protocols |    ✅    |      ❌    | Only supports `MODEL` (breaking changes).
 | Avo               |    ✅    |      ❌    | Schema changes managed in Avo [branches](https://www.avo.app/docs/workspace/branches) - `"version": "1-0"`(always).<br> Avo customers can build data artifacts based on their Avo tracking plan using `reflekt pull` + `reflekt build`. |
 
 ### Example schema
-An example `ProductClicked` event schema, based on Segment's [Ecommerce Spec](https://segment.com/docs/connections/spec/ecommerce/v2/#product-clicked), is shown below.
+An example `ProductClicked` event schema, based on the [Segment Ecommerce Spec](https://segment.com/docs/connections/spec/ecommerce/v2/#product-clicked), is shown below.
 
 <details>
-<summary><code>my_reflekt_project/schemas/segment/ecommerce/ProductClicked/1-0.json</code> (CLICK TO EXPAND) </summary>
+<summary><code>my_reflekt_project/schemas/segment/ecommerce/ProductClicked/1-0.json</code> (click to expand) </summary>
 <br>
 
 ```json
@@ -232,13 +232,16 @@ demo_reflekt_project
 ├── README.md
 └── reflekt_project.yml   # Project configuration
 ```
-Sync the project to Github to enable collaboration and version control amongst your team.
+You can use the `reflekt init` command to create a new Reflekt project. Sync the project to Github to enable collaboration and version control amongst your teams.
 
 ### Configuration Files
-There are 2 configuration files required to run Reflekt:
+There are 2 configuration files required to run Reflekt.
+
+#### `reflekt_project.yml`
+General project settings, schema & linting conventions, data artifacts configuration.
 
 <details>
-<summary><code>reflekt_project.yml (click to expand example)</code> - General project settings, schema & linting conventions, data artifacts configuration. </summary>
+<summary><code>example_reflekt_project.yml</code>(click to expand)</summary>
 <br>
 
 ```yaml
@@ -293,8 +296,11 @@ artifacts:                      # Configure how data artifacts are built
 </details>
 <br>
 
+
+#### `reflekt_profiles.yml`
+Defines connection to schema registries and sources where event data is stored.
 <details>
-<summary><code>reflekt_profile.yml (click to expand example)</code> - Defines connection to schema registries and sources (i.e., data warehouses) where event data is stored. </summary>
+<summary><code>example_reflekt_profile.yml</code>(click to expand)</summary>
 <br>
 
 ```yaml

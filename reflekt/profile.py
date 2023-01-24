@@ -73,6 +73,8 @@ class Profile:
             self.registry = self.config.get("registry")
             self.source = self.config.get("source")
 
+            self._check_unique_source_ids()
+
     def to_yaml(self):
         """Convert Profile class to YAML and write to reflekt_profiles.yml."""
         if self.path.exists():
@@ -108,6 +110,21 @@ class Profile:
                 allow_unicode=True,
                 encoding=("utf-8"),
             )
+
+    def _check_unique_source_ids(self):
+        """Check that source IDs are unique.
+
+        Raises:
+            SystemExit: Source IDs are not unique.
+        """
+        source_ids = [source["id"] for source in self.source]
+        if len(source_ids) != len(set(source_ids)):
+            logger.error(
+                f"Duplicate source 'id' in profile: '{self.name}' in {self.path}. "
+                f"\n\n    Duplicated source ids: "
+                f"{[x for x in source_ids if source_ids.count(x) > 1]}\n"
+            )
+            raise SystemExit(1)
 
     def validate_profile(self):
         """Validate Reflekt profile configuration."""

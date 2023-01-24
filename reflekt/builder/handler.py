@@ -55,7 +55,7 @@ class BuilderHandler:
         Returns:
             str: Artifact type.
         """
-        if artifact not in ["dbt"]:  # TODO - add to this list as needed
+        if artifact not in ["dbt"]:
             raise NotImplementedError(f"Artifact type '{artifact}' is not supported.")
         else:
             return artifact
