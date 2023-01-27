@@ -5,11 +5,10 @@
 import json
 from typing import List
 
-from jsonschema import Draft7Validator, ValidationError, validate
+from jsonschema import Draft7Validator
 from loguru import logger
 
 from reflekt.casing import event_case, property_case
-from reflekt.errors import LintingError
 from reflekt.project import Project
 
 

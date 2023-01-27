@@ -8,10 +8,13 @@
         "format": "jsonschema",
         "version": "1-0"
     },
-    "metadata": {},
+    "metadata": {
+        "code_owner": "Maura",
+        "product_owner": "Greg"
+    },
     "type": "object",
     "properties": {
-        "cartId": {
+        "cart_id": {
             "description": "Cart ID to which the product was added to",
             "type": "string"
         },
