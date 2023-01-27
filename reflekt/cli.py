@@ -269,6 +269,10 @@ def debug():
         profile = Profile(project=project)
     except ValidationError or SystemExit:  # Catch exceptions, these will throw errors themselves
         pass
+    else:
+        logger.info(
+            "[green]Reflekt project and profiles are configured correctly![green/]"
+        )
 
 
 @app.command()
@@ -371,11 +375,14 @@ def lint(
         logger.info(
             f"{i} of {len(schema_paths)} Linting [magenta]{schema_path}[magenta/]"
         )
-        lint_schema(r_schema, errors)
+        lint_schema(r_schema, errors)  # If errors
 
     if errors:
         print("")
-        logger.info(f"[red]Linting failed with {len(errors)} errors[/red]")
+        logger.error(f"[red]Linting failed with {len(errors)} errors:[/red]")
+        print("")
+        for error in errors:
+            logger.error(error)
         raise typer.Exit(code=1)
     else:
         print("")
@@ -476,10 +483,10 @@ def main(
 
 
 if __name__ == "__main__":
-    debug()
+    # debug()
     # pull(select="segment/surfline-web")
     # push(select="segment/ecommerce", delete=False)
-    # lint(select="segment/ecommerce")
+    lint(select="segment/ecommerce")
 
     # reflekt build dbt --select segment/ecommerce --sdk segment --source snowflake.raw.schema_name
     # build(
