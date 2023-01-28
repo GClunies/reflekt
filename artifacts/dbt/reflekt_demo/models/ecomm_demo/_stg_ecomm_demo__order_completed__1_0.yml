@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: order_completed
+  - name: stg_ecomm_demo__order_completed__1_0
     description: Order successfully completed by the user.
     columns:
       - name: event_id

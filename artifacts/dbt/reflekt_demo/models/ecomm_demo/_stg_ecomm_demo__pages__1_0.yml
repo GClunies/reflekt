@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: pages
+  - name: stg_ecomm_demo__pages__1_0
     description: User viewed a page on the website.
     columns:
       - name: page_id

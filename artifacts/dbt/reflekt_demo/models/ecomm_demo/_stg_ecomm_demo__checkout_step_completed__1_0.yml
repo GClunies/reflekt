@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: checkout_step_completed
+  - name: stg_ecomm_demo__checkout_step_completed__1_0
     description: Checkout step completed by the user.
     columns:
       - name: event_id

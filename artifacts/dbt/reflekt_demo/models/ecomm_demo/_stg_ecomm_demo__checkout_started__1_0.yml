@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: checkout_started
+  - name: stg_ecomm_demo__checkout_started__1_0
     description: User initiated the order process (a transaction is created).
     columns:
       - name: event_id

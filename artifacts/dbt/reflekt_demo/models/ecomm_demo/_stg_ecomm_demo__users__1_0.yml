@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: users
+  - name: stg_ecomm_demo__users__1_0
     description: User traits set by identify() calls.
     columns:
       - name: user_id

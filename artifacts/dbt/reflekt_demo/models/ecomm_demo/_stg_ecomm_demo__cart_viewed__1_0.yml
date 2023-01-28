@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: cart_viewed
+  - name: stg_ecomm_demo__cart_viewed__1_0
     description: User viewed their shopping cart.
     columns:
       - name: event_id

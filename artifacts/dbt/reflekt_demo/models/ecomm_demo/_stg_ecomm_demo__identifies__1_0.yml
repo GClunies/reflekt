@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: identifies
+  - name: stg_ecomm_demo__identifies__1_0
     description: Segment identify() call.
     columns:
       - name: identify_id

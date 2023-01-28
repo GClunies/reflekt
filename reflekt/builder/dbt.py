@@ -125,11 +125,13 @@ class DbtBuilder:
         """Build dbt model.
 
         Args:
+            schema_id (str): Reflekt schema ID.
+            source_schema (str): source schema.
             table_name (str): Table name.
             columns (List[Dict]): List of column dicts (with name, description, etc).
         """
         schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
-        model_file: str = (
+        model_file = (
             f"{self._mdl_prefix}{self._schema}__{table_name}__{schema_version}.sql"
         )
         model_path: Path = self._tmp_pkg_dir / "models" / self._schema / model_file
@@ -232,6 +234,7 @@ class DbtBuilder:
             columns (List[Dict]): List of column dicts (with name, description, etc).
         """
         schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
+        model_name = f"{self._mdl_prefix}{self._schema}__{table_name}__{schema_version}"
         doc_file = (
             f"{self._doc_prefix}{self._schema}__{table_name}__{schema_version}.yml"
         )
@@ -246,7 +249,7 @@ class DbtBuilder:
             "version": 2,
             "models": [
                 {
-                    "name": table_name,
+                    "name": model_name,
                     "description": description,
                     "columns": [],
                 }
@@ -467,7 +470,7 @@ class DbtBuilder:
                 # Build Segment users table/model/doc
                 if self._sdk_arg == "segment" and table_name == "identifies":
                     logger.info(
-                        f"Building dbt artifacts for schema: [magenta]Segment 'users' table[magenta/]"  # noqa: E501
+                        "Building dbt artifacts for schema: [magenta]Segment 'users' table[magenta/]"  # noqa: E501
                     )
                     self._build_dbt_table(
                         source=source_obj,
@@ -490,7 +493,7 @@ class DbtBuilder:
         # Build Segment tracks table/model/doc
         if self._sdk_arg == "segment":
             logger.info(
-                f"Building dbt artifacts for schema: [magenta]Segment 'tracks' table[magenta/]"  # noqa: E501
+                "Building dbt artifacts for schema: [magenta]Segment 'tracks' table[magenta/]"  # noqa: E501
             )
             self._build_dbt_table(
                 source=source_obj,
