@@ -11,8 +11,6 @@ sources:
         description: User traits set by identify() calls.
       - name: cart_viewed
         description: User viewed their shopping cart.
-      - name: cart_viewed
-        description: User viewed their shopping cart.
       - name: checkout_step_viewed
         description: User viewed a checkout step.
       - name: order_completed

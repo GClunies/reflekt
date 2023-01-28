@@ -112,8 +112,12 @@ class DbtBuilder:
             description (str): Table description.
         """
         dbt_table = {"name": table_name, "description": description}
-        source["sources"][0]["tables"].append(dbt_table)
-        logger.info(f"Building dbt table '{table_name}' in source '{self._schema}'")
+        # Find existing tables in dbt source
+        existing_tables = [t["name"] for t in source["sources"][0]["tables"]]
+
+        if table_name not in existing_tables:
+            source["sources"][0]["tables"].append(dbt_table)
+            logger.info(f"Building dbt table '{table_name}' in source '{self._schema}'")
 
     def _build_dbt_model(
         self,
