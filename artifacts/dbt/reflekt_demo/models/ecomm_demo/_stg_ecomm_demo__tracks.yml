@@ -35,9 +35,6 @@ models:
           to the current time by the Segment Tracking API. Used by Segment
           to send to downstream destinations, and used for historical replays.
           Recommended timestamp for analysis when chronology does matter.
-      - name: type
-        description: 'Type of message, corresponding to the API method:
-          ''identify'', ''group'', ''track'', ''page'', ''screen'' or ''alias''.'
       - name: anonymous_id
         description: A pseudo-unique substitute for a User ID, for cases
           when you don’t have an absolutely unique identifier. A userId
@@ -47,98 +44,22 @@ models:
         description: Unique identifier for the user in your database. A
           userId or an anonymousId is required. See the Identities docs
           for more details.
-      - name: active
-        description: Whether a user is active. This is usually used to flag
-          an .identify() call to just update the traits but not “last seen.”
-      - name: app_name
-        description: The name of the application.
-      - name: app_version
-        description: The version of the application.
-      - name: app_build
-        description: The build of the application.
-      - name: campaign_name
-        description: The name of the campaign.
-      - name: campaign_source
-        description: The source of the campaign.
-      - name: campaign_medium
-        description: The medium of the campaign.
       - name: ip
         description: Current user’s IP address.
       - name: library_name
         description: The name of the library.
       - name: library_version
         description: The version of the library.
-      - name: locale
-        description: Locale string for the current user, for example en-US.
-      - name: location_city
-        description: The city of the user's current location.
-      - name: location_country
-        description: The country of the user's current location.
-      - name: location_latitude
-        description: The latitude of the user's current location.
-      - name: location_longitude
-        description: The longitude of the user's current location.
-      - name: location_postal_code
-        description: The postal code of the user's current location.
-      - name: location_region
-        description: The region of the user's current location.
-      - name: location_speed
-        description: The current speed of the user
-      - name: network_bluetooth
-        description: Whether the device has bluetooth enabled.
-      - name: network_carrier
-        description: The carrier of the device.
-      - name: network_cellular
-        description: Whether the device has cellular enabled.
-      - name: network_wifi
-        description: Whether the device has wifi enabled.
-      - name: os_name
-        description: The name of the operating system.
-      - name: os_version
-        description: The version of the operating system.
       - name: page_path
         description: The path of the current page.
       - name: page_referrer
         description: The referrer of the current page.
-      - name: page_search
-        description: The search query of the current page.
       - name: page_title
         description: The title of the current page.
       - name: page_url
         description: The url of the current page.
-      - name: referrer_type
-        description: The type of the referrer.
-      - name: referrer_name
-        description: The name of the referrer.
-      - name: referrer_url
-        description: The url of the referrer.
-      - name: referrer_link
-        description: The link of the referrer.
-      - name: screen_density
-        description: The density of the screen.
-      - name: screen_height
-        description: The height of the screen.
-      - name: screen_width
-        description: The width of the screen.
-      - name: timezone
-        description: Timezones are sent as tzdata strings to add user timezone
-          information which might be stripped from the timestamp, for example
-          America/New_York.
-      - name: group_id
-        description: Group / Account ID. This is useful in B2B use cases
-          where you need to attribute your non-group calls to a company
-          or account. It is relied on by several Customer Success and CRM
-          tools.
-      - name: traits
-        description: Dictionary of traits of the current user. This is useful
-          in cases where you need to track an event, but also associate
-          information from a previous identify call. You should fill this
-          object the same way you would fill traits in an identify call.
       - name: user_agent
         description: User agent of the device making the request.
-      - name: version
-        description: Version of the Tracking API that received the message,
-          automatically set by Segment.
       - name: call_type
         description: The type of Segment call (i.e., identify, group, page,
           screen, track) that collected the data.

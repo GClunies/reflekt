@@ -86,7 +86,47 @@ class Warehouse:
         # elif self.type == "bigquery":  # TODO: Add BigQuery support later
         #     pass
 
-    def get_columns(self, table: str) -> Tuple[Optional[list], Optional[str]]:
+    def find_columns(
+        self, table_name: str, columns_to_search: list[dict]
+    ) -> Tuple[list, Optional[str]]:
+        """For a given dictionary of columns, find which columns exist in a table.
+
+        Args:
+            table_name (str): Table name.
+            search_columns (list): List of column name to search for.
+
+        Returns:
+            Tuple[Optional[list], Optional[str]]: List of columns that were found in
+                the table and error message.
+        """
+        # Set default values
+        found_columns = []
+        error_msg = None
+
+        # Search for columns in table
+        with self.engine.connect() as conn:
+            try:
+                query = conn.execute(
+                    f"select * from {self.schema}.{table_name} limit 0"
+                )
+                table_columns = query.keys()._keys
+                found_columns = [
+                    search_column
+                    for search_column in columns_to_search
+                    if search_column["name"] in table_columns
+                ]
+
+            except sqlalchemy.exc.ProgrammingError as e:
+                if self.type == "snowflake":
+                    error_msg = e.orig.msg
+                elif self.type == "redshift":
+                    error_msg = e.orig.args[0]["M"]
+
+            return found_columns, error_msg
+
+    def get_columns(
+        self, table: str, common_cols
+    ) -> Tuple[Optional[list], Optional[str]]:
         """Get column names for a given table.
 
         Does not include columns that have all NULL values.

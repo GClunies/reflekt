@@ -450,17 +450,15 @@ class DbtBuilder:
                 }
                 for field in Flatson.from_schemafile(schema_path).fields
             ]
-            all_columns = common_columns + schema_columns
-            warehouse_columns, warehouse_error = self._warehouse.get_columns(
-                table=table_name
+            columns_to_search = common_columns + schema_columns
+            columns, warehouse_error = self._warehouse.find_columns(
+                table_name=table_name,
+                columns_to_search=columns_to_search,
             )
 
             if warehouse_error is not None:
                 self.wh_errors.append(warehouse_error)
             else:
-                columns = [
-                    col for col in all_columns if col["name"] in warehouse_columns
-                ]
                 self._build_dbt_table(
                     source=source_obj,
                     table_name=table_name,
@@ -484,52 +482,68 @@ class DbtBuilder:
                     logger.info(
                         "Building dbt artifacts for schema: [magenta]Segment 'users' table[magenta/]"  # noqa: E501
                     )
-                    self._build_dbt_table(
-                        source=source_obj,
+                    columns, warehouse_error = self._warehouse.find_columns(
                         table_name="users",
-                        description="User traits set by identify() calls.",
+                        columns_to_search=common_columns,
                     )
-                    self._build_dbt_model(
-                        schema_id=schema_id,
-                        source_schema=self._schema,
-                        table_name="users",
-                        columns=columns,
-                    )
-                    self._build_dbt_doc(
-                        schema_id=schema_id,
-                        table_name="users",
-                        description="User traits set by identify() calls.",
-                        columns=columns,
-                    )
+
+                    if warehouse_error is not None:
+                        self.wh_errors.append(warehouse_error)
+                    else:
+                        self._build_dbt_table(
+                            source=source_obj,
+                            table_name="users",
+                            description="User traits set by identify() calls.",
+                        )
+                        self._build_dbt_model(
+                            schema_id=schema_id,
+                            source_schema=self._schema,
+                            table_name="users",
+                            columns=columns,
+                        )
+                        self._build_dbt_doc(
+                            schema_id=schema_id,
+                            table_name="users",
+                            description="User traits set by identify() calls.",
+                            columns=columns,
+                        )
 
         # Build Segment tracks table/model/doc
         if self._sdk_arg == "segment":
             logger.info(
                 "Building dbt artifacts for schema: [magenta]Segment 'tracks' table[magenta/]"  # noqa: E501
             )
-            self._build_dbt_table(
-                source=source_obj,
+            columns, warehouse_error = self._warehouse.find_columns(
                 table_name="tracks",
-                description=(
-                    "A summary of track() calls from all events. Properties unique "
-                    "to each event's track() call are omitted."
-                ),
+                columns_to_search=common_columns,
             )
-            self._build_dbt_model(
-                schema_id=schema_id,
-                source_schema=self._schema,
-                table_name="tracks",
-                columns=common_columns,
-            )
-            self._build_dbt_doc(
-                schema_id="dummy/schema_id/for/tracks/1-0.json",
-                table_name="tracks",
-                description=(
-                    "A summary of track() calls from all events. Properties unique "
-                    "to each event's track() call are omitted."
-                ),
-                columns=common_columns,
-            )
+
+            if warehouse_error is not None:
+                self.wh_errors.append(warehouse_error)
+            else:
+                self._build_dbt_table(
+                    source=source_obj,
+                    table_name="tracks",
+                    description=(
+                        "A summary of track() calls from all events. Properties unique "
+                        "to each event's track() call are omitted."
+                    ),
+                )
+                self._build_dbt_model(
+                    schema_id=schema_id,
+                    source_schema=self._schema,
+                    table_name="tracks",
+                    columns=columns,
+                )
+                self._build_dbt_doc(
+                    schema_id="dummy/schema_id/for/tracks/1-0.json",
+                    table_name="tracks",
+                    description=(
+                        "A summary of track() calls from all events. Properties unique "
+                        "to each event's track() call are omitted."
+                    ),
+                    columns=columns,
+                )
 
         with source_path.open("w") as f:
             yaml.dump(
