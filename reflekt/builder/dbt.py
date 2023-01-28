@@ -538,10 +538,8 @@ class DbtBuilder:
         if self.wh_errors:
             print("")
             logger.warning(
-                f"The following data warehouse warning(s) occurred while building "
-                f"the dbt package. NOTE: 'Object ... does not exist' errors are "
-                f"expected for schemas that have not produced data at the specified "
-                f"'--source'. These errors do not prevent dbt package build. "
+                f"The data warehouse returned the following warning(s) occurred while "
+                f"building the dbt package."
                 f"\n\n{wh_errors_str}"
             )
 

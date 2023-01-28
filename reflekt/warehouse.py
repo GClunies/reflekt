@@ -49,8 +49,8 @@ class Warehouse:
         if not self._source_found:  # Raise error if no match found
             raise sourceArgError(
                 message=(
-                    f"Invalid argument '--source {self._source_arg}'. source name "
-                    f"'{self.type}' does not match a 'source:' configuration in "
+                    f"Invalid argument '--source {self._source_arg}'. source id "
+                    f"'{self.source_id}' does not match a 'source:' configuration in "
                     f"{self._profile.path}. source argument must follow the format: "
                     f"<source_type>.<database>.<schema>\n"
                 ),
