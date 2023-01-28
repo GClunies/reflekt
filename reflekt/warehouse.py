@@ -89,14 +89,16 @@ class Warehouse:
     def find_columns(
         self, table_name: str, columns_to_search: list[dict]
     ) -> Tuple[list, Optional[str]]:
-        """For a given dictionary of columns, find which columns exist in a table.
+        """For a given dict of columns, find matching columns in table in the DWH.
 
         Args:
-            table_name (str): Table name.
-            search_columns (list): List of column name to search for.
+            table_name (str): Table name in the data warehouse.
+            columns_to_search (list[dict]): List of dictionaries that contain column
+            names and descriptions. The column names are used to search for columns in
+            the table.
 
         Returns:
-            Tuple[Optional[list], Optional[str]]: List of columns that were found in
+            Tuple[list, Optional[str]]: List of columns that were found in
                 the table and error message.
         """
         # Set default values
@@ -123,32 +125,3 @@ class Warehouse:
                     error_msg = e.orig.args[0]["M"]
 
             return found_columns, error_msg
-
-    def get_columns(
-        self, table: str, common_cols
-    ) -> Tuple[Optional[list], Optional[str]]:
-        """Get column names for a given table.
-
-        Does not include columns that have all NULL values.
-
-        Args:
-            table (str): Table name.
-
-        Returns:
-            List[str]: List of column names.
-        """
-        with self.engine.connect() as conn:
-            try:
-                query = conn.execute(f"select * from {self.schema}.{table} limit 0")
-                columns = query.keys()._keys
-                error_msg = None
-
-            except sqlalchemy.exc.ProgrammingError as e:
-                columns = None
-
-                if self.type == "snowflake":
-                    error_msg = e.orig.msg
-                elif self.type == "redshift":
-                    error_msg = e.orig.args[0]["M"]
-
-            return columns, error_msg
