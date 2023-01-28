@@ -16,8 +16,8 @@ A tool to help Data, Engineering, and Product teams:
     - Descriptions are always included.
     - Required metadata is defined.
 - Interact with schema registries
-  - Sync schema(s) to a schema registry where they can be used for event data validation.
-  - Pull schema(s) from a schema registry to into a Reflekt project.
+  - Push schema(s) from a Reflekt project to a schema registry where they can be used for event data validation.
+  - Pull schema(s) from a schema registry into a Reflekt project to build corresponding data artifacts.
 - Build data artifacts (e.g., dbt packages) based on schemas that model and document event data.
   - Keep data artifacts in sync with instrumentation - ready for use by engineers, analysts, and the business.
   - Reduce errors, improve data quality, and automate important (but boring) data tasks.
