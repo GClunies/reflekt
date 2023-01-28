@@ -11,6 +11,8 @@ models:
         tests:
           - unique
           - not_null
+      - name: event_name
+        description: Name of the event.
       - name: original_tstamp
         description: Time on the client device when call was invoked; OR
           The timestamp value manually passed in through server-side libraries.
@@ -137,3 +139,12 @@ models:
       - name: version
         description: Version of the Tracking API that received the message,
           automatically set by Segment.
+      - name: call_type
+        description: The type of Segment call (i.e., identify, group, page,
+          screen, track) that collected the data.
+      - name: source_schema
+        description: The schema where the raw event data is stored.
+      - name: source_table
+        description: The table where the raw event data is stored.
+      - name: schema_id
+        description: The Reflekt schema ID that governs the event.

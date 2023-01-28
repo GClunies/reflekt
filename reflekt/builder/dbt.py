@@ -115,14 +115,23 @@ class DbtBuilder:
         source["sources"][0]["tables"].append(dbt_table)
         logger.info(f"Building dbt table '{table_name}' in source '{self._schema}'")
 
-    def _build_dbt_model(self, table_name: str, columns: List[Dict]) -> None:
+    def _build_dbt_model(
+        self,
+        schema_id: str,
+        source_schema: str,
+        table_name: str,
+        columns: List[Dict],
+    ) -> None:
         """Build dbt model.
 
         Args:
             table_name (str): Table name.
             columns (List[Dict]): List of column dicts (with name, description, etc).
         """
-        model_file: str = f"{self._mdl_prefix}{self._schema}__{table_name}.sql"
+        schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
+        model_file: str = (
+            f"{self._mdl_prefix}{self._schema}__{table_name}__{schema_version}.sql"
+        )
         model_path: Path = self._tmp_pkg_dir / "models" / self._schema / model_file
         mdl_sql = (  # Config
             "{{\n"
@@ -158,6 +167,9 @@ class DbtBuilder:
                         col_sql = f"\n        {col_name} as event_id,"
                     else:  # Custom events
                         col_sql = f"\n        {col_name} as event_id,"
+                elif col_name == "event_text":
+                    col_sql = f"\n        {col_name} as event_name,"
+
                 elif col_name in [
                     "original_timestamp",
                     "sent_at",
@@ -176,6 +188,22 @@ class DbtBuilder:
 
                 mdl_sql += col_sql
 
+            # Add columns describing the call type and where the data came from
+            if table_name in ["identifies", "users"]:
+                mdl_sql += "\n        'identify'::varchar as call_type,"
+            elif table_name == "groups":
+                mdl_sql += "\n        'group'::varchar as call_type,"
+            elif table_name == "pages":
+                mdl_sql += "\n        'page'::varchar as call_type,"
+            elif table_name == "screens":
+                mdl_sql += "\n        'screen'::varchar as call_type,"
+            else:
+                mdl_sql += "\n        'track'::varchar as call_type,"
+
+            mdl_sql += f"\n        '{source_schema}'::varchar as source_schema,"
+            mdl_sql += f"\n        '{table_name}'::varchar as source_table,"
+            mdl_sql += f"\n        '{schema_id}'::varchar as schema_id,"
+
         mdl_sql = mdl_sql[:-1]  # Remove final trailing comma
         mdl_sql += "\n    from source\n)\n\nselect * from renamed"
 
@@ -193,16 +221,20 @@ class DbtBuilder:
     #     pass
 
     def _build_dbt_doc(
-        self, table_name: str, description: str, columns: List[Dict]
+        self, schema_id: str, table_name: str, description: str, columns: List[Dict]
     ) -> None:
         """Build dbt documentation for model.
 
         Args:
+            schema_id (str): Reflekt schema ID.
             table_name (str): Table name.
             description (str): Model description.
             columns (List[Dict]): List of column dicts (with name, description, etc).
         """
-        doc_file = f"{self._doc_prefix}{self._schema}__{table_name}.yml"
+        schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
+        doc_file = (
+            f"{self._doc_prefix}{self._schema}__{table_name}__{schema_version}.yml"
+        )
         doc_path = (
             self._tmp_pkg_dir
             / "models"
@@ -222,42 +254,66 @@ class DbtBuilder:
         }
         test_cols = list(self._project.artifacts["dbt"]["docs"]["tests"].keys())
 
-        for col in columns:
-            if col["name"] == "id":
-                if table_name == "identifies":
-                    col_name = "identify_id"
-                elif table_name == "users":
-                    col_name = "user_id"
-                elif table_name == "groups":
-                    col_name = "group_id"
-                elif table_name == "pages":
-                    col_name = "page_id"
-                elif table_name == "screens":
-                    col_name = "screen_id"
-                elif table_name == "tracks":
-                    col_name = "event_id"
-                else:  # Custom events
-                    col_name = "event_id"
-            else:
-                col_name = (
-                    underscore(col["name"])
-                    .replace("timestamp", "tstamp")
-                    .replace("_at", "_at_tstamp")
-                    if "context_" not in underscore(col["name"])
-                    else underscore(col["name"]).replace("context_", "")
-                )
+        if self._sdk_arg == "segment":
+            for col in columns:
+                if col["name"] == "id":
+                    if table_name == "identifies":
+                        col_name = "identify_id"
+                    elif table_name == "users":
+                        col_name = "user_id"
+                    elif table_name == "groups":
+                        col_name = "group_id"
+                    elif table_name == "pages":
+                        col_name = "page_id"
+                    elif table_name == "screens":
+                        col_name = "screen_id"
+                    elif table_name == "tracks":
+                        col_name = "event_id"
+                    else:  # Custom events
+                        col_name = "event_id"
+                elif col["name"] == "event_text":
+                    col_name = "event_name"
+                else:
+                    col_name = (
+                        underscore(col["name"])
+                        .replace("timestamp", "tstamp")
+                        .replace("_at", "_at_tstamp")
+                        if "context_" not in underscore(col["name"])
+                        else underscore(col["name"]).replace("context_", "")
+                    )
 
-            dbt_col = {
-                "name": col_name,
-                "description": col["description"],
-            }
+                dbt_col = {
+                    "name": col_name,
+                    "description": col["description"],
+                }
 
-            if col["name"] in test_cols:
-                dbt_col["tests"] = self._project.artifacts["dbt"]["docs"]["tests"][
-                    col["name"]
-                ]
+                if col["name"] in test_cols:
+                    dbt_col["tests"] = self._project.artifacts["dbt"]["docs"]["tests"][
+                        col["name"]
+                    ]
 
-            doc_obj["models"][0]["columns"].append(dbt_col)
+                doc_obj["models"][0]["columns"].append(dbt_col)
+
+            # Columns describing the call type and where the data came from
+            additional_cols = [
+                {
+                    "name": "call_type",
+                    "description": "The type of Segment call (i.e., identify, group, page, screen, track) that collected the data.",  # noqa: E501
+                },
+                {
+                    "name": "source_schema",
+                    "description": "The schema where the raw event data is stored.",
+                },
+                {
+                    "name": "source_table",
+                    "description": "The table where the raw event data is stored.",
+                },
+                {
+                    "name": "schema_id",
+                    "description": "The Reflekt schema ID that governs the event.",
+                },
+            ]
+            doc_obj["models"][0]["columns"].extend(additional_cols)
 
         with doc_path.open("w") as f:
             yaml.dump(
@@ -354,89 +410,88 @@ class DbtBuilder:
 
         # Iterate through all schemas to build artifacts
         for schema_path in self._schema_paths:
-            # Get schema name and version
-            schema_name = schema_path.parts[-2]
-            schema_version = int(schema_path.parts[-1].split(".")[0].replace("-", ""))
-            # Get all schemas with same name, then get versions of those schemas
-            schema_paths_same_name = [
-                p for p in self._schema_paths if p.parts[-2] == schema_name
-            ]
-            schema_versions = [
-                int(schema_path.name.split("/")[-1].split(".")[0].replace("-", ""))
-                for schema_path in schema_paths_same_name
-            ]
+            logger.info(f"Building dbt artifacts for schema: {schema_path}")
 
-            # Only build table/model/doc for the LATEST schema version
-            if schema_version == max(schema_versions):
-                logger.info(f"Building dbt artifacts for schema: {schema_path}")
-                # Get event schema details
-                with schema_path.open("r") as f:
-                    schema_json = json.load(f)
+            with schema_path.open("r") as f:
+                schema_json = json.load(f)
 
-                event_name = schema_json["self"]["name"]
-                event_desc = schema_json["description"]
-                table_name = underscore(event_name.lower().replace(" ", "_"))
+            schema_id = schema_json["$id"]
+            event_name = schema_json["self"]["name"]
+            event_desc = schema_json["description"]
+            table_name = underscore(event_name.lower().replace(" ", "_"))
 
-                if self._sdk_arg == "segment":
-                    table_name = (
-                        table_name.replace("identify", "identifies")
-                        .replace("group", "groups")
-                        .replace("page_viewed", "pages")
-                        .replace("screen_viewed", "screens")
-                    )
-
-                schema_columns = [
-                    {
-                        "name": underscore(field.name.replace(".", "_")),
-                        "description": field.schema["description"],
-                    }
-                    for field in Flatson.from_schemafile(schema_path).fields
-                ]
-                all_columns = common_columns + schema_columns
-                warehouse_columns, warehouse_error = self._warehouse.get_columns(
-                    table=table_name
+            if self._sdk_arg == "segment":
+                table_name = (
+                    table_name.replace("identify", "identifies")
+                    .replace("group", "groups")
+                    .replace("page_viewed", "pages")
+                    .replace("screen_viewed", "screens")
                 )
 
-                if warehouse_error is not None:
-                    self.wh_errors.append(warehouse_error)
-                else:
-                    columns = [
-                        col for col in all_columns if col["name"] in warehouse_columns
-                    ]
+            schema_columns = [
+                {
+                    "name": underscore(field.name.replace(".", "_")),
+                    "description": field.schema["description"],
+                }
+                for field in Flatson.from_schemafile(schema_path).fields
+            ]
+            all_columns = common_columns + schema_columns
+            warehouse_columns, warehouse_error = self._warehouse.get_columns(
+                table=table_name
+            )
+
+            if warehouse_error is not None:
+                self.wh_errors.append(warehouse_error)
+            else:
+                columns = [
+                    col for col in all_columns if col["name"] in warehouse_columns
+                ]
+                self._build_dbt_table(
+                    source=source_obj,
+                    table_name=table_name,
+                    description=event_desc,
+                )
+                self._build_dbt_model(
+                    schema_id=schema_id,
+                    source_schema=self._schema,
+                    table_name=table_name,
+                    columns=columns,
+                )
+                self._build_dbt_doc(
+                    schema_id=schema_id,
+                    table_name=table_name,
+                    description=event_desc,
+                    columns=columns,
+                )
+
+                # Build Segment users table/model/doc
+                if self._sdk_arg == "segment" and table_name == "identifies":
+                    logger.info(
+                        f"Building dbt artifacts for schema: [magenta]Segment 'users' table[magenta/]"  # noqa: E501
+                    )
                     self._build_dbt_table(
                         source=source_obj,
-                        table_name=table_name,
-                        description=event_desc,
+                        table_name="users",
+                        description="User traits set by identify() calls.",
                     )
                     self._build_dbt_model(
-                        table_name=table_name,
+                        schema_id=schema_id,
+                        source_schema=self._schema,
+                        table_name="users",
                         columns=columns,
                     )
                     self._build_dbt_doc(
-                        table_name=table_name,
-                        description=event_desc,
+                        schema_id=schema_id,
+                        table_name="users",
+                        description="User traits set by identify() calls.",
                         columns=columns,
                     )
 
-                    if self._sdk_arg == "segment" and table_name == "identifies":
-                        # Build Segment users table/model/doc
-                        self._build_dbt_table(
-                            source=source_obj,
-                            table_name="users",
-                            description="User traits set by identify() calls.",
-                        )
-                        self._build_dbt_model(
-                            table_name="users",
-                            columns=columns,
-                        )
-                        self._build_dbt_doc(
-                            table_name="users",
-                            description="User traits set by identify() calls.",
-                            columns=columns,
-                        )
-
+        # Build Segment tracks table/model/doc
         if self._sdk_arg == "segment":
-            # Build Segment users table/model/doc
+            logger.info(
+                f"Building dbt artifacts for schema: [magenta]Segment 'tracks' table[magenta/]"  # noqa: E501
+            )
             self._build_dbt_table(
                 source=source_obj,
                 table_name="tracks",
@@ -446,10 +501,13 @@ class DbtBuilder:
                 ),
             )
             self._build_dbt_model(
+                schema_id=schema_id,
+                source_schema=self._schema,
                 table_name="tracks",
                 columns=common_columns,
             )
             self._build_dbt_doc(
+                schema_id="dummy/schema_id/for/tracks/1-0.json",
                 table_name="tracks",
                 description=(
                     "A summary of track() calls from all events. Properties unique "
@@ -480,10 +538,10 @@ class DbtBuilder:
         if self.wh_errors:
             print("")
             logger.warning(
-                f"The following data warehouse error(s) occurred while building "
+                f"The following data warehouse warning(s) occurred while building "
                 f"the dbt package. NOTE: 'Object ... does not exist' errors are "
                 f"expected for schemas that have not produced data at the specified "
-                f"'--source'. These errors do not prevent successful build. "
+                f"'--source'. These errors do not prevent dbt package build. "
                 f"\n\n{wh_errors_str}"
             )
 

@@ -7,12 +7,13 @@
 with
 
 source as (
-    select * from {{ source('ecomm_demo', 'order_completed') }}
+    select * from {{ source('ecomm_demo', 'checkout_step_viewed') }}
 ),
 
 renamed as (
     select
         id as event_id,
+        event_text as event_name,
         original_timestamp as original_tstamp,
         sent_at as sent_at_tstamp,
         received_at as received_at_tstamp,
@@ -22,12 +23,12 @@ renamed as (
         context_library_name as library_name,
         context_library_version as library_version,
         checkout_id,
-        currency,
-        order_id,
-        products,
-        revenue,
-        shipping,
-        tax
+        shipping_method,
+        step,
+        'track'::varchar as call_type,
+        'ecomm_demo'::varchar as source_schema,
+        'checkout_step_viewed'::varchar as source_table,
+        'segment/ecommerce/Checkout Step Viewed/1-0.json'::varchar as schema_id
     from source
 )
 

@@ -13,6 +13,7 @@ source as (
 renamed as (
     select
         id as event_id,
+        event_text as event_name,
         original_timestamp as original_tstamp,
         sent_at as sent_at_tstamp,
         received_at as received_at_tstamp,
@@ -60,7 +61,11 @@ renamed as (
         context_group_id as group_id,
         context_traits as traits,
         context_user_agent as user_agent,
-        version
+        version,
+        'track'::varchar as call_type,
+        'ecomm_demo'::varchar as source_schema,
+        'tracks'::varchar as source_table,
+        'segment/ecommerce/Product Added/1-0.json'::varchar as schema_id
     from source
 )
 

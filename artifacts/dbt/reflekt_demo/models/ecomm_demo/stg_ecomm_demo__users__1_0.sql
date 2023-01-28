@@ -7,12 +7,12 @@
 with
 
 source as (
-    select * from {{ source('ecomm_demo', 'pages') }}
+    select * from {{ source('ecomm_demo', 'users') }}
 ),
 
 renamed as (
     select
-        id as page_id,
+        id as user_id,
         original_timestamp as original_tstamp,
         sent_at as sent_at_tstamp,
         received_at as received_at_tstamp,
@@ -28,11 +28,10 @@ renamed as (
         context_page_title as page_title,
         context_page_url as page_url,
         context_user_agent as user_agent,
-        path,
-        referrer,
-        search,
-        title,
-        url
+        'identify'::varchar as call_type,
+        'ecomm_demo'::varchar as source_schema,
+        'users'::varchar as source_table,
+        'segment/ecommerce/Identify/1-0.json'::varchar as schema_id
     from source
 )
 

@@ -1,7 +1,7 @@
 version: 2
 models:
-  - name: cart_viewed
-    description: User viewed their shopping cart.
+  - name: checkout_step_viewed
+    description: User viewed a checkout step.
     columns:
       - name: event_id
         description: Unique identifier for the message collected by the
@@ -10,6 +10,8 @@ models:
         tests:
           - unique
           - not_null
+      - name: event_name
+        description: Name of the event.
       - name: original_tstamp
         description: Time on the client device when call was invoked; OR
           The timestamp value manually passed in through server-side libraries.
@@ -41,15 +43,22 @@ models:
         description: Unique identifier for the user in your database. A
           userId or an anonymousId is required. See the Identities docs
           for more details.
-      - name: ip
-        description: Current user’s IP address.
       - name: library_name
         description: The name of the library.
       - name: library_version
         description: The version of the library.
-      - name: user_agent
-        description: User agent of the device making the request.
-      - name: cart_id
-        description: Cart ID to which the product was added to
-      - name: products
-        description: Products in the order
+      - name: checkout_id
+        description: Checkout transaction ID
+      - name: shipping_method
+        description: The shipping method chosen
+      - name: step
+        description: Number representing a step in the checkout process
+      - name: call_type
+        description: The type of Segment call (i.e., identify, group, page,
+          screen, track) that collected the data.
+      - name: source_schema
+        description: The schema where the raw event data is stored.
+      - name: source_table
+        description: The table where the raw event data is stored.
+      - name: schema_id
+        description: The Reflekt schema ID that governs the event.

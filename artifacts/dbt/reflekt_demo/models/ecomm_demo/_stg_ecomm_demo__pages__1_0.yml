@@ -75,3 +75,12 @@ models:
         description: Page’s full URL. Segment first looks for the canonical
           URL. If the canonical URL is not provided, Segment uses location.href
           from the DOM API.
+      - name: call_type
+        description: The type of Segment call (i.e., identify, group, page,
+          screen, track) that collected the data.
+      - name: source_schema
+        description: The schema where the raw event data is stored.
+      - name: source_table
+        description: The table where the raw event data is stored.
+      - name: schema_id
+        description: The Reflekt schema ID that governs the event.
