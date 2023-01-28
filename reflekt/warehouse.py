@@ -94,8 +94,8 @@ class Warehouse:
         Args:
             table_name (str): Table name in the data warehouse.
             columns_to_search (list[dict]): List of dictionaries that contain column
-            names and descriptions. The column names are used to search for columns in
-            the table.
+                names and descriptions. The column names are used to search for columns
+                in the table.
 
         Returns:
             Tuple[list, Optional[str]]: List of columns that were found in
