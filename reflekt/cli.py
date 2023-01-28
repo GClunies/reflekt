@@ -379,7 +379,7 @@ def lint(
 
     if errors:
         print("")
-        logger.error(f"[red]Linting failed with {len(errors)} errors:[/red]")
+        logger.error(f"[red]Linting failed with {len(errors)} error(s):[/red]")
         print("")
         for error in errors:
             logger.error(error)

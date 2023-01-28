@@ -19,6 +19,48 @@ with meta_path.open() as f:
     meta_schema = json.load(f)
 
 
+def lint_event_name_matches_id(schema_event_name: str, schema_id: str, errors: List):
+    """Check that the schema event name matches the schema ID.
+
+    Args:
+        schema_event_name (str): The event name from the schema.
+        schema_id (str): Reflekt schema ID.
+        errors (List): A list of linting errors.
+    """
+    abs_path = project.dir / "schemas" / schema_id
+    name_from_id = schema_id.split("/")[-2]
+
+    if schema_event_name != name_from_id:
+        err_msg = (
+            f"Event name '{schema_event_name}' does not match schema ID '{schema_id}' "
+            f"in {abs_path}"
+        )
+        logger.error(err_msg)
+        errors.append(err_msg)
+
+
+def lint_event_version_matches_id(
+    schema_event_version: str, schema_id: str, errors: List
+):
+    """Check that the schema event version matches the schema ID.
+
+    Args:
+        schema_event_version (str): The event version from the schema.
+        schema_id (str): Reflekt schema ID.
+        errors (List): A list of linting errors.
+    """
+    abs_path = project.dir / "schemas" / schema_id
+    version_from_id = schema_id.split("/")[-1].replace(".json", "")
+
+    if schema_event_version != version_from_id:
+        err_msg = (
+            f"Event version '{schema_event_version}' does not match schema ID "
+            f"'{schema_id}' in {abs_path}"
+        )
+        logger.error(err_msg)
+        errors.append(err_msg)
+
+
 def lint_event_casing(event_name: str, schema_id: str, errors: List):
     """Check that the event name is in the correct casing.
 
@@ -210,6 +252,8 @@ def lint_schema(r_schema: dict, errors: list):
                 errors.append(error_msg)
 
     # Lint event conventions
+    lint_event_name_matches_id(r_schema["self"]["name"], r_schema["$id"], errors)
+    lint_event_version_matches_id(r_schema["self"]["version"], r_schema["$id"], errors)
     lint_event_casing(r_schema["self"]["name"], r_schema["$id"], errors)
     lint_event_numbers(r_schema["self"]["name"], r_schema["$id"], errors)
     lint_event_reserved(r_schema["self"]["name"], r_schema["$id"], errors)
@@ -231,29 +275,3 @@ def lint_schema(r_schema: dict, errors: list):
         lint_property_type(prop_key, prop_type_list, r_schema["$id"], errors)
 
     return errors
-
-    # # Lint event conventions
-    # try:
-    #     lint_event_casing(r_schema["self"]["name"], r_schema["$id"])
-    #     lint_event_numbers(r_schema["self"]["name"], r_schema["$id"])
-    #     lint_event_reserved(r_schema["self"]["name"], r_schema["$id"])
-    # except LintingError as e:
-    #     errors.append(e.message)
-
-    # for prop_key, prop_dict in r_schema["properties"].items():
-    #     try:
-    #         lint_property_casing(prop_key, r_schema["$id"])
-    #         lint_property_numbers(prop_key, r_schema["$id"])
-    #         lint_property_reserved(prop_key, r_schema["$id"])
-    #         lint_property_description(
-    #             prop_key, prop_dict["description"], r_schema["$id"]
-    #         )
-    #         if isinstance(prop_dict["type"], str):
-    #             prop_type_list = [prop_dict["type"]]
-    #         else:
-    #             prop_type_list = prop_dict["type"]
-
-    #         lint_property_type(prop_key, prop_type_list, r_schema["$id"])
-
-    #     except LintingError as e:
-    #         errors.append(e.message)
