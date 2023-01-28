@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: stg_ecomm_demo__tracks__1_0
+  - name: stg_ecomm_demo__tracks
     description: A summary of track() calls from all events. Properties
       unique to each event's track() call are omitted.
     columns:

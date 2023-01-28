@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: stg_ecomm_demo__product_added__1_0
+  - name: stg_ecomm_demo__product_added
     description: User adds a product to their shopping cart.
     columns:
       - name: event_id

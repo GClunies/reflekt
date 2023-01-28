@@ -1,7 +1,7 @@
 version: 2
 models:
-  - name: stg_ecomm_demo__checkout_started__1_0
-    description: User initiated the order process (a transaction is created).
+  - name: stg_ecomm_demo__order_completed
+    description: Order successfully completed by the user.
     columns:
       - name: event_id
         description: Unique identifier for the message collected by the
@@ -51,6 +51,8 @@ models:
         description: Checkout transaction ID
       - name: currency
         description: Currency code associated with the transaction
+      - name: order_id
+        description: Order ID
       - name: products
         description: Products in the order
       - name: revenue

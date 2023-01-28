@@ -132,7 +132,9 @@ class DbtBuilder:
         """
         schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
         model_file = (
-            f"{self._mdl_prefix}{self._schema}__{table_name}__{schema_version}.sql"
+            f"{self._mdl_prefix}{self._schema}__{table_name}__v{schema_version}.sql"
+            if schema_version != "1_0"
+            else f"{self._mdl_prefix}{self._schema}__{table_name}.sql"
         )
         model_path: Path = self._tmp_pkg_dir / "models" / self._schema / model_file
         mdl_sql = (  # Config
@@ -234,9 +236,15 @@ class DbtBuilder:
             columns (List[Dict]): List of column dicts (with name, description, etc).
         """
         schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
-        model_name = f"{self._mdl_prefix}{self._schema}__{table_name}__{schema_version}"
+        model_name = (
+            f"{self._mdl_prefix}{self._schema}__{table_name}__v{schema_version}"
+            if schema_version != "1_0"
+            else f"{self._mdl_prefix}{self._schema}__{table_name}"
+        )
         doc_file = (
             f"{self._doc_prefix}{self._schema}__{table_name}__{schema_version}.yml"
+            if schema_version != "1_0"
+            else f"{self._doc_prefix}{self._schema}__{table_name}.yml"
         )
         doc_path = (
             self._tmp_pkg_dir
