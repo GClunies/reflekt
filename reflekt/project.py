@@ -157,7 +157,7 @@ class Project:
             dir (Path): The directory to start searching for a Reflekt project.
 
         Raises:
-            SystemExit: An error occurred while getting project root directory.
+            ProjectError: An error occurred while getting project root directory.
 
         Returns:
             Tuple[Path, Path, bool]: Path to project directory, path to
