@@ -9,7 +9,6 @@ from typing import Optional, Tuple
 import yaml
 from git import InvalidGitRepositoryError, Repo
 from jsonschema import validate
-from loguru import logger
 
 from reflekt.dumper import ReflektYamlDumper
 
@@ -186,16 +185,12 @@ class Project:
                     f"{projects_str}"
                     f"\nOnly one Reflekt project can be defined per repo."
                 )
-                logger.error(error_msg)
-                # raise SystemExit(1)
                 raise ProjectError(error_msg, project=self)
             else:  # pragma: no cover
                 error_msg = (
                     f"Git repository found at {str(repo_root)}, but does not contain "
                     f"reflekt_project.yml."
                 )
-                logger.error(error_msg)
-                # raise SystemExit(1)
                 raise ProjectError(error_msg, project=self)
 
         except InvalidGitRepositoryError:  # pragma: no cover
@@ -204,8 +199,6 @@ class Project:
                 "repository. You can create one by running `git init` in the directory "
                 "where your Reflekt project will be (or is) located."
             )
-            logger.error(error_msg)
-            # raise SystemExit(1)
             raise ProjectError(error_msg, project=self)
 
 

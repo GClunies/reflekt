@@ -8,7 +8,6 @@ from typing import List, Optional
 
 import yaml
 from jsonschema import validate
-from loguru import logger
 
 from reflekt.dumper import ReflektYamlDumper
 from reflekt.project import Project
