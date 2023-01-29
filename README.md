@@ -10,7 +10,7 @@ SPDX-License-Identifier: Apache-2.0
 [![PyPI - License](https://img.shields.io/pypi/l/reflekt)](https://pypi.org/project/reflekt/)
 
 A tool to help Data, Engineering, and Product teams:
-- Define event schemas as `code` using [JSON Schema](https://json-schema.org/), providing a version controlled source of truth.
+- Define event schemas as `code` using [JSONschema](https://json-schema.org/), providing a version controlled source of truth.
 - Lint schemas to enforce agreed-upon conventions (configurable). Run `reflekt lint` in a CI/CD pipeline to check:
     - Naming conventions (snake_case, camelCase, Title Case, etc.)
     - Descriptions are always included.
@@ -108,7 +108,7 @@ Event's can be collected using different SDKs, each with their own unique ways o
 ---
 
 ## Schemas
-Event schemas stored as JSON files in the `schemas/` directory of a project. Behind the scenes, Reflekt understands how different schema registries store and structure schemas, creating a common codified representation using [JSON Schema](https://json-schema.org/). When pulling/pushing schemas from/to a schema registry, Reflekt handles the conversion between the registry's format and JSON Schema.
+Event schemas stored as JSON files in the `schemas/` directory of a project. Behind the scenes, Reflekt understands how different schema registries store and structure schemas, creating a common codified representation using [JSONschema](https://json-schema.org/). When pulling/pushing schemas from/to a schema registry, Reflekt handles the conversion between the registry's format and JSON Schema.
 
 ### Schema `$id`
 Schemas are identified in Reflekt by their `$id` property, equal to their relative path to the `schemas/` directory. For example, the schema at `my_reflekt_project/schemas/segment/ecommerce/CartViewed/1-0.json` has the `$id` of `segment/ecommerce/CartViewed/1-0.json`.
