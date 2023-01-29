@@ -30,7 +30,7 @@ from reflekt.constants import (
     SdkEnum,
 )
 from reflekt.errors import SelectArgError
-from reflekt.linter import lint_schema
+from reflekt.linter import Linter
 from reflekt.profile import Profile
 from reflekt.project import Project
 from reflekt.registry.handler import RegistryHandler
@@ -87,6 +87,7 @@ def init(
     Raises:
         SystemExit: A Reflekt project already exists in the directory.
     """
+
     project = Project(use_defaults=True)
     project.dir = Path(dir).expanduser()
     project.path = project.dir / "reflekt_project.yml"
@@ -368,6 +369,8 @@ def lint(
     logger.info(f"Found {len(schema_paths)} schema(s) to lint")
     print("")
 
+    linter = Linter(project=project)
+
     for i, schema_path in enumerate(schema_paths, start=1):  # Get all Reflekt schemas
         with schema_path.open("r") as f:
             r_schema = json.load(f)
@@ -375,7 +378,7 @@ def lint(
         logger.info(
             f"{i} of {len(schema_paths)} Linting [magenta]{schema_path}[magenta/]"
         )
-        lint_schema(r_schema, errors)  # If errors
+        linter.lint_schema(r_schema, errors)  # If errors
 
     if errors:
         print("")
