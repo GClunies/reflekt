@@ -7,7 +7,7 @@ import json
 import os
 import shutil
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 import click
 import pkg_resources
@@ -85,16 +85,16 @@ def init(
     """Initialize a Reflekt project.
 
     Raises:
-        SystemExit: A Reflekt project already exists in the directory.
+        ProjectError: A Reflekt project already exists in the directory.
     """
     project = Project(use_defaults=True)
     project.dir = Path(dir).expanduser()
     project.path = project.dir / "reflekt_project.yml"
 
     if project.path.exists():
-        raise ExistingProjectError(
-            project_path=project.path,
+        raise ProjectError(
             message=f"Reflekt project configuration already defined at: {project.path}!",
+            project=project,
         )
 
     project.name = typer.prompt("Project name [letters, digits, underscore]", type=str)
@@ -268,8 +268,8 @@ def debug():
     try:
         project = Project()
         profile = Profile(project=project)
-    except ValidationError or SystemExit:  # Catch exceptions, these will throw errors themselves
-        pass
+    except Union[ValidationError, ProjectError, ProfileError] as e:
+        raise e
     else:
         logger.info(
             "[green]Reflekt project and profiles are configured correctly![green/]"
