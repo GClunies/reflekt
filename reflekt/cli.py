@@ -100,8 +100,9 @@ def init(
     project.name = typer.prompt("Project name [letters, digits, underscore]", type=str)
     project.vendor = typer.prompt("Schema vendor [e.g com.your_company]", type=str)
 
-    if project.vendor == "":
-        raise typer.BadParameter("Vendor cannot be empty string")
+    while project.vendor == "":
+        logger.warning("Vendor cannot be empty string")
+        project.vendor = typer.prompt("Schema vendor [e.g com.your_company]", type=str)
 
     profile_path = typer.prompt(
         "Path for 'reflekt_profiles.yml' [for connection to schema registry and data warehouse].",
