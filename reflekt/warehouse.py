@@ -8,7 +8,7 @@ import sqlalchemy
 from snowflake.sqlalchemy import URL as snow_url
 from sqlalchemy.engine.url import URL as redshift_url
 
-from reflekt.errors import sourceArgError
+from reflekt.errors import SourceArgError
 from reflekt.profile import Profile
 
 
@@ -31,7 +31,7 @@ class Warehouse:
         """Create warehouse engine based on --source argument and 'source:' in profile.
 
         Raises:
-            sourceArgError: Raised when an invalid --source argument is provided.
+            SourceArgError: Raised when an invalid --source argument is provided.
         """
         # Parse source argument
         self.source_id = self._source_arg.split(".")[0]
@@ -47,7 +47,7 @@ class Warehouse:
                 self.credentials = profile_source
 
         if not self._source_found:  # Raise error if no match found
-            raise sourceArgError(
+            raise SourceArgError(
                 message=(
                     f"Invalid argument '--source {self._source_arg}'. source id "
                     f"'{self.source_id}' does not match a 'source:' configuration in "

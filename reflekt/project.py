@@ -187,23 +187,41 @@ class Project:
                     f"\nOnly one Reflekt project can be defined per repo."
                 )
                 logger.error(error_msg)
-                raise SystemExit(1)
+                # raise SystemExit(1)
+                raise ProjectError(error_msg, project=self)
             else:  # pragma: no cover
-                logger.error(
-                    f"Git repo found at {str(repo_root)}, but does not contain "
+                error_msg = (
+                    f"Git repository found at {str(repo_root)}, but does not contain "
                     f"reflekt_project.yml."
                 )
-                raise SystemExit(1)
+                logger.error(error_msg)
+                # raise SystemExit(1)
+                raise ProjectError(error_msg, project=self)
 
         except InvalidGitRepositoryError:  # pragma: no cover
             error_msg = (
-                "Git repo not detected. Reflekt project must be inside a Git repo. You "
-                "can create one by running:"
-                "\n\n    git init"
-                "\n\n...at the root of your Reflekt project."
+                "Git repo not detected. Reflekt project must be inside a Git "
+                "repository. You can create one by running `git init` in the directory "
+                "where your Reflekt project will be (or is) located."
             )
             logger.error(error_msg)
-            raise SystemExit(1)
+            # raise SystemExit(1)
+            raise ProjectError(error_msg, project=self)
+
+
+class ProjectError(Exception):
+    """Raised when an error with the Reflekt project is detected."""
+
+    def __init__(self, message: str, project: Project) -> None:
+        """Initialize ProjectError class.
+
+        Args:
+            message (str): Error message.
+            project (Project): Reflekt project class instance.
+        """
+        self.message = message
+        self.project = project
+        super().__init__(self.message)
 
 
 if __name__ == "__main__":  # pragma: no cover

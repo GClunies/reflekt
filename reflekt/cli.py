@@ -31,8 +31,8 @@ from reflekt.constants import (
 )
 from reflekt.errors import SelectArgError
 from reflekt.linter import Linter
-from reflekt.profile import Profile
-from reflekt.project import Project
+from reflekt.profile import Profile, ProfileError
+from reflekt.project import Project, ProjectError
 from reflekt.registry.handler import RegistryHandler
 
 
@@ -87,7 +87,6 @@ def init(
     Raises:
         SystemExit: A Reflekt project already exists in the directory.
     """
-
     project = Project(use_defaults=True)
     project.dir = Path(dir).expanduser()
     project.path = project.dir / "reflekt_project.yml"
@@ -439,8 +438,11 @@ def main(
         None, "--version", callback=version_callback, is_eager=True
     ),
 ):
-    """CLI tool to develop, lint, validate, model, and document events using JSON schema."""
-    project = Project()
+    """Entry point into the Reflekt CLI."""
+    try:
+        project = Project()
+    except ProjectError:  # This happens when Reflekt project has not yet been created
+        project = Project(use_defaults=True)  # Set a dummy project
 
     # Configure logging
     if not project.exists:
@@ -490,8 +492,6 @@ if __name__ == "__main__":
     # pull(select="segment/surfline-web")
     # push(select="segment/ecommerce", delete=False)
     lint(select="segment/ecommerce")
-
-    # reflekt build dbt --select segment/ecommerce --sdk segment --source snowflake.raw.schema_name
     # build(
     #     artifact="dbt",
     #     select="segment/ecommerce",

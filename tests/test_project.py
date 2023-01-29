@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from reflekt.project import Project
+from reflekt.project import Project, ProjectError
 
 
 def test_project_init():
@@ -266,7 +266,7 @@ def test_multiple_reflekt_project_files_error():
         "./tests/tmp/reflekt_project.yml",
     )
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ProjectError):
         Project()
 
     shutil.rmtree(Path("./tests/tmp"))

@@ -8,7 +8,7 @@ from pathlib import Path  # noqa: D100
 import pytest
 import yaml
 
-from reflekt.profile import Profile
+from reflekt.profile import Profile, ProfileError
 from reflekt.project import Project
 
 
@@ -49,7 +49,7 @@ def test_non_existent_profiles_path():
     project = Project(path="./tests/fixtures/reflekt_project.yml")
     project.profiles_path = Path("non/existent/path")
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ProfileError):
         Profile(project=project)
 
 
@@ -58,7 +58,7 @@ def test_profile_not_found():
     project = Project(path="./tests/fixtures/reflekt_project.yml")
     project.default_profile = "non_existent_profile"
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ProfileError):
         Profile(project=project)
 
 
@@ -180,5 +180,5 @@ def test_non_unique_source_ids():
         .expanduser()
     )
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(ProfileError):
         Profile(project=project)

@@ -33,7 +33,7 @@ class Profile:
                 initialize default_profile in reflekt_project.yml.
 
         Raises:
-            SystemExit: An error occurred while initializing the project.
+            ProfileError: An error occurred while initializing the profile.
         """
         self.project: Project = project
         self.path: Path = project.profiles_path
@@ -52,11 +52,11 @@ class Profile:
 
         if self.project.exists:  # False when running 'reflekt init'
             if not self.path.exists():
-                logger.error(
+                error_msg = (
                     f"'profiles_path: {self.project.profiles_path}' specified in "
                     f"{self.project.path} does not exist"
                 )
-                raise SystemExit(1)
+                raise ProfileError(error_msg, profile=self)
 
             with self.path.open() as f:
                 profiles = yaml.safe_load(f)
@@ -64,8 +64,8 @@ class Profile:
             try:
                 self.config = profiles[self.name]
             except KeyError:
-                logger.error(f"Profile '{self.name}' not found in {self.path}")
-                raise SystemExit(1)
+                error_msg = f"Profile '{self.name}' not found in {self.path}"
+                raise ProfileError(error_msg, profile=self)
 
             self.validate_profile()
 
@@ -115,16 +115,16 @@ class Profile:
         """Check that source IDs are unique.
 
         Raises:
-            SystemExit: Source IDs are not unique.
+            ProfileError: Source IDs found in Profile are not unique.
         """
         source_ids = [source["id"] for source in self.source]
         if len(source_ids) != len(set(source_ids)):
-            logger.error(
+            error_msg = (
                 f"Duplicate source 'id' in profile: '{self.name}' in {self.path}. "
                 f"\n\n    Duplicated source ids: "
                 f"{[x for x in source_ids if source_ids.count(x) > 1]}\n"
             )
-            raise SystemExit(1)
+            raise ProfileError(error_msg, profile=self)
 
     def validate_profile(self):
         """Validate Reflekt profile configuration."""
@@ -134,6 +134,21 @@ class Profile:
             schema = json.load(f)
 
         validate(self.config, schema)
+
+
+class ProfileError(Exception):
+    """Raised when an error with the Reflekt profile is detected."""
+
+    def __init__(self, message: str, profile: Profile) -> None:
+        """Initialize ProfileError class.
+
+        Args:
+            message (str): Error message.
+            profile (Profile): Reflekt profile class instance.
+        """
+        self.message = message
+        self.profile = profile
+        super().__init__(self.message)
 
 
 if __name__ == "__main__":  # pragma: no cover

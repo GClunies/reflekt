@@ -23,11 +23,11 @@ class SelectArgError(Exception):
         super().__init__(self.message)
 
 
-class sourceArgError(Exception):
+class SourceArgError(Exception):
     """Raised when an invalid --source argument is provided."""
 
     def __init__(self, message: str, source: str) -> None:
-        """Initialize sourceArgError class.
+        """Initialize SourceArgError class.
 
         Args:
             message (str): Error message.
