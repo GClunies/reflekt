@@ -45,8 +45,8 @@ class Linter:
 
         if schema_event_name != name_from_id:
             err_msg = (
-                f"Event name '{schema_event_name}' does not match schema ID '{schema_id}' "
-                f"in {abs_path}"
+                f"Event name '{schema_event_name}' does not match schema ID "
+                f"'{schema_id}' in {abs_path}"
             )
             logger.error(err_msg)
             errors.append(err_msg)
@@ -84,7 +84,8 @@ class Linter:
         if event_name != event_case(event_name):
             err_msg = (
                 f"Event '{event_name}' in {abs_path} does not match naming convention "
-                f"'casing: {self._self._project.conventions['event']['casing']}' in {self._self._project.path}. "
+                f"'casing: {self._project.conventions['event']['casing']}' in "
+                f"{self._project.path}. "
             )
             logger.error(err_msg)
             errors.append(err_msg)
@@ -101,7 +102,8 @@ class Linter:
         if any(char.isdigit() for char in event_name):
             err_msg = (
                 f"Event '{event_name}' in {abs_path} does not match naming convention "
-                f"'numbers: {self._project.conventions['event']['numbers']}' in {self._project.path}. "
+                f"'numbers: {self._project.conventions['event']['numbers']}' in "
+                f"{self._project.path}. "
             )
             logger.error(err_msg)
             errors.append(err_msg)
@@ -135,8 +137,10 @@ class Linter:
         abs_path = self._project.dir / "schemas" / schema_id
         if prop_name != property_case(prop_name):
             err_msg = (
-                f"Property '{prop_name}' in {abs_path} does not match naming convention "
-                f"'casing: {self._project.conventions['property']['casing']}' in {self._project.path}."
+                f"Property '{prop_name}' in {abs_path} does not match naming "
+                f"convention "
+                f"'casing: {self._project.conventions['property']['casing']}' in "
+                f"{self._project.path}."
             )
             logger.error(err_msg)
             errors.append(err_msg)
@@ -152,7 +156,8 @@ class Linter:
         abs_path = self._project.dir / "schemas" / schema_id
         if any(char.isdigit() for char in prop_name):
             err_msg = (
-                f"Property '{prop_name}' in {abs_path} does not match naming convention "
+                f"Property '{prop_name}' in {abs_path} does not match naming "
+                f"convention "
                 f"'numbers: {self._project.conventions['property']['numbers']}' in "
                 f"{self._project.path}."
             )
@@ -222,8 +227,8 @@ class Linter:
     def lint_schema(self, r_schema: dict, errors: list):
         """Lint event schema.
 
-        Linting is performed against conventions defined in reflekt_self._project.yml and
-        required metadata fields defined in schemas/.reflekt/event-meta/1-0.json.
+        Linting is performed against conventions defined in reflekt_self._project.yml
+        and required metadata fields defined in schemas/.reflekt/event-meta/1-0.json.
 
         If a linting error is found, the error message is appended to the errors list.
 
@@ -247,7 +252,7 @@ class Linter:
                     )
                     and error.absolute_path[0] == "metadata"
                 ):
-                    pass  # Segment does not support metadata for identify or group calls
+                    pass  # Segment does not support metadata for identify/group calls
                 else:
                     error_msg = (
                         f"Schema validation error in '{error.absolute_path[0]}' in "
