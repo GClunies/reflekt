@@ -20,7 +20,7 @@
                     "properties": {
                         "vendor": {
                             "type": "string",
-                            "description": "The company, application, team, or system that authored the schema (com.company, com.company.android, com.company.marketing, com.segment)"
+                            "description": "The company, application, team, or system that authored the schema (e.g., com.company, com.company.android, com.company.marketing)"
                         },
                         "name": {
                             "type": "string",
@@ -33,8 +33,8 @@
                         },
                         "version": {
                             "type": "string",
-                            "description": "The version of the schema, in SchemaVer format (e.g., 1-0, 2-0-1, 3-1-7)",
-                            "pattern": "^[1-9][0-9]*-(0|[1-9][0-9]*)-(0|[1-9][0-9]*)$"
+                            "description": "The schema version, in MODEL-ADDITION format (e.g., 1-0, 1-1, 2-3, etc.)",
+                            "pattern": "^[1-9][0-9]*-(0|[1-9][0-9]*)$"
                         }
                     },
                     "required": ["vendor", "name", "format", "version"],
@@ -48,6 +48,7 @@
                     "additionalProperties": false
                 },
                 "properties": {},
+                "tests": {},
                 "metrics": {
                     "type": "object",
                     "properties": {

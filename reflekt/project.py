@@ -43,7 +43,6 @@ class Project:
         self.profiles_path: Path = None
         self.schemas: dict = {}
         self.conventions: dict = {}  # Nested in self.schemas
-        self.sources: dict = {}
         self.registry: dict = {}
         self.artifacts: dict = {}
 
@@ -111,22 +110,32 @@ class Project:
             )
             self.schemas = self.config.get("schemas")
             self.conventions = self.schemas["conventions"]
-            self.sources = self.config.get("sources")
             self.registry = self.config.get("registry")
             self.artifacts = self.config.get("artifacts")
 
     def to_yaml(self):
         """Convert Project class and write to reflekt_project.yml."""
-        data = {
-            "version": self.version,
-            "name": self.name,
-            "default_profile": self.default_profile,
-            "profiles_path": str(self.profiles_path),
-            "schemas": self.schemas,
-            "sources": self.sources,
-            "registry": self.registry,
-            "artifacts": self.artifacts,
-        }
+        if self.registry != {}:
+            data = {
+                "version": self.version,
+                "name": self.name,
+                "vendor": self.vendor,
+                "default_profile": self.default_profile,
+                "profiles_path": str(self.profiles_path),
+                "schemas": self.schemas,
+                "registry": self.registry,
+                "artifacts": self.artifacts,
+            }
+        else:
+            data = {
+                "version": self.version,
+                "name": self.name,
+                "vendor": self.vendor,
+                "default_profile": self.default_profile,
+                "profiles_path": str(self.profiles_path),
+                "schemas": self.schemas,
+                "artifacts": self.artifacts,
+            }
 
         with self.path.open("w") as f:
             yaml.dump(

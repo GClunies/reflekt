@@ -246,7 +246,7 @@ class DbtBuilder:
             else f"{self._mdl_prefix}{self._schema}__{table_name}"
         )
         doc_file = (
-            f"{self._doc_prefix}{self._schema}__{table_name}__{schema_version}.yml"
+            f"{self._doc_prefix}{self._schema}__{table_name}__v{schema_version}.yml"
             if schema_version != "1_0"
             else f"{self._doc_prefix}{self._schema}__{table_name}.yml"
         )
@@ -344,6 +344,7 @@ class DbtBuilder:
             )
 
         logger.info(f"Building dbt documentation '{doc_file}'")
+        print("")
 
     def build(self) -> None:
         """Build dbt package."""
@@ -567,7 +568,7 @@ class DbtBuilder:
         if self.wh_errors:
             print("")
             logger.warning(
-                f"The data warehouse returned the following warning(s) occurred while "
+                f"The data warehouse returned the following warning(s) while "
                 f"building the dbt package."
                 f"\n\n{wh_errors_str}"
             )

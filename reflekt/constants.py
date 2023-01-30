@@ -22,10 +22,6 @@ REFLEKT_JSON_SCHEMA = {
     "properties": {},
     "required": [],
     "additionalProperties": False,
-    "metrics": {
-        "dimensions": [],
-        "measures": [],
-    },
 }
 
 REGISTRY = [

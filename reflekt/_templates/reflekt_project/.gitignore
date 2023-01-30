@@ -3,3 +3,5 @@ reflekt_profiles.yml
 /.logs/**
 /.reflekt_cache/**
 
+# General
+.DS_Store
