@@ -45,7 +45,7 @@ class DbtBuilder:
         """
         self._profile = profile
         self._project = Project()
-        self._pkg_name = self._project.name
+        self._pkg_name = underscore(self._project.name)
         self._pkg_dir = self._project.dir / "artifacts" / "dbt" / self._pkg_name
         self._tmp_pkg_dir = (
             self._project.dir / ".reflekt_cache" / "artifacts" / "dbt" / self._pkg_name
