@@ -154,31 +154,45 @@ class DbtBuilder:
             f"    select * from {{{{ source('{underscore(self._schema)}', '{table_name}') }}}}\n"  # noqa: E501
             f"),\n\n"
         )
-        mdl_sql += "renamed as (\n" "    select"  # Rename CTE
+        mdl_sql += "renamed as (\n" "    select"  # Rename CTE start
 
-        if self._sdk_arg == "segment":
+        if self._sdk_arg == "segment":  # TODO - should this be its own method?
+            taken_cols = []  # Used to check for duplicates
+
             for col in columns:
                 col_name = underscore(col["name"])
 
-                if col_name == "id":
+                # Rename columns for staging models
+                if col_name == "id":  # ID column
                     if table_name == "identifies":
-                        col_sql = f"\n        {col_name} as identify_id,"
+                        alias_name = "identify_id"
+                        taken_cols.append(alias_name)
+                        col_sql = f"\n        {col_name} as {alias_name},"
                     elif table_name == "users":
-                        col_sql = f"\n        {col_name} as user_id,"
+                        alias_name = "user_id"
+                        taken_cols.append(alias_name)
+                        col_sql = f"\n        {col_name} as {alias_name},"
                     elif table_name == "groups":
-                        col_sql = f"\n        {col_name} as group_id,"
+                        alias_name = "group_id"
+                        taken_cols.append(alias_name)
+                        col_sql = f"\n        {col_name} as {alias_name},"
                     elif table_name == "pages":
-                        col_sql = f"\n        {col_name} as page_id,"
+                        alias_name = "page_id"
+                        taken_cols.append(alias_name)
+                        col_sql = f"\n        {col_name} as {alias_name},"
                     elif table_name == "screens":
-                        col_sql = f"\n        {col_name} as screen_id,"
-                    elif table_name == "tracks":
-                        col_sql = f"\n        {col_name} as event_id,"
-                    else:  # Custom events
-                        col_sql = f"\n        {col_name} as event_id,"
-                elif col_name == "event_text":
-                    col_sql = f"\n        {col_name} as event_name,"
-
-                elif col_name in [
+                        alias_name = "screen_id"
+                        taken_cols.append(alias_name)
+                        col_sql = f"\n        {col_name} as {alias_name},"
+                    else:  # 'tracks' table and custom events
+                        alias_name = "event_id"
+                        taken_cols.append(alias_name)
+                        col_sql = f"\n        {col_name} as {alias_name},"
+                elif col_name == "event_text":  # Event name column
+                    alias_name = "event_name"
+                    taken_cols.append(alias_name)
+                    col_sql = f"\n        {col_name} as {alias_name},"
+                elif col_name in [  # Timestamp columns
                     "original_timestamp",
                     "sent_at",
                     "received_at",
@@ -187,33 +201,61 @@ class DbtBuilder:
                     alias_name = col_name.replace("timestamp", "tstamp").replace(
                         "_at", "_at_tstamp"
                     )
+                    taken_cols.append(alias_name)
                     col_sql = f"\n        {col_name} as {alias_name},"
-                elif "context_" in col_name:
+                elif "context_" in col_name:  # Context columns
                     alias_name = f"{col_name.replace('context_', '')},"
+                    taken_cols.append(alias_name)
                     col_sql = f"\n        {col_name} as {alias_name}"
-                else:
-                    col_sql = f"\n        {col_name},"
+                else:  # Other columns (i.e., from schema properties)
+                    col_sql = (  # Rename column from schema, check for duplicate names
+                        f"\n        {col_name},"
+                        if col_name not in taken_cols
+                        and col_name
+                        not in [  # These columns are added to the model later
+                            "call_type",
+                            "source_schema",
+                            "source_table",
+                            "schema_id",
+                        ]
+                        else f"\n        _{col_name},"
+                    )
 
-                mdl_sql += col_sql
+                mdl_sql += col_sql  # Add column to SQL
 
-            # Add columns describing the call type and where the data came from
+            # Columns to describe the Segment call type and where the data came from
             if table_name in ["identifies", "users"]:
-                mdl_sql += "\n        'identify'::varchar as call_type,"
+                alias_name = "call_type"
+                taken_cols.append(alias_name)
+                col_sql = f"\n        'identify'::varchar as {alias_name},"
             elif table_name == "groups":
-                mdl_sql += "\n        'group'::varchar as call_type,"
+                alias_name = "call_type"
+                taken_cols.append(alias_name)
+                col_sql = f"\n        'group'::varchar as {alias_name},"
             elif table_name == "pages":
-                mdl_sql += "\n        'page'::varchar as call_type,"
+                alias_name = "call_type"
+                taken_cols.append(alias_name)
+                col_sql = f"\n        'page'::varchar as {alias_name},"
             elif table_name == "screens":
-                mdl_sql += "\n        'screen'::varchar as call_type,"
+                alias_name = "call_type"
+                taken_cols.append(alias_name)
+                col_sql = f"\n        'screen'::varchar as {alias_name},"
             else:
-                mdl_sql += "\n        'track'::varchar as call_type,"
+                alias_name = "call_type"
+                taken_cols.append(alias_name)
+                col_sql = f"\n        'track'::varchar as {alias_name},"
 
-            mdl_sql += f"\n        '{source_schema}'::varchar as source_schema,"
-            mdl_sql += f"\n        '{table_name}'::varchar as source_table,"
-            mdl_sql += f"\n        '{schema_id}'::varchar as schema_id,"
+            mdl_sql += col_sql  # Add call_type column
+            mdl_sql += (  # Add columns for data source and schema ID
+                f"\n        '{source_schema}'::varchar as source_schema,"
+                f"\n        '{table_name}'::varchar as source_table,"
+                f"\n        '{schema_id}'::varchar as schema_id,"
+            )
+            taken_cols.extend(["source_schema", "source_table", "schema_id"])
 
-        mdl_sql = mdl_sql[:-1]  # Remove final trailing comma
-        mdl_sql += "\n    from source\n)\n\nselect * from renamed"
+        mdl_sql = mdl_sql[:-1]  # Remove final trailing comma from last rename
+        mdl_sql += "\n    from source\n)"  # Rename CTE end
+        mdl_sql += "\n\nselect * from renamed"  # Final select
 
         if not model_path.parent.exists():
             model_path.parent.mkdir(parents=True)
@@ -223,8 +265,7 @@ class DbtBuilder:
 
         logger.info(f"Building staging model '{model_file}'")
 
-    # TODO - reserved for later use
-    # def _build_dbt_metric(self) -> None:
+    # def _build_dbt_metric(self) -> None:  # TODO - reserved for later use
     #     """Build dbt metric."""
     #     pass
 
@@ -270,24 +311,31 @@ class DbtBuilder:
         test_cols = list(self._project.artifacts["dbt"]["docs"]["tests"].keys())
 
         if self._sdk_arg == "segment":
+            taken_cols = []  # Used to check for duplicates
+
             for col in columns:
                 if col["name"] == "id":
                     if table_name == "identifies":
                         col_name = "identify_id"
+                        taken_cols.append(col_name)
                     elif table_name == "users":
                         col_name = "user_id"
+                        taken_cols.append(col_name)
                     elif table_name == "groups":
                         col_name = "group_id"
+                        taken_cols.append(col_name)
                     elif table_name == "pages":
                         col_name = "page_id"
+                        taken_cols.append(col_name)
                     elif table_name == "screens":
                         col_name = "screen_id"
-                    elif table_name == "tracks":
+                        taken_cols.append(col_name)
+                    else:  # 'tracks' table and custom events
                         col_name = "event_id"
-                    else:  # Custom events
-                        col_name = "event_id"
+                        taken_cols.append(col_name)
                 elif col["name"] == "event_text":
                     col_name = "event_name"
+                    taken_cols.append(col_name)
                 else:
                     col_name = (
                         underscore(col["name"])
@@ -296,6 +344,11 @@ class DbtBuilder:
                         if "context_" not in underscore(col["name"])
                         else underscore(col["name"]).replace("context_", "")
                     )
+
+                    if col_name in taken_cols:  # Check for duplicates
+                        col_name = f"_{col_name}"
+
+                    taken_cols.append(col_name)
 
                 dbt_col = {
                     "name": col_name,
