@@ -292,10 +292,7 @@ artifacts:                      # Configure how data artifacts are built
         id: [unique, not_null]
 
 ```
-
 </details>
-<br>
-
 
 #### `reflekt_profiles.yml`
 Defines connection to schema registries and sources where event data is stored.
@@ -333,12 +330,10 @@ dev_reflekt:                                              # Profile name (multip
       password: reflekt_user_password
 
 ```
-
 </details>
-<br>
 
 ### Metadata
-You can define globally required metadata for all events in your project by modifying the `metadata` object in the `schemas/.reflekt/event-meta/1-0.json` schema. This is optional and by default no metadata is required.
+Required metadata can be globally defined for all events in a project by modifying the `metadata` object in the `schemas/.reflekt/event-meta/1-0.json` schema. This is optional and by default no metadata is required.
 
 <details>
 <summary><code>schemas/.reflekt/event-meta/1-0.json  (click to expand example)</code></summary>
