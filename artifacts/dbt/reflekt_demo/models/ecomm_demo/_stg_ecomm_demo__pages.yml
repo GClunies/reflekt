@@ -84,3 +84,5 @@ models:
         description: The table where the raw event data is stored.
       - name: schema_id
         description: The Reflekt schema ID that governs the event.
+      - name: schema_metadata
+        description: Schema metadata associated with the event.

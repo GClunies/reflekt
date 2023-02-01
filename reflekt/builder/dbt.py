@@ -125,6 +125,7 @@ class DbtBuilder:
         source_schema: str,
         table_name: str,
         columns: List[Dict],
+        metadata: Dict,
     ) -> None:
         """Build dbt model.
 
@@ -133,6 +134,7 @@ class DbtBuilder:
             source_schema (str): source schema.
             table_name (str): Table name.
             columns (List[Dict]): List of column dicts (with name, description, etc).
+            metadata (Dict): Schema metadata.
         """
         schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
         model_file = (
@@ -253,6 +255,13 @@ class DbtBuilder:
             )
             taken_cols.extend(["source_schema", "source_table", "schema_id"])
 
+            if metadata != {}:  # Add metadata columns
+                metadata_str = json.dumps(metadata)
+                alias_name = "schema_metadata"
+                taken_cols.append(alias_name)
+                col_sql = f"\n        '{metadata_str}'::varchar as {alias_name},"
+                mdl_sql += col_sql
+
         mdl_sql = mdl_sql[:-1]  # Remove final trailing comma from last rename
         mdl_sql += "\n    from source\n)"  # Rename CTE end
         mdl_sql += "\n\nselect * from renamed"  # Final select
@@ -270,7 +279,12 @@ class DbtBuilder:
     #     pass
 
     def _build_dbt_doc(
-        self, schema_id: str, table_name: str, description: str, columns: List[Dict]
+        self,
+        schema_id: str,
+        table_name: str,
+        description: str,
+        columns: List[Dict],
+        metadata: Dict,
     ) -> None:
         """Build dbt documentation for model.
 
@@ -279,6 +293,7 @@ class DbtBuilder:
             table_name (str): Table name.
             description (str): Model description.
             columns (List[Dict]): List of column dicts (with name, description, etc).
+            metadata (Dict): Schema metadata.
         """
         schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
         model_name = (
@@ -382,6 +397,13 @@ class DbtBuilder:
                 },
             ]
             doc_obj["models"][0]["columns"].extend(additional_cols)
+
+            if metadata != {}:
+                metadata_col = {
+                    "name": "schema_metadata",
+                    "description": "Schema metadata associated with the event.",
+                }
+                doc_obj["models"][0]["columns"].append(metadata_col)
 
         with doc_path.open("w") as f:
             yaml.dump(
@@ -488,6 +510,7 @@ class DbtBuilder:
             event_name = schema_json["self"]["name"]
             event_desc = schema_json["description"]
             table_name = underscore(event_name.lower().replace(" ", "_"))
+            metadata = schema_json["metadata"]
 
             if self._sdk_arg == "segment":
                 table_name = (
@@ -523,12 +546,14 @@ class DbtBuilder:
                     source_schema=self._schema,
                     table_name=table_name,
                     columns=columns,
+                    metadata=metadata,
                 )
                 self._build_dbt_doc(
                     schema_id=schema_id,
                     table_name=table_name,
                     description=event_desc,
                     columns=columns,
+                    metadata=metadata,
                 )
 
                 # Build Segment users table/model/doc
@@ -554,12 +579,14 @@ class DbtBuilder:
                             source_schema=self._schema,
                             table_name="users",
                             columns=columns,
+                            metadata={},
                         )
                         self._build_dbt_doc(
                             schema_id=schema_id,
                             table_name="users",
                             description="User traits set by identify() calls.",
                             columns=columns,
+                            metadata={},
                         )
 
         # Build Segment tracks table/model/doc
@@ -588,6 +615,7 @@ class DbtBuilder:
                     source_schema=self._schema,
                     table_name="tracks",
                     columns=columns,
+                    metadata={},
                 )
                 self._build_dbt_doc(
                     schema_id="dummy/schema_id/for/tracks/1-0.json",
@@ -597,6 +625,7 @@ class DbtBuilder:
                         "to each event's track() call are omitted."
                     ),
                     columns=columns,
+                    metadata={},
                 )
 
         with source_path.open("w") as f:
