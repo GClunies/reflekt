@@ -207,10 +207,6 @@ An example `ProductClicked` event schema, based on the [Segment Ecommerce Spec](
   },
   "required": [],
   "additionalProperties": false,
-  "metrics": {
-      "dimensions": [],
-      "measures": []
-  }
 }
 ```
 
