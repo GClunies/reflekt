@@ -17,16 +17,9 @@
         "cart_id": {
             "description": "Cart ID to which the product was added to",
             "type": "string"
-        },
-        "products": {
-            "description": "Products in the order",
-            "type": "array"
         }
     },
-    "required": [
-        "cart_id",
-        "products"
-    ],
+    "required": ["cart_id"],
     "additionalProperties": false,
     "metrics": {
         "dimensions": [],
