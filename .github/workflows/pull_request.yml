@@ -1,4 +1,4 @@
-name: CI Suite
+name: Lint & Test
 
 on: pull_request
 
