@@ -9,7 +9,7 @@ SPDX-License-Identifier: Apache-2.0
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/reflekt?style=for-the-badge)
 ![GitHub](https://img.shields.io/github/license/gclunies/reflekt?style=for-the-badge)
 
-A tool to help Data, Engineering, and Product teams:
+A CLI tool to help Data, Engineering, and Product teams:
 - Define event schemas as `code` using [JSONschema](https://json-schema.org/), providing a version controlled source of truth.
 - Lint schemas to enforce agreed-upon conventions (configurable). Run `reflekt lint` in a CI/CD pipeline to check:
     - Naming conventions (snake_case, camelCase, Title Case, etc.)
