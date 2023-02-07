@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-n-publish:
-    name: Publish Python Package to TestPyPi
+    name: Publish to TestPyPi
     strategy:
       fail-fast: false
       matrix:
