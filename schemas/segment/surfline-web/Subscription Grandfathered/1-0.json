@@ -1,0 +1,51 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Subscription Grandfathered/1-0.json",
+    "description": "Server side event when a subscription is grandfathered in Stripe.  '",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Subscription Grandfathered",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "newPlan": {
+            "description": "The new subscription plan.",
+            "type": "string"
+        },
+        "oldPlan": {
+            "description": "The old subscription plan.",
+            "type": "string"
+        },
+        "planId": {
+            "description": "The subscription plan ID.",
+            "type": "string"
+        },
+        "platform": {
+            "description": "The platform the event is attributed to.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+        "newPlan",
+        "oldPlan",
+        "planId",
+        "platform"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

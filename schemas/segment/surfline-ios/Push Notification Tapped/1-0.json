@@ -1,0 +1,61 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Push Notification Tapped/1-0.json",
+    "description": "Client side event fired when a user clicks a push notification and opens the app.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Push Notification Tapped",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "aps_alert": {
+            "description": "The notification.",
+            "type": "string"
+        },
+        "aps_alert_body": {
+            "description": "The notification body text.",
+            "type": "string"
+        },
+        "aps_alert_title": {
+            "description": "The notification title.",
+            "type": "string"
+        },
+        "custom_category": {
+            "description": "The notification category.",
+            "type": "string"
+        },
+        "custom_feature": {
+            "description": "The notification feature.",
+            "type": "string"
+        },
+        "custom_journey_step": {
+            "description": "The notification journey step.",
+            "type": "string"
+        },
+        "type": {
+            "description": "The type of notification.",
+            "type": "string"
+        },
+        "wp_reporting_campaign_id": {
+            "description": "The campaign ID the notifaction belongs to.",
+            "type": "string"
+        },
+        "wp_reporting_notification_id": {
+            "description": "The notification ID.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

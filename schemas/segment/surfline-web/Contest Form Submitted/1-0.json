@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Contest Form Submitted/1-0.json",
+    "description": "Web event fired when a user enters the Wave of the Winter contest.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Contest Form Submitted",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-content",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "adminLink": {
+            "description": "The link to the admin page for the contest.",
+            "type": "string"
+        },
+        "contestName": {
+            "description": "The name of the contest.",
+            "type": "string"
+        },
+        "date": {
+            "description": "The date of the wave.",
+            "type": "string"
+        },
+        "spot": {
+            "description": "The spot of the contest.",
+            "type": "string"
+        },
+        "surfer": {
+            "description": "The name of the surfer.",
+            "type": "string"
+        },
+        "videoUrl": {
+            "description": "The url of the video.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

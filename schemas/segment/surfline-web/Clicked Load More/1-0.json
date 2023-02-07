@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Load More/1-0.json",
+    "description": "Web event fired when a user clicks",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Load More",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-web-platform",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "locationcategory": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "pageName": {
+            "description": "The page name.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        },
+        "subregionName": {
+            "description": "The region name.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

@@ -1,0 +1,144 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Video Content Started/1-0.json",
+    "description": "Fires when a video content segment starts playing within a playback session",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Video Content Started",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-realtime",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "airdate": {
+            "description": "Original air date.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "assetId": {
+            "description": "The unique ID of the content asset.",
+            "type": "string"
+        },
+        "bitrate": {
+            "description": "The current kbps.",
+            "type": "integer"
+        },
+        "camId": {
+            "description": "The camera ID.",
+            "type": "string"
+        },
+        "camName": {
+            "description": "The camera name.",
+            "type": "string"
+        },
+        "description": {
+            "description": "Short description of the video content.",
+            "type": "string"
+        },
+        "episode": {
+            "description": "The episode number if applicable.",
+            "type": "string"
+        },
+        "framerate": {
+            "description": "The average fps.",
+            "type": "number"
+        },
+        "fullEpisode": {
+            "description": "true if content is a full episode and false otherwise.",
+            "type": "boolean"
+        },
+        "fullScreen": {
+            "description": "true if playback is currently in full screen mode and false otherwise.",
+            "type": "boolean"
+        },
+        "genre": {
+            "description": "The genre of the content (i.e., comedy, action, etc).",
+            "type": "string"
+        },
+        "highlight": {
+            "description": "Whether or not the video content is a Cam Highlight.",
+            "type": "boolean"
+        },
+        "keywords": {
+            "description": "An array of arbitrary keywords or tags that describe or categorize the video content.",
+            "type": "array"
+        },
+        "livestream": {
+            "description": "If the content will be a livetream, send true, otherwise false.",
+            "type": "boolean"
+        },
+        "playerSessionId": {
+            "description": "The unique ID of the overall session used to tie all events generated from a specific playback. This value should be same across all playback, content, and ad events if they are from the same playback session.",
+            "type": "string"
+        },
+        "podId": {
+            "description": "The unique ID of the content pod.",
+            "type": "string"
+        },
+        "position": {
+            "description": "The current index position in seconds of the playhead into the content/asset. This position must exclude the duration of any ads played.",
+            "type": "integer"
+        },
+        "program": {
+            "description": "The name of the program, show, etc. of the content if applicable (e.g., Surf Your Best).",
+            "type": "string"
+        },
+        "rewind": {
+            "description": "Whether or not the video content is a Cam Rewind.",
+            "type": "boolean"
+        },
+        "season": {
+            "description": "The season number if applicable.",
+            "type": "string"
+        },
+        "spotId": {
+            "description": "ID of the spot where camera is located.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "subregionName": {
+            "description": "Name of the sub-region where camera is located.",
+            "type": "string"
+        },
+        "surflineSession": {
+            "description": "Whether or not the video content is a Surfline Session.",
+            "type": "boolean"
+        },
+        "title": {
+            "description": "The title of the video content.",
+            "type": "string"
+        },
+        "totalLength": {
+            "description": "The total duration of the content/asset in seconds. This should exclude the duration of any ads included in the playback of this asset. For livestream playback, send null.",
+            "type": [
+                "integer",
+                "null"
+            ]
+        }
+    },
+    "required": [
+        "assetId",
+        "fullScreen",
+        "highlight",
+        "livestream",
+        "playerSessionId",
+        "podId",
+        "position",
+        "rewind",
+        "surflineSession",
+        "totalLength"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

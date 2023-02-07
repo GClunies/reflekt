@@ -1,0 +1,43 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Popup/1-0.json",
+    "description": "Client side event fired when a user clicks on any pop-up in app.'",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Popup",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "buttonText": {
+            "description": "The text of the button."
+        },
+        "category": {
+            "description": "The event category (used to group related events)."
+        },
+        "email": {
+            "description": "The email address of the user."
+        },
+        "popupName": {
+            "description": "The name of the popup."
+        },
+        "screenName": {
+            "description": "The screen name."
+        },
+        "text": {
+            "description": "The text of the popup."
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

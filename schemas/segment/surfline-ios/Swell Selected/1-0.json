@@ -1,0 +1,56 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Swell Selected/1-0.json",
+    "description": "Fired when a user clicks a swell modal.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Swell Selected",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "forecastPeriod": {
+            "description": "The forecast period (1 = day event fired).",
+            "type": "integer"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        },
+        "subregionName": {
+            "description": "The subregion name.",
+            "type": "string"
+        },
+        "swellNumber": {
+            "description": "The swell the user clicks on.",
+            "type": "number"
+        }
+    },
+    "required": [
+        "forecastPeriod",
+        "spotId",
+        "spotName",
+        "subregionId",
+        "subregionName",
+        "swellNumber"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

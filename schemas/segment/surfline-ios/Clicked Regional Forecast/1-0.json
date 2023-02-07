@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Regional Forecast/1-0.json",
+    "description": "Client side event fired when a user clicks on the Regional Forecast button.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Regional Forecast",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "regionId": {
+            "description": "The region ID.",
+            "type": "integer"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "regionId",
+        "subregionId"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

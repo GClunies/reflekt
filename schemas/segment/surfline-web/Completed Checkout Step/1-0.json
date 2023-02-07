@@ -1,0 +1,83 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Completed Checkout Step/1-0.json",
+    "description": "Web event fired when a user completes step 2 of the subscription funnel.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Completed Checkout Step",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "currency": {
+            "description": "The currency.",
+            "pattern": "[A-Z]",
+            "type": "string"
+        },
+        "orderType": {
+            "description": "The line of business the order takes place under (e.g. E-commerce, subscription, etc).",
+            "enum": [
+                "ecommerce",
+                "subscription",
+                "travel"
+            ],
+            "type": "string"
+        },
+        "planName": {
+            "description": "The name of the plan",
+            "enum": [
+                "premium annual",
+                "premium monthly",
+                "youth annual",
+                "free account"
+            ],
+            "type": "string"
+        },
+        "promotionId": {
+            "description": "The promotion ID (if any).",
+            "type": "string"
+        },
+        "quantity": {
+            "description": "The quantity of the product ordered.",
+            "type": "integer"
+        },
+        "step": {
+            "description": "The funnel step (1 = first step in funnel).",
+            "enum": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "age verification"
+            ],
+            "type": "string"
+        },
+        "stepName": {
+            "description": "The name of the funnel step.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "total": {
+            "description": "The total cost of the order.",
+            "type": "number"
+        }
+    },
+    "required": [
+        "orderType",
+        "step",
+        "stepName"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

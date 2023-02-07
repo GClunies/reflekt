@@ -1,0 +1,79 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Posted Receipt Successfully/1-0.json",
+    "description": "Client side event fired when a a user has completed the funnel and a receipt from Apple has been posted to our server. Used by engineering for debugging transactions.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Posted Receipt Successfully",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "currency": {
+            "description": "The currency.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "id": {
+            "description": "The product ID.",
+            "type": "string"
+        },
+        "interval": {
+            "description": "The subscription billing interval.",
+            "enum": [
+                "month",
+                "year"
+            ],
+            "type": "string"
+        },
+        "intervalCount": {
+            "description": "The count of the interval the receipt applies to.",
+            "type": "integer"
+        },
+        "orderId": {
+            "description": "The order ID.",
+            "type": "string"
+        },
+        "paymentPlatform": {
+            "description": "The payment platform",
+            "enum": [
+                "iTunes"
+            ],
+            "type": "string"
+        },
+        "price": {
+            "description": "The price.",
+            "type": "number"
+        },
+        "productName": {
+            "description": "The product name.",
+            "type": "string"
+        },
+        "quantity": {
+            "description": "The quantity.",
+            "type": "integer"
+        },
+        "sku": {
+            "description": "The product SKU.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

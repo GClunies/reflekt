@@ -1,0 +1,139 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Changed Subscription Plan/1-0.json",
+    "description": "Server-side event that is triggered by any billing platform (Stripe, Google, Apple) when an active subscription billing interval is changed to a different billing interval.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Changed Subscription Plan",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "active": {
+            "description": "Indicates if the subscription is currently used for allowing access to premium entitlements.",
+            "type": "boolean"
+        },
+        "billingPlatform": {
+            "description": "Represents the payment processor for each subscription.",
+            "enum": [
+                "stripe",
+                "ios",
+                "android",
+                "gift"
+            ],
+            "type": "string"
+        },
+        "country": {
+            "description": "Available for subscription billed through the Google/Android billing platform.  Indicates the subscription's country of origin.",
+            "type": "string"
+        },
+        "currency": {
+            "description": "The currency.",
+            "pattern": "[A-Z]",
+            "type": "string"
+        },
+        "currentPeriodEnd": {
+            "description": "The end of the current trial or billing period.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "currentPeriodStart": {
+            "description": "The start of the current trial or billing period.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "entitlement": {
+            "description": "Indicates the premium product access this subscription promotes.",
+            "type": "string"
+        },
+        "expiration": {
+            "description": "The date of the subscriptions expiration.  May not be the same as currentPeriodEnd in some cases.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "inTrial": {
+            "description": "Is the subscription actively trialing.",
+            "type": "boolean"
+        },
+        "interval": {
+            "description": "The subscription billing interval.",
+            "enum": [
+                "month",
+                "year"
+            ],
+            "type": "string"
+        },
+        "planId": {
+            "description": "The premium product that purchased and billed each interval.",
+            "type": "string"
+        },
+        "platform": {
+            "description": "Similar to billingPlatform.  This represents where the subscription originated.",
+            "enum": [
+                "ios",
+                "android",
+                "web"
+            ],
+            "type": "string"
+        },
+        "promotionId": {
+            "description": "The ID of the associated promotional campaign.",
+            "type": "string"
+        },
+        "reason": {
+            "description": "An sting value represetntative of a cancellation.",
+            "type": "string"
+        },
+        "secondsRemaining": {
+            "description": "Time remaining on a subscription.",
+            "type": "integer"
+        },
+        "subscriptionId": {
+            "description": "The unique identifier for each subscription that can be used for SQL joins for determining lifecycle events.",
+            "type": "string"
+        },
+        "trialEligible": {
+            "description": "Indicated if the customer/user associated with a subscription is eligible for a free trial.",
+            "type": "boolean"
+        },
+        "trialEndDate": {
+            "description": "The end of the current trial.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "trialLength": {
+            "description": "The length of the trial in days.",
+            "type": "integer"
+        },
+        "trialStartDate": {
+            "description": "The start of the current trial.",
+            "format": "date-time",
+            "type": "string"
+        }
+    },
+    "required": [
+        "active",
+        "billingPlatform",
+        "currentPeriodEnd",
+        "currentPeriodStart",
+        "entitlement",
+        "expiration",
+        "inTrial",
+        "interval",
+        "planId",
+        "platform",
+        "subscriptionId",
+        "trialEligible"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

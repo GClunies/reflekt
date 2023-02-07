@@ -138,10 +138,9 @@ dmypy.json
 !reflekt/tests/fixtures/reflekt_project.yml
 !reflekt/_templates/**/*
 !reflekt/_templates/project/reflekt_project.yml
+!schemas/.reflekt/
 
 # IGNORE
-/artifacts/
-/schemas/
 /.backup/
 /.logs/
 /.reflekt/

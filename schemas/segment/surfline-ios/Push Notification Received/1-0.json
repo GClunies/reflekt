@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Push Notification Received/1-0.json",
+    "description": "Client side event fired when a user receives a push notification.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Push Notification Received",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "campaign_content": {
+            "description": "The campaign content.",
+            "type": "string"
+        },
+        "campaign_medium": {
+            "description": "The campaign medium.",
+            "type": "string"
+        },
+        "campaign_name": {
+            "description": "The campaign name.",
+            "type": "string"
+        },
+        "campaign_source": {
+            "description": "The campaign source.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

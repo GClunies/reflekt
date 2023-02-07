@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Cancel Create/Sign In Modal/1-0.json",
+    "description": "Client side event fired when a user clicks \"Cancel\" on either the \"Create Account\" or 'Sign in\" modal.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Cancel Create/Sign In Modal",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "screenName": {
+            "description": "The screen name.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "screenName"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

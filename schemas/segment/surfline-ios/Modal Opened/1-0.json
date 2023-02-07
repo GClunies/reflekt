@@ -1,0 +1,73 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Modal Opened/1-0.json",
+    "description": "Fired when user opens a modal on the product.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Modal Opened",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "forecastPeriod": {
+            "description": "The forecast period (1 = day event fired).",
+            "type": "integer"
+        },
+        "graphType": {
+            "description": "The graph type when the modal opens.",
+            "enum": [
+                "bar",
+                "line"
+            ],
+            "type": "string"
+        },
+        "modalType": {
+            "description": "The modal type",
+            "enum": [
+                "swell",
+                "live-wind"
+            ],
+            "type": "string"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        },
+        "subregionName": {
+            "description": "The subregion name.",
+            "type": "string"
+        },
+        "tabName": {
+            "description": "The kbyg tab the user is on (report, forecast, or analysis)",
+            "enum": [
+                "report",
+                "forecast",
+                "analysis"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+        "modalType",
+        "graphType"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

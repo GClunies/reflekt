@@ -1,0 +1,51 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Generated Promo Code/1-0.json",
+    "description": "Server side event when we generate a promo code.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Generated Promo Code",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "code": {
+            "description": "The promo code.",
+            "type": "string"
+        },
+        "platform": {
+            "description": "The platform the event is attributed to.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        },
+        "promoCodesAvailable": {
+            "description": "The number of promo codes available.",
+            "type": "integer"
+        },
+        "type": {
+            "description": "The type of promo code.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "code",
+        "platform",
+        "promoCodesAvailable",
+        "type"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

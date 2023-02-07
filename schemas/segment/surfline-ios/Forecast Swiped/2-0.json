@@ -1,0 +1,76 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Forecast Swiped/2-0.json",
+    "description": "Client side event fired when a swipes a forecast (i.e. the user swipes the screen on teh forecast tab to change the day)",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Forecast Swiped",
+        "format": "jsonschema",
+        "version": "2-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The product category this event belongs to (e.g. `kbyg`, `ecommerce`, `sessions`, `travel`, `content`).",
+            "enum": [
+                "kbyg",
+                "ecommerce",
+                "sessions",
+                "travel",
+                "content"
+            ],
+            "type": "string"
+        },
+        "forecastPeriod": {
+            "description": "The integer day the forecast corresponds to (today=1).",
+            "type": "integer"
+        },
+        "forecastRangeEnd": {
+            "description": "The end of the forecast the range was swiped to. Integer relative to today (today=1).",
+            "type": "integer"
+        },
+        "forecastRangeStart": {
+            "description": "The start of range the forecast ass swiped to. Integer relative to today (today=1).",
+            "type": "integer"
+        },
+        "graphType": {
+            "description": "The graph type",
+            "enum": [
+                "forecast",
+                "swell"
+            ],
+            "type": "string"
+        },
+        "screenName": {
+            "description": "The name of the screen where the forecast range was swiped.",
+            "type": "string"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        },
+        "subregionName": {
+            "description": "The region name.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

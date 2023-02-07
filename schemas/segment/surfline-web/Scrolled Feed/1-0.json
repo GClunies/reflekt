@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Scrolled Feed/1-0.json",
+    "description": "Web event fired when a user scrolls the feed of articles/links on the home page or news page, which triggers more articles/links to load at the bottom of the page.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Scrolled Feed",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-content",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "pageCounter": {
+            "description": "The count of the number of pages scrolled.",
+            "type": "integer"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "category",
+        "pageCounter"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

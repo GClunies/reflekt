@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Signed Out/1-0.json",
+    "description": "Fired when a user signs out.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Signed Out",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "method": {
+            "description": "The method used to sign out.",
+            "type": "string"
+        },
+        "platform": {
+            "description": "The platform the event is attributed to.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+        "platform"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

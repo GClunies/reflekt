@@ -1,0 +1,53 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Promotion/1-0.json",
+    "description": "Web event fired when any utm_* tracking parameters are detected in the URL.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Promotion",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-web-platform",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "campaignContent": {
+            "description": "The campaign content of the promotion (from utm_content).",
+            "type": "string"
+        },
+        "campaignId": {
+            "description": "The campaign ID of the promotion.",
+            "type": "string"
+        },
+        "campaignMedium": {
+            "description": "The campaign medium of the promotion (from utm_medium).",
+            "type": "string"
+        },
+        "campaignName": {
+            "description": "The campaign name of the promotion (from utm_campaign).",
+            "type": "string"
+        },
+        "campaignSource": {
+            "description": "The campaign source of the promotion (from utm_source).",
+            "type": "string"
+        },
+        "campaignTerm": {
+            "description": "The campaign term of the promotion (from utm_term).",
+            "type": "string"
+        },
+        "legacyMarketingId": {
+            "description": "The legacy marketing ID of the promotion.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

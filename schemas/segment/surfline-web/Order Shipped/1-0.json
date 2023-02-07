@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Order Shipped/1-0.json",
+    "description": "Fired when an order gets shipped from the store.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Order Shipped",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The category this event belongs to (e.g. `kbyg`, `ecommerce`, `sessions`, `travel`, `content`).",
+            "enum": [
+                "kbyg",
+                "ecommerce",
+                "sessions",
+                "travel",
+                "content"
+            ],
+            "type": "string"
+        },
+        "orderId": {
+            "description": "Order/transaction ID.",
+            "type": "string"
+        },
+        "total": {
+            "description": "Total value ($) of the order.",
+            "type": "number"
+        }
+    },
+    "required": [
+        "category",
+        "orderId",
+        "total"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

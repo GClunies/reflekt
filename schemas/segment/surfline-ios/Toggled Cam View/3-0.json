@@ -1,0 +1,98 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Toggled Cam View/3-0.json",
+    "description": "Client side event fired when a user toggles a camera view.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Toggled Cam View",
+        "format": "jsonschema",
+        "version": "3-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "camChange": {
+            "description": "The type of camera change.",
+            "enum": [
+                "spot",
+                "angle",
+                "nearby"
+            ],
+            "type": "string"
+        },
+        "camId": {
+            "description": "The camera ID.",
+            "type": "string"
+        },
+        "camName": {
+            "description": "The camera name.",
+            "type": "string"
+        },
+        "category": {
+            "description": "The product category this event belongs to (e.g. `kbyg`, `ecommerce`, `sessions`, `travel`, `content`).",
+            "enum": [
+                "kbyg",
+                "ecommerce",
+                "sessions",
+                "travel",
+                "content"
+            ],
+            "type": "string"
+        },
+        "favorite": {
+            "description": "Is the camera a favorite?",
+            "type": "boolean"
+        },
+        "numberOfCams": {
+            "description": "The number of cameras at the spot.",
+            "type": "integer"
+        },
+        "playerMode": {
+            "description": "The player mode.",
+            "type": "string"
+        },
+        "premiumCam": {
+            "description": "Whether the feature was a premium cam.",
+            "type": "boolean"
+        },
+        "screenName": {
+            "description": "The screen name.",
+            "type": "string"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        },
+        "subregionName": {
+            "description": "The region name.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "camChange",
+        "camId",
+        "camName",
+        "playerMode",
+        "screenName",
+        "spotId",
+        "spotName",
+        "subregionId"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

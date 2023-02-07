@@ -1,0 +1,69 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Article Page Link/1-0.json",
+    "description": "Web event fired when a user clicks a local headlines article link.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Article Page Link",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-content",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "contentId": {
+            "description": "The linked article content ID.",
+            "type": "string"
+        },
+        "contentType": {
+            "description": "The linked article type of content.",
+            "type": "string"
+        },
+        "destinationUrl": {
+            "description": "The linked article destination URL.",
+            "type": "string"
+        },
+        "locationCategory": {
+            "description": "The location category of where the artile link was clicked.",
+            "type": "string"
+        },
+        "mediaType": {
+            "description": "The linked article media type.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "premiumArticle": {
+            "description": "Whether or not the article link is to a premium article.",
+            "type": "boolean"
+        },
+        "tags": {
+            "description": "Any tags to the linked article.",
+            "type": "array"
+        },
+        "title": {
+            "description": "The linked article title.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "contentId",
+        "contentType",
+        "destinationUrl",
+        "locationCategory",
+        "mediaType",
+        "premiumArticle",
+        "tags",
+        "title"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

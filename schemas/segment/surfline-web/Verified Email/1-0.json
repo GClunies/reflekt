@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Verified Email/1-0.json",
+    "description": "Server side event fired when a user successfully verifies their email.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Verified Email",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "platform": {
+            "description": "The platform the event is attributed to.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+        "platform"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

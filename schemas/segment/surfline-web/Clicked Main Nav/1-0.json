@@ -1,0 +1,57 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Main Nav/1-0.json",
+    "description": "Web event fired when a user accesses a page/link through the main navigation menu (Cams & Reports, Forecasts, News).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Main Nav",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-web-platform",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "clickEndlocation": {
+            "description": "Where the event fired on our application.",
+            "type": "string"
+        },
+        "completion": {
+            "description": "Did the event complete successfully.",
+            "type": "boolean"
+        },
+        "currentTaxonomyLevel": {
+            "description": "The current taxonomy level.",
+            "type": "integer"
+        },
+        "destinationurl": {
+            "description": "The destination URL.",
+            "type": "string"
+        },
+        "linkName": {
+            "description": "The name of the link.",
+            "type": "string"
+        },
+        "locationcategory": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "pageName": {
+            "description": "The page name.",
+            "type": "string"
+        },
+        "tabName": {
+            "description": "The name of the tab.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

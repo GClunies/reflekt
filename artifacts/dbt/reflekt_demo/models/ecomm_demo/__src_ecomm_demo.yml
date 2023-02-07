@@ -1,0 +1,29 @@
+version: 2
+sources:
+  - name: ecomm_demo
+    schema: ecomm_demo
+    database: raw
+    description: Schema in snowflake with raw Segment event data.
+    tables:
+      - name: identifies
+        description: Segment identify() call.
+      - name: users
+        description: User traits set by identify() calls.
+      - name: cart_viewed
+        description: User viewed their shopping cart.
+      - name: checkout_step_viewed
+        description: User viewed a checkout step.
+      - name: order_completed
+        description: Order successfully completed by the user.
+      - name: checkout_step_completed
+        description: Checkout step completed by the user.
+      - name: checkout_started
+        description: User initiated the order process (a transaction is
+          created).
+      - name: pages
+        description: User viewed a page on the website.
+      - name: product_added
+        description: User adds a product to their shopping cart.
+      - name: tracks
+        description: A summary of track() calls from all events. Properties
+          unique to each event's track() call are omitted.

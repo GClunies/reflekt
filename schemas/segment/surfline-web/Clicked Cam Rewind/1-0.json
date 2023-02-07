@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Cam Rewind/1-0.json",
+    "description": "Web event fired when a user click the cam rewind button on a surf camera.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Cam Rewind",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-realtime",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "camId": {
+            "description": "The camera ID.",
+            "type": "string"
+        },
+        "camName": {
+            "description": "The camera name.",
+            "type": "string"
+        },
+        "ctaLocation": {
+            "description": "The location of the CTA.",
+            "type": "string"
+        },
+        "premiumCam": {
+            "description": "Whether or not the cam rewind is for a premium cam.",
+            "type": "boolean"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "camId",
+        "camName",
+        "ctaLocation",
+        "spotId",
+        "spotName"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

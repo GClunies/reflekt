@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Nearby Buoy/1-0.json",
+    "description": "Web event fired when a user clicks \"Nearby Buoys\" dropdown on a surf report page.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Nearby Buoy",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/forecast-web",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "buoyId": {
+            "description": "The assigned ID for the buoy",
+            "type": "string"
+        },
+        "buoyName": {
+            "description": "The name of the buoy",
+            "type": "string"
+        },
+        "category": {
+            "description": "What category of event is it",
+            "type": "string"
+        },
+        "location": {
+            "description": "Where the event fired on our application.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "buoyId",
+        "buoyName",
+        "category",
+        "location"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Viewed Redeem Step/1-0.json",
+    "description": "Web event fired when a user views the \"Redeem Your Gift\" page.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Viewed Redeem Step",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "step": {
+            "description": "The funnel step.",
+            "type": "integer"
+        }
+    },
+    "required": [
+        "step"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

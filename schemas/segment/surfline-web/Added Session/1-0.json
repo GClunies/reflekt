@@ -1,0 +1,68 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Added Session/1-0.json",
+    "description": "Server side event fired when a user adds a Surfline Session.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Added Session",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-realtime",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "client": {
+            "description": "The client used to record the session",
+            "type": "string"
+        },
+        "maxDistance": {
+            "description": "The maximum wave distance in the session.",
+            "type": "number"
+        },
+        "maxSpeed": {
+            "description": "The maximum wave speed in the session.",
+            "type": "number"
+        },
+        "sessionId": {
+            "description": "The Surfline Session ID.",
+            "type": "string"
+        },
+        "startLatLon": {
+            "description": "The starting lat/lon of the session.",
+            "type": "string"
+        },
+        "startTimestamp": {
+            "description": "The starting timestamp of the session.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "stopTimestamp": {
+            "description": "The stopping timestamp of the session.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "waveCount": {
+            "description": "The number of waves in the session.",
+            "type": "integer"
+        }
+    },
+    "required": [
+        "client",
+        "maxDistance",
+        "maxSpeed",
+        "sessionId",
+        "startLatLon",
+        "startTimestamp",
+        "stopTimestamp",
+        "waveCount"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

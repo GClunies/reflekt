@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Stripe Identity Result/1-0.json",
+    "description": "Fired via webhook when user leaves (success or failure) stripe identity",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Stripe Identity Result",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "errorDescription": {
+            "description": "The description of the error",
+            "type": "string"
+        },
+        "outcome": {
+            "description": "The outcome of stripe identity result",
+            "type": "string"
+        }
+    },
+    "required": [
+        "outcome"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

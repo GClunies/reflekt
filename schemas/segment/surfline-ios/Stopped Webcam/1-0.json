@@ -1,0 +1,45 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Stopped Webcam/1-0.json",
+    "description": "Client side event fired when a user stops a camera by hitting pause, leaving the spot screen, or leaving the app.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Stopped Webcam",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "duration": {
+            "description": "The duration played in seconds when the webcam was stopped.",
+            "type": "integer"
+        },
+        "fullScreenEnabled": {
+            "description": "Whether the camera was full screen or not.",
+            "type": "boolean"
+        },
+        "id": {
+            "description": "The cam ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

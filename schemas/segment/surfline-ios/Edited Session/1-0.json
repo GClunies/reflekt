@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Edited Session/1-0.json",
+    "description": "Client side event fired when a user changes a spot for their Surfline Session.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Edited Session",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The event category (used to group related events)."
+        },
+        "daysAgo": {
+            "description": "The number of days since the session was created."
+        },
+        "screenName": {
+            "description": "The screen name."
+        },
+        "sessionEdit": {
+            "description": "The type of edit being made to the session."
+        },
+        "spotId": {
+            "description": "The spot ID."
+        },
+        "spotName": {
+            "description": "The spot name."
+        }
+    },
+    "required": [
+        "daysAgo",
+        "screenName",
+        "sessionEdit"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

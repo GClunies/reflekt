@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Create Account Form Clicked Sign In/1-0.json",
+    "description": "Web event fired when a user clicks \"Sign in\" from the create account page.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Create Account Form Clicked Sign In",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "location": {
+            "description": "Where the event fired on our application.",
+            "type": "string"
+        },
+        "promotionId": {
+            "description": "The promotion ID (if any).",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

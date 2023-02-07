@@ -1,0 +1,66 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Gave Information/1-0.json",
+    "description": "Client side event fired when a user gives us feedback of any type.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Gave Information",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "answer": {
+            "description": "The feedback the user gave.",
+            "type": "string"
+        },
+        "category": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "infoPrompt": {
+            "description": "The prompt the user saw.",
+            "type": "string"
+        },
+        "screenName": {
+            "description": "The screen name.",
+            "type": "string"
+        },
+        "sessionId": {
+            "description": "The surfline session ID.",
+            "type": "string"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "trigger": {
+            "description": "The trigger for the event.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "answer",
+        "category",
+        "infoPrompt",
+        "screenName",
+        "sessionId",
+        "spotId",
+        "spotName",
+        "trigger"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

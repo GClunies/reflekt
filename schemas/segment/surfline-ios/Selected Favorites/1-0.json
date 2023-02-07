@@ -1,0 +1,56 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Selected Favorites/1-0.json",
+    "description": "Client side event fired when a user leaves the Spot Suggestion screen (\"Skip\" or \"Continue\" button).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Selected Favorites",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The event category (used to group related events)."
+        },
+        "numberFavorites": {
+            "description": "The number of favorites selected."
+        },
+        "numberPopular": {
+            "description": "The number of popular spots selected."
+        },
+        "numberRecommend": {
+            "description": "The number of popular spots selected."
+        },
+        "numberRegion": {
+            "description": "The number of regions from the spots selected."
+        },
+        "numberSearch": {
+            "description": "The number of searched spots selected."
+        },
+        "screenName": {
+            "description": "The screen name."
+        },
+        "spotsPopular": {
+            "description": "A list of the popular spots selected."
+        }
+    },
+    "required": [
+        "category",
+        "numberPopular",
+        "numberRecommend",
+        "numberRegion",
+        "numberSearch",
+        "screenName"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

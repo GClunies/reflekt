@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Set New Password/1-0.json",
+    "description": "Server side event sent when a user creates a new password.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Set New Password",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "enabledAccount": {
+            "description": "Is the user's account enabled?",
+            "type": "boolean"
+        },
+        "platform": {
+            "description": "The platform the event is attributed to.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+        "enabledAccount",
+        "platform"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

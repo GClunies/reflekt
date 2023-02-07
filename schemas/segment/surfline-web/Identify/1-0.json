@@ -1,0 +1,291 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Identify/1-0.json",
+    "description": "Segment identify() call.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Identify",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {},
+    "type": "object",
+    "properties": {
+        "abilityLevel": {
+            "description": "The user's ability level.",
+            "type": [
+                "string"
+            ]
+        },
+        "address": {
+            "description": "The user's address.",
+            "type": [
+                "string"
+            ]
+        },
+        "brand": {
+            "description": "The brand the user orginally signed up with. NOTE - for Surfline, Buoyweather, and Fishtrack - users get a single account for all 3 brands. This field cpatures the brand they originally signed up with.",
+            "type": [
+                "string"
+            ]
+        },
+        "createdAt": {
+            "description": "The date the user's account was created (in seconds since the epoch).",
+            "type": [
+                "integer"
+            ]
+        },
+        "crossDomainId": {
+            "description": "The user's Cross Domain ID (if they had one).",
+            "type": [
+                "string"
+            ]
+        },
+        "cwUserId": {
+            "description": "The user's CoastalWatch user ID (if they had one).",
+            "type": [
+                "string"
+            ]
+        },
+        "distance": {
+            "description": "The distance typically travelled to go surfing by the user.",
+            "type": [
+                "number"
+            ]
+        },
+        "email": {
+            "description": "The user's email address.",
+            "type": [
+                "string"
+            ]
+        },
+        "experiments": {
+            "description": "An array of experiments and variants a user was assigned to.",
+            "items": {
+                "properties": {
+                    "experiment": {
+                        "description": "The name of the experiment.",
+                        "type": [
+                            "string"
+                        ]
+                    },
+                    "variant": {
+                        "description": "The name of the variant.",
+                        "type": [
+                            "string"
+                        ]
+                    }
+                },
+                "required": [],
+                "type": "object"
+            },
+            "type": [
+                "array"
+            ]
+        },
+        "favoritesCount": {
+            "description": "The number of favorites the user has.",
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "firstName": {
+            "description": "The user's first name.",
+            "type": [
+                "string"
+            ]
+        },
+        "gender": {
+            "description": "The user's gender.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "isEmailVerified": {
+            "description": "True if the user has verified their email.",
+            "type": [
+                "boolean"
+            ]
+        },
+        "lastName": {
+            "description": "The user's last name.",
+            "type": [
+                "string"
+            ]
+        },
+        "locale": {
+            "description": "The user's locale.",
+            "type": [
+                "string"
+            ]
+        },
+        "location.continent": {
+            "description": "The user's continent.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "location.country": {
+            "description": "The user's country.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "location.countryIso": {
+            "description": "The ISO code for the user's country.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "location.subdivisionOne": {
+            "description": "The first subdivision of the user's location.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "location.subdivisionTwo": {
+            "description": "The second subdivision of the user's location.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "location.subdivisionTwoIso": {
+            "description": "The ISO code for the second subdivision of the user's location.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "migrated_brand": {
+            "description": "Name of the previous brand the user migrated from. Used to flag users who migrated from surf2surf.",
+            "type": [
+                "string"
+            ]
+        },
+        "receivePromotions": {
+            "description": "True if the user wants to receive promotions.",
+            "type": [
+                "boolean"
+            ]
+        },
+        "subscription.active": {
+            "description": "True if the user's subscription is active (including free-trial).",
+            "type": [
+                "boolean",
+                "null"
+            ]
+        },
+        "subscription.availablediscount.10off": {
+            "description": "The 10% discount available to the user (if any).",
+            "type": [
+                "string"
+            ]
+        },
+        "subscription.availablediscount.20off": {
+            "description": "The 20% discount available to the user (if any).",
+            "type": [
+                "string"
+            ]
+        },
+        "subscription.availablediscount.50off": {
+            "description": "The 50% discount available to the user (if any).",
+            "type": [
+                "string"
+            ]
+        },
+        "subscription.discount": {
+            "description": "The discount the user has applied to their subscription (if any).",
+            "type": [
+                "string"
+            ]
+        },
+        "subscription.entitlement": {
+            "description": "The user's subscription entitlement.",
+            "type": [
+                "string"
+            ]
+        },
+        "subscription.expiration": {
+            "description": "The date the user's subscription will expire.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "subscription.in_grace_period": {
+            "description": "True if the user is in a grace period.",
+            "type": [
+                "boolean"
+            ]
+        },
+        "subscription.in_trial": {
+            "description": "True if the user is in a free trial.",
+            "type": [
+                "boolean"
+            ]
+        },
+        "subscription.interval": {
+            "description": "The interval of the user's subscription.",
+            "type": [
+                "string"
+            ]
+        },
+        "subscription.interval_count": {
+            "description": "The number of intervals the user's subscription has.",
+            "type": [
+                "integer"
+            ]
+        },
+        "subscription.plan_id": {
+            "description": "the ID of the plan the user is subscribed to.",
+            "type": [
+                "string"
+            ]
+        },
+        "subscription.promotionId": {
+            "description": "the ID of the promotion connected to the user's subscription.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "subscription.renewalCount": {
+            "description": "The number of times the user has renewed their subscription.",
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "subscription.trial_eligible": {
+            "description": "True if the user is eligible for a free trial.",
+            "type": [
+                "boolean"
+            ]
+        },
+        "subscription_currency": {
+            "description": "The currency of the user's subscription.",
+            "type": [
+                "string"
+            ]
+        },
+        "zeroChecksLeft": {
+            "description": "Server-side trait fired when a user a user has zero surf checks left from rate limiting.",
+            "type": [
+                "boolean"
+            ]
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}
