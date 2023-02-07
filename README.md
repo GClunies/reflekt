@@ -314,7 +314,7 @@ Schemas are identified in Reflekt by their `$id` property, equal to their relati
 
 See the [--select](#--select) syntax docs for more details on selecting schemas when running commands.
 
-### Schema version
+### Schema Versions
 Schema changes are captured using a `MAJOR-MINOR` version spec (inspired by [SchemaVer](https://docs.snowplow.io/docs/pipeline-components-and-applications/iglu/common-architecture/schemaver/)). Schema versions start at `1-0` and are incremented as follows:
 
 - **MAJOR** - Breaking schema changes incompatible with previous data. Examples:
@@ -325,7 +325,7 @@ Schema changes are captured using a `MAJOR-MINOR` version spec (inspired by [Sch
   - Add/remove/rename an optional property
   - Change a property from *required to optional*
 
-### Schema registries
+### Schema Registries
 Reflekt supports the following schema registries. While Reflekt uses the `MAJOR-MINOR` versioning spec, registries handle schema versions differently. Compatibility with Reflekt's `MAJOR-MINOR` spec is included in the table below.
 | Schema Registry   | `MODEL` | `ADDITION` | Notes     |
 |-------------------|:-------:|:----------:|:----------|
