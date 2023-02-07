@@ -33,7 +33,6 @@ https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-
   - [Reflekt Project Setup](#reflekt-project-setup)
   - [Using Data Artifacts](#using-data-artifacts)
 
-<br>
 
 ## Installation
 Reflekt is available on [PyPI](https://pypi.org/project/reflekt/). Install with `pip`:
@@ -41,7 +40,6 @@ Reflekt is available on [PyPI](https://pypi.org/project/reflekt/). Install with 
 pip install reflekt
 ```
 
-<br>
 
 ## Commands
 A list of CLI commands and arguments can be accessed by running `reflekt --help`. Each Command has a `--help` flag to provide command details (arguments, options, etc.). All commands (except `init`) can be run against a single or multiple schema(s). The command examples below give an overview of the syntax.
@@ -95,114 +93,6 @@ reflekt build dbt --select segment/ecommerce --source snowflake.raw.segment_prod
 **Supported data artifacts:**
 - [dbt packages](https://docs.getdbt.com/docs/build/packages) - defines dbt sources, models, and documentation for selected schemas and event data found in the specified [--source](#sources).
 
-<br>
-
-## Schemas
-Event schemas stored as JSON files in the `schemas/` directory of a project. Behind the scenes, Reflekt understands how different schema registries store and structure schemas, creating a common codified representation using [JSONschema](https://json-schema.org/). When pulling/pushing schemas from/to a schema registry, Reflekt handles the conversion between the registry's format and JSON Schema.
-
-### Schema `$id`
-Schemas are identified in Reflekt by their `$id` property, equal to their relative path to the `schemas/` directory. For example, the schema at `my_reflekt_project/schemas/segment/ecommerce/CartViewed/1-0.json` has the `$id` of `segment/ecommerce/CartViewed/1-0.json`.
-
-See the [--select](#--select) syntax docs for more details on selecting schemas when running commands.
-
-### Schema version
-Schema changes are captured using a `MAJOR-MINOR` version spec (inspired by [SchemaVer](https://docs.snowplow.io/docs/pipeline-components-and-applications/iglu/common-architecture/schemaver/)). Schema versions start at `1-0` and are incremented as follows:
-
-- **MAJOR** - Breaking schema changes incompatible with previous data. Examples:
-  - Add/remove/rename a required property
-  - Change a property from *optional to required*
-  - Change a property's type
-- **MINOR** - Non-breaking schema changes compatible with previous data. Examples:
-  - Add/remove/rename an optional property
-  - Change a property from *required to optional*
-
-### Schema registries
-Reflekt supports the following schema registries. While Reflekt uses the `MAJOR-MINOR` versioning spec, registries handle schema versions differently. Compatibility with Reflekt's `MAJOR-MINOR` spec is included in the table below.
-| Schema Registry   | `MODEL` | `ADDITION` | Notes     |
-|-------------------|:-------:|:----------:|:----------|
-| Segment Protocols |    ✅    |      ❌    | Only supports `MODEL` (breaking changes).
-| Avo               |    ✅    |      ❌    | Schema changes managed in Avo [branches](https://www.avo.app/docs/workspace/branches) - `"version": "1-0"`(always).<br> Avo customers can build data artifacts based on their Avo tracking plan using `reflekt pull` + `reflekt build`. |
-
-### Example schema
-An example `ProductClicked` event schema, based on the [Segment Ecommerce Spec](https://segment.com/docs/connections/spec/ecommerce/v2/#product-clicked), is shown below.
-
-<details>
-<summary><code>my_reflekt_project/schemas/segment/ecommerce/ProductClicked/1-0.json</code> (click to expand) </summary>
-<br>
-
-```json
-{
-  "$id": "segment/ecommerce/ProductClicked/1-0.json",
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "self": {
-      "vendor": "com.company_name",
-      "name": "ProductClicked",
-      "format": "jsonschema",
-      "version": "1-0"
-  },
-  "metadata": {
-      "code_owner": "engineering/ecommerce-squad",
-      "product_owner": "product_manager_name@company_name.com",
-  },
-  "type": "object",
-  "properties": {
-      "product_id": {
-          "type": "string",
-          "description": "Database id of the product being viewed"
-      },
-      "sku": {
-          "type": "string",
-          "description": "Sku of the product being viewed"
-      },
-      "category": {
-          "type": "string",
-          "description": "Category of the product being viewed"
-      },
-      "name": {
-          "type": "string",
-          "description": "Name of the product being viewed"
-      },
-      "brand": {
-          "type": "string",
-          "description": "Brand of the product being viewed"
-      },
-      "variant": {
-          "type": "string",
-          "description": "Variant of the product being viewed"
-      },
-      "price": {
-          "type": "number",
-          "description": "Price of the product ($) being viewed"
-      },
-      "quantity": {
-          "type": "integer",
-          "description": "Quantity of the product being viewed"
-      },
-      "coupon": {
-          "type": "string",
-          "description": "Coupon code associated with a product (for example, MAY_DEALS_3)"
-      },
-      "position": {
-          "type": "integer",
-          "description": "Position in the product list (ex. 3)"
-      },
-      "url": {
-          "type": "string",
-          "description": "URL of the product being viewed"
-      },
-      "image_url": {
-          "type": "string",
-          "description": "URL of the product image being viewed"
-      },
-  },
-  "required": [],
-  "additionalProperties": false,
-}
-```
-
-</details>
-
-<br>
 
 ## Reflekt Project Setup
 
@@ -415,7 +305,112 @@ Required metadata can be globally defined for all events in a project by modifyi
 
 </details>
 
+
+## Schemas
+Event schemas stored as JSON files in the `schemas/` directory of a project. Behind the scenes, Reflekt understands how different schema registries store and structure schemas, creating a common codified representation using [JSONschema](https://json-schema.org/). When pulling/pushing schemas from/to a schema registry, Reflekt handles the conversion between the registry's format and JSON Schema.
+
+### Schema `$id`
+Schemas are identified in Reflekt by their `$id` property, equal to their relative path to the `schemas/` directory. For example, the schema at `my_reflekt_project/schemas/segment/ecommerce/CartViewed/1-0.json` has the `$id` of `segment/ecommerce/CartViewed/1-0.json`.
+
+See the [--select](#--select) syntax docs for more details on selecting schemas when running commands.
+
+### Schema version
+Schema changes are captured using a `MAJOR-MINOR` version spec (inspired by [SchemaVer](https://docs.snowplow.io/docs/pipeline-components-and-applications/iglu/common-architecture/schemaver/)). Schema versions start at `1-0` and are incremented as follows:
+
+- **MAJOR** - Breaking schema changes incompatible with previous data. Examples:
+  - Add/remove/rename a required property
+  - Change a property from *optional to required*
+  - Change a property's type
+- **MINOR** - Non-breaking schema changes compatible with previous data. Examples:
+  - Add/remove/rename an optional property
+  - Change a property from *required to optional*
+
+### Schema registries
+Reflekt supports the following schema registries. While Reflekt uses the `MAJOR-MINOR` versioning spec, registries handle schema versions differently. Compatibility with Reflekt's `MAJOR-MINOR` spec is included in the table below.
+| Schema Registry   | `MODEL` | `ADDITION` | Notes     |
+|-------------------|:-------:|:----------:|:----------|
+| Segment Protocols |    ✅    |      ❌    | Only supports `MODEL` (breaking changes).
+| Avo               |    ✅    |      ❌    | Schema changes managed in Avo [branches](https://www.avo.app/docs/workspace/branches) - `"version": "1-0"`(always).<br> Avo customers can build data artifacts based on their Avo tracking plan using `reflekt pull` + `reflekt build`. |
+
+### Example schema
+An example `ProductClicked` event schema, based on the [Segment Ecommerce Spec](https://segment.com/docs/connections/spec/ecommerce/v2/#product-clicked), is shown below.
+
+<details>
+<summary><code>my_reflekt_project/schemas/segment/ecommerce/ProductClicked/1-0.json</code> (click to expand) </summary>
 <br>
+
+```json
+{
+  "$id": "segment/ecommerce/ProductClicked/1-0.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "self": {
+      "vendor": "com.company_name",
+      "name": "ProductClicked",
+      "format": "jsonschema",
+      "version": "1-0"
+  },
+  "metadata": {
+      "code_owner": "engineering/ecommerce-squad",
+      "product_owner": "product_manager_name@company_name.com",
+  },
+  "type": "object",
+  "properties": {
+      "product_id": {
+          "type": "string",
+          "description": "Database id of the product being viewed"
+      },
+      "sku": {
+          "type": "string",
+          "description": "Sku of the product being viewed"
+      },
+      "category": {
+          "type": "string",
+          "description": "Category of the product being viewed"
+      },
+      "name": {
+          "type": "string",
+          "description": "Name of the product being viewed"
+      },
+      "brand": {
+          "type": "string",
+          "description": "Brand of the product being viewed"
+      },
+      "variant": {
+          "type": "string",
+          "description": "Variant of the product being viewed"
+      },
+      "price": {
+          "type": "number",
+          "description": "Price of the product ($) being viewed"
+      },
+      "quantity": {
+          "type": "integer",
+          "description": "Quantity of the product being viewed"
+      },
+      "coupon": {
+          "type": "string",
+          "description": "Coupon code associated with a product (for example, MAY_DEALS_3)"
+      },
+      "position": {
+          "type": "integer",
+          "description": "Position in the product list (ex. 3)"
+      },
+      "url": {
+          "type": "string",
+          "description": "URL of the product being viewed"
+      },
+      "image_url": {
+          "type": "string",
+          "description": "URL of the product image being viewed"
+      },
+  },
+  "required": [],
+  "additionalProperties": false,
+}
+```
+
+</details>
+
 
 ## Using Data Artifacts
 
