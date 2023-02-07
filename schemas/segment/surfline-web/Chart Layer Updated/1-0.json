@@ -1,0 +1,63 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Chart Layer Updated/1-0.json",
+    "description": "Fired when a user updates a layer on a chart (e.g. changes base layer from satellite to topography).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Chart Layer Updated",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/forecast-web",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "from": {
+            "description": "The layer the user is switching from.",
+            "enum": [
+                "topography",
+                "road",
+                "satellite",
+                "wave height",
+                "wave period",
+                "wind",
+                "sea temp"
+            ],
+            "type": "string"
+        },
+        "layerType": {
+            "description": "The type of chart layer being updated.",
+            "enum": [
+                "base",
+                "overlay"
+            ],
+            "type": "string"
+        },
+        "to": {
+            "description": "The layer the user is switching to.",
+            "enum": [
+                "topography",
+                "road",
+                "satellite",
+                "wave height",
+                "wave period",
+                "wind",
+                "sea temp"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+        "from",
+        "layerType",
+        "to"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

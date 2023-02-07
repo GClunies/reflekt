@@ -1,0 +1,58 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Toggled Cam View/1-0.json",
+    "description": "Client side event fired when a user toggles a camera view.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Toggled Cam View",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "camChange": {
+            "description": "The type of camera change."
+        },
+        "camId": {
+            "description": "The camera ID."
+        },
+        "camName": {
+            "description": "The camera name."
+        },
+        "playerMode": {
+            "description": "The player mode."
+        },
+        "screenName": {
+            "description": "The screen name."
+        },
+        "spotId": {
+            "description": "The spot ID."
+        },
+        "spotName": {
+            "description": "The spot name."
+        },
+        "subregionId": {
+            "description": "The subregion ID."
+        },
+        "subregionName": {
+            "description": "The region name."
+        }
+    },
+    "required": [
+        "playerMode",
+        "screenName",
+        "spotId",
+        "spotName",
+        "subregionId"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

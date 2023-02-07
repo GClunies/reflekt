@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Paired Watch/1-0.json",
+    "description": "Client side event fired when a user pairs an Apple Watch (not partner watch).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Paired Watch",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "email": {
+            "description": "The user's email.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "isPaired": {
+            "description": "Whether the watch is paired.",
+            "type": "boolean"
+        },
+        "isReachable": {
+            "description": "Whether the watch is reachable.",
+            "type": "boolean"
+        },
+        "userId": {
+            "description": "The user's ID.",
+            "type": "string"
+        },
+        "userType": {
+            "description": "The user type.",
+            "type": "string"
+        },
+        "watchSeries": {
+            "description": "The watch series.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "isPaired",
+        "isReachable"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

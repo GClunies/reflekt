@@ -1,0 +1,59 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Swell Alert Card/1-0.json",
+    "description": "Web event fired when a user clicks a Swell Alert card.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Swell Alert Card",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/forecast-web",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "basins": {
+            "description": "The basins the swell alert applies to.",
+            "type": "string"
+        },
+        "contentType": {
+            "description": "The content type of the swell alert card.",
+            "type": "string"
+        },
+        "destinationUrl": {
+            "description": "The desitination URL.",
+            "type": "string"
+        },
+        "locationCategory": {
+            "description": "The location category of the swell alert card.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        },
+        "subregionName": {
+            "description": "The region name.",
+            "type": "string"
+        },
+        "title": {
+            "description": "The title of the swell alert card.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "basins",
+        "contentType",
+        "destinationUrl",
+        "locationCategory",
+        "title"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

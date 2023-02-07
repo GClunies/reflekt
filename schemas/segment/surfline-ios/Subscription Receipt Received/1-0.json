@@ -1,0 +1,80 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Subscription Receipt Received/1-0.json",
+    "description": "Client side event fired when an in-app purchase receipt is successfully synced with our server.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Subscription Receipt Received",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The category.",
+            "type": "string"
+        },
+        "currency": {
+            "description": "The currency of the order.",
+            "type": "string"
+        },
+        "inTrial": {
+            "description": "Is the subscription actively trialing.",
+            "type": "boolean"
+        },
+        "interval": {
+            "description": "The interval of the subscription in the order.",
+            "type": "string"
+        },
+        "orderId": {
+            "description": "The order ID of the order.",
+            "type": "string"
+        },
+        "paymentPlatform": {
+            "description": "The payment platform of the order.",
+            "type": "string"
+        },
+        "price": {
+            "description": "The price of the order.",
+            "type": "number"
+        },
+        "productName": {
+            "description": "The product name of the order.",
+            "type": "string"
+        },
+        "products": {
+            "description": "The products in the order.",
+            "type": "array"
+        },
+        "quantity": {
+            "description": "The quantity in the order.",
+            "type": "integer"
+        },
+        "revenue": {
+            "description": "The revenue of the order.",
+            "type": "number"
+        },
+        "sku": {
+            "description": "The SKU of the product in the order.",
+            "type": "string"
+        },
+        "total": {
+            "description": "The total price of the order.",
+            "type": "number"
+        }
+    },
+    "required": [
+        "currency",
+        "orderId"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

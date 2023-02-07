@@ -1,0 +1,69 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Edit Favorites/1-0.json",
+    "description": "Client side event fired when a user adds, modifies or deletes favorites.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Edit Favorites",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "action": {
+            "description": "The action that was performed.",
+            "enum": [
+                "add",
+                "delete",
+                "modify"
+            ],
+            "type": "string"
+        },
+        "hasCam": {
+            "description": "Indicates if spot added has a camera.",
+            "type": "boolean"
+        },
+        "numberOfCams": {
+            "description": "The number of cameras at the spot.",
+            "type": "integer"
+        },
+        "screenName": {
+            "description": "Which screen is the user editing favorites on",
+            "enum": [
+                "report",
+                "forecast",
+                "analysis",
+                "search",
+                "favorites"
+            ],
+            "type": "string"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        },
+        "subregionName": {
+            "description": "The subregion name.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

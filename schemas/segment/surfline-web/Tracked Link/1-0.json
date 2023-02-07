@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Tracked Link/1-0.json",
+    "description": "Web event fired when a user clicks a link for the photos section.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Tracked Link",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-realtime",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "link": {
+            "description": "The link that was clicked.",
+            "type": "string"
+        },
+        "linkText": {
+            "description": "The link text.",
+            "type": "string"
+        },
+        "pageName": {
+            "description": "The page name.",
+            "type": "string"
+        },
+        "pageSection": {
+            "description": "The page section.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "link",
+        "linkText",
+        "pageName",
+        "pageSection"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

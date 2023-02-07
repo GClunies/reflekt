@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Application Installed/1-0.json",
+    "description": "Client side event fired when the Surfline app is installed.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Application Installed",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "build": {
+            "description": "The application build.",
+            "type": "string"
+        },
+        "version": {
+            "description": "The application version.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "build",
+        "version"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

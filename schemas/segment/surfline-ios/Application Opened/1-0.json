@@ -1,0 +1,43 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Application Opened/1-0.json",
+    "description": "Client side event fired when a user opens the Surfline app.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Application Opened",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "build": {
+            "description": "The application build."
+        },
+        "from_background": {
+            "description": "Whether the application was opened from the background."
+        },
+        "referring_application": {
+            "description": "The application that referred the user to the Surfline."
+        },
+        "url": {
+            "description": "The deep link URL that brought the user to the Surfline app."
+        },
+        "version": {
+            "description": "The application version."
+        }
+    },
+    "required": [
+        "build",
+        "version"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

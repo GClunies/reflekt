@@ -1,0 +1,85 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Stopped Webcam/2-0.json",
+    "description": "Client side event fired when a user stops a camera by hitting pause, leaving the spot screen, or leaving the app.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Stopped Webcam",
+        "format": "jsonschema",
+        "version": "2-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "camId": {
+            "description": "The camera ID.",
+            "type": "string"
+        },
+        "camName": {
+            "description": "The camera name.",
+            "type": "string"
+        },
+        "category": {
+            "description": "The product category this event belongs to (e.g. `kbyg`, `ecommerce`, `sessions`, `travel`, `content`).",
+            "enum": [
+                "kbyg",
+                "ecommerce",
+                "sessions",
+                "travel",
+                "content"
+            ],
+            "type": "string"
+        },
+        "favorite": {
+            "description": "Is the camera favorited by the user?",
+            "type": "boolean"
+        },
+        "numberOfCams": {
+            "description": "The number of cameras at the spot.",
+            "type": "integer"
+        },
+        "premiumCam": {
+            "description": "Is camera premium?",
+            "type": "boolean"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        },
+        "subregionName": {
+            "description": "The region name.",
+            "type": "string"
+        },
+        "videoType": {
+            "description": "The type of video.",
+            "enum": [
+                "live",
+                "highlights"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+        "camId",
+        "camName",
+        "spotId",
+        "spotName"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

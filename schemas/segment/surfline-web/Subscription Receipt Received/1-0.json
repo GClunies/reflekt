@@ -1,0 +1,112 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Subscription Receipt Received/1-0.json",
+    "description": "Client side event when a subscription has been confirmed.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Subscription Receipt Received",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "billingPlatform": {
+            "description": "The billing platform the event is attributed to.",
+            "enum": [
+                "stripe",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        },
+        "coupon": {
+            "description": "The name of the discount applied to a Subscription upon creation.",
+            "type": "string"
+        },
+        "inTrial": {
+            "description": "Whether the subscription is actively trialing.",
+            "type": "boolean"
+        },
+        "interval": {
+            "description": "The period for which a subscription is billing.",
+            "type": "string"
+        },
+        "orderId": {
+            "description": "The subscription's unique identifier.",
+            "type": "string"
+        },
+        "platform": {
+            "description": "The platform the event is attributed to.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        },
+        "products": {
+            "description": "An array where each element in the array is a product being purchased.",
+            "items": {
+                "properties": {
+                    "category": {
+                        "description": "The category of the product (e.g., Subscription).",
+                        "type": [
+                            "string"
+                        ]
+                    },
+                    "name": {
+                        "description": "The name of the product.",
+                        "type": [
+                            "string"
+                        ]
+                    },
+                    "price": {
+                        "description": "The price of the product.",
+                        "type": [
+                            "number"
+                        ]
+                    },
+                    "productId": {
+                        "description": "the ID of the product.",
+                        "type": [
+                            "string"
+                        ]
+                    },
+                    "quantity": {
+                        "description": "The quantity of the product ordered.",
+                        "type": [
+                            "integer"
+                        ]
+                    },
+                    "sku": {
+                        "description": "The product SKU.",
+                        "type": [
+                            "string"
+                        ]
+                    }
+                },
+                "required": [],
+                "type": "object"
+            },
+            "type": "array"
+        }
+    },
+    "required": [
+        "billingPlatform",
+        "inTrial",
+        "interval",
+        "orderId",
+        "platform",
+        "products"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

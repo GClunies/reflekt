@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Cancel Configuration Screen/1-0.json",
+    "description": "Client side event fired when a user clicks \"Cancel\" on the configuration screen (i.e., user does not want to go through process of setting their basin).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Cancel Configuration Screen",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "screenName": {
+            "description": "The screen name.",
+            "type": "string"
+        },
+        "text": {
+            "description": "The text of the button.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "screenName",
+        "text"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

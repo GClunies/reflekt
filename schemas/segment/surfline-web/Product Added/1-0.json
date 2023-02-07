@@ -1,0 +1,95 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Product Added/1-0.json",
+    "description": "User added a product to their cart.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Product Added",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "brand": {
+            "description": "Brand of the product being ordered.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "cartId": {
+            "description": "Cart ID to which the product was added to.",
+            "type": "string"
+        },
+        "category": {
+            "description": "Category of the product being ordered (e.g. 'subscription', 'boards', 'surf accessories', 'apparel', 'wetsuits').",
+            "type": "string"
+        },
+        "name": {
+            "description": "Name of the product added to the cart.",
+            "type": "string"
+        },
+        "price": {
+            "description": "Price of the product.",
+            "type": "number"
+        },
+        "productId": {
+            "description": "ID of product added to the cart.",
+            "type": "string"
+        },
+        "quantity": {
+            "description": "Quantity of the product added.",
+            "type": "integer"
+        },
+        "variant": {
+            "description": "A dictionary of key-value pairs describing the product (e.g. {color: 'blue', size: 'large'}).",
+            "properties": {
+                "color": {
+                    "description": "Product color.",
+                    "type": [
+                        "string"
+                    ]
+                },
+                "entryType": {
+                    "description": "Entry type (for wetsuits).",
+                    "type": [
+                        "string"
+                    ]
+                },
+                "gender": {
+                    "description": "Product gender.",
+                    "type": [
+                        "string"
+                    ]
+                },
+                "size": {
+                    "description": "Product size.",
+                    "type": [
+                        "string"
+                    ]
+                }
+            },
+            "required": [],
+            "type": "object"
+        }
+    },
+    "required": [
+        "cartId",
+        "productId",
+        "category",
+        "name",
+        "brand",
+        "price",
+        "quantity"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

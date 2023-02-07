@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Connect Button/1-0.json",
+    "description": "Client side event fired when a user clicks to connect and authorize a 3rd party partner (e.g., Garmin, Dawn Patrol) '",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Connect Button",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "screenName": {
+            "description": "The screen name.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "screenName"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

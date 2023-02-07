@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked State Park Map Pin/1-0.json",
+    "description": "Web event fired when a user clicks on a State Park pin on the map on the California Explorer pass page.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked State Park Map Pin",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-web-platform",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "position": {
+            "description": "The position of the State Park pin.",
+            "type": "string"
+        },
+        "url": {
+            "description": "The URL of the State Park pin.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

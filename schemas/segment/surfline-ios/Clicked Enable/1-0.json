@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Enable/1-0.json",
+    "description": "Client side event fired when a user clicks the Settings button in an alert view which is shown if the user does not have location services enabled. If they click \"enable\", we send the user to settings to enable location services.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Enable",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "screenName": {
+            "description": "The screen name.",
+            "type": "string"
+        },
+        "trigger": {
+            "description": "The event trigger.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "screenName",
+        "trigger"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Saved Unit/1-0.json",
+    "description": "Client side event fired when a user updates their preferred units for forecast metrics (e.g., swell height in feet or meters) or toggles their preferred model (LOLA/LOTUS).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Saved Unit",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "fieldName": {
+            "description": "The field name.",
+            "type": "string"
+        },
+        "fieldValue": {
+            "description": "The field value.",
+            "type": "string"
+        },
+        "location": {
+            "description": "Where the event fired on our application.",
+            "type": "string"
+        },
+        "screenName": {
+            "description": "The screen name.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "fieldName",
+        "fieldValue",
+        "location",
+        "screenName"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

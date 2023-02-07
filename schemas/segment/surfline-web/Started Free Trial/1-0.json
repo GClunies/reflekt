@@ -1,0 +1,146 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Started Free Trial/1-0.json",
+    "description": "Server side event fired when a user starts a free trial.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Started Free Trial",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "active": {
+            "description": "Is the subscription active?",
+            "type": "boolean"
+        },
+        "billingPlatform": {
+            "description": "Represents the payment processor for each subscription.",
+            "enum": [
+                "stripe",
+                "ios",
+                "android",
+                "gift"
+            ],
+            "type": "string"
+        },
+        "country": {
+            "description": "Available for subscription billed through the Google/Android billing platform.  Indicates the subscription's country of origin.",
+            "type": "string"
+        },
+        "currency": {
+            "description": "The currency.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "currentPeriodEnd": {
+            "description": "The end of the current trial or billing period.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "currentPeriodStart": {
+            "description": "The start of the current trial or billing period.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "daysUntilRenew": {
+            "description": "The number of days until renewal, e.g. 15, 30, 60",
+            "type": "number"
+        },
+        "discountCode": {
+            "description": "The discount code (if any).",
+            "type": "string"
+        },
+        "entitlement": {
+            "description": "The user's entitlement.",
+            "type": "string"
+        },
+        "expiration": {
+            "description": "The expiration date.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "inTrial": {
+            "description": "Is the subscription in a trial?",
+            "type": "boolean"
+        },
+        "interval": {
+            "description": "The subscription billing interval.",
+            "enum": [
+                "month",
+                "year"
+            ],
+            "type": "string"
+        },
+        "planId": {
+            "description": "The plan ID.",
+            "type": "string"
+        },
+        "platform": {
+            "description": "The platform the event is attributed to.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        },
+        "promotionId": {
+            "description": "The promotion ID (if any).",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "secondsRemaining": {
+            "description": "Time remaining on a subscription.",
+            "type": "integer"
+        },
+        "subscriptionId": {
+            "description": "The subscription ID.",
+            "type": "string"
+        },
+        "trialEligible": {
+            "description": "Is the user eligible for a trial?",
+            "type": "boolean"
+        },
+        "trialEndDate": {
+            "description": "The end of the current trial.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "trialLength": {
+            "description": "The length of the trial in days.",
+            "type": "integer"
+        },
+        "trialStartDate": {
+            "description": "The start of the current trial.",
+            "format": "date-time",
+            "type": "string"
+        }
+    },
+    "required": [
+        "active",
+        "daysUntilRenew",
+        "entitlement",
+        "expiration",
+        "inTrial",
+        "interval",
+        "planId",
+        "platform",
+        "subscriptionId",
+        "trialEligible"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

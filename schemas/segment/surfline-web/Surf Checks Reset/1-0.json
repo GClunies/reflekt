@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Surf Checks Reset/1-0.json",
+    "description": "Server side event fired when a users surf checks reset to the maximum allowed surf check amount.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Surf Checks Reset",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "checksAvailable": {
+            "description": "The number of checks available to the user.",
+            "type": "integer"
+        },
+        "meterId": {
+            "description": "The meter ID.",
+            "type": "string"
+        },
+        "platform": {
+            "description": "The platform the event is attributed to.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+        "checksAvailable",
+        "meterId",
+        "platform"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

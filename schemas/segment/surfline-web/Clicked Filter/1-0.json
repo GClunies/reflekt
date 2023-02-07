@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Filter/1-0.json",
+    "description": "Client side event fired when a user selects a filter value.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Filter",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/forecast-web",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "filterName": {
+            "description": "The name of filter that was clicked.",
+            "type": "string"
+        },
+        "pageName": {
+            "description": "The name of the page that the filter was clicked on.",
+            "type": "string"
+        },
+        "tabName": {
+            "description": "The name of the screen tab that the filter was clicked on.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "filterName",
+        "pageName"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}
