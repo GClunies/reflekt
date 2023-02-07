@@ -29,8 +29,8 @@ https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-
 ## Table of Contents
   - [Installation](#installation)
   - [Commands](#commands)
-  - [Schemas](#schemas)
   - [Reflekt Project Setup](#reflekt-project-setup)
+  - [Schemas](#schemas)
   - [Using Data Artifacts](#using-data-artifacts)
 
 
