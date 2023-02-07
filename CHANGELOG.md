@@ -27,6 +27,7 @@ SPDX-License-Identifier: Apache-2.0
 - Replaced `reflekt dbt` with `reflekt build` in prep to support building other data artifact types.
 - dbt packages are now built in the `artifacts/dbt/` directory. Previously `dbt-packages/`.
 - dbt packages only template staging models as views. Previously, staging models could be incremental, but this was overly complex with little benefit.
+- CI suite upgrades.
 
 ## <=[0.2.18]
 No formal changelog for versions <= 0.2.18, during this time:
