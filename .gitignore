@@ -140,6 +140,8 @@ dmypy.json
 !reflekt/_templates/project/reflekt_project.yml
 
 # IGNORE
+/artifacts/
+/schemas/
 /.backup/
 /.logs/
 /.reflekt/
@@ -147,9 +149,3 @@ dmypy.json
 /reflekt_profiles.yml
 TODO.md
 .DS_Store
-
-# TESTING
-/schemas/segment/surfline-web/**/*
-/schemas/segment/surfline-ios/**/*
-/artifacts/dbt/reflekt_demo/models/surfline/**/*
-/artifacts/dbt/reflekt_demo/models/surfline-ios/**/*
