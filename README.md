@@ -23,9 +23,25 @@ A tool to help Data, Engineering, and Product teams:
   - Reduce errors, improve data quality, and automate important (but boring) data tasks.
 
 ---
+## Table of Contents
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Commands](#commands)
+  - [Schemas](#schemas)
+  - [Reflekt Project Setup](#reflekt-project-setup)
+  - [Using Data Artifacts](#using-data-artifacts)
+
+---
+
+## Installation
+Reflekt is available on [PyPI](https://pypi.org/project/reflekt/). Install with `pip`:
+```bash
+pip install reflekt
+```
+---
 
 ## Commands
-A list of CLI commands and arguments can be accessed by running `reflekt --help`. Commands have a `--help` flag to provide command details (arguments, options, etc.). All commands (except `init`) can be run against a single or multiple schema(s). The command examples below give a brief overview of the syntax.
+A list of CLI commands and arguments can be accessed by running `reflekt --help`. Each Command has a `--help` flag to provide command details (arguments, options, etc.). All commands (except `init`) can be run against a single or multiple schema(s). The command examples below give an overview of the syntax.
 
 See the [argument syntax](#argument-syntax) section for more details on selecting [schemas](#--select), specifying [sources](#--source) and [SDKs](--sdk) used to collect event data.
 
@@ -75,35 +91,6 @@ reflekt build dbt --select segment/ecommerce --source snowflake.raw.segment_prod
 ```
 **Supported data artifacts:**
 - [dbt packages](https://docs.getdbt.com/docs/build/packages) - defines dbt sources, models, and documentation for selected schemas and event data found in the specified [--source](#sources).
-
-
-## Argument syntax
-
-### --select
-The `--select` / `-s` argument specifies what schema(s) a [command](#commands) is run against. Schema's are selected using their [schema `$id`](#schema-id). Schemas can be selected from:
-1. Schema registries (e.g., Segment, Avo, etc.)
-   ```bash
-   # Pull schemas from 'ecommerce' tracking plan in Segment registry to my_reflekt_project/schemas/segment/ecommerce/
-   reflekt pull --select segment/ecommerce
-   ```
-
-2. Schemas in a Reflekt project `schemas/` directory
-   ```bash
-   # Push my_reflekt_project/schemas/segment/ecommerce/CartViewed/1-0.json to 'ecommerce' tracking plan in Segment registry
-   reflekt push --select segment/ecommerce/CartViewed/1-0.json
-   ```
-
-### --source
-In Reflekt, a source defines where raw event data is stored in a data warehouse. The `--source` / `-t` argument tells Reflekt where to search for event tables when building data artifacts. It must be specified in the format:
-```
---source source_id.database_name.schema_name
-```
-where `source_id` is the source's `id` defined in a profile found in the [reflekt_profile.yml](#reflekt_profilesyml) file.
-
-### --sdk
-Event's can be collected using different SDKs, each with their own unique ways of collecting event data and loading it into sources. The `--sdk` / `-sdk` argument tells Reflekt how the data is structured in the [source](#--source) so that it can build data artifacts accordingly. Currently supported SDKs include:
-- [Segment](https://segment.com/)
-- Others coming soon!
 
 ---
 
@@ -425,4 +412,27 @@ Required metadata can be globally defined for all events in a project by modifyi
 
 </details>
 
+---
 
+## Using Data Artifacts
+
+### dbt packages
+To use a private dbt package built by Reflekt in a downstream dbt project, add it to the `packages.yml` of the project (see examples below) and then run `dbt deps` to import it.
+
+#### dbt-core
+```yaml
+packages:
+  - git: "https://github.com/<your_user_or_org>/<your_repo>"  # Replace with Github repo URL for your Reflekt project
+    subdirectory: "dbt-packages/<reflekt_dbt_package_name>"
+    revision: v0.1.0___DBT_PKG_NAME_  # Example tag. Replace with branch, tag, or commit (full 40-character hash)
+```
+
+#### dbt-cloud
+```yaml
+packages:
+  - git: ""https://{{env_var('DBT_ENV_SECRET_GITHUB_PAT')}}@github.com/<your_user_or_org>/<your_repo>.git""  # Replace with your PAT and Github repo URL for your Reflekt project
+    subdirectory: "dbt-packages/<reflekt_dbt_package_name>"
+    revision: v0.1.0___DBT_PKG_NAME_  # Example tag. Replace with branch, tag, or commit (full 40-character hash)
+```
+
+`DBT_ENV_SECRET_GITHUB_PAT` is a Github personal access token (PAT) stored as an environment variable in dbt Cloud. This is required to access private Github repos. To create a PAT and configure it with dbt-cloud, see the [dbt](https://docs.getdbt.com/docs/build/packages#git-token-method) and [GitHub](https://docs.github.com/en/enterprise-server@3.1/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) docs.
