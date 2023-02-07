@@ -5,7 +5,6 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt
-[![PyPI version](https://badge.fury.io/py/reflekt.svg)](https://badge.fury.io/py/reflekt)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/reflekt)](https://pypi.org/project/reflekt/)
 [![PyPI - License](https://img.shields.io/pypi/l/reflekt)](https://pypi.org/project/reflekt/)
 
