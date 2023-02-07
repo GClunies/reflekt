@@ -22,6 +22,7 @@ A tool to help Data, Engineering, and Product teams:
   - Keep data artifacts in sync with instrumentation - ready for use by engineers, analysts, and the business.
   - Reduce errors, improve data quality, and automate important (but boring) data tasks.
 
+<br>
 
 ## Table of Contents
   - [Table of Contents](#table-of-contents)
@@ -31,7 +32,7 @@ A tool to help Data, Engineering, and Product teams:
   - [Reflekt Project Setup](#reflekt-project-setup)
   - [Using Data Artifacts](#using-data-artifacts)
 
-
+<br>
 
 ## Installation
 Reflekt is available on [PyPI](https://pypi.org/project/reflekt/). Install with `pip`:
@@ -39,6 +40,7 @@ Reflekt is available on [PyPI](https://pypi.org/project/reflekt/). Install with 
 pip install reflekt
 ```
 
+<br>
 
 ## Commands
 A list of CLI commands and arguments can be accessed by running `reflekt --help`. Each Command has a `--help` flag to provide command details (arguments, options, etc.). All commands (except `init`) can be run against a single or multiple schema(s). The command examples below give an overview of the syntax.
@@ -92,7 +94,7 @@ reflekt build dbt --select segment/ecommerce --source snowflake.raw.segment_prod
 **Supported data artifacts:**
 - [dbt packages](https://docs.getdbt.com/docs/build/packages) - defines dbt sources, models, and documentation for selected schemas and event data found in the specified [--source](#sources).
 
-
+<br>
 
 ## Schemas
 Event schemas stored as JSON files in the `schemas/` directory of a project. Behind the scenes, Reflekt understands how different schema registries store and structure schemas, creating a common codified representation using [JSONschema](https://json-schema.org/). When pulling/pushing schemas from/to a schema registry, Reflekt handles the conversion between the registry's format and JSON Schema.
@@ -199,6 +201,7 @@ An example `ProductClicked` event schema, based on the [Segment Ecommerce Spec](
 
 </details>
 
+<br>
 
 ## Reflekt Project Setup
 
@@ -411,6 +414,7 @@ Required metadata can be globally defined for all events in a project by modifyi
 
 </details>
 
+<br>
 
 ## Using Data Artifacts
 
