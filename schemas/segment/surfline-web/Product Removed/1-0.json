@@ -1,0 +1,63 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Product Removed/1-0.json",
+    "description": "Fired when a user removes a product from their cart.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Product Removed",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "cartId": {
+            "description": "Cart ID from which the product was removed.",
+            "type": "string"
+        },
+        "category": {
+            "description": "The category this event belongs to (e.g. `kbyg`, `ecommerce`, `sessions`, `travel`, `content`).",
+            "enum": [
+                "kbyg",
+                "ecommerce",
+                "sessions",
+                "travel",
+                "content"
+            ],
+            "type": "string"
+        },
+        "price": {
+            "description": "The product price.",
+            "type": "number"
+        },
+        "productId": {
+            "description": "ID of product added to the cart.",
+            "type": "string"
+        },
+        "productName": {
+            "description": "Name of the product added to the cart.",
+            "type": "string"
+        },
+        "quantity": {
+            "description": "The quantity of the product removed.",
+            "type": "integer"
+        }
+    },
+    "required": [
+        "cartId",
+        "category",
+        "price",
+        "productId",
+        "productName",
+        "quantity"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

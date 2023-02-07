@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Edited Wave/1-0.json",
+    "description": "Client side event fired when a user edits the properties of a wave event.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Edited Wave",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "clipId": {
+            "description": "The clip ID."
+        },
+        "daysAgo": {
+            "description": "The number of days ago between the event timestamp and the wave timestamp."
+        },
+        "screenName": {
+            "description": "The screen name."
+        },
+        "waveEdit": {
+            "description": "The type of edit being made to the wave."
+        }
+    },
+    "required": [
+        "daysAgo",
+        "screenName",
+        "waveEdit"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

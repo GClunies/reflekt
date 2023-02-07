@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Saved Clip/1-0.json",
+    "description": "Client side event fired when a user downloads a Cam Rewind.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Saved Clip",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "camId": {
+            "description": "The cam ID."
+        },
+        "camName": {
+            "description": "The cam name."
+        },
+        "daysAgo": {
+            "description": "The number of days since the clip was created."
+        },
+        "premiumCam": {
+            "description": "Whether the clip is a premium cam."
+        },
+        "screenName": {
+            "description": "The screen name."
+        },
+        "spotId": {
+            "description": "The spot ID."
+        },
+        "spotName": {
+            "description": "The spot name."
+        },
+        "subregionId": {
+            "description": "The subregion ID."
+        }
+    },
+    "required": [
+        "daysAgo",
+        "screenName",
+        "spotId",
+        "spotName",
+        "subregionId"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

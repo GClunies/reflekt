@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Cart Abandoned/1-0.json",
+    "description": "Fired after a cart is abandoned by a user. A cart is considered abandoned if no changes have been made for at least one hour after the last modified property.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Cart Abandoned",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "cartId": {
+            "description": "Cart ID to which the product was added to.",
+            "type": "string"
+        },
+        "category": {
+            "description": "The category this event belongs to (e.g. `kbyg`, `ecommerce`, `sessions`, `travel`, `content`).",
+            "enum": [
+                "kbyg",
+                "ecommerce",
+                "sessions",
+                "travel",
+                "content"
+            ],
+            "type": "string"
+        },
+        "quantity": {
+            "description": "Number of items in the cart.",
+            "type": "integer"
+        }
+    },
+    "required": [
+        "cartId",
+        "category",
+        "quantity"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

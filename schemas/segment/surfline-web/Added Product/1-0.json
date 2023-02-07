@@ -1,0 +1,75 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Added Product/1-0.json",
+    "description": "Web event fired when a user makes a product selection (monthly, yearly) from the dropdown in our funnel.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Added Product",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "currency": {
+            "description": "The currency.",
+            "pattern": "[A-Z]",
+            "type": "string"
+        },
+        "interval": {
+            "description": "The interval of the product.",
+            "enum": [
+                "month",
+                "year"
+            ],
+            "type": "string"
+        },
+        "paymentPlatform": {
+            "description": "The payment platform.",
+            "type": "string"
+        },
+        "planName": {
+            "description": "The name of the plan",
+            "enum": [
+                "Premium Annual",
+                "Premium Monthly",
+                "Youth Annual"
+            ],
+            "type": "string"
+        },
+        "price": {
+            "description": "The price of the product added.",
+            "type": "number"
+        },
+        "productName": {
+            "description": "The product name.",
+            "type": "string"
+        },
+        "quantity": {
+            "description": "The quantity of the product.",
+            "type": "integer"
+        },
+        "sku": {
+            "description": "The product SKU.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "currency",
+        "interval",
+        "paymentPlatform",
+        "price",
+        "productName",
+        "quantity",
+        "sku"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

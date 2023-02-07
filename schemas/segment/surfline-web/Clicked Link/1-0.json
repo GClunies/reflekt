@@ -1,0 +1,101 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Link/1-0.json",
+    "description": "Web event fired when a user clicks a page link.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Link",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-web-platform",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "articleId": {
+            "description": "The article ID the link was clicked on.",
+            "type": "string"
+        },
+        "category": {
+            "description": "What category of event is it",
+            "type": "string"
+        },
+        "isInstapage": {
+            "description": "Indicates if the event originated from InstaPage.",
+            "type": "boolean"
+        },
+        "isThisMoment": {
+            "description": "Indicates if the event originated from ThisMoment.",
+            "type": "boolean"
+        },
+        "linkLocation": {
+            "description": "Where the link was located on the page.",
+            "type": "string"
+        },
+        "linkName": {
+            "description": "The name of the link as it appears on the page.",
+            "type": "string"
+        },
+        "linkUrl": {
+            "description": "The link URL.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "location": {
+            "description": "Where the event fired on our application.",
+            "type": "string"
+        },
+        "pageName": {
+            "description": "The screen that the event takes place on (web only)",
+            "type": "string"
+        },
+        "path": {
+            "description": "The path portion of the page URL.",
+            "type": "string"
+        },
+        "perk": {
+            "description": "The name of the Premium Perk.",
+            "type": "string"
+        },
+        "perkId": {
+            "description": "The perkID.",
+            "type": "string"
+        },
+        "spotId": {
+            "description": "The spot ID the link was clicked on.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name the link was clicked on.",
+            "type": "string"
+        },
+        "subscriptionEntitlement": {
+            "description": "The subscription entitlement of user if known, otherwise null.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "title": {
+            "description": "The title of the page.",
+            "type": "string"
+        },
+        "url": {
+            "description": "The full URL of the page.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "linkUrl"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

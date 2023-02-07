@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Continued To Cancel/1-0.json",
+    "description": "Web event fired when a user clicks to continue canceling their subscription on the cancel funnel landing page.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Continued To Cancel",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "location": {
+            "description": "Where the event fired on our application.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "location"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

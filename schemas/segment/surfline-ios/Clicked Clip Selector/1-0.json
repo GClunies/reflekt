@@ -1,0 +1,61 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Clip Selector/1-0.json",
+    "description": "Client side event fired when a user clicks the day selection, AM, or PR button in the Cam Rewind clip selector.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Clip Selector",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "button": {
+            "description": "The button that was clicked.",
+            "type": "string"
+        },
+        "camId": {
+            "description": "The camera ID.",
+            "type": "string"
+        },
+        "camName": {
+            "description": "The camera name.",
+            "type": "string"
+        },
+        "daysAgo": {
+            "description": "The number of days bewteen now and the clip timestamp.",
+            "type": "string"
+        },
+        "premiumCam": {
+            "description": "Is camera premium?",
+            "type": "boolean"
+        },
+        "screenName": {
+            "description": "The screen name.",
+            "type": "string"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

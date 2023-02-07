@@ -1,0 +1,45 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Scrubber Player/1-0.json",
+    "description": "Web event fired when a user clicks rewind/play/fast-forward on a chart player (e.g. High Res Wind).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Scrubber Player",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-realtime",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "buttonAction": {
+            "description": "The action taken on the scrubber player.",
+            "type": "string"
+        },
+        "category": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "pageName": {
+            "description": "The page name.",
+            "type": "string"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

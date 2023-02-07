@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Switched Session Wave Views/1-0.json",
+    "description": "Client side event fired when a user switches the wave view from the List view to the Map view (and vice versa).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Switched Session Wave Views",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The event category (used to group related events)."
+        },
+        "daysAgo": {
+            "description": "The number of days ago the session was recorded."
+        },
+        "screenName": {
+            "description": "The screen name."
+        },
+        "sessionRating": {
+            "description": "The session rating."
+        },
+        "spotId": {
+            "description": "The spot ID."
+        },
+        "spotName": {
+            "description": "The spot name."
+        }
+    },
+    "required": [
+        "daysAgo",
+        "screenName",
+        "sessionRating"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

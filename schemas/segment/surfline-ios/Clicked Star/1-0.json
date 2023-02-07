@@ -1,0 +1,49 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Star/1-0.json",
+    "description": "Client side event fired when a user clicks on the Favorite Star on the Spot, Forecast, Favorites, or Map screen.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Star",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "action": {
+            "description": "The action that the user took.",
+            "type": "string"
+        },
+        "category": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "hasCam": {
+            "description": "Whether or not the spot has a camera.",
+            "type": "boolean"
+        },
+        "screenName": {
+            "description": "The screen name where the user clicked the star.",
+            "type": "string"
+        },
+        "spotId": {
+            "description": "The spotID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

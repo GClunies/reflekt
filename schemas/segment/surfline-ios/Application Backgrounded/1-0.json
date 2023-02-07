@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Application Backgrounded/1-0.json",
+    "description": "Client side event fired when the app is backgrounded.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Application Backgrounded",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-android",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

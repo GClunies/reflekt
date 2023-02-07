@@ -1,0 +1,77 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Save Alerts/1-0.json",
+    "description": "Client side event fired when a user saves an alert, including deleting or turning an alert on/off.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Save Alerts",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "alertSave": {
+            "description": "The type of alert being saved.",
+            "enum": [
+                "Criteria Change",
+                "Turned On",
+                "Turned Off",
+                "New Alert",
+                "Deleted"
+            ],
+            "type": "string"
+        },
+        "alertType": {
+            "description": "The alert type.",
+            "type": "string"
+        },
+        "alertcategory": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "category": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "conditionRating": {
+            "description": "The condition rating.",
+            "type": "string"
+        },
+        "numberSpots": {
+            "description": "The number of spots in the alert.",
+            "type": "integer"
+        },
+        "reportUpdate": {
+            "description": "The report update.",
+            "type": "string"
+        },
+        "screenName": {
+            "description": "The screen name.",
+            "type": "string"
+        },
+        "waveheight": {
+            "description": "The wave height.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "alertSave",
+        "alertType",
+        "category",
+        "conditionRating",
+        "numberSpots",
+        "reportUpdate",
+        "screenName",
+        "waveheight"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

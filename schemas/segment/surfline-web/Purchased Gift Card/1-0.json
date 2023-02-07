@@ -1,0 +1,91 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Purchased Gift Card/1-0.json",
+    "description": "Server side event fired when a user purchases a gift card.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Purchased Gift Card",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "amount": {
+            "description": "The amount of the gift card.",
+            "type": "number"
+        },
+        "currency": {
+            "description": "The unit of currency used to purchase the product,",
+            "type": "string"
+        },
+        "description": {
+            "description": "The description of the gift card.",
+            "type": "string"
+        },
+        "message": {
+            "description": "The message from the purchaser.",
+            "type": "string"
+        },
+        "planId": {
+            "description": "The plan ID.",
+            "type": "string"
+        },
+        "platform": {
+            "description": "The platform the event is attributed to.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        },
+        "priceId": {
+            "description": "The unique identifier of the price item purchased",
+            "type": "string"
+        },
+        "purchaseDate": {
+            "description": "The date the gift card was purchased (in seconds since epoch).",
+            "type": "integer"
+        },
+        "purchaserEmail": {
+            "description": "The purchaser's email.",
+            "type": "string"
+        },
+        "purchaserName": {
+            "description": "The purchaser's name.",
+            "type": "string"
+        },
+        "recipientEmail": {
+            "description": "The user's email.",
+            "type": "string"
+        },
+        "recipientName": {
+            "description": "The recipient's name.",
+            "type": "string"
+        },
+        "redeemCode": {
+            "description": "The redemption code for the gift card.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "amount",
+        "platform",
+        "purchaseDate",
+        "purchaserEmail",
+        "purchaserName",
+        "recipientEmail",
+        "recipientName",
+        "redeemCode"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

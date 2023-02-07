@@ -1,0 +1,58 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Spot Loaded/1-0.json",
+    "description": "Client side event fired when a loads any of the report, forecast, or analysis tabs on the spot",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Spot Loaded",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "hasCam": {
+            "description": "Whether the page has a camera.",
+            "type": "boolean"
+        },
+        "numberOfCams": {
+            "description": "The number of cameras at the spot.",
+            "type": "integer"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        },
+        "subregionName": {
+            "description": "The region name.",
+            "type": "string"
+        },
+        "tabName": {
+            "description": "The kbyg tab the user is on (report, forecast, or analysis)",
+            "enum": [
+                "report",
+                "forecast",
+                "analysis"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

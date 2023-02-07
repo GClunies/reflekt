@@ -1,0 +1,80 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Spot Page Feed Link/1-0.json",
+    "description": "Web event fired when a user clicks a link in the feed shown on a spot page (e.g., Featured Content article link).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Spot Page Feed Link",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-content",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "contentId": {
+            "description": "The content ID of the feed link.",
+            "type": "string"
+        },
+        "contentType": {
+            "description": "The content type of the feed link.",
+            "type": "string"
+        },
+        "destinationurl": {
+            "description": "The destination URL.",
+            "type": "string"
+        },
+        "feedLocale": {
+            "description": "The feed locale.",
+            "enum": [
+                "US",
+                "AUS",
+                "LOCALIZED"
+            ],
+            "type": "string"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": "string"
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "tags": {
+            "description": "An array with data on associated tags for the feed link.",
+            "items": {
+                "properties": {
+                    "name": {
+                        "description": "The tag name.",
+                        "type": [
+                            "string"
+                        ]
+                    },
+                    "url": {
+                        "description": "The tag URL.",
+                        "type": [
+                            "string"
+                        ]
+                    }
+                },
+                "required": [],
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "title": {
+            "description": "The title of the feed link.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Push Notifications Enabled/1-0.json",
+    "description": "Client side event fired when a user clicks \"Allow\" in system prompted push notifications alert box.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Push Notifications Enabled",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "screenName": {
+            "description": "The screen name.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "category",
+        "screenName"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

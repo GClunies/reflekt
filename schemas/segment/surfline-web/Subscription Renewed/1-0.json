@@ -1,0 +1,110 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Subscription Renewed/1-0.json",
+    "description": "Triggered when an active subscription billing dates are changed.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Subscription Renewed",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "active": {
+            "description": "Indicates if the subscription is currently used for allowing access to premium entitlements.",
+            "type": "boolean"
+        },
+        "billingPlatform": {
+            "description": "Represents the payment processor for each subscription.",
+            "enum": [
+                "stripe",
+                "ios",
+                "android",
+                "gift"
+            ],
+            "type": "string"
+        },
+        "country": {
+            "description": "Available for subscription billed through the Google/Android billing platform.  Indicates the subscription's country of origin.",
+            "type": "string"
+        },
+        "currentPeriodEnd": {
+            "description": "The end of the new billing period.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "currentPeriodStart": {
+            "description": "The start of the new billing period.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "daysUntilRenew": {
+            "description": "The number of days until renewal, e.g. 15, 30, 60",
+            "type": "number"
+        },
+        "entitlement": {
+            "description": "Indicates the premium product access this subscription promotes.",
+            "type": "string"
+        },
+        "inTrial": {
+            "description": "Is the subscription actively trialing.",
+            "type": "boolean"
+        },
+        "interval": {
+            "description": "The subscription billing interval.",
+            "enum": [
+                "month",
+                "year"
+            ],
+            "type": "string"
+        },
+        "planId": {
+            "description": "The premium product that purchased and billed each interval.",
+            "type": "string"
+        },
+        "platform": {
+            "description": "Similar to billingPlatform.  This represents where the subscription originated.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        },
+        "promotionId": {
+            "description": "The ID of the associated promotional campaign.",
+            "type": "string"
+        },
+        "secondsRemaining": {
+            "description": "Time remaining on a subscription.",
+            "type": "integer"
+        },
+        "subscriptionId": {
+            "description": "The unique identifier for each subscription that can be used for SQL joins for determining lifecycle events.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "active",
+        "billingPlatform",
+        "currentPeriodEnd",
+        "currentPeriodStart",
+        "daysUntilRenew",
+        "entitlement",
+        "inTrial",
+        "interval",
+        "planId",
+        "platform",
+        "subscriptionId"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

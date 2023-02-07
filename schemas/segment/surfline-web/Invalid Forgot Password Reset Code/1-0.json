@@ -1,0 +1,39 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Invalid Forgot Password Reset Code/1-0.json",
+    "description": "Server side event fired when the password is reset for an account after requested by the user during a failed login.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Invalid Forgot Password Reset Code",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "code": {
+            "description": "The code.",
+            "type": "string"
+        },
+        "reason": {
+            "description": "The reason the event fired.",
+            "type": "string"
+        },
+        "resetCode": {
+            "description": "The reset code.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "code"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

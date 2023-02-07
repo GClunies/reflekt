@@ -1,0 +1,123 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Enriched Session/1-0.json",
+    "description": "Server side event fired when a Session gets added weather, surf, and other details.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Enriched Session",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-realtime",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "client": {
+            "description": "The client used to record the session.",
+            "type": "string"
+        },
+        "condition": {
+            "description": "The condition of the session.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "currentTideHeight": {
+            "description": "The current tide height.",
+            "type": "number"
+        },
+        "maxDistance": {
+            "description": "The maximum wave distance in the session.",
+            "type": "number"
+        },
+        "maxSpeed": {
+            "description": "The maximum speed of the session.",
+            "type": "number"
+        },
+        "nextTideHeight": {
+            "description": "The next tide height.",
+            "type": "number"
+        },
+        "sessionId": {
+            "description": "The Surfline Session ID.",
+            "type": "string"
+        },
+        "sessionLength": {
+            "description": "Length of session in milliseconds.",
+            "type": "number"
+        },
+        "spotId": {
+            "description": "The spot ID.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "spotName": {
+            "description": "The spot name.",
+            "type": "string"
+        },
+        "spotReliveRating": {
+            "description": "The session relive rating.",
+            "type": [
+                "integer",
+                "null"
+            ]
+        },
+        "startLatLon": {
+            "description": "The start lat/lon of the session.",
+            "type": "string"
+        },
+        "startTimestamp": {
+            "description": "The start timestamp of the session.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "stopTimestamp": {
+            "description": "The stop timestamp of the session.",
+            "format": "date-time",
+            "type": "string"
+        },
+        "waveCount": {
+            "description": "The number of waves in the session.",
+            "type": "integer"
+        },
+        "waveHeightMax": {
+            "description": "The maximum wave height during the session.",
+            "type": "number"
+        },
+        "waveHeightMin": {
+            "description": "The minimum wave height during the session.",
+            "type": "number"
+        },
+        "windDirection": {
+            "description": "The wind direction during the session.",
+            "type": "number"
+        },
+        "windSpeed": {
+            "description": "The wind speed during the session.",
+            "type": "number"
+        }
+    },
+    "required": [
+        "client",
+        "condition",
+        "maxDistance",
+        "maxSpeed",
+        "sessionId",
+        "sessionLength",
+        "startLatLon",
+        "startTimestamp",
+        "stopTimestamp",
+        "waveCount"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

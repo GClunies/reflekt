@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Deleted Account/1-0.json",
+    "description": "Server-side event fired when a user's account is deleted.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Deleted Account",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "trigger": {
+            "description": "The source of the deletion (user-requested vs admininstrative)",
+            "type": "string"
+        }
+    },
+    "required": [
+        "trigger"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

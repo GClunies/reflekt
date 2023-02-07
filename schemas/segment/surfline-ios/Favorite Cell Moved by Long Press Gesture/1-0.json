@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Favorite Cell Moved by Long Press Gesture/1-0.json",
+    "description": "Client side event fired when a user long presses to change the order of their favorite spots on the Favorites screen.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Favorite Cell Moved by Long Press Gesture",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

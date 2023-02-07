@@ -1,0 +1,84 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Module/1-0.json",
+    "description": "Client side event fired when a user clicks on any content in the feed (Forecast or Surf).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Module",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "contentId": {
+            "description": "The content ID.",
+            "type": "integer"
+        },
+        "contentType": {
+            "description": "The content type of the content accessed by the module click..",
+            "type": "string"
+        },
+        "isPremium": {
+            "description": "Whether the module click takes the user to content for premium users only.",
+            "type": "boolean"
+        },
+        "isSponsoredArticle": {
+            "description": "Whether the module click takes the user to a sponsored article.",
+            "type": "boolean"
+        },
+        "isVideo": {
+            "description": "Whether the module click takes the user to a video.",
+            "type": "boolean"
+        },
+        "location": {
+            "description": "Where the event fired on our application.",
+            "type": "string"
+        },
+        "postSeries": {
+            "description": "The post series of the content accessed by the module click.",
+            "type": "string"
+        },
+        "postcategory": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "screenName": {
+            "description": "The screen name when the module was clicked.",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID .",
+            "type": "string"
+        },
+        "tags": {
+            "description": "Any tags associated with the content accessed by the module click.",
+            "type": "string"
+        },
+        "text": {
+            "description": "The text of the module.",
+            "type": "string"
+        },
+        "title": {
+            "description": "The title of the content accessed by the module click.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "location",
+        "screenName"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

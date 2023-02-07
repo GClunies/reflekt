@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked App Rating/1-0.json",
+    "description": "Client side event fired when a user clicks any button of the app rating banner.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked App Rating",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "category": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "screenName": {
+            "description": "The screen name.",
+            "type": "string"
+        },
+        "text": {
+            "description": "The text of the button.",
+            "type": "string"
+        },
+        "title": {
+            "description": "The title of the page.",
+            "type": "string"
+        }
+    },
+    "required": [],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

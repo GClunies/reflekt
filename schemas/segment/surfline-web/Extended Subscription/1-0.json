@@ -1,0 +1,80 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Extended Subscription/1-0.json",
+    "description": "Server side event fired when a subscription is extended and payment is processed successfully.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Extended Subscription",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "active": {
+            "description": "Is the subscription active?",
+            "type": "boolean"
+        },
+        "entitlement": {
+            "description": "The user's entitlement.",
+            "type": "string"
+        },
+        "expiration": {
+            "description": "The expiration date.",
+            "type": "string"
+        },
+        "inTrial": {
+            "description": "Is the subscription in a trial?",
+            "type": "boolean"
+        },
+        "interval": {
+            "description": "The subscription billing interval.",
+            "enum": [
+                "month",
+                "year"
+            ],
+            "type": "string"
+        },
+        "planId": {
+            "description": "The plan ID.",
+            "type": "string"
+        },
+        "platform": {
+            "description": "The platform the event is attributed to.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        },
+        "subscriptionId": {
+            "description": "The subscription ID.",
+            "type": "string"
+        },
+        "trialEligible": {
+            "description": "Is the user eligible for a trial?",
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "active",
+        "entitlement",
+        "expiration",
+        "inTrial",
+        "interval",
+        "planId",
+        "platform",
+        "subscriptionId",
+        "trialEligible"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

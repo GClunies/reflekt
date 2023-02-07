@@ -1,0 +1,51 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Swell Alert Link/1-0.json",
+    "description": "Web event fired when a user clicks a Swell Alert link.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Swell Alert Link",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/forecast-web",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "destinationTitle": {
+            "description": "The destination title of the swell alert.",
+            "type": "string"
+        },
+        "destinationUrl": {
+            "description": "The destination URL.",
+            "type": "string"
+        },
+        "locationCategory": {
+            "description": "The event category (used to group related events).",
+            "type": "string"
+        },
+        "subregionId": {
+            "description": "The subregion ID.",
+            "type": "string"
+        },
+        "subregionName": {
+            "description": "The region name.",
+            "type": "string"
+        },
+        "title": {
+            "description": "The title of the swell alert.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "title"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

@@ -1,0 +1,101 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Carousel Clicked/1-0.json",
+    "description": "Fired when a clicks inside any carousel (e.g. in the Booking Layer Travel Carousel).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Carousel Clicked",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-content",
+        "priority": 1
+    },
+    "type": "object",
+    "properties": {
+        "carouselItem": {
+            "description": "The title or name of the item that was clicked in the carousel (e.g. Uluwatu, Bali Surf Villas, etc)",
+            "type": "string"
+        },
+        "carouselName": {
+            "description": "The name of the carousel or a description of its location in the experience",
+            "type": "string"
+        },
+        "category": {
+            "description": "The product category this event belongs to (e.g. `kbyg`, `ecommerce`, `sessions`, `travel`, `content`).",
+            "enum": [
+                "kbyg",
+                "ecommerce",
+                "sessions",
+                "travel",
+                "content"
+            ],
+            "type": "string"
+        },
+        "path": {
+            "description": "The path portion of the page URL.",
+            "type": "string"
+        },
+        "positionNumber": {
+            "description": "Number of the card in order from left to right.",
+            "type": "integer"
+        },
+        "postCategories": {
+            "description": "The post categories.",
+            "type": "string"
+        },
+        "postId": {
+            "description": "The post ID.",
+            "type": "string"
+        },
+        "provider": {
+            "description": "Who is the carousel data provided by.",
+            "type": "string"
+        },
+        "referrer": {
+            "description": "The previous pageURL - aka `the page that referred the user to the current page`.",
+            "type": "string"
+        },
+        "screenName": {
+            "description": "The name of the screen the carousel was clicked on.",
+            "type": "string"
+        },
+        "search": {
+            "description": "Query string portion of the page URL.",
+            "type": "string"
+        },
+        "title": {
+            "description": "The title of the page.",
+            "type": "string"
+        },
+        "travelSupplierId": {
+            "description": "The ID of the supplier.",
+            "type": "string"
+        },
+        "travelSupplierName": {
+            "description": "The name of the supplier.",
+            "type": "string"
+        },
+        "travelZone": {
+            "description": "The zone where the Supplier is located (as designated by Booking Layer).",
+            "type": "string"
+        },
+        "url": {
+            "description": "The full URL of the page.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "carouselName",
+        "carouselItem",
+        "category",
+        "provider"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

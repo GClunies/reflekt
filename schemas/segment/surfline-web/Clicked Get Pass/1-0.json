@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Get Pass/1-0.json",
+    "description": "Web event fired when a user clicks the 1st \"GET PASS\" to get a California Explorer Pass on the http://caexplorer.surfline.com/products/california-explorer page.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Get Pass",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-web-platform",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "position": {
+            "description": "The position of the button.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "position"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

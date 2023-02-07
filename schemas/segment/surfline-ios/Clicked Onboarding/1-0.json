@@ -1,0 +1,43 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-ios/Clicked Onboarding/1-0.json",
+    "description": "Client side event fired when a user clicks any onboarding interaction on the app. Different properties for different onboarding screen variants. Legacy onboarding screens will not change.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Onboarding",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/native-ios",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "action": {
+            "description": "The action taken by the user."
+        },
+        "buttonText": {
+            "description": "The text of the button."
+        },
+        "onboardingName": {
+            "description": "The name of the onboarding variant."
+        },
+        "screenName": {
+            "description": "The screen name."
+        },
+        "text": {
+            "description": "The text of the onboarding interaction."
+        }
+    },
+    "required": [
+        "screenName",
+        "text"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

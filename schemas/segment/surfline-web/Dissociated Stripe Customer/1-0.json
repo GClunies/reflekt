@@ -1,0 +1,41 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Dissociated Stripe Customer/1-0.json",
+    "description": "Server-side event fired when a Wavetrak User Account is unlinked from their respective Stripe Customer object reference. Triggered by the Subscription-Service via request from the Wavetrak Admin tools only.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Dissociated Stripe Customer",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "server",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "platform": {
+            "description": "The platform the event is attributed to.",
+            "enum": [
+                "web",
+                "ios",
+                "android"
+            ],
+            "type": "string"
+        },
+        "previousStripeCustomerId": {
+            "description": "The reference to the dissociated Customer in Stripe.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "platform",
+        "previousStripeCustomerId"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}

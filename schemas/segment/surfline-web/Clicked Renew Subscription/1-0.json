@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/surfline-web/Clicked Renew Subscription/1-0.json",
+    "description": "Web event fired when a user clicks to renew their subscription.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Clicked Renew Subscription",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {
+        "fires_on": "client",
+        "owner": "@Surfline/squad-subscription",
+        "priority": 2
+    },
+    "type": "object",
+    "properties": {
+        "location": {
+            "description": "Where the event fired on our application.",
+            "type": "string"
+        },
+        "plan": {
+            "description": "The plan the user is renewing.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "location",
+        "plan"
+    ],
+    "additionalProperties": false,
+    "metrics": {
+        "dimensions": [],
+        "measures": []
+    }
+}
