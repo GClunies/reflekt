@@ -5,9 +5,9 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt
-[![PyPI version](https://badge.fury.io/py/reflekt.svg)](https://badge.fury.io/py/reflekt)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/reflekt)](https://pypi.org/project/reflekt/)
-[![PyPI - License](https://img.shields.io/pypi/l/reflekt)](https://pypi.org/project/reflekt/)
+![PyPI](https://img.shields.io/pypi/v/reflekt?style=for-the-badge)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/reflekt?style=for-the-badge)
+![GitHub](https://img.shields.io/github/license/gclunies/reflekt)
 
 A tool to help Data, Engineering, and Product teams:
 - Define event schemas as `code` using [JSONschema](https://json-schema.org/), providing a version controlled source of truth.
