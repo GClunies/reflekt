@@ -27,7 +27,6 @@ https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-
 
 
 ## Table of Contents
-  - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Commands](#commands)
   - [Schemas](#schemas)
