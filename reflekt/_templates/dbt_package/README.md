@@ -19,8 +19,7 @@ packages:
     subdirectory: "dbt-packages/<reflekt_dbt_package_name>"
     revision: v0.1.0___DBT_PKG_NAME_  # Example tag. Replace with branch, tag, or commit (full 40-character hash)
 ```
-
-`DBT_ENV_SECRET_GITHUB_PAT` is a Github personal access token (PAT) stored as an environment variable in dbt Cloud. This is required to access private Github repos. To create a PAT and configure it with dbt-cloud, see the [dbt](https://docs.getdbt.com/docs/build/packages#git-token-method) and [GitHub](https://docs.github.com/en/enterprise-server@3.1/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) docs.
+To use with dbt-cloud, you will need to [create a Github personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) (e.g., `DBT_ENV_SECRET_GITHUB_PAT`) and [configure it as an environment variable](https://docs.getdbt.com/docs/dbt-cloud/using-dbt-cloud/cloud-environment-variables) in your dbt-cloud account.
 
 ### Reflekt resources:
 - [GitHub repo](https://github.com/GClunies/Reflekt)
