@@ -4,10 +4,9 @@
 
 # Setup for python env using conda:
 #   1. Install conda env with poetry dependency
-#         conda env update --file /Users/gclunies2-mba/Repos/Reflekt/environment.yml --prune
+#         conda env update --file ./environment.yml --prune
 #   2. Activate the conda env `source activate reflekt-conda` OR `conda activate reflekt-conda`
-#   3. Run `poetry install` ... this will install the dependencies from poetry.lock
-#      INSIDE the conda env (magic!)
+#   3. Run `poetry install` ... this will install the dependencies from poetry.lock INSIDE the conda env (magic!)
 name: reflekt-conda
 channels:
 - conda-forge

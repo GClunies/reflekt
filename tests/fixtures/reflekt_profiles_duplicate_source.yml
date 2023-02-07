@@ -1,0 +1,28 @@
+version: 1.0
+test_profile:
+  do_not_track: false
+  registry:
+    - type: segment
+      api_token: test_token
+    - type: avo
+      workspace_id: test_workspace_id
+      service_account_name: test_service_account_name
+      service_account_secret: test_secret
+  source:
+    - id: test_source
+      type: snowflake
+      account: test_account
+      database: test_database
+      warehouse: test_warehouse
+      role: test_role
+      user: test_user
+      password: test_password
+
+    - id: test_source
+      type: snowflake
+      account: test_account
+      database: test_database
+      warehouse: test_warehouse
+      role: test_role
+      user: test_user
+      password: test_password

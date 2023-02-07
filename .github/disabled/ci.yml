@@ -1,0 +1,81 @@
+# SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: CI Suite
+
+on: pull_request
+
+jobs:
+  lint:
+    name: Lint - (${{ matrix.python-version }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest']
+        python-version: ['3.8']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+
+      # - name: Load pip cache if it exists
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.cache/pip
+      #     key: ${{ runner.os }}-pip
+      #     restore-keys: ${{ runner.os }}-pip
+
+      - name: Install Poetry & dependencies
+        run: |  # Poetry installed via pip for simplicity, then install deps via poetry (including Reflekt)
+          python -m pip install --upgrade pip
+          python -m pip install poetry
+          poetry install --no-interaction
+
+      - name: Run linters
+        run: |
+          poetry run make lint
+
+  test:
+    needs: lint
+    name: Test (${{ matrix.python-version }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest']
+        python-version: ['3.8', '3.9', '3.10']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python: ${{ matrix.python-version }}
+
+      # - name: Load pip cache if it exists
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.cache/pip
+      #     key: ${{ runner.os }}-pip
+      #     restore-keys: ${{ runner.os }}-pip
+
+      # - name: Working directory
+      #   run: |
+      #     pwd
+      #     echo "----------------"
+      #     ls -la
+
+      - name: Install Poetry & dependencies
+        run: |  # Poetry installed via pip for simplicity, then install deps via poetry (including Reflekt)
+          python -m pip install --upgrade pip
+          python -m pip install poetry
+          poetry install --no-interaction
+
+      - name: Tests & Coverage
+        run: |
+          poetry run pytest --cov=reflekt tests/

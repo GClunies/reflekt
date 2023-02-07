@@ -2,4 +2,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-__version__ = "0.2.18"  # Set by bumpversion
+import os
+
+from dotenv import load_dotenv
+
+
+__version__ = "0.3.0"
+
+
+load_dotenv()  # load environment variables from .env file
+
+SHOW_LOCALS = os.getenv("REFLEKT_SHOW_LOCALS") == "true"

@@ -76,7 +76,7 @@ instance/
 docs/_build/
 
 # PyBuilder
-target/
+source/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -95,7 +95,7 @@ ipython_config.py
 #   install all needed dependencies.
 #Pipfile.lock
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+# PEP 582; used by e.g., github.com/David-OConnor/pyflow
 __pypackages__/
 
 # Celery stuff
@@ -132,23 +132,24 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# macOS stuff
+# --- DEV ---
+# Allow
+!reflekt/tests/fixtures/reflekt_profiles.yml
+!reflekt/tests/fixtures/reflekt_project.yml
+!reflekt/_templates/**/*
+!reflekt/_templates/project/reflekt_project.yml
+
+# IGNORE
+/.backup/
+/.logs/
+/.reflekt/
+/.reflekt_cache/
+/reflekt_profiles.yml
+TODO.md
 .DS_Store
 
-# VSCode dev tools
-.vscode/
-.VSCodeCounter/
-
-# reflekt
-.reflekt/
-avo.json
-*reflekt_config*.yml
-*reflekt_project*.yml
-tracking-plans/
-dbt-packages/
-
-# Allow template files in reflekt python package
-!reflekt/templates/**/*
-!reflekt/templates/project/reflekt_project.yml
-!tests/tests_reflekt_config.yml
-!tests/tests_reflekt_project.yml
+# TESTING
+/schemas/segment/surfline-web/**/*
+/schemas/segment/surfline-ios/**/*
+/artifacts/dbt/reflekt_demo/models/surfline/**/*
+/artifacts/dbt/reflekt_demo/models/surfline-ios/**/*

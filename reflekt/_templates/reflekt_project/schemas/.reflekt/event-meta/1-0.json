@@ -1,0 +1,73 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": ".reflekt/event-meta/1-0.json",
+    "description": "Meta-schema for all Reflekt events",
+    "self": {
+        "vendor": "reflekt",
+        "name": "meta",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "type": "object",
+    "allOf": [
+        {
+            "$ref": "http://json-schema.org/draft-07/schema#"
+        },
+        {
+            "properties": {
+                "self": {
+                    "type": "object",
+                    "properties": {
+                        "vendor": {
+                            "type": "string",
+                            "description": "The company, application, team, or system that authored the schema (e.g., com.company, com.company.android, com.company.marketing)"
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "The schema name. Describes what the schema is meant to capture (e.g., pageViewed, clickedLink)"
+                        },
+                        "format": {
+                            "type": "string",
+                            "description": "The format of the schema",
+                            "const": "jsonschema"
+                        },
+                        "version": {
+                            "type": "string",
+                            "description": "The schema version, in MODEL-ADDITION format (e.g., 1-0, 1-1, 2-3, etc.)",
+                            "pattern": "^[1-9][0-9]*-(0|[1-9][0-9]*)$"
+                        }
+                    },
+                    "required": ["vendor", "name", "format", "version"],
+                    "additionalProperties": false
+                },
+                "metadata": {
+                    "type": "object",
+                    "description": "Required metadata for all event schemas",
+                    "properties": {},
+                    "required": [],
+                    "additionalProperties": false
+                },
+                "properties": {},
+                "tests": {},
+                "metrics": {
+                    "type": "object",
+                    "properties": {
+                        "dimensions": {
+                            "type": "array",
+                            "description": "Schema properties to be used as dimensions",
+                            "items": {"type": "string"}
+                        },
+                        "measures": {
+                            "type": "array",
+                            "description": "Schema properties to be used as measures",
+                            "items": { "type": "string"}
+                        }
+                    },
+                    "required": ["dimensions", "measures"],
+                    "additionalProperties": false
+                }
+            },
+            "required": ["self", "metadata", "properties"]
+        }
+    ]
+}

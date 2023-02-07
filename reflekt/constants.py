@@ -2,82 +2,72 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-TITLE_CASE_RE = r"[A-Z][a-z]+"
-CAMEL_CASE_RE = r"(^[a-z]|[A-Z])[a-z]*"
-SNAKE_CASE_RE = r"^[a-z._]+$"
+from enum import Enum
 
-REFLEKT_INJECTED_COLUMNS = [  # Columns Reflekt injects when templating
-    "source_schema",
-    "source_table",
-    "tracking_plan",
-    "event_text",
-    "call_type",
-]
 
-# Columns reserved by Reflekt templater. If found in table, prefix with underscore (_)
-REFLEKT_TEMPLATED_COLUMNS = [
-    "id",
-    "user_id",
-    "anonymous_id",
-    "user_id",
-    "group_id",
-    "page_id",
-    "screen_id",
-    "event_id",
-    "source_schema",
-    "source_table",
-    "tracking_plan",
-    "event_name",
-    "call_type",
-]
+SCHEMA_DIALECT = "http://json-schema.org/draft-07/schema#"
 
-PLANS = [
-    "segment",
+REFLEKT_JSON_SCHEMA = {
+    "$schema": SCHEMA_DIALECT,
+    "$id": "",
+    "description": "",
+    "self": {
+        "vendor": "",
+        "name": "",
+        "format": "jsonschema",
+        "version": "1-0",
+    },
+    "metadata": {},
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": False,
+}
+
+REGISTRY = [
     "avo",
-    # "rudderstack",
-    # "snowplow",
-]
-
-PLAN_INIT_STRING = (
-    "\n[1] Segment Protocols"
-    "\n[2] Avo"
-    # "\n[3] Rudderstack"
-    # "\n[4] Snowplow"
-)
-
-PLAN_MAP = {
-    "1": "segment",
-    "2": "avo",
-    # "3": "rudderstack",
-    # "4": "snowplow",
-}
-
-CDPS = [
     "segment",
     # "rudderstack",
-    # "snowplow",
+    # "snowplow Iglu",
+    # "amplitude Data",
 ]
 
-CDP_INIT_STRING = (
-    "\n[1] Segment"
-    # "\n[2] Rudderstack"
-    # "\n[3] Snowplow"
-)
 
-CDP_MAP = {
-    "1": "segment",
-    # "2": "rudderstack",
-    # "3": "snowplow",
-}
+class RegistryEnum(str, Enum):
+    """Enum of supported schema registries."""
 
-WAREHOUSES = [
+    avo = "avo"
+    segment = "segment"
+    # rudderstack = "rudderstack"
+    # amplitude = "amplitude"
+    # snowplow = "snowplow"
+
+
+WAREHOUSE = [
     "snowflake",
     "redshift",
+    # "bigquery",
 ]
 
-WAREHOUSE_INIT_STRING = "\n[1] Snowflake" "\n[2] Redshift"
 
-WAREHOUSE_MAP = {
-    "1": "snowflake",
-    "2": "redshift",
-}
+class WarehouseEnum(str, Enum):
+    """Enum of supported data warehouse."""
+
+    snowflake = "snowflake"
+    redshift = "redshift"
+    # bigquery = "bigquery"
+
+
+class ArtifactEnum(str, Enum):
+    """Enum of supported data artifacts."""
+
+    dbt = "dbt"
+    # looker = "looker"
+    # lightdash = "lightdash"
+    # malloy = "malloy"
+
+
+class SdkEnum(str, Enum):
+    """Enum of supported SDKs that generate event data."""
+
+    segment = "segment"
