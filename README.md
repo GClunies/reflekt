@@ -22,7 +22,9 @@ A tool to help Data, Engineering, and Product teams:
   - Keep data artifacts in sync with instrumentation - ready for use by engineers, analysts, and the business.
   - Reduce errors, improve data quality, and automate important (but boring) data tasks.
 
-<br>
+
+https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
+
 
 ## Table of Contents
   - [Table of Contents](#table-of-contents)
