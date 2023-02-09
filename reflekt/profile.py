@@ -37,7 +37,7 @@ class Profile:
         self.project: Project = project
         self.path: Path = project.profiles_path
 
-        if profile_name:
+        if profile_name is not None:
             self.name: str = profile_name
         else:
             self.name: str = project.default_profile

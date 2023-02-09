@@ -88,7 +88,8 @@
                         "models": {
                             "type": "object",
                             "properties": {
-                                "prefix": {"type": "string"}
+                                "prefix": {"type": "string"},
+                                "filter": {"type": "string"}
                             },
                             "required": ["prefix"]
                         },

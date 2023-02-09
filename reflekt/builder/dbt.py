@@ -5,7 +5,7 @@
 import json
 import shutil
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import pkg_resources
 import yaml
@@ -126,6 +126,7 @@ class DbtBuilder:
         table_name: str,
         columns: List[Dict],
         metadata: Dict,
+        filter: Optional[str] = None,
     ) -> None:
         """Build dbt model.
 
@@ -135,6 +136,7 @@ class DbtBuilder:
             table_name (str): Table name.
             columns (List[Dict]): List of column dicts (with name, description, etc).
             metadata (Dict): Schema metadata.
+            filter (Optional[str]): Filter to apply to model. Defaults to None.
         """
         schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
         model_file = (
@@ -150,12 +152,27 @@ class DbtBuilder:
             "  )\n"
             "}}\n\n"
         )
-        mdl_sql += (  # Import CTE
+        mdl_sql += (  # Import CTE start
             f"with\n\n"
             f"source as (\n"
-            f"    select * from {{{{ source('{underscore(self._schema)}', '{table_name}') }}}}\n"  # noqa: E501
-            f"),\n\n"
+            f"    select *\n"
+            f"    from {{{{ source('{underscore(self._schema)}', '{table_name}') }}}}\n"
         )
+
+        # Add filter to SQL if provided and table is not an entity table
+        if filter is not None:
+            if self._sdk_arg == "segment" and table_name not in ["users", "groups"]:
+                filter_list = self._project.artifacts["dbt"]["models"][
+                    "filter"
+                ].splitlines()
+                filter_str = ""
+
+                for line in filter_list:
+                    filter_str += f"    {line}\n"
+        else:
+            filter_str = ""
+
+        mdl_sql += f"{filter_str}),\n\n"  # Import CTE end
         mdl_sql += "renamed as (\n" "    select"  # Rename CTE start
 
         if self._sdk_arg == "segment":  # TODO - should this be its own method?
@@ -499,6 +516,9 @@ class DbtBuilder:
             for field in Flatson.from_schemafile(common_json).fields
         ]
 
+        models_config: Dict = self._project.artifacts["dbt"]["models"]
+        self._filter = models_config.get("filter", None)
+
         # Iterate through all schemas to build artifacts
         for schema_path in self._schema_paths:
             logger.info(f"Building dbt artifacts for schema: {schema_path}")
@@ -512,7 +532,7 @@ class DbtBuilder:
             table_name = underscore(event_name.lower().replace(" ", "_"))
             metadata = schema_json["metadata"]
 
-            if self._sdk_arg == "segment":
+            if self._sdk_arg == "segment":  # Handle Segment-specific table naming
                 table_name = (
                     table_name.replace("identify", "identifies")
                     .replace("group", "groups")
@@ -547,6 +567,7 @@ class DbtBuilder:
                     table_name=table_name,
                     columns=columns,
                     metadata=metadata,
+                    filter=self._filter,
                 )
                 self._build_dbt_doc(
                     schema_id=schema_id,
@@ -616,6 +637,7 @@ class DbtBuilder:
                     table_name="tracks",
                     columns=columns,
                     metadata={},
+                    filter=self._filter,
                 )
                 self._build_dbt_doc(
                     schema_id="dummy/schema_id/for/tracks/1-0.json",

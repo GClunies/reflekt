@@ -41,6 +41,8 @@ artifacts:                      # Configure how data artifacts are built
       prefix: __src_            # Source files start with this prefix
     models:
       prefix: stg_              # Model files start with this prefix
+      filter: |                 # Add a filter to staging model files (OPTIONAL)
+        where received_at < current_date
     docs:
       prefix: _stg_             # Docs files start with this prefix
       in_folder: false          # Docs files in separate folder?
