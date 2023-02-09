@@ -17,47 +17,27 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Install Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Cache Poetry
-        id: cache-poetry
-        uses: actions/cache@v3
-        with:
-          path: ~/.poetry
-          key: ${{ matrix.os }}-poetry
+          python: ${{ matrix.python-version }}
 
       - name: Install Poetry
-        if: steps.cache-poetry.outputs.cache-hit != 'true'
-        run: |
-          curl -sSL https://install.python-poetry.org | POETRY_HOME=$HOME/.poetry/bin python3 -
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
 
-      - name: Add Poetry to GitHub $PATH
-        run: |
-          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
-
-      - name: Get Poetry version
-        run: |
-          poetry --version
-
-      - name: Check pyproject.toml validity
-        run: poetry check --no-interaction
-
-      - name: Cache dependencies
-        id: cache-deps
+      - name: Load cached venv (if available)
+        id: cached-poetry-dependencies
         uses: actions/cache@v3
         with:
-          path: ${{github.workspace}}/.venv
-          key: ${{ matrix.os }}-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: ${{ matrix.os }}-
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
 
-      - name: Install dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: |
-          poetry config virtualenvs.in-project true
-          poetry install --no-interaction
+      - name: Install dependencies (cache not available)
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
 
       - name: Publish package to TestPyPI
         with:
