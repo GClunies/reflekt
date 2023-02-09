@@ -35,42 +35,6 @@
                     },
                     {
                         "if": {
-                            "properties": {"type": {"const": "snowplow"}},
-                            "required": ["type"]
-                        },
-                        "then": {
-                            "properties": {
-                                "url": {"type": "string"}
-                            },
-                            "required": ["url"]
-                        }
-                    },
-                    {
-                        "if": {
-                            "properties": {"type": {"const": "rudderstack"}},
-                            "required": ["type"]
-                        },
-                        "then": {
-                            "properties": {
-                                "access_token": {"type": "string"}
-                            },
-                            "required": ["access_token"]
-                        }
-                    },
-                    {
-                        "if": {
-                            "properties": {"type": {"const": "amplitude"}},
-                            "required": ["type"]
-                        },
-                        "then": {
-                            "properties": {
-                                "access_token": {"type": "string"}
-                            },
-                            "required": ["access_token"]
-                        }
-                    },
-                    {
-                        "if": {
                             "properties": {"type": {"const": "avo"}},
                             "required": ["type"]
                         },
@@ -82,7 +46,8 @@
                             "required": ["service_account_name", "service_account_secret"]
                         }
                     }
-                ]
+                ],
+                "required": ["type"]
             }
         },
         "source": {
