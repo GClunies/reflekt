@@ -80,6 +80,7 @@ class Project:
                     "sources": {"prefix": "__src_"},
                     "models": {
                         "prefix": "stg_",
+                        "filter": "",
                     },
                     "docs": {
                         "prefix": "_stg_",

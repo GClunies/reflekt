@@ -91,7 +91,7 @@
                                 "prefix": {"type": "string"},
                                 "filter": {"type": "string"}
                             },
-                            "required": ["prefix"]
+                            "required": ["prefix", "filter"]
                         },
                         "docs": {
                             "type": "object",
