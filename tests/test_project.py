@@ -132,6 +132,7 @@ def test_project_init_from_path():
             "sources": {"prefix": "__src_"},
             "models": {
                 "prefix": "stg_",
+                "filter": "",
             },
             "docs": {
                 "prefix": "_stg_",
@@ -180,6 +181,7 @@ def test_project_init_use_defaults():
             "sources": {"prefix": "__src_"},
             "models": {
                 "prefix": "stg_",
+                "filter": "",
             },
             "docs": {
                 "prefix": "_stg_",
@@ -249,6 +251,7 @@ def test_project_to_yaml():
             "sources": {"prefix": "__src_"},
             "models": {
                 "prefix": "stg_",
+                "filter": "",
             },
             "docs": {
                 "prefix": "_stg_",

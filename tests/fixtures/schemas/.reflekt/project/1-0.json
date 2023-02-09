@@ -27,16 +27,20 @@
                                 "capitalize_camel": {"type": "boolean"},
                                 "numbers": {"type": "boolean"},
                                 "reserved": {"type": "array", "items": {"type": "string"}}
-                            }
+                            },
+                            "required": ["casing", "capitalize_camel", "numbers", "reserved"],
+                            "additionalProperties": false
                         },
                         "property": {
                             "type": "object",
                             "properties": {
                                 "casing": {"type": "string", "enum": ["snake", "camel", "title", "any"]},
+                                "capitalize_camel": {"type": "boolean"},
                                 "numbers": {"type": "boolean"},
-                                "reserved": {"type": "array", "items": {"type": "string"}},
-                                "allow_additional": {"type": "boolean"}
-                            }
+                                "reserved": {"type": "array", "items": {"type": "string"}}
+                            },
+                            "required": ["casing", "capitalize_camel", "numbers", "reserved"],
+                            "additionalProperties": false
                         },
                         "data_types": {
                             "type": "array",
@@ -49,20 +53,6 @@
                     "required": ["event", "property", "data_types"],
                     "additionalProperties": false
                 }
-            }
-        },
-        "sources": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {"type": "string"},
-                    "type": {"type": "string", "enum": ["snowflake", "bigquery", "redshift"]},
-                    "database": {"type": "string"},
-                    "schema": {"type": "string"}
-                },
-                "required": ["type", "database", "schema"],
-                "additionalProperties": false
             }
         },
         "registry": {
@@ -97,24 +87,27 @@
                             "properties": {
                                 "prefix": {"type": "string"}
                             },
-                            "required": ["prefix"]
+                            "required": ["prefix"],
+                            "additionalProperties": false
                         },
                         "models": {
                             "type": "object",
                             "properties": {
-                                "prefix": {"type": "string"}
+                                "prefix": {"type": "string"},
+                                "filter": {"type": "string"}
                             },
-                            "required": ["prefix"]
+                            "required": ["prefix", "filter"],
+                            "additionalProperties": false
                         },
                         "docs": {
                             "type": "object",
                             "properties": {
                                 "prefix": {"type": "string"},
                                 "in_folder": {"type": "boolean"},
-                                "tests": { "type": "object"},
-                                "test_unique": {"type": "boolean"}
+                                "tests": { "type": "object"}
                             },
-                            "required": ["prefix", "in_folder", "tests"]
+                            "required": ["prefix", "in_folder", "tests"],
+                            "additionalProperties": false
                         }
                     }
                 }

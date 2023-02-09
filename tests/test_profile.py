@@ -182,3 +182,7 @@ def test_non_unique_source_ids():
 
     with pytest.raises(ProfileError):
         Profile(project=project)
+
+
+# Final cleanup
+Path("./tests/fixtures/tmp_reflekt_profiles.yml").resolve().unlink(missing_ok=True)
