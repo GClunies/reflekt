@@ -38,5 +38,5 @@ To use with dbt-cloud, you will need to [create a Github personal access token](
 For local dbt development, you will need to set the environment variable on your local machine.
 ```bash
 # Add the following line to your .zshrc, .bash_profile, etc.
-export DBT_ENV_SECRET_GITHUB_PAT=MY_DBT_ENV_SECRET_GITHUB_PAT
+export DBT_ENV_SECRET_GITHUB_PAT=YOUR_TOKEN
 ```

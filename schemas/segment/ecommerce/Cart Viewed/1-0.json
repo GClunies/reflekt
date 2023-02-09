@@ -19,10 +19,8 @@
             "type": "string"
         }
     },
-    "required": ["cart_id"],
-    "additionalProperties": false,
-    "metrics": {
-        "dimensions": [],
-        "measures": []
-    }
+    "required": [
+        "cart_id"
+    ],
+    "additionalProperties": false
 }

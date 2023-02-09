@@ -25,9 +25,5 @@
         }
     },
     "required": [],
-    "additionalProperties": false,
-    "metrics": {
-        "dimensions": [],
-        "measures": []
-    }
+    "additionalProperties": false
 }
