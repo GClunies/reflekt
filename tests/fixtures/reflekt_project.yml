@@ -40,6 +40,7 @@ artifacts:
       prefix: __src_
     models:
       prefix: stg_
+      filter: ""
     docs:
       prefix: _stg_
       in_folder: false

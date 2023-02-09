@@ -492,10 +492,11 @@ if __name__ == "__main__":
     # debug()
     # pull(select="segment/surfline-web")
     # push(select="segment/ecommerce", delete=False)
-    lint(select="segment/ecommerce")
-    # build(
-    #     artifact="dbt",
-    #     select="segment/ecommerce",
-    #     sdk="segment",
-    #     source="snowflake.raw.my_app_web",
-    # )
+    # lint(select="segment/ecommerce")
+    build(
+        artifact="dbt",
+        select="segment/ecommerce",
+        source="snowflake.raw.my_app_web",
+        sdk="segment",
+        profile_name=None,  # Must have value when using Vscode debugger
+    )

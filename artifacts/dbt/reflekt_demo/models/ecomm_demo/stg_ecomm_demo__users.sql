@@ -7,7 +7,8 @@
 with
 
 source as (
-    select * from {{ source('ecomm_demo', 'users') }}
+    select *
+    from {{ source('ecomm_demo', 'users') }}
 ),
 
 renamed as (

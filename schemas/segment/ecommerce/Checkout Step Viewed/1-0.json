@@ -34,9 +34,5 @@
         "checkout_id",
         "step"
     ],
-    "additionalProperties": false,
-    "metrics": {
-        "dimensions": [],
-        "measures": []
-    }
+    "additionalProperties": false
 }

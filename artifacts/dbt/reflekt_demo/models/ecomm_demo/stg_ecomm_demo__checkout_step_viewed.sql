@@ -7,7 +7,9 @@
 with
 
 source as (
-    select * from {{ source('ecomm_demo', 'checkout_step_viewed') }}
+    select *
+    from {{ source('ecomm_demo', 'checkout_step_viewed') }}
+    where received_at < current_date
 ),
 
 renamed as (
