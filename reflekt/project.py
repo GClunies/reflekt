@@ -3,12 +3,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import pkgutil
 from pathlib import Path
 from typing import Optional, Tuple
 
 import yaml
 from git import InvalidGitRepositoryError, Repo
-from jsonschema import validate
+from jsonschema import ValidationError, validate
 
 from reflekt.dumper import ReflektYamlDumper
 
@@ -101,7 +102,19 @@ class Project:
             with self.path.open() as f:  # Load config from reflekt_project.yml
                 self.config = yaml.safe_load(f)
 
-            self.validate_project()
+            try:
+                self.validate_project()
+            except ValidationError as e:
+                raise ProjectError(
+                    message=(
+                        f"Invalid reflekt_project.yml: {e.message} at "
+                        f"'{e.json_path.replace('$.', '')}'. See the docs at "
+                        f"https://github.com/GClunies/Reflekt#reflekt_projectyml "
+                        f"for details on project configuration."
+                    ),
+                    project=self,
+                )
+
             self.version = self.config.get("version")
             self.name = self.config.get("name")
             self.vendor = self.config.get("vendor")
@@ -153,11 +166,7 @@ class Project:
 
     def validate_project(self):
         """Validate Reflekt profile configuration."""
-        reflekt_project = self.dir / "schemas/.reflekt/project/1-0.json"
-
-        with reflekt_project.open() as f:
-            schema = json.load(f)
-
+        schema = json.loads(pkgutil.get_data("reflekt", "_validation/project/1-0.json"))
         validate(self.config, schema)
 
     def _get_project_dir(self, dir: Path) -> Tuple[Path, Path]:
@@ -229,3 +238,4 @@ class ProjectError(Exception):
 
 if __name__ == "__main__":  # pragma: no cover
     project = Project()
+    pass

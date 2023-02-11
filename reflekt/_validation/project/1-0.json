@@ -109,7 +109,9 @@
                             "required": ["prefix", "in_folder", "tests"],
                             "additionalProperties": false
                         }
-                    }
+                    },
+                    "required": ["sources", "models", "docs"],
+                    "additionalProperties": false
                 }
             }
         }

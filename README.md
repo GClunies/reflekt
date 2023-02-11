@@ -158,13 +158,13 @@ registry:                       # Additional config for schema registry if neede
 artifacts:                      # Configure how data artifacts are built
   dbt:                          # dbt package config
     sources:
-      prefix: __src_            # Source files start with this prefix
+      prefix: __src_            # Source files will start with this prefix
     models:
-      prefix: stg_              # Model files start with this prefix
+      prefix: stg_              # Model files will start with this prefix
     docs:
-      prefix: _stg_             # Docs files start with this prefix
+      prefix: _stg_             # Docs files will start with this prefix
       in_folder: false          # Docs files in separate folder?
-      tests:                    # Add generic dbt tests for columns found in schemas
+      tests:                    # dbt tests to add based on column name (can be empty dict {})
         id: [unique, not_null]
 
 ```
@@ -173,7 +173,7 @@ artifacts:                      # Configure how data artifacts are built
 #### `reflekt_profiles.yml`
 Defines connection to schema registries and sources where event data is stored.
 <details>
-<summary><code>example_reflekt_profile.yml</code>(click to expand)</summary>
+<summary><code>example_reflekt_profiles.yml</code>(click to expand)</summary>
 <br>
 
 ```yaml

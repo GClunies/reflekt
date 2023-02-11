@@ -3,11 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import pkgutil
 from pathlib import Path
 from typing import List, Optional
 
 import yaml
-from jsonschema import validate
+from jsonschema import ValidationError, validate
 
 from reflekt.dumper import ReflektYamlDumper
 from reflekt.project import Project
@@ -66,7 +67,18 @@ class Profile:
                 error_msg = f"Profile '{self.name}' not found in {self.path}"
                 raise ProfileError(error_msg, profile=self)
 
-            self.validate_profile()
+            try:
+                self.validate_profile()
+            except ValidationError as e:
+                raise ProfileError(
+                    message=(
+                        f"Invalid reflekt_profile.yml: {e.message} at "
+                        f"'{e.json_path.replace('$.', '')}'. See the docs at "
+                        f"https://github.com/GClunies/Reflekt#reflekt_profilesyml "
+                        f"for details on project configuration."
+                    ),
+                    project=self,
+                )
 
             self.do_not_track = self.config.get("do_not_track")
             self.registry = self.config.get("registry")
@@ -127,11 +139,7 @@ class Profile:
 
     def validate_profile(self):
         """Validate Reflekt profile configuration."""
-        schema_path = self.project.dir / "schemas/.reflekt/profile/1-0.json"
-
-        with schema_path.open() as f:
-            schema = json.load(f)
-
+        schema = json.loads(pkgutil.get_data("reflekt", "_validation/profile/1-0.json"))
         validate(self.config, schema)
 
 
@@ -154,3 +162,4 @@ if __name__ == "__main__":  # pragma: no cover
     project = Project()
     profile = Profile(project=project)
     profile.validate_profile()
+    pass
