@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import pkgutil
 import shutil
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -491,13 +492,8 @@ class DbtBuilder:
 
         # Get common columns based on SDK used to collect event data
         if self._sdk_arg == "segment":
-            common_json = (
-                self._project.dir
-                / "schemas"
-                / ".reflekt"
-                / "segment"
-                / "common"
-                / "1-0.json"
+            common_schema = json.loads(
+                pkgutil.get_data("reflekt", "builder/_schemas/segment_common/1-0.json")
             )
         # elif self._sdk_arg == "rudderstack":
         #     pass
@@ -506,6 +502,8 @@ class DbtBuilder:
         # elif self._sdk_arg == "amplitude":
         #     pass
 
+        # Convert nested schema fields (e.g., context.page.url) to flat column names
+        # (e.g., context_page_url)
         common_columns = [
             {
                 "name": underscore(
@@ -513,7 +511,7 @@ class DbtBuilder:
                 ),
                 "description": field.schema["description"],
             }
-            for field in Flatson.from_schemafile(common_json).fields
+            for field in Flatson(common_schema).fields
         ]
 
         models_config: Dict = self._project.artifacts["dbt"]["models"]
