@@ -212,6 +212,24 @@
                         }
                     }
                 },
+                "protocols": {
+                    "type": "object",
+                    "description": "Dictionary of information about Segment Protocols violations or omissions associated with the call.",
+                    "properties": {
+                        "sourceID": {
+                            "type": "string",
+                            "description": "The ID of the Segment source that generated the violation or omission."
+                        },
+                        "violations": {
+                            "type": "string",
+                            "description": "A array of property violations that occurred in the call. Represented as a string."
+                        },
+                        "omitted": {
+                            "type": "string",
+                            "description": "A array of properties that were omitted from the call. Represented as a string."
+                        }
+                    }
+                },
                 "referrer": {
                     "type": "object",
                     "description": "Dictionary of information about the way the user was referred to the website or app, containing: type, name, url, and link.",
