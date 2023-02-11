@@ -29,6 +29,9 @@ class Project:
                 default values. Defaults to False.
             path (Optional[str]): Path to reflekt_project.yml file. If None,
                 searches Git repo for reflekt_project.yml. Defaults to None.
+
+        Raises:
+            ProjectError: An error occurred while initializing the project.
         """
         self.use_defaults = use_defaults
         self.exists: bool = False
