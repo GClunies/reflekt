@@ -40,7 +40,7 @@ https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-
 ## Getting Started
 
 ### Installation
-Reflekt is available on [PyPI](https://pypi.org/project/reflekt/). Install with `pip` (preferably in a virtual environment):
+Reflekt is available on [PyPI](https://pypi.org/project/my-reflekt-project/). Install with `pip` (preferably in a virtual environment):
 ```bash
 ❯ pip install reflekt
 ❯ reflekt --version           # Confirm installation
@@ -421,26 +421,26 @@ Schemas can be linted to test if they follow the naming and metadata conventions
 ❯ reflekt lint --select segment/ecommerce
 [18:57:45] INFO     Running with reflekt=0.3.1
 
-[18:57:46] INFO     Searching for JSON schemas in: /Users/myuser/Repos/reflekt/schemas/segment/ecommerce
+[18:57:46] INFO     Searching for JSON schemas in: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce
 
 [18:57:46] INFO     Found 9 schema(s) to lint
 
-[18:57:46] INFO     1 of 9 Linting /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Identify/1-0.json
-[18:57:47] INFO     2 of 9 Linting /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Cart Viewed/1-0.json
-[18:57:48] ERROR    Property 'cartId' in /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Cart Viewed/1-0.json does not match naming convention 'casing: snake' in
-                    /Users/myuser/Repos/reflekt/reflekt_project.yml.
-[18:57:48] INFO     3 of 9 Linting /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Checkout Step Viewed/1-0.json
-[18:57:50] INFO     4 of 9 Linting /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Group/1-0.json
-[18:57:50] INFO     5 of 9 Linting /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Order Completed/1-0.json
-[18:57:54] INFO     6 of 9 Linting /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Checkout Step Completed/1-0.json
-[18:57:55] INFO     7 of 9 Linting /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Checkout Started/1-0.json
-[18:57:58] INFO     8 of 9 Linting /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Page Viewed/1-0.json
-[18:58:01] INFO     9 of 9 Linting /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Product Added/1-0.json
+[18:57:46] INFO     1 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Identify/1-0.json
+[18:57:47] INFO     2 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json
+[18:57:48] ERROR    Property 'cartId' in /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json does not match naming convention 'casing: snake' in
+                    /Users/myuser/Repos/my-reflekt-project/reflekt_project.yml.
+[18:57:48] INFO     3 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Viewed/1-0.json
+[18:57:50] INFO     4 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Group/1-0.json
+[18:57:50] INFO     5 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Order Completed/1-0.json
+[18:57:54] INFO     6 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Completed/1-0.json
+[18:57:55] INFO     7 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Started/1-0.json
+[18:57:58] INFO     8 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Page Viewed/1-0.json
+[18:58:01] INFO     9 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Product Added/1-0.json
 
 [18:58:04] ERROR    Linting failed with 1 error(s):
 
-[18:58:04] ERROR    Property 'cartId' in /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Cart Viewed/1-0.json does not match naming convention 'casing: snake' in
-                    /Users/myuser/Repos/reflekt/reflekt_project.yml.
+[18:58:04] ERROR    Property 'cartId' in /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json does not match naming convention 'casing: snake' in
+                    /Users/myuser/Repos/my-reflekt-project/reflekt_project.yml.
 ```
 
 Running `reflekt lint` in a CI/CD pipeline is a great way to ensure schema consistency and quality before pushing schemas to a schema registry.
@@ -463,15 +463,15 @@ Pulling schemas from a registry is as easy as ...
 
 [19:28:33] INFO     Found 9 schemas to pull:
 
-[19:28:33] INFO     1 of 9 Writing to /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Identify/1-0.json
-[19:28:34] INFO     2 of 9 Writing to /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Group/1-0.json
-[19:28:34] INFO     3 of 9 Writing to /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Cart Viewed/1-0.json
-[19:28:34] INFO     4 of 9 Writing to /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Checkout Started/1-0.json
-[19:28:34] INFO     5 of 9 Writing to /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Checkout Step Completed/1-0.json
-[19:28:34] INFO     6 of 9 Writing to /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Checkout Step Viewed/1-0.json
-[19:28:34] INFO     7 of 9 Writing to /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Order Completed/1-0.json
-[19:28:34] INFO     8 of 9 Writing to /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Page Viewed/1-0.json
-[19:28:34] INFO     9 of 9 Writing to /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Product Added/1-0.json
+[19:28:33] INFO     1 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Identify/1-0.json
+[19:28:34] INFO     2 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Group/1-0.json
+[19:28:34] INFO     3 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json
+[19:28:34] INFO     4 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Started/1-0.json
+[19:28:34] INFO     5 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Completed/1-0.json
+[19:28:34] INFO     6 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Viewed/1-0.json
+[19:28:34] INFO     7 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Order Completed/1-0.json
+[19:28:34] INFO     8 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Page Viewed/1-0.json
+[19:28:34] INFO     9 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Product Added/1-0.json
 
 [19:28:34] INFO     Completed successfully
 ```
@@ -509,19 +509,19 @@ Publishing schemas to a registry follows the same pattern ...
 ❯ reflekt push --select segment/ecommerce
 [19:29:06] INFO     Running with reflekt=0.3.1
 
-[19:29:07] INFO     Searching for JSON schemas in: /Users/myuser/Repos/reflekt/schemas/segment/ecommerce
+[19:29:07] INFO     Searching for JSON schemas in: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce
 
 [19:29:07] INFO     Found 9 schemas to push
 
-[19:29:07] INFO     1 of 9 Pushing /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Identify/1-0.json
-[19:29:07] INFO     2 of 9 Pushing /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Cart Viewed/1-0.json
-[19:29:07] INFO     3 of 9 Pushing /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Checkout Step Viewed/1-0.json
-[19:29:07] INFO     4 of 9 Pushing /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Group/1-0.json
-[19:29:07] INFO     5 of 9 Pushing /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Order Completed/1-0.json
-[19:29:07] INFO     6 of 9 Pushing /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Checkout Step Completed/1-0.json
-[19:29:07] INFO     7 of 9 Pushing /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Checkout Started/1-0.json
-[19:29:07] INFO     8 of 9 Pushing /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Page Viewed/1-0.json
-[19:29:07] INFO     9 of 9 Pushing /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Product Added/1-0.json
+[19:29:07] INFO     1 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Identify/1-0.json
+[19:29:07] INFO     2 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json
+[19:29:07] INFO     3 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Viewed/1-0.json
+[19:29:07] INFO     4 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Group/1-0.json
+[19:29:07] INFO     5 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Order Completed/1-0.json
+[19:29:07] INFO     6 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Completed/1-0.json
+[19:29:07] INFO     7 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Started/1-0.json
+[19:29:07] INFO     8 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Page Viewed/1-0.json
+[19:29:07] INFO     9 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Product Added/1-0.json
 
 [19:29:08] INFO     Completed successfully
 ```
@@ -555,19 +555,19 @@ If an event schema has multiple versions, Reflekt builds a staging model for bot
 ❯ reflekt build dbt --select segment/ecommerce --source snowflake.raw.ecomm_demo --sdk segment
 [09:45:23] INFO     Running with reflekt=0.3.1
 
-[09:45:24] INFO     Searching for JSON schemas in: /Users/myuser/Repos/reflekt/schemas/segment/ecommerce
+[09:45:24] INFO     Searching for JSON schemas in: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce
 
 [09:45:24] INFO     Found 10 schemas to build
 
 [09:45:24] INFO     Building dbt package:
                         name: reflekt_demo
-                        dir: /Users/myuser/Repos/reflekt/artifacts/dbt/reflekt_demo
+                        dir: /Users/myuser/Repos/my-reflekt-project/artifacts/dbt/reflekt_demo
                         --select: segment/ecommerce
                         --sdk_arg: segment
                         --source: snowflake.raw.ecomm_demo
 
 [09:45:24] INFO     Building dbt source 'ecomm_demo'
-[09:45:24] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Identify/1-0.json
+[09:45:24] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Identify/1-0.json
 [09:45:26] INFO     Building dbt table 'identifies' in source 'ecomm_demo'
 [09:45:26] INFO     Building staging model 'stg_ecomm_demo__identifies.sql'
 [09:45:26] INFO     Building dbt documentation '_stg_ecomm_demo__identifies.yml'
@@ -577,12 +577,12 @@ If an event schema has multiple versions, Reflekt builds a staging model for bot
 [09:45:26] INFO     Building staging model 'stg_ecomm_demo__users.sql'
 [09:45:26] INFO     Building dbt documentation '_stg_ecomm_demo__users.yml'
 
-[09:45:26] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Cart Viewed/2-0.json
+[09:45:26] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/2-0.json
 [09:45:26] INFO     Building dbt table 'cart_viewed' in source 'ecomm_demo'
 [09:45:26] INFO     Building staging model 'stg_ecomm_demo__cart_viewed__v2_0.sql'
 [09:45:26] INFO     Building dbt documentation '_stg_ecomm_demo__cart_viewed__v2_0.yml'
 
-[09:45:26] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Cart Viewed/1-0.json
+[09:45:26] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json
 [09:45:27] INFO     Building staging model 'stg_ecomm_demo__cart_viewed.sql'
 [09:45:27] INFO     Building dbt documentation '_stg_ecomm_demo__cart_viewed.yml'
 
@@ -596,8 +596,8 @@ If an event schema has multiple versions, Reflekt builds a staging model for bot
 [09:45:29] INFO     Building dbt documentation '_stg_ecomm_demo__tracks.yml'
 
 
-[09:45:29] INFO     Copying dbt package from temporary path /Users/myuser/Repos/reflekt/.reflekt_cache/artifacts/dbt/reflekt_demo to
-                    /Users/myuser/Repos/reflekt/artifacts/dbt/reflekt_demo
+[09:45:29] INFO     Copying dbt package from temporary path /Users/myuser/Repos/my-reflekt-project/.reflekt_cache/artifacts/dbt/reflekt_demo to
+                    /Users/myuser/Repos/my-reflekt-project/artifacts/dbt/reflekt_demo
 
 [09:45:29] INFO     Successfully built dbt package
 ```
