@@ -475,7 +475,7 @@ Pulling schemas from a registry is as easy as ...
 
 [19:28:34] INFO     Completed successfully
 ```
-The `reflekt pull` command builds the corresponding directory structure the pulled schemas in the `schemas/` directory. For the example above, the resulting schema structure would be:
+The `reflekt pull` command builds the corresponding JSON files in the `schemas/` directory. For the example above, the resulting directory structure would be:
 ```bash
 schemas
 ├── .reflekt
