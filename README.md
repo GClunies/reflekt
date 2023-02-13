@@ -541,7 +541,7 @@ While we recommend following this practice, it can be ***a lot of work to mainta
 
 **Reflekt can help by building dbt artifacts for you with single command.** Think of this as dbt's [codegen](https://github.com/dbt-labs/dbt-codegen) package on steroids :muscle: :pill:.
 
-### Build a private dbt package
+### Building private dbt packages
 To build a private dbt package with sources, staging models, and docs that perfectly *reflekts* the schemas in a Reflekt project and the raw data in the warehouse, you can run a command like the example below.
 
 Where:
