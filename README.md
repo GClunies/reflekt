@@ -534,7 +534,7 @@ Publishing schemas to a registry follows the same pattern ...
 - Define staging models, 1-to-1 for each source, that [rename, recast, or usefully reconsider](https://discourse.getdbt.com/t/how-we-used-to-structure-our-dbt-projects/355#data-transformation-101-1) columns into a consistent format. Materialized as views.
 - Document staging models with descriptions for the model and its fields, including relevant tests (e.g., unique and not_null IDs) as required.
 
-While this is great practice that we recommend following, it can be ***a lot of work to maintain***, particularly for product analytics where:
+While we recommend following this practice, it can be ***a lot of work to maintain*** for product analytics, where:
 - There are many events (often 100+) and properties.
 - Events and properties are added or updated regularly as the product and data requirements evolve.
 - The Product and Engineer teams are bigger than the Data team, making it hard to keep up with the changes.
