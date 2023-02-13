@@ -555,19 +555,19 @@ If an event schema has multiple versions, Reflekt builds a staging model for bot
 ❯ reflekt build dbt --select segment/ecommerce --source snowflake.raw.ecomm_demo --sdk segment
 [09:45:23] INFO     Running with reflekt=0.3.1
 
-[09:45:24] INFO     Searching for JSON schemas in: /Users/gclunies/Repos/reflekt/schemas/segment/ecommerce
+[09:45:24] INFO     Searching for JSON schemas in: /Users/myuser/Repos/reflekt/schemas/segment/ecommerce
 
 [09:45:24] INFO     Found 10 schemas to build
 
 [09:45:24] INFO     Building dbt package:
                         name: reflekt_demo
-                        dir: /Users/gclunies/Repos/reflekt/artifacts/dbt/reflekt_demo
+                        dir: /Users/myuser/Repos/reflekt/artifacts/dbt/reflekt_demo
                         --select: segment/ecommerce
                         --sdk_arg: segment
                         --source: snowflake.raw.ecomm_demo
 
 [09:45:24] INFO     Building dbt source 'ecomm_demo'
-[09:45:24] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/segment/ecommerce/Identify/1-0.json
+[09:45:24] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Identify/1-0.json
 [09:45:26] INFO     Building dbt table 'identifies' in source 'ecomm_demo'
 [09:45:26] INFO     Building staging model 'stg_ecomm_demo__identifies.sql'
 [09:45:26] INFO     Building dbt documentation '_stg_ecomm_demo__identifies.yml'
@@ -577,12 +577,12 @@ If an event schema has multiple versions, Reflekt builds a staging model for bot
 [09:45:26] INFO     Building staging model 'stg_ecomm_demo__users.sql'
 [09:45:26] INFO     Building dbt documentation '_stg_ecomm_demo__users.yml'
 
-[09:45:26] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/segment/ecommerce/Cart Viewed/2-0.json
+[09:45:26] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Cart Viewed/2-0.json
 [09:45:26] INFO     Building dbt table 'cart_viewed' in source 'ecomm_demo'
 [09:45:26] INFO     Building staging model 'stg_ecomm_demo__cart_viewed__v2_0.sql'
 [09:45:26] INFO     Building dbt documentation '_stg_ecomm_demo__cart_viewed__v2_0.yml'
 
-[09:45:26] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/segment/ecommerce/Cart Viewed/1-0.json
+[09:45:26] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/reflekt/schemas/segment/ecommerce/Cart Viewed/1-0.json
 [09:45:27] INFO     Building staging model 'stg_ecomm_demo__cart_viewed.sql'
 [09:45:27] INFO     Building dbt documentation '_stg_ecomm_demo__cart_viewed.yml'
 
@@ -596,8 +596,8 @@ If an event schema has multiple versions, Reflekt builds a staging model for bot
 [09:45:29] INFO     Building dbt documentation '_stg_ecomm_demo__tracks.yml'
 
 
-[09:45:29] INFO     Copying dbt package from temporary path /Users/gclunies/Repos/reflekt/.reflekt_cache/artifacts/dbt/reflekt_demo to
-                    /Users/gclunies/Repos/reflekt/artifacts/dbt/reflekt_demo
+[09:45:29] INFO     Copying dbt package from temporary path /Users/myuser/Repos/reflekt/.reflekt_cache/artifacts/dbt/reflekt_demo to
+                    /Users/myuser/Repos/reflekt/artifacts/dbt/reflekt_demo
 
 [09:45:29] INFO     Successfully built dbt package
 ```
