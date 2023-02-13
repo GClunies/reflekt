@@ -264,7 +264,7 @@ def init(
 
 @app.command()
 def debug():
-    """Check reflekt_project.yml and reflekt_profiles.yml are configured correctly."""
+    """Check Reflekt project configuration."""
     try:
         project = Project()
         profile = Profile(project=project)
@@ -348,7 +348,7 @@ def push(
 def lint(
     select: str = typer.Option(..., "--select", "-s", help="Schema(s) to lint."),
 ):
-    """Lint schema(s) against schemas/.reflekt/meta/1-0.json and conventions in reflekt_project.yml."""
+    """Lint schema(s) to test for naming and metadata conventions."""
     errors = []
     schema_paths = []  # List of schema IDs (Paths) to pull
     select = clean_select(select)
@@ -363,6 +363,7 @@ def lint(
                 if file.endswith(".json"):
                     schema_paths.append(Path(root) / file)
     else:  # Get single schema file
+        select_path = select_path.with_suffix(".json")
         if select_path.exists():
             schema_paths.append(select_path)
 
@@ -401,19 +402,22 @@ def build(
         ..., "--select", "-s", help="Schema(s) to build data artifacts for."
     ),
     sdk: SdkEnum = typer.Option(
-        ..., "--sdk", "-sdk", help="The type of SDK that generated the data."
+        ..., "--sdk", "-sdk", help="The SDK used to collect the event data."
     ),
     source: str = typer.Option(
-        ..., "--source", "-t", help="Schema in database where event data is loaded."
+        ...,
+        "--source",
+        "-t",
+        help="Data source where the raw event data is stored. In the format `--source source_id.database.schema`, matching a configured source in reflekt_profiles.yml.",
     ),
     profile_name: str = typer.Option(
         None,
         "--profile",
         "-p",
-        help="Profile in reflekt_profiles.yml to use for source (i.e., data warehouse) connection.",
+        help="Profile in reflekt_profiles.yml to use when connecting to the .",
     ),
 ):
-    """Build data artifact(s) based on schema(s)."""
+    """Build data artifacts based on schemas."""
     select = clean_select(select)
     project = Project()
     profile = Profile(project=project, profile_name=profile_name)
@@ -439,7 +443,7 @@ def main(
         None, "--version", callback=version_callback, is_eager=True
     ),
 ):
-    """Entry point into the Reflekt CLI."""
+    """Reflekt CLI."""
     try:
         project = Project()
     except ProjectError:  # This happens when Reflekt project has not yet been created
@@ -496,7 +500,7 @@ if __name__ == "__main__":
     build(
         artifact="dbt",
         select="segment/ecommerce",
-        source="snowflake.raw.my_app_web",
+        source="snowflake.raw.ecomm_demo",
         sdk="segment",
         profile_name=None,  # Must have value when using Vscode debugger
     )

@@ -30,9 +30,5 @@
         "cart_id",
         "products"
     ],
-    "additionalProperties": false,
-    "metrics": {
-        "dimensions": [],
-        "measures": []
-    }
+    "additionalProperties": false
 }

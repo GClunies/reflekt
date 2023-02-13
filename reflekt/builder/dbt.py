@@ -668,7 +668,6 @@ class DbtBuilder:
             wh_errors_str += wh_error
 
         if self.wh_errors:
-            print("")
             logger.warning(
                 f"The data warehouse returned the following warning(s) while "
                 f"building the dbt package."

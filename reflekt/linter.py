@@ -25,7 +25,7 @@ class Linter:
             project (Project): Reflekt project object.
         """
         self._project = project
-        self._meta_path = self._project.dir / "schemas/.reflekt/event-meta/1-0.json"
+        self._meta_path = self._project.dir / "schemas/.reflekt/meta/1-0.json"
 
         with self._meta_path.open() as f:
             self._meta_schema = json.load(f)
@@ -227,8 +227,8 @@ class Linter:
     def lint_schema(self, r_schema: dict, errors: list):
         """Lint event schema.
 
-        Linting is performed against conventions defined in reflekt_self._project.yml
-        and required metadata fields defined in schemas/.reflekt/event-meta/1-0.json.
+        Linting is performed against conventions defined in reflekt_project.yml
+        and required metadata fields defined in schemas/.reflekt/meta/1-0.json.
 
         If a linting error is found, the error message is appended to the errors list.
 

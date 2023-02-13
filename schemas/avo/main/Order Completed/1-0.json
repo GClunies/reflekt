@@ -58,9 +58,5 @@
         "products",
         "revenue"
     ],
-    "additionalProperties": false,
-    "metrics": {
-        "dimensions": [],
-        "measures": []
-    }
+    "additionalProperties": false
 }

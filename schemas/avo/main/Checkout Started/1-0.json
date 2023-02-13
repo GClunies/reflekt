@@ -53,9 +53,5 @@
         "currency",
         "products"
     ],
-    "additionalProperties": false,
-    "metrics": {
-        "dimensions": [],
-        "measures": []
-    }
+    "additionalProperties": false
 }

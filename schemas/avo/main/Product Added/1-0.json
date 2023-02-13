@@ -62,9 +62,5 @@
         "quantity",
         "price"
     ],
-    "additionalProperties": false,
-    "metrics": {
-        "dimensions": [],
-        "measures": []
-    }
+    "additionalProperties": false
 }
