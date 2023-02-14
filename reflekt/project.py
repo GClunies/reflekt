@@ -1,8 +1,8 @@
 # SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 #
 # SPDX-License-Identifier: Apache-2.0
-
 import json
+import os
 import pkgutil
 from pathlib import Path
 from typing import Optional, Tuple
@@ -138,7 +138,9 @@ class Project:
                 "name": self.name,
                 "vendor": self.vendor,
                 "default_profile": self.default_profile,
-                "profiles_path": str(self.profiles_path),
+                "profiles_path": str(self.profiles_path).replace(
+                    os.path.expanduser("~"), "~"
+                ),
                 "schemas": self.schemas,
                 "registry": self.registry,
                 "artifacts": self.artifacts,
@@ -149,7 +151,9 @@ class Project:
                 "name": self.name,
                 "vendor": self.vendor,
                 "default_profile": self.default_profile,
-                "profiles_path": str(self.profiles_path),
+                "profiles_path": str(self.profiles_path).replace(
+                    os.path.expanduser("~"), "~"
+                ),
                 "schemas": self.schemas,
                 "artifacts": self.artifacts,
             }
