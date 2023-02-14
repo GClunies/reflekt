@@ -289,11 +289,9 @@ A meta-schema used to validate all event schemas in the project. Under the hood,
 ```
 
 </details>
-<br>
-
-:warning: If you don't require metadata, editing `schemas/.reflekt/meta/1-0.json` is not recommended unless you understand the implications on schema validation. :warning:
 
 <br>
+
 
 ## Using Reflekt
 ### Defining schemas
