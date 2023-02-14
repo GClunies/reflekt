@@ -280,19 +280,21 @@ class SegmentRegistry:
                 )
                 plan_data = self._handle_response(r)
                 plan_id = plan_data["trackingPlan"]["id"]
-
-            if schema_name is None:  # Update all schemas in tracking plan
-                r = requests.put(
-                    url=self.base_url + f"/{plan_id}/rules",
-                    headers=self.headers,
-                    json={"trackingPlanId": plan_id, "rules": schemas},
-                )
-            elif schema_name is not None:  # Update specified schema(s) in tracking plan
-                r = requests.patch(
-                    url=self.base_url + f"/{plan_id}/rules",
-                    headers=self.headers,
-                    json={"trackingPlanId": plan_id, "rules": schemas},
-                )
+            else:
+                if schema_name is None:  # Update all schemas in tracking plan
+                    r = requests.put(
+                        url=self.base_url + f"/{plan_id}/rules",
+                        headers=self.headers,
+                        json={"trackingPlanId": plan_id, "rules": schemas},
+                    )
+                elif (
+                    schema_name is not None
+                ):  # Update specified schema(s) in tracking plan
+                    r = requests.patch(
+                        url=self.base_url + f"/{plan_id}/rules",
+                        headers=self.headers,
+                        json={"trackingPlanId": plan_id, "rules": schemas},
+                    )
         else:  # Delete schemas
             r = requests.delete(
                 url=self.base_url + f"/{plan_id}/rules",

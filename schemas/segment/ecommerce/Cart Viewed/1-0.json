@@ -17,10 +17,15 @@
         "cart_id": {
             "description": "Cart ID to which the product was added to",
             "type": "string"
+        },
+        "products": {
+            "description": "Products in the cart",
+            "type": "array"
         }
     },
     "required": [
-        "cart_id"
+        "cart_id",
+        "products"
     ],
     "additionalProperties": false
 }

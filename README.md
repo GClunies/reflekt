@@ -9,17 +9,14 @@ SPDX-License-Identifier: Apache-2.0
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/reflekt?style=for-the-badge)
 ![GitHub](https://img.shields.io/github/license/gclunies/reflekt?style=for-the-badge)
 
+> ***Product analytics is a team sport***
 
-**Product analytics is a team sport** - Reflekt helps Data, Engineering, and Product teams to:
-- Define event schemas as `code` using [jsonschema](https://json-schema.org/).
-  - Unlike spreadsheets or GUIs, code can be versioned controlled, tested, and extended. You own your code.
-  - Pull requests are the perfect medium for collaboration, review, and feedback amongst team members.
-- Lint schemas to test for naming and metadata conventions, ensuring schema consistency and quality.
-- Interact with Schema Registries - pull schemas from a registry or push schemas to update a registry.
-- Build private dbt packages defining sources, models, and documentation that *reflekt* the event schemas and collected data.
-  - Save time. Stop writing sources, staging models, or docs for your product analytics events.
-  - Complete documentation ready to be used by teams and the business.
-  - Easily imported into a dbt project using `packages.yml`.
+Reflekt helps Data, Engineering, and Product teams work together to define event schemas as `code`using [jsonschema](https://json-schema.org/), making it easy to:
+- Version control a single source of truth for schemas.
+- Use pull requests to propose schema changes, get input from team members, and request reviews.
+- Run a CI suite to [lint](#linting-schemas) schemas, [push](#push-schemas-to-a-registry) them to a schema registry, and [build matching dbt artifacts](#building-private-dbt-packages).
+
+Reflekt integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts) to help teams define and manage the schemas for their event instrumentation while saving time by automating downstream data work.
 
 https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
 
@@ -36,6 +33,7 @@ https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-
   - [Linting schemas](#linting-schemas)<br>
   - [Interacting with schema registries](#interacting-with-schema-registries)<br>
   - [Building dbt artifacts](#dbt-artifacts)<br>
+  - [Supported data warehouses](#supported-data-warehouses)<br>
 
 ## Getting Started
 
@@ -447,10 +445,10 @@ Schema registries are used to store and serve schemas. Once a schema is in a reg
 
 | **Registry**          | **`--push` support** | **`--pull` support** | **Schema `--select` syntax**            | **Schema `version` support**                                                                                                                                                                                            |
 |-----------------------|:--------:|:--------:|----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Segment Protocols** |     ✅    |     ✅    | `--select segment/tracking_plan_name` | `MAJOR-0` only. Versions with `MINOR` != 0 will throw error.                                                                                                                                                          |
+| **Segment Protocols** |     ✅    |     ✅    | `--select segment/tracking_plan_name` | Only supports `MAJOR-0` versions.                                                                                                                                              |
 | **Avo**               |     ❌    |     ✅    | `--select avo/branch_name`            | Schema changes managed in Avo [branches](https://www.avo.app/docs/workspace/branches) - `"version": "1-0"` (always).<br> Avo customers pull schemas with `reflekt pull` and build dbt artifacts with `reflekt build`. |
 
-
+#### Pull schemas from a registry
 Pulling schemas from a registry is as easy as ...
 ```bash
 ❯ reflekt pull --select segment/ecommerce
@@ -498,8 +496,7 @@ schemas
             └── 1-0.json
 ```
 
-<br>
-
+#### Push schemas to a registry
 Publishing schemas to a registry follows the same pattern ...
 
 ```bash
@@ -624,3 +621,9 @@ For local dbt development, set the environment variable on your local machine.
 # Add the following line to your .zshrc, .bash_profile, etc.
 export DBT_ENV_SECRET_GITHUB_PAT=YOUR_TOKEN
 ```
+
+### Supported data warehouses
+Reflekt currently supports the following data warehouses:
+- Snowflake
+- Redshift
+- :construction: BigQuery support coming soon! :construction:
