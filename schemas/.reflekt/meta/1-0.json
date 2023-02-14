@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": ".reflekt/event-meta/1-0.json",
+    "$id": ".reflekt/meta/1-0.json",
     "description": "Meta-schema for all Reflekt events",
     "self": {
         "vendor": "reflekt",
