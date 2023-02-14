@@ -16,7 +16,7 @@ Reflekt helps Data, Engineering, and Product teams work together to define event
 - Use pull requests to propose schema changes, get input from team members, and request reviews.
 - Run a CI suite to [lint](#linting-schemas) schemas, [push](#push-schemas-to-a-registry) them to a schema registry, and [build matching dbt artifacts](#building-private-dbt-packages).
 
-Reflekt integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts) to help teams define and manage the schemas for their event instrumentation while saving time by automating downstream data work.
+Reflekt integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts) to provide a process to define, manage, and govern event schemas and instrumentation. By leveraging schemas, Reflekt can automate downstream data work, saving time and improving data quality.
 
 https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
 
