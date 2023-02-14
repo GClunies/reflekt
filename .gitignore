@@ -148,3 +148,4 @@ dmypy.json
 /reflekt_profiles.yml
 TODO.md
 .DS_Store
+.internal
