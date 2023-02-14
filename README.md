@@ -12,7 +12,7 @@ SPDX-License-Identifier: Apache-2.0
 > ***Product analytics is a team sport***
 
 Reflekt helps Data, Engineering, and Product teams work together to define event schemas as `code`using [jsonschema](https://json-schema.org/), making it easy to:
-- Version control a single source of truth for schemas.
+- Version control event schemas, creating a single source of truth.
 - Use pull requests to propose schema changes, get input from team members, and request reviews.
 - Run a CI suite to [lint](#linting-schemas) schemas, [push](#push-schemas-to-a-registry) them to a schema registry, and [build matching dbt artifacts](#building-private-dbt-packages).
 
