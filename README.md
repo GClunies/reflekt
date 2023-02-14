@@ -292,7 +292,6 @@ A meta-schema used to validate all event schemas in the project. Under the hood,
 
 <br>
 
-
 ## Using Reflekt
 ### Defining schemas
 Event schemas are defined using [jsonschema](https://json-schema.org/). Each schema is defined as a separate JSON file, stored in the `schemas/` directory of a Reflekt project. An example `ProductClicked` event schema is shown below.
