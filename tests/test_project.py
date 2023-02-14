@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import copy
+import os
 import shutil
 from pathlib import Path
 
@@ -209,7 +210,9 @@ def test_project_to_yaml():
     assert project_yaml["name"] == "test_project"
     assert project_yaml["default_profile"] == "test_profile"
     assert project_yaml["profiles_path"] == str(
-        Path("./tests/fixtures/reflekt_profiles.yml").resolve()
+        str(Path("./tests/fixtures/reflekt_profiles.yml").resolve()).replace(
+            os.path.expanduser("~"), "~"
+        )
     )
     assert project.schemas == {
         "conventions": {
