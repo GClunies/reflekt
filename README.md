@@ -124,10 +124,10 @@ Contains general project settings as well as configuration for schema convention
 # GENERAL CONFIG ----------------------------------------------------------------------
 version: 1.0
 
-name: reflekt_demo               # Project name
-vendor: com.company_name         # Default vendor for schemas in reflekt project
-default_profile: dev_reflekt     # Default profile to use from reflekt_profiles.yml
-# profiles_path: optional/path/to/reflekt_profiles.yml  # Optional, defaults to ~/.reflekt/reflekt_profiles.yml
+name: reflekt_demo              # Project name
+vendor: com.company_name        # Default vendor for schemas in reflekt project
+default_profile: dev_reflekt    # Default profile to use from reflekt_profiles.yml
+profiles_path: ~/.reflekt/reflekt_profiles.yml  # Path to reflekt_profiles.yml
 
 # SCHEMAS CONFIG ----------------------------------------------------------------------
 schemas:                        # Define schema conventions
