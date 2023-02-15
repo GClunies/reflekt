@@ -11,12 +11,12 @@ SPDX-License-Identifier: Apache-2.0
 
 > ***Product analytics is a team sport***
 
-Reflekt helps Data, Engineering, and Product teams work together to define event schemas as `code`using [jsonschema](https://json-schema.org/), making it easy to:
-- Version control event schemas, creating a single source of truth.
-- Use pull requests to propose schema changes, get input from team members, and request reviews.
-- Run a CI suite to [lint](#linting-schemas) schemas, [push](#push-schemas-to-a-registry) them to a schema registry, and [build matching dbt artifacts](#building-private-dbt-packages).
+Reflekt helps Data, Engineering, and Product teams work together to define, manage, and model events for product analytics.
+- Event schemas are defined as `code`using [jsonschema](https://json-schema.org/). Creating a version controlled source-of-truth.
+- Open pull requests (PRs) to propose schema changes, get input, and request reviews.
+- Easily build a CI suite to [lint](#linting-schemas) schemas, [push](#push-schemas-to-a-registry) them to a schema registry, and [build matching dbt artifacts](#building-private-dbt-packages).
 
-Reflekt integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts) to provide a process to define, manage, and govern event schemas and instrumentation. By leveraging schemas, Reflekt can automate downstream data work, saving time and improving data quality.
+Reflekt integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts).
 
 https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
 
