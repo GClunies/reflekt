@@ -27,6 +27,7 @@ renamed as (
         context_library_version as library_version,
         context_user_agent as user_agent,
         cart_id,
+        products,
         'track'::varchar as call_type,
         'ecomm_demo'::varchar as source_schema,
         'cart_viewed'::varchar as source_table,
