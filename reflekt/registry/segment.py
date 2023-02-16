@@ -201,7 +201,7 @@ class SegmentRegistry:
 
         return response.json()["data"]
 
-    def _pull_segment(self, select: str) -> List:
+    def _get_segment(self, select: str) -> List:
         """Fetch Segment tracking plan schemas from API based on --select from CLI.
 
         Args:
@@ -253,12 +253,15 @@ class SegmentRegistry:
 
         return s_schemas
 
-    def _push_segment(
+    def _post_put_patch_del_segment(
         self, select: str, plan_name: str, schemas: List, delete: bool = False
     ) -> None:
         """Sync Reflekt schemas to Segment Protocols based on --select from CLI.
 
-        If the tracking plan does not exist, it will be created.
+        Tracking plan does not exists -> POST request to create tracking plan
+        Tracking plan exists -> PUT request to update tracking plan
+        Specific schema(s) selected -> PATCH request to update tracking plan
+        Delete flag set -> DELETE request to delete schema(s) from tracking plan
 
         Args:
             select (str): The --select argument passed to Reflekt CLI.
@@ -313,7 +316,7 @@ class SegmentRegistry:
             select (str): The --select argument passed to Reflekt CLI.
         """
         plan_name, _, _ = self._parse_select(select)
-        s_schemas = self._pull_segment(select=select)  # Segment schemas
+        s_schemas = self._get_segment(select=select)  # Segment schemas
 
         for i, s_schema in enumerate(s_schemas, start=1):
             if s_schema["type"] in ["IDENTIFY", "GROUP"]:
@@ -486,7 +489,7 @@ class SegmentRegistry:
 
             s_schemas.append(s_schema)
 
-        self._push_segment(
+        self._post_put_patch_del_segment(
             select=select, plan_name=plan_name, schemas=s_schemas, delete=delete
         )
 
