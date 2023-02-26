@@ -202,7 +202,7 @@ class SegmentRegistry:
         return response.json()["data"]
 
     def _get_segment(self, select: str) -> List:
-        """Fetch Segment tracking plan schemas from API based on --select from CLI.
+        """Get Segment tracking plan schemas from API based on --select from CLI.
 
         Args:
             select (str): The --select argument passed to Reflekt CLI.
@@ -385,14 +385,14 @@ class SegmentRegistry:
             # Copy empty Reflekt jsonschema and set values
             r_schema = copy.deepcopy(REFLEKT_JSON_SCHEMA)
             r_schema["$id"] = id
+            r_schema["description"] = description
             r_schema["self"]["vendor"] = self.profile.project.vendor
             r_schema["self"]["name"] = name
-            r_schema["description"] = description
             r_schema["self"]["version"] = version
+            r_schema["self"]["metadata"] = metadata
             r_schema["properties"] = properties
             r_schema["required"] = required
             r_schema["additionalProperties"] = additional_properties
-            r_schema["metadata"] = metadata
 
             write_path = Path(self.profile.project.dir / "schemas" / r_schema["$id"])
 
@@ -410,7 +410,7 @@ class SegmentRegistry:
 
         return len(s_schemas)  # Return the count of schemas pulled
 
-    def push(self, select: str, delete: bool = False) -> None:
+    def push(self, select: str, delete: bool = False) -> int:
         """Push Reflekt JSON schemas to Segment Protocols.
 
         Args:
@@ -420,6 +420,9 @@ class SegmentRegistry:
 
         Raises:
             SelectArgError: Error with the --select argument.
+
+        Returns:
+            int: The count of schemas pushed to Segment Protocols.
         """
         plan_name, _, schema_version = self._parse_select(select)
 
@@ -480,7 +483,7 @@ class SegmentRegistry:
                 s_schema["key"] = r_schema["self"]["name"]
                 s_schema["type"] = "TRACK"
                 s_schema["version"] = int(r_schema["self"]["version"].split("-")[0])
-                s_schema["jsonSchema"]["labels"] = r_schema["metadata"]
+                s_schema["jsonSchema"]["labels"] = r_schema["self"]["metadata"]
                 s_schema["jsonSchema"]["description"] = r_schema["description"]
                 s_schema["jsonSchema"]["properties"]["properties"][
                     "properties"

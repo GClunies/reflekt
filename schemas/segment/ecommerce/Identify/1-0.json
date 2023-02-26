@@ -6,9 +6,9 @@
         "vendor": "com.reflekt-ci",
         "name": "Identify",
         "format": "jsonschema",
-        "version": "1-0"
+        "version": "1-0",
+        "metadata": {}
     },
-    "metadata": {},
     "type": "object",
     "properties": {
         "email": {

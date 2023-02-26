@@ -17,7 +17,6 @@ REFLEKT_JSON_SCHEMA = {
         "format": "jsonschema",
         "version": "1-0",
     },
-    "metadata": {},
     "type": "object",
     "properties": {},
     "required": [],

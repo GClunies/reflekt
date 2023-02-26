@@ -135,8 +135,8 @@ class AvoRegistry:
 
         return response.json()["events"]
 
-    def pull_avo(self, select: str, branch: str) -> List:
-        """Pull tracking plan schemas from Avo.
+    def _get_avo(self, select: str, branch: str) -> List:
+        """Get Avo tracking plan schemas from API based on --select from CLI.
 
         Args:
             select (str): The --select argument passed to Reflekt CLI.
@@ -176,7 +176,7 @@ class AvoRegistry:
             select (str): The --select argument passed to Reflekt CLI.
         """
         branch = self._parse_select(select=select)
-        a_schemas = self.pull_avo(select=select, branch=branch)
+        a_schemas = self._get_avo(select=select, branch=branch)
 
         for i, a_schema in enumerate(a_schemas, start=1):
             name = a_schema["name"]
@@ -218,14 +218,14 @@ class AvoRegistry:
             # Copy empty Reflekt jsonschema and set values
             r_schema = copy.deepcopy(REFLEKT_JSON_SCHEMA)
             r_schema["$id"] = id
+            r_schema["description"] = description
             r_schema["self"]["vendor"] = self.profile.project.vendor
             r_schema["self"]["name"] = name
-            r_schema["description"] = description
             r_schema["self"]["version"] = version
+            r_schema["self"]["metadata"] = metadata
             r_schema["properties"] = properties
             r_schema["required"] = required
             r_schema["additionalProperties"] = additional_properties
-            r_schema["metadata"] = metadata
 
             write_path = Path(self.profile.project.dir / "schemas" / r_schema["$id"])
 
