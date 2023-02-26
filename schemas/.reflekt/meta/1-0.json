@@ -6,7 +6,8 @@
         "vendor": "reflekt",
         "name": "meta",
         "format": "jsonschema",
-        "version": "1-0"
+        "version": "1-0",
+        "metadata": {}
     },
     "type": "object",
     "allOf": [
