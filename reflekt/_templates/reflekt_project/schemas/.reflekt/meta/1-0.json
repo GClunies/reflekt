@@ -6,7 +6,8 @@
         "vendor": "reflekt",
         "name": "meta",
         "format": "jsonschema",
-        "version": "1-0"
+        "version": "1-0",
+        "metadata": {}
     },
     "type": "object",
     "allOf": [
@@ -35,39 +36,17 @@
                             "type": "string",
                             "description": "The schema version, in MODEL-ADDITION format (e.g., 1-0, 1-1, 2-3, etc.)",
                             "pattern": "^[1-9][0-9]*-(0|[1-9][0-9]*)$"
-                        }
-                    },
-                    "required": ["vendor", "name", "format", "version"],
-                    "additionalProperties": false
-                },
-                "metadata": {
-                    "type": "object",
-                    "description": "Required metadata for all event schemas",
-                    "properties": {},
-                    "required": [],
-                    "additionalProperties": false
-                },
-                "properties": {},
-                "tests": {},
-                "metrics": {
-                    "type": "object",
-                    "properties": {
-                        "dimensions": {
-                            "type": "array",
-                            "description": "Schema properties to be used as dimensions",
-                            "items": {"type": "string"}
                         },
-                        "measures": {
-                            "type": "array",
-                            "description": "Schema properties to be used as measures",
-                            "items": { "type": "string"}
-                        }
+                        "metadata": {},
+                        "tests": {},
+                        "metrics": {}
                     },
-                    "required": ["dimensions", "measures"],
+                    "required": ["vendor", "name", "format", "version", "metadata"],
                     "additionalProperties": false
-                }
+                },
+                "properties": {}
             },
-            "required": ["self", "metadata", "properties"]
+            "required": ["self", "properties"]
         }
     ]
 }
