@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/ecommerce/Schemas Pulled/1-0.json",
+    "description": "Schemas linted to test for naming and meta data conventions.",
+    "self": {
+        "vendor": "cli.reflekt",
+        "name": "Schemas Pulled",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {},
+    "type": "object",
+    "properties": {
+        "project_id": {
+            "description": "Unique identifier for the Reflekt project. MD5 hash of the project name.",
+            "type": "string"
+        },
+        "profile_id": {
+            "description": "Unique identifier for the Reflekt profile. MD5 hash of the profile name.",
+            "type": "string"
+        },
+        "schema_registry": {
+            "description": "The type of schema registry the schemas were pulled from.",
+            "type": "string",
+            "enum": [
+                "segment",
+                "avo"
+            ]
+        },
+        "count_schemas": {
+            "description": "The number of schemas pulled from the schema registry.",
+            "type": "integer"
+        },
+        "ci": {
+            "description": "Whether the command was knowingly run in a CI/CD environment. True if an environment variable `CI=true` is found.",
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "project_id",
+        "profile_id",
+        "schema_registry",
+        "count_schemas",
+        "ci"
+    ],
+    "additionalProperties": false
+}

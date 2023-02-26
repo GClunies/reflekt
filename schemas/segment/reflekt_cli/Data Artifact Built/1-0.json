@@ -1,0 +1,60 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/ecommerce/Data Artifact Built/1-0.json",
+    "description": "Data artifact build based on schemas defined in a Reflekt project.",
+    "self": {
+        "vendor": "cli.reflekt",
+        "name": "Data Artifact Built",
+        "format": "jsonschema",
+        "version": "1-0"
+    },
+    "metadata": {},
+    "type": "object",
+    "properties": {
+        "project_id": {
+            "description": "Unique identifier for the Reflekt project. MD5 hash of the project name.",
+            "type": "string"
+        },
+        "profile_id": {
+            "description": "Unique identifier for the Reflekt profile. MD5 hash of the profile name.",
+            "type": "string"
+        },
+        "data_artifact": {
+            "description": "The type of data artifact that was built.",
+            "type": "string",
+            "enum": [
+                "dbt"
+            ]
+        },
+        "data_warehouse": {
+            "description": "The type of data warehouse storing the raw event data.",
+            "type": "string",
+            "enum": [
+                "snowflake",
+                "redshift"
+            ]
+        },
+        "source_id": {
+            "description": "Unique identifier for the Reflekt source. MD5 hash of the --source argument.",
+            "type": "string"
+        },
+        "count_schemas": {
+            "description": "The number of schemas for which the data artifact was built.",
+            "type": "integer"
+        },
+        "ci": {
+            "description": "Whether the command was knowingly run in a CI/CD environment.",
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "project_id",
+        "profile_id",
+        "data_artifact",
+        "data_warehouse",
+        "source_id",
+        "count_schemas",
+        "ci"
+    ],
+    "additionalProperties": false
+}

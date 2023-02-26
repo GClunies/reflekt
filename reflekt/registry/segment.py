@@ -309,11 +309,14 @@ class SegmentRegistry:
         print("")
         logger.info("[green]Completed successfully[green/]")
 
-    def pull(self, select: str) -> None:
+    def pull(self, select: str) -> int:
         """Pull schemas from Segment Protocols and write to Reflekt JSON schemas files.
 
         Args:
             select (str): The --select argument passed to Reflekt CLI.
+
+        Returns:
+            int: The count of schemas pulled from Segment Protocols.
         """
         plan_name, _, _ = self._parse_select(select)
         s_schemas = self._get_segment(select=select)  # Segment schemas
@@ -405,6 +408,8 @@ class SegmentRegistry:
         print("")
         logger.info("[green]Completed successfully[green/]")
 
+        return len(s_schemas)  # Return the count of schemas pulled
+
     def push(self, select: str, delete: bool = False) -> None:
         """Push Reflekt JSON schemas to Segment Protocols.
 
@@ -492,6 +497,8 @@ class SegmentRegistry:
         self._post_put_patch_del_segment(
             select=select, plan_name=plan_name, schemas=s_schemas, delete=delete
         )
+
+        return len(r_schemas)  # Return the count of schemas pushed
 
 
 if __name__ == "__main__":  # pragma: no cover
