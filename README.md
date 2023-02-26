@@ -13,10 +13,10 @@ SPDX-License-Identifier: Apache-2.0
 
 Reflekt helps Data, Engineering, and Product teams work together to define, manage, and model events for product analytics. Reflekt integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts).
 
-- Event schemas are defined as `code` using [jsonschema](https://json-schema.org/), version controlled, and stored in a GitHub repo.
+- Define event schemas (aka data contracts) as `code` using [jsonschema](https://json-schema.org/). Schemas are version controlled, and stored in a GitHub repo.
 - Configure naming and metadata conventions for events and properties. Lint schemas to test for compliance.
 - Open pull requests (PRs) to propose schema changes, get input, and request reviews.
-- Easily build a CI suite to [lint](#linting-schemas) schemas, [push](#push-schemas-to-a-registry) them to a schema registry, and [build matching dbt artifacts](#building-private-dbt-packages).
+- Easily build a CI suite to [lint](#linting-schemas) schemas, [push](#push-schemas-to-a-registry) them to a schema registry, and [build corresponding dbt artifacts](#building-private-dbt-packages).
 
 https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
 
@@ -260,23 +260,19 @@ To define ***required metadata*** for all event schemas in your project, you can
                             "type": "string",
                             "description": "The schema version, in MODEL-ADDITION format (e.g., 1-0, 1-1, 2-3, etc.)",
                             "pattern": "^[1-9][0-9]*-(0|[1-9][0-9]*)$"
-                        }
+                        },
+                        "metadata": {  // EXAMPLE: Defining required metadata (code_owner, product_owner)
+                            "type": "object",
+                            "description": "Required metadata for all event schemas",
+                            "properties": {
+                                "code_owner": {"type": "string"},
+                                "product_owner": {"type": "string"}
+                            },
+                            "required": ["code_owner", "product_owner"],
+                            "additionalProperties": false
+                        },
                     },
                     "required": ["vendor", "name", "format", "version"],
-                    "additionalProperties": false
-                },
-                "metadata": {  // EXAMPLE: Defining required metadata (code_owner, product_owner)
-                    "type": "object",
-                    "description": "Required metadata for all event schemas",
-                    "properties": {
-                        "code_owner": {
-                            "type": "string"
-                        },
-                        "product_owner": {
-                            "type": "string"
-                        }
-                    },
-                    "required": ["code_owner", "product_owner"],
                     "additionalProperties": false
                 },
                 "properties": {},
@@ -310,11 +306,11 @@ Event schemas are defined using [jsonschema](https://json-schema.org/). Each sch
       "vendor": "com.company_name",  // Company, application, team, or system that authored the schema
       "name": "ProductClicked",      // Name of the event
       "format": "jsonschema",        // Format of the schema
-      "version": "1-0"               // Version of the schema
-  },
-  "metadata": {                      // Metadata for the event
-      "code_owner": "engineering/ecommerce-squad",
-      "product_owner": "product_manager_name@company_name.com",
+      "version": "1-0",              // Version of the schema
+      "metadata": {                  // Metadata for the event
+          "code_owner": "engineering/ecommerce-squad",
+          "product_owner": "product_manager_name@company_name.com",
+      }
   },
   "type": "object",
   "properties": {                   // Properties of the event
@@ -377,7 +373,7 @@ Event schemas are defined using [jsonschema](https://json-schema.org/). Each sch
       "price",
       "quantity"
   ],
-  "additionalProperties": false,  // No additional properties allowed
+  "additionalProperties": false,   // No additional properties allowed
 }
 ```
 
