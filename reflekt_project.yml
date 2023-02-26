@@ -42,7 +42,7 @@ artifacts:                      # Configure how data artifacts are built
     models:
       prefix: stg_              # Model files start with this prefix
       filter:                   # Filter for model files (can be empty string)
-        where received_at < current_date
+        where received_at < get_date()
     docs:
       prefix: _stg_             # Docs files start with this prefix
       in_folder: false          # Docs files in separate folder?

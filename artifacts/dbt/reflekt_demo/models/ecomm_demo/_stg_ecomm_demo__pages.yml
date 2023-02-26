@@ -77,7 +77,7 @@ models:
           from the DOM API.
       - name: call_type
         description: The type of Segment call (i.e., identify, group, page,
-          screen, track) that collected the data.
+          screen , track) that collected the data.
       - name: source_schema
         description: The schema where the raw event data is stored.
       - name: source_table

@@ -538,7 +538,7 @@ class DbtBuilder:
             event_name = schema_json["self"]["name"]
             event_desc = schema_json["description"]
             table_name = underscore(event_name.lower().replace(" ", "_"))
-            metadata = schema_json["metadata"]
+            metadata = schema_json["self"]["metadata"]
 
             if self.sdk_arg == "segment":  # Handle Segment-specific table naming
                 table_name = (
