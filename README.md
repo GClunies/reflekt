@@ -292,6 +292,7 @@ To define ***required metadata*** for all event schemas in your project, you can
 </details>
 
 <br>
+<br>
 
 ## Using Reflekt
 ### Defining schemas
