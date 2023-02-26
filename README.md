@@ -603,6 +603,7 @@ To use a Reflekt dbt package in a downstream dbt project, add it to the dbt proj
 
 #### dbt-core
 ```yaml
+# packages.yml
 packages:
   - git: "https://github.com/<your_user_or_org>/<your_repo>"  # Reflekt project Github repo URL
     subdirectory: "dbt-packages/<reflekt_dbt_package_name>"
@@ -611,6 +612,7 @@ packages:
 
 #### dbt-cloud
 ```yaml
+# packages.yml
 packages:
   - git: ""https://{{env_var('DBT_ENV_SECRET_GITHUB_PAT')}}@github.com/<your_user_or_org>/<your_repo>.git""  # Reflekt project Github repo URL with GitHub PAT
     subdirectory: "dbt-packages/<reflekt_dbt_package_name>"
