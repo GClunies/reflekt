@@ -599,7 +599,7 @@ If an event schema has multiple versions, Reflekt builds a staging model for bot
 ```
 
 ### Using private dbt packages
-To use a Reflekt dbt package in a downstream dbt project, add it to dbt project's `packages.yml`.
+To use a Reflekt dbt package in a downstream dbt project, add it to the dbt project's `packages.yml`.
 
 #### dbt-core
 ```yaml
