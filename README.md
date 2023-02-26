@@ -13,8 +13,8 @@ SPDX-License-Identifier: Apache-2.0
 
 Reflekt helps Data, Engineering, and Product teams work together to define, manage, and model events for product analytics. Reflekt integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts).
 
-- Event schemas are defined as `code` using [jsonschema](https://json-schema.org/). Creating a version controlled source-of-truth.
-- Configure naming and metadata conventions for events and properties.
+- Event schemas are defined as `code` using [jsonschema](https://json-schema.org/), version controlled, and stored in a GitHub repo.
+- Configure naming and metadata conventions for events and properties. Lint schemas to test for compliance.
 - Open pull requests (PRs) to propose schema changes, get input, and request reviews.
 - Easily build a CI suite to [lint](#linting-schemas) schemas, [push](#push-schemas-to-a-registry) them to a schema registry, and [build matching dbt artifacts](#building-private-dbt-packages).
 
@@ -38,17 +38,18 @@ https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-
 ## Getting Started
 
 ### Installation
-Reflekt is available on [PyPI](https://pypi.org/project/my-reflekt-project/). Install with `pip` (preferably in a virtual environment):
+Reflekt is available on [PyPI](https://pypi.org/project/my-reflekt-project/). Install with `pip` (or package manager of choice), preferably in a virtual environment:
 ```bash
-❯ pip install reflekt
-❯ reflekt --version           # Confirm installation
+❯ source /path/to/venv/bin/activate  # Activate virtual environment
+❯ pip install reflekt                # Install Reflekt
+❯ reflekt --version                  # Confirm installation
 Reflekt CLI Version: 0.3.1
 ```
 
 ### Reflekt `--help`
 The `--help` flag provides an overview of available `reflekt` commands.
 ```bash
-❯ reflekt --help
+❯ reflekt --help  # Show general --help details
 
  Usage: reflekt [OPTIONS] COMMAND [ARGS]...
 
@@ -72,7 +73,7 @@ The `--help` flag provides an overview of available `reflekt` commands.
 
 Each command also has a `--help` flag providing command details (arguments, options, syntax, etc.).
 ```bash
-❯ reflekt lint --help
+❯ reflekt lint --help  # Show --help details for `reflekt lint`
 
  Usage: reflekt lint [OPTIONS]
 
@@ -85,7 +86,7 @@ Each command also has a `--help` flag providing command details (arguments, opti
 ```
 
 ### Creating a project
-After creating a Git repo, you can create a new Reflekt project by running
+Create a new directory, initialize a new Git repo, and run `reflekt init` to create a new Reflekt project.
 ```bash
 ❯ mkdir ~/Repos/my-reflekt-project  # Create a new directory for the project
 ❯ cd ~/Repos/my-reflekt-project     # Navigate to the project directory
@@ -110,7 +111,7 @@ my-reflekt-project
 ### Project configuration
 Reflekt uses 3 files to configure a project: `reflekt_project.yml`, `reflekt_profiles.yml`, and `schemas/.reflekt/meta/1-0.json`. Under the hood, Reflekt validates these configuration files before running, raising errors if an invalid configuration is detected. Examples of each file with configuration details are found below.
 
-#### `reflekt_project.yml`
+#### **reflekt_project.yml**
 Contains general project settings as well as configuration for schema conventions, schema registry details (if needed), and data artifact generation. Click to expand the example below with details on each setting.
 
 <details>
@@ -168,7 +169,7 @@ artifacts:                      # Configure how data artifacts are built
 </details>
 <br>
 
-#### `reflekt_profiles.yml`
+#### **reflekt_profiles.yml**
 Contains connection details for schema registries (used to validate event data) and data sources (i.e., data warehouse with raw event data). Click to expand the example below with details on each setting.
 <details>
 <summary><code>example_reflekt_profiles.yml</code>(CLICK TO EXPAND)</summary>
@@ -212,8 +213,10 @@ dev_reflekt:                                              # Profile name (multip
 </details>
 <br>
 
-#### `schemas/.reflekt/meta/1-0.json`
-A meta-schema used to validate all event schemas in the project. Under the hood, Reflekt uses this meta-schema along with the conventions defined in `reflekt_project.yml` to validate event schemas. If you want to define ***required metadata*** for all event schemas in your project, you can update the `metadata` object. See the example below showing how to require **code owner** and **product owner** metadata.
+#### **schemas/.reflekt/meta/1-0.json**
+A meta-schema used to validate all event schemas in the project. Under the hood, Reflekt uses this meta-schema along with the naming conventions defined in the `reflekt_project.yml` file to validate all event schemas.
+
+To define ***required metadata*** for all event schemas in your project, you can update the `metadata` object in `schemas/.reflekt/meta/1-0.json`. See the example below showing how to require both **code owner** and **product owner** metadata.
 
 <details>
 <summary><code>schemas/.reflekt/meta/1-0.json</code>(CLICK TO EXPAND)</summary>
@@ -409,37 +412,6 @@ As data collection requirements change, event schemas must be updated to *reflek
 
 When defining a new schema version, **create a new file** with the incremented version and updated schema definition.
 
-### Linting schemas
-Schemas can be linted to test if they follow the naming and metadata conventions configured for a Reflekt project.
-
-```bash
-❯ reflekt lint --select segment/ecommerce
-[18:57:45] INFO     Running with reflekt=0.3.1
-
-[18:57:46] INFO     Searching for JSON schemas in: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce
-
-[18:57:46] INFO     Found 9 schema(s) to lint
-
-[18:57:46] INFO     1 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Identify/1-0.json
-[18:57:47] INFO     2 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json
-[18:57:48] ERROR    Property 'cartId' in /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json does not match naming convention 'casing: snake' in
-                    /Users/myuser/Repos/my-reflekt-project/reflekt_project.yml.
-[18:57:48] INFO     3 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Viewed/1-0.json
-[18:57:50] INFO     4 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Group/1-0.json
-[18:57:50] INFO     5 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Order Completed/1-0.json
-[18:57:54] INFO     6 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Completed/1-0.json
-[18:57:55] INFO     7 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Started/1-0.json
-[18:57:58] INFO     8 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Page Viewed/1-0.json
-[18:58:01] INFO     9 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Product Added/1-0.json
-
-[18:58:04] ERROR    Linting failed with 1 error(s):
-
-[18:58:04] ERROR    Property 'cartId' in /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json does not match naming convention 'casing: snake' in
-                    /Users/myuser/Repos/my-reflekt-project/reflekt_project.yml.
-```
-
-Running `reflekt lint` in a CI/CD pipeline is a great way to ensure schema consistency and quality before pushing schemas to a schema registry.
-
 ### Interacting with schema registries
 Schema registries are used to store and serve schemas. Once a schema is in a registry, it can be used to validate event data against the schema to ensure event data quality. Reflekt supports interacting with schema registries to push (publish) and pull (retrieve) schemas. Currently, the following registries are supported:
 
@@ -519,6 +491,39 @@ Publishing schemas to a registry follows the same pattern ...
 
 [19:29:08] INFO     Completed successfully
 ```
+
+<br>
+
+### Linting schemas
+Schemas can be linted to test if they follow the naming and metadata conventions configured for a Reflekt project.
+
+```bash
+❯ reflekt lint --select segment/ecommerce
+[18:57:45] INFO     Running with reflekt=0.3.1
+
+[18:57:46] INFO     Searching for JSON schemas in: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce
+
+[18:57:46] INFO     Found 9 schema(s) to lint
+
+[18:57:46] INFO     1 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Identify/1-0.json
+[18:57:47] INFO     2 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json
+[18:57:48] ERROR    Property 'cartId' in /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json does not match naming convention 'casing: snake' in
+                    /Users/myuser/Repos/my-reflekt-project/reflekt_project.yml.
+[18:57:48] INFO     3 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Viewed/1-0.json
+[18:57:50] INFO     4 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Group/1-0.json
+[18:57:50] INFO     5 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Order Completed/1-0.json
+[18:57:54] INFO     6 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Completed/1-0.json
+[18:57:55] INFO     7 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Started/1-0.json
+[18:57:58] INFO     8 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Page Viewed/1-0.json
+[18:58:01] INFO     9 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Product Added/1-0.json
+
+[18:58:04] ERROR    Linting failed with 1 error(s):
+
+[18:58:04] ERROR    Property 'cartId' in /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json does not match naming convention 'casing: snake' in
+                    /Users/myuser/Repos/my-reflekt-project/reflekt_project.yml.
+```
+
+Running `reflekt lint` in a CI/CD pipeline is a great way to ensure schema consistency and quality before pushing schemas to a schema registry.
 
 <br>
 
