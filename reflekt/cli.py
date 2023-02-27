@@ -526,6 +526,7 @@ def build(
                     builder.source_arg.encode("utf-8")
                 ).hexdigest(),
                 "count_schemas": len(builder.schema_paths),
+                "sdk": sdk.value,
                 "ci": os.getenv("CI") if os.getenv("CI") is True else False,
             },
             context=default_context,

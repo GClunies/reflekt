@@ -181,7 +181,15 @@ class AvoRegistry:
         for i, a_schema in enumerate(a_schemas, start=1):
             name = a_schema["name"]
             description = a_schema["description"]
-            metadata = a_schema["tags"]
+            metadata = {}
+            metadata_tags = a_schema["tags"]
+
+            # Parse string of tags into metadata dict
+            for tag in metadata_tags:
+                key = tag.split(": ")[0]
+                value = tag.split(": ")[1]
+                metadata[key] = value
+
             properties = (
                 a_schema["rules"]
                 .get("properties", {})
@@ -227,16 +235,17 @@ class AvoRegistry:
             r_schema["required"] = required
             r_schema["additionalProperties"] = additional_properties
 
-            write_path = Path(self.profile.project.dir / "schemas" / r_schema["$id"])
+            json_file = Path(self.profile.project.dir / "schemas" / r_schema["$id"])
 
-            if not write_path.parent.exists():
-                write_path.parent.mkdir(parents=True)
+            if not json_file.parent.exists():
+                json_file.parent.mkdir(parents=True)
 
             logger.info(
-                f"{i} of {len(a_schemas)} Writing to [magenta]{write_path}[magenta/]"
+                f"{i} of {len(a_schemas)} Writing to [magenta]{json_file}[magenta/]"
             )
-            with open(write_path, "w", encoding="utf-8") as f:
+            with open(json_file, "w", encoding="utf-8") as f:
                 json.dump(r_schema, f, indent=4, ensure_ascii=False)
+                f.write("\n")  # Add newline at end of file
 
         print("")
         logger.info("[green]Completed successfully[green/]")

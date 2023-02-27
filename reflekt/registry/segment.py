@@ -394,16 +394,17 @@ class SegmentRegistry:
             r_schema["required"] = required
             r_schema["additionalProperties"] = additional_properties
 
-            write_path = Path(self.profile.project.dir / "schemas" / r_schema["$id"])
+            json_file = Path(self.profile.project.dir / "schemas" / r_schema["$id"])
 
-            if not write_path.parent.exists():
-                write_path.parent.mkdir(parents=True)
+            if not json_file.parent.exists():
+                json_file.parent.mkdir(parents=True)
 
             logger.info(
-                f"{i} of {len(s_schemas)} Writing to [magenta]{write_path}[magenta/]"
+                f"{i} of {len(s_schemas)} Writing to [magenta]{json_file}[magenta/]"
             )
-            with open(write_path, "w", encoding="utf-8") as f:
+            with open(json_file, "w", encoding="utf-8") as f:
                 json.dump(r_schema, f, indent=4, ensure_ascii=False)
+                f.write("\n")  # Add newline at end of file
 
         print("")
         logger.info("[green]Completed successfully[green/]")
