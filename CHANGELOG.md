@@ -6,9 +6,30 @@ SPDX-License-Identifier: Apache-2.0
 
 # Reflekt Changelog
 
-## [Unreleased]
+## [0.3.2] - 2023-02-26
+### Added
+- Missing docstrings to Reflekt code.
+- Anonymous usage stats.
 
-## [0.3.0] - 2023-01-08
+### Changed
+- Improve Reflekt project and profile validation.
+- Reflekt now stores validation and common schemas internally.
+- Update templates for Reflekt projects and dbt packages.
+- Update README docs.
+- Updated Reflekt meta-schema so that metadata is defined under the `'self'` object.
+- Fixed how Avo tags are transformed into Reflekt metadata.
+
+
+## [0.3.1] - 2023-02-08
+### Added
+- Adds a required filter: config to reflekt_project.yml (can be empty string).
+
+### Changed
+- Improves schema checks on reflekt_project.yml and reflekt_profiles.yml.
+- Cleanup example schemas and artifacts.
+- Fixes templated README when running `reflekt build dbt ...`
+
+## [0.3.0] - 2023-02-06
 
 ### Added
 - Tests can be run using `tox`.
