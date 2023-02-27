@@ -26,9 +26,6 @@ REFLEKT_JSON_SCHEMA = {
 REGISTRY = [
     "avo",
     "segment",
-    # "rudderstack",
-    # "snowplow Iglu",
-    # "amplitude Data",
 ]
 
 
@@ -37,9 +34,6 @@ class RegistryEnum(str, Enum):
 
     avo = "avo"
     segment = "segment"
-    # rudderstack = "rudderstack"
-    # amplitude = "amplitude"
-    # snowplow = "snowplow"
 
 
 WAREHOUSE = [

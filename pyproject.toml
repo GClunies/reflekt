@@ -28,7 +28,6 @@ snowflake-sqlalchemy = "^1.4.6"
 snowflake-connector-python = "^2.9.0"
 sqlalchemy-redshift = "^0.8.12"
 segment-analytics-python = "^2.2.2"
-rudder-sdk-python = "^2.0.1"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "^1.6.0"

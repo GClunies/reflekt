@@ -480,21 +480,6 @@ files = [
 ]
 
 [[package]]
-name = "deprecation"
-version = "2.0.7"
-description = "A library to handle automated deprecations"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "deprecation-2.0.7-py2.py3-none-any.whl", hash = "sha256:dc9b4f252b7aca8165ce2764a71da92a653b5ffbf7a389461d7a640f6536ecb2"},
-    {file = "deprecation-2.0.7.tar.gz", hash = "sha256:c0392f676a6146f0238db5744d73e786a43510d54033f80994ef2f4c9df192ed"},
-]
-
-[package.dependencies]
-packaging = "*"
-
-[[package]]
 name = "distlib"
 version = "0.3.6"
 description = "Distribution utilities"
@@ -1619,29 +1604,6 @@ typing-extensions = {version = ">=4.0.0,<5.0", markers = "python_version < \"3.9
 jupyter = ["ipywidgets (>=7.5.1,<8.0.0)"]
 
 [[package]]
-name = "rudder-sdk-python"
-version = "2.0.1"
-description = "RudderStack is an open-source Segment alternative written in Go, built for the enterprise."
-category = "main"
-optional = false
-python-versions = ">=3.6.0"
-files = [
-    {file = "rudder-sdk-python-2.0.1.tar.gz", hash = "sha256:8560c4441fecd9289dfb9cb5cad57f7f87d0e8952ececfa90c4dc90b8cdfb42e"},
-    {file = "rudder_sdk_python-2.0.1-py2.py3-none-any.whl", hash = "sha256:167ae45ac8a2e4b8c5eb8e3d7247d2dbb071c63b5d67ab53fac77dde7de100e9"},
-]
-
-[package.dependencies]
-backoff = ">=2.1,<3.0"
-deprecation = ">=2.0.6,<2.1.0"
-monotonic = ">=1.5,<2.0"
-python-dateutil = ">=2.2,<3.0"
-python-dotenv = ">=0.21.0,<0.22.0"
-requests = ">=2.7,<3.0"
-
-[package.extras]
-test = ["flake8 (==3.7.9)", "mock (==2.0.0)", "pylint (==2.8.0)"]
-
-[[package]]
 name = "s3transfer"
 version = "0.6.0"
 description = "An Amazon S3 Transfer Manager"
@@ -2079,4 +2041,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "e5d216e3b4f2cd0e955d824a3237e8ce52ae198129f9d38915ced4df3ba61574"
+content-hash = "239b937ee3f9937a03f7f2fc099d2db19d76467a08c9d66fddd9474969389202"
