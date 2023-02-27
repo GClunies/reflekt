@@ -1,10 +1,11 @@
 # PROJECT_NAME
-A [Reflekt](https://github.com/GClunies/reflekt) project to manage product analytics event schemas and corresponding dbt package.
+A [Reflekt](https://github.com/GClunies/reflekt) project to manage product analytics event schemas and build corresponding data artifacts.
 
 ## Getting Started
 - See the [Reflekt Github repo](https://github.com/GClunies/reflekt) for details on commands, schemas, registries, and project configuration.
 - Event schemas are defined in the [`schemas/`](schemas/) directory.
-- dbt packages are built in the [`artifacts/dbt/`](artifacts/dbt/) directory.
+- Data artifacts are built in the [`artifacts/`](artifacts/) directory.
+  - dbt packages are built in the [`artifacts/dbt/`](artifacts/dbt/) directory.
 
 ## Using dbt artifacts
 To use a Reflekt dbt package in a downstream dbt project, add it to dbt project's `packages.yml`.

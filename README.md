@@ -55,20 +55,20 @@ The `--help` flag provides an overview of available `reflekt` commands.
 
  Reflekt CLI.
 
-╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ --version                                                                                                                                                                             │
-│ --install-completion        [bash|zsh|fish|powershell|pwsh]  Install completion for the specified shell. [default: None]                                                              │
-│ --show-completion           [bash|zsh|fish|powershell|pwsh]  Show completion for the specified shell, to copy it or customize the installation. [default: None]                       │
-│ --help                                                       Show this message and exit.                                                                                              │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-╭─ Commands ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ build             Build data artifacts based on schemas.                                                                                                                              │
-│ debug             Check Reflekt project configuration.                                                                                                                                │
-│ init              Initialize a Reflekt project.                                                                                                                                       │
-│ lint              Lint schema(s) to test for naming and metadata conventions.                                                                                                         │
-│ pull              Pull schema(s) from a schema registry.                                                                                                                              │
-│ push              Push schema(s) to a schema registry.                                                                                                                                │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --version                                                                                                                                                        │
+│ --install-completion        [bash|zsh|fish|powershell|pwsh]  Install completion for the specified shell. [default: None]                                         │
+│ --show-completion           [bash|zsh|fish|powershell|pwsh]  Show completion for the specified shell, to copy it or customize the installation. [default: None]  │
+│ --help                                                       Show this message and exit.                                                                         │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ build             Build data artifacts based on schemas.                                                                                                         │
+│ debug             Check Reflekt project configuration.                                                                                                           │
+│ init              Initialize a Reflekt project.                                                                                                                  │
+│ lint              Lint schema(s) to test for naming and metadata conventions.                                                                                    │
+│ pull              Pull schema(s) from a schema registry.                                                                                                         │
+│ push              Push schema(s) to a schema registry.                                                                                                           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
 Each command also has a `--help` flag providing command details (arguments, options, syntax, etc.).
@@ -79,10 +79,10 @@ Each command also has a `--help` flag providing command details (arguments, opti
 
  Lint schema(s) to test for naming and metadata conventions.
 
-╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ *  --select  -s      TEXT  Schema(s) to lint. [default: None] [required]                                                                                                              │
-│    --help                  Show this message and exit.                                                                                                                                │
-╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *  --select  -s      TEXT  Schema(s) to lint. [default: None] [required]                                                                                         │
+│    --help                  Show this message and exit.                                                                                                           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
 ### Creating a project

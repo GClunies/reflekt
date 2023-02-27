@@ -239,6 +239,7 @@ class Linter:
         Returns:
             errors (list): A list of linting errors.
         """
+        # Lint schema against Reflekt meta-schema
         schema_path = self._project.dir / "schemas" / r_schema["$id"]
         validator = Draft7Validator(schema=self._meta_schema)
 

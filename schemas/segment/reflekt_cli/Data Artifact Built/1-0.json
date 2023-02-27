@@ -42,6 +42,13 @@
             "description": "Unique identifier for the Reflekt project. MD5 hash of the project name.",
             "type": "string"
         },
+        "sdk": {
+            "description": "The SDK used to collect the event data.",
+            "type": "string",
+            "enum": [
+                "segment"
+            ]
+        },
         "source_id": {
             "description": "Unique identifier for the Reflekt source. MD5 hash of the --source argument.",
             "type": "string"

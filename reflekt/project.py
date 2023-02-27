@@ -54,13 +54,13 @@ class Project:
             self.schemas = {
                 "conventions": {
                     "event": {
-                        "casing": "any",
+                        "casing": "title",
                         "capitalize_camel": True,
                         "numbers": False,
                         "reserved": [],
                     },
                     "property": {
-                        "casing": "any",
+                        "casing": "title",
                         "capitalize_camel": True,
                         "numbers": False,
                         "reserved": [],
@@ -123,7 +123,7 @@ class Project:
             self.vendor = self.config.get("vendor")
             self.default_profile = self.config.get("default_profile")
             self.profiles_path = (
-                Path(self.config.get("profiles_path")).resolve().expanduser()
+                Path(self.config.get("profiles_path")).expanduser().resolve()
             )
             self.schemas = self.config.get("schemas")
             self.conventions = self.schemas["conventions"]
