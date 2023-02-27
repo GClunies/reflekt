@@ -7,7 +7,6 @@ import uuid
 from pathlib import Path
 from typing import Optional
 
-import rudderstack.analytics as rudder_analytics
 import segment.analytics as segment_analytics  # FOR DEBUGGING, use 'import analytics as segment_analytics'  # noqa: E501
 import yaml
 from loguru import logger
@@ -30,14 +29,6 @@ if os.getenv("REFLEKT_SEGMENT_WRITE_KEY_DEV") is not None:
     segment_analytics.on_error = on_error
 else:
     segment_analytics.write_key = "2r0G0DfAXeRZ9ZUhfa9Xk1Hk3FnO2GnW"
-
-
-# Setup Rudderstack when in dev only
-if os.getenv("REFLEKT_RUDDERSTACK_WRITE_KEY_DEV") is not None:
-    rudder_analytics.write_key = os.getenv("REFLEKT_RUDDERSTACK_WRITE_KEY_DEV")
-    rudder_analytics.debug = True
-    rudder_analytics.on_error = on_error
-    rudder_analytics.dataPlaneUrl = "https://reflektgrwicz.dataplane.rudderstack.com"
 
 
 class ReflektUser:
@@ -94,9 +85,6 @@ class ReflektUser:
 def track_event(user_id: str, event_name: str, properties: dict, context: dict):
     """Track an event.
 
-    Reflekt helps teams manage event data regardless of their chosen CDP. So we
-    send events to multiple CDPs to ensure we can support them all.
-
     Args:
         user_id (str): The user's ID.
         event_name (str): The event name.
@@ -104,4 +92,3 @@ def track_event(user_id: str, event_name: str, properties: dict, context: dict):
         context (dict): The event context.
     """
     segment_analytics.track(user_id, event_name, properties, context)
-    # rudder_analytics.track(user_id, event_name, properties, context)
