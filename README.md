@@ -535,7 +535,7 @@ While we recommend following this practice, it can be ***a lot of work to mainta
 - Events and properties are added or updated regularly as the product and data requirements evolve.
 - The Product and Engineer teams are bigger than the Data team, making it hard to keep up with the changes.
 
-**Reflekt can help by building dbt artifacts for you with single command.** Think of this as dbt's [codegen](https://github.com/dbt-labs/dbt-codegen) package on steroids :muscle: :pill:.
+**Reflekt can help by building dbt artifacts for you with a single CLI command.** Think of this as dbt's [codegen](https://github.com/dbt-labs/dbt-codegen) package on steroids :muscle: :pill:.
 
 ### Building private dbt packages
 To build a private dbt package with sources, staging models, and docs that perfectly *reflekts* the schemas in a Reflekt project and the raw data in the warehouse, you can run a command like the example below.
