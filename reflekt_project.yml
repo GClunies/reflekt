@@ -8,7 +8,7 @@ name: reflekt_demo               # Project name
 vendor: com.reflekt-ci           # Default vendor for schemas in reflekt project
 
 default_profile: dev_reflekt     # Default profile to use from reflekt_profiles.yml
-profiles_path: ./reflekt_profiles.yml  # Optional, defaults to ~/.reflekt/reflekt_profiles.yml
+profiles_path: ./reflekt_profiles.yml  # Path to reflekt_profiles.yml
 
 # SCHEMAS CONFIG ----------------------------------------------------------------------
 schemas:                        # Define schema conventions
@@ -42,7 +42,7 @@ artifacts:                      # Configure how data artifacts are built
     models:
       prefix: stg_              # Model files start with this prefix
       filter:                   # Filter for model files (can be empty string)
-        where received_at < current_date
+        where received_at < get_date()
     docs:
       prefix: _stg_             # Docs files start with this prefix
       in_folder: false          # Docs files in separate folder?

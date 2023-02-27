@@ -1,14 +1,15 @@
 # SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 #
 # SPDX-License-Identifier: Apache-2.0
-
 import json
+import os
+import pkgutil
 from pathlib import Path
 from typing import Optional, Tuple
 
 import yaml
 from git import InvalidGitRepositoryError, Repo
-from jsonschema import validate
+from jsonschema import ValidationError, validate
 
 from reflekt.dumper import ReflektYamlDumper
 
@@ -28,6 +29,9 @@ class Project:
                 default values. Defaults to False.
             path (Optional[str]): Path to reflekt_project.yml file. If None,
                 searches Git repo for reflekt_project.yml. Defaults to None.
+
+        Raises:
+            ProjectError: An error occurred while initializing the project.
         """
         self.use_defaults = use_defaults
         self.exists: bool = False
@@ -101,13 +105,25 @@ class Project:
             with self.path.open() as f:  # Load config from reflekt_project.yml
                 self.config = yaml.safe_load(f)
 
-            self.validate_project()
+            try:
+                self.validate_project()
+            except ValidationError as e:
+                raise ProjectError(
+                    message=(
+                        f"Invalid reflekt_project.yml: {e.message} at "
+                        f"'{e.json_path.replace('$.', '')}'. See the docs at "
+                        f"https://github.com/GClunies/Reflekt#reflekt_projectyml "
+                        f"for details on project configuration."
+                    ),
+                    project=self,
+                )
+
             self.version = self.config.get("version")
             self.name = self.config.get("name")
             self.vendor = self.config.get("vendor")
             self.default_profile = self.config.get("default_profile")
             self.profiles_path = (
-                Path(self.config.get("profiles_path")).resolve().expanduser()
+                Path(self.config.get("profiles_path")).expanduser().resolve()
             )
             self.schemas = self.config.get("schemas")
             self.conventions = self.schemas["conventions"]
@@ -122,7 +138,9 @@ class Project:
                 "name": self.name,
                 "vendor": self.vendor,
                 "default_profile": self.default_profile,
-                "profiles_path": str(self.profiles_path),
+                "profiles_path": str(self.profiles_path).replace(
+                    os.path.expanduser("~"), "~"
+                ),
                 "schemas": self.schemas,
                 "registry": self.registry,
                 "artifacts": self.artifacts,
@@ -133,7 +151,9 @@ class Project:
                 "name": self.name,
                 "vendor": self.vendor,
                 "default_profile": self.default_profile,
-                "profiles_path": str(self.profiles_path),
+                "profiles_path": str(self.profiles_path).replace(
+                    os.path.expanduser("~"), "~"
+                ),
                 "schemas": self.schemas,
                 "artifacts": self.artifacts,
             }
@@ -153,11 +173,7 @@ class Project:
 
     def validate_project(self):
         """Validate Reflekt profile configuration."""
-        reflekt_project = self.dir / "schemas/.reflekt/project/1-0.json"
-
-        with reflekt_project.open() as f:
-            schema = json.load(f)
-
+        schema = json.loads(pkgutil.get_data("reflekt", "_validation/project/1-0.json"))
         validate(self.config, schema)
 
     def _get_project_dir(self, dir: Path) -> Tuple[Path, Path]:
@@ -229,3 +245,4 @@ class ProjectError(Exception):
 
 if __name__ == "__main__":  # pragma: no cover
     project = Project()
+    pass

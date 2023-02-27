@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import pkgutil
 import shutil
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -43,30 +44,30 @@ class DbtBuilder:
             source_arg (str): The --source argument passed to Reflekt CLI.
             profile (Profile): Reflekt Profile object.
         """
-        self._profile = profile
-        self._project = Project()
-        self._pkg_name = underscore(self._project.name)
-        self._pkg_dir = self._project.dir / "artifacts" / "dbt" / self._pkg_name
-        self._tmp_pkg_dir = (
-            self._project.dir / ".reflekt_cache" / "artifacts" / "dbt" / self._pkg_name
+        self.profile = profile
+        self.project = Project()
+        self.pkg_name = underscore(self.project.name)
+        self.pkg_dir = self.project.dir / "artifacts" / "dbt" / self.pkg_name
+        self.tmp_pkg_dir = (
+            self.project.dir / ".reflekt_cache" / "artifacts" / "dbt" / self.pkg_name
         )
-        self._blank_dbt_pkg = pkg_resources.resource_filename(
+        self.blank_dbt_pkg = pkg_resources.resource_filename(
             "reflekt", "_templates/dbt_package/"
         )
-        self._src_prefix = self._project.artifacts["dbt"]["sources"]["prefix"]
-        self._mdl_prefix = self._project.artifacts["dbt"]["models"]["prefix"]
-        self._doc_prefix = self._project.artifacts["dbt"]["docs"]["prefix"]
-        self._doc_folder = self._project.artifacts["dbt"]["docs"]["in_folder"]
-        self._doc_folder_str = "" if not self._doc_folder else "docs/"
-        self.wh_errors = []
-        self._select_arg = select_arg
-        self._schema_paths = schema_paths
-        self._sdk_arg = sdk_arg
-        self._source_arg = source_arg
-        self._warehouse = Warehouse(source_arg=self._source_arg, profile=self._profile)
-        self._warehouse_type = self._warehouse.type
-        self._database = self._warehouse.database
-        self._schema = self._warehouse.schema
+        self.src_prefix = self.project.artifacts["dbt"]["sources"]["prefix"]
+        self.mdl_prefix = self.project.artifacts["dbt"]["models"]["prefix"]
+        self.doc_prefix = self.project.artifacts["dbt"]["docs"]["prefix"]
+        self.doc_folder = self.project.artifacts["dbt"]["docs"]["in_folder"]
+        self.doc_folder_str = "" if not self.doc_folder else "docs/"
+        self.select_arg = select_arg
+        self.schema_paths = schema_paths
+        self.sdk_arg = sdk_arg
+        self.source_arg = source_arg
+        self.warehouse = Warehouse(source_arg=self.source_arg, profile=self.profile)
+        self.warehouse_type = self.warehouse.type
+        self.warehouse_database = self.warehouse.database
+        self.warehouse_schema = self.warehouse.schema
+        self.warehouse_errors = []
 
     def _build_dbt_source(self) -> Dict:
         """Build dbt source.
@@ -75,10 +76,10 @@ class DbtBuilder:
             Dict: dbt source object.
         """
         src_path = (
-            self._tmp_pkg_dir
+            self.tmp_pkg_dir
             / "models"
-            / self._doc_folder_str
-            / f"{self._src_prefix}{self._schema}.yml"
+            / self.doc_folder_str
+            / f"{self.src_prefix}{self.warehouse_schema}.yml"
         )
 
         # If dbt source exists in temp dbt pkg (copied from existing pkg), use it
@@ -90,16 +91,19 @@ class DbtBuilder:
                 "version": 2,
                 "sources": [
                     {
-                        "name": self._schema,
-                        "schema": self._schema,
-                        "database": self._database,
-                        "description": f"Schema in {self._warehouse_type} with raw {titleize(self._sdk_arg)} event data.",  # noqa: E501
+                        "name": self.warehouse_schema,
+                        "schema": self.warehouse_schema,
+                        "database": self.warehouse_database,
+                        "description": (
+                            f"Schema in {self.warehouse_type} with raw "
+                            f"{titleize(self.sdk_arg)} event data."
+                        ),
                         "tables": [],
                     }
                 ],
             }
 
-        logger.info(f"Building dbt source '{self._schema}'")
+        logger.info(f"Building dbt source '{self.warehouse_schema}'")
 
         return dbt_source
 
@@ -117,7 +121,9 @@ class DbtBuilder:
 
         if table_name not in existing_tables:
             source["sources"][0]["tables"].append(dbt_table)
-            logger.info(f"Building dbt table '{table_name}' in source '{self._schema}'")
+            logger.info(
+                f"Building dbt table '{table_name}' in source '{self.warehouse_schema}'"
+            )
 
     def _build_dbt_model(
         self,
@@ -140,11 +146,13 @@ class DbtBuilder:
         """
         schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
         model_file = (
-            f"{self._mdl_prefix}{self._schema}__{table_name}__v{schema_version}.sql"
+            f"{self.mdl_prefix}{self.warehouse_schema}__{table_name}__v{schema_version}.sql"  # noqa: E501
             if schema_version != "1_0"
-            else f"{self._mdl_prefix}{self._schema}__{table_name}.sql"
+            else f"{self.mdl_prefix}{self.warehouse_schema}__{table_name}.sql"
         )
-        model_path: Path = self._tmp_pkg_dir / "models" / self._schema / model_file
+        model_path: Path = (
+            self.tmp_pkg_dir / "models" / self.warehouse_schema / model_file
+        )
         mdl_sql = (  # Config
             "{{\n"
             "  config(\n"
@@ -156,13 +164,13 @@ class DbtBuilder:
             f"with\n\n"
             f"source as (\n"
             f"    select *\n"
-            f"    from {{{{ source('{underscore(self._schema)}', '{table_name}') }}}}\n"
+            f"    from {{{{ source('{underscore(self.warehouse_schema)}', '{table_name}') }}}}\n"  # noqa: E501
         )
 
         # Add filter to SQL if provided and table is not an entity table
         if filter is not None:
-            if self._sdk_arg == "segment" and table_name not in ["users", "groups"]:
-                filter_list = self._project.artifacts["dbt"]["models"][
+            if self.sdk_arg == "segment" and table_name not in ["users", "groups"]:
+                filter_list = self.project.artifacts["dbt"]["models"][
                     "filter"
                 ].splitlines()
                 filter_str = ""
@@ -175,7 +183,7 @@ class DbtBuilder:
         mdl_sql += f"{filter_str}),\n\n"  # Import CTE end
         mdl_sql += "renamed as (\n" "    select"  # Rename CTE start
 
-        if self._sdk_arg == "segment":  # TODO - should this be its own method?
+        if self.sdk_arg == "segment":  # TODO - should this be its own method?
             taken_cols = []  # Used to check for duplicates
 
             for col in columns:
@@ -314,20 +322,20 @@ class DbtBuilder:
         """
         schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
         model_name = (
-            f"{self._mdl_prefix}{self._schema}__{table_name}__v{schema_version}"
+            f"{self.mdl_prefix}{self.warehouse_schema}__{table_name}__v{schema_version}"  # noqa: E501
             if schema_version != "1_0"
-            else f"{self._mdl_prefix}{self._schema}__{table_name}"
+            else f"{self.mdl_prefix}{self.warehouse_schema}__{table_name}"
         )
         doc_file = (
-            f"{self._doc_prefix}{self._schema}__{table_name}__v{schema_version}.yml"
+            f"{self.doc_prefix}{self.warehouse_schema}__{table_name}__v{schema_version}.yml"  # noqa: E501
             if schema_version != "1_0"
-            else f"{self._doc_prefix}{self._schema}__{table_name}.yml"
+            else f"{self.doc_prefix}{self.warehouse_schema}__{table_name}.yml"
         )
         doc_path = (
-            self._tmp_pkg_dir
+            self.tmp_pkg_dir
             / "models"
-            / self._schema
-            / self._doc_folder_str
+            / self.warehouse_schema
+            / self.doc_folder_str
             / doc_file
         )
         doc_obj = {
@@ -340,9 +348,9 @@ class DbtBuilder:
                 }
             ],
         }
-        test_cols = list(self._project.artifacts["dbt"]["docs"]["tests"].keys())
+        test_cols = list(self.project.artifacts["dbt"]["docs"]["tests"].keys())
 
-        if self._sdk_arg == "segment":
+        if self.sdk_arg == "segment":
             taken_cols = []  # Used to check for duplicates
 
             for col in columns:
@@ -388,7 +396,7 @@ class DbtBuilder:
                 }
 
                 if col["name"] in test_cols:
-                    dbt_col["tests"] = self._project.artifacts["dbt"]["docs"]["tests"][
+                    dbt_col["tests"] = self.project.artifacts["dbt"]["docs"]["tests"][
                         col["name"]
                     ]
 
@@ -398,7 +406,10 @@ class DbtBuilder:
             additional_cols = [
                 {
                     "name": "call_type",
-                    "description": "The type of Segment call (i.e., identify, group, page, screen, track) that collected the data.",  # noqa: E501
+                    "description": (
+                        "The type of Segment call (i.e., identify, group, page, screen "
+                        ", track) that collected the data."
+                    ),
                 },
                 {
                     "name": "source_schema",
@@ -443,69 +454,66 @@ class DbtBuilder:
         print("")
         logger.info(
             f"Building dbt package:"
-            f"\n    name: {self._pkg_name}"
-            f"\n    dir: {self._pkg_dir}"
-            f"\n    --select: {self._select_arg}"
-            f"\n    --sdk_arg: {self._sdk_arg}"
-            f"\n    --source: {self._source_arg}"
+            f"\n    name: {self.pkg_name}"
+            f"\n    dir: {self.pkg_dir}"
+            f"\n    --select: {self.select_arg}"
+            f"\n    --sdk_arg: {self.sdk_arg}"
+            f"\n    --source: {self.source_arg}"
         )
         print("")
 
-        if self._pkg_dir.exists():  # If dbt pkg exists, use as base for build
-            if self._tmp_pkg_dir.exists():  # Start temp pkg blank template
-                shutil.rmtree(self._tmp_pkg_dir)
-            shutil.copytree(self._pkg_dir, self._tmp_pkg_dir)
+        if self.pkg_dir.exists():  # If dbt pkg exists, use as base for build
+            if self.tmp_pkg_dir.exists():  # Start temp pkg blank template
+                shutil.rmtree(self.tmp_pkg_dir)
+            shutil.copytree(self.pkg_dir, self.tmp_pkg_dir)
         else:  # If dbt pkg does not exist, temp pkg from blank template
-            if self._tmp_pkg_dir.exists():
-                shutil.rmtree(self._tmp_pkg_dir)
+            if self.tmp_pkg_dir.exists():
+                shutil.rmtree(self.tmp_pkg_dir)
             shutil.copytree(
-                self._blank_dbt_pkg, str(self._tmp_pkg_dir), dirs_exist_ok=True
+                self.blank_dbt_pkg, str(self.tmp_pkg_dir), dirs_exist_ok=True
             )
 
         # Update dbt_project.yml
-        with open(self._tmp_pkg_dir / "dbt_project.yml", "r") as f:
+        with open(self.tmp_pkg_dir / "dbt_project.yml", "r") as f:
             dbt_project_yml = f.read()
 
-        dbt_project_yml = dbt_project_yml.replace("package_name", self._pkg_name)
+        dbt_project_yml = dbt_project_yml.replace("package_name", self.pkg_name)
 
-        with open(self._tmp_pkg_dir / "dbt_project.yml", "w") as f:
+        with open(self.tmp_pkg_dir / "dbt_project.yml", "w") as f:
             f.write(dbt_project_yml)
 
         # Update README.md
-        with open(self._tmp_pkg_dir / "README.md", "r") as f:
+        with open(self.tmp_pkg_dir / "README.md", "r") as f:
             readme_md = f.read()
 
-        readme_md = readme_md.replace("_DBT_PKG_NAME_", self._pkg_name)
+        readme_md = readme_md.replace("_DBT_PKG_NAME_", self.pkg_name)
 
-        with open(self._tmp_pkg_dir / "README.md", "w") as f:
+        with open(self.tmp_pkg_dir / "README.md", "w") as f:
             f.write(readme_md)
 
         source_obj = self._build_dbt_source()
         source_path = (
-            self._tmp_pkg_dir
+            self.tmp_pkg_dir
             / "models"
-            / self._schema
-            / self._doc_folder_str
-            / f"{self._src_prefix}{self._schema}.yml"
+            / self.warehouse_schema
+            / self.doc_folder_str
+            / f"{self.src_prefix}{self.warehouse_schema}.yml"
         )
 
         # Get common columns based on SDK used to collect event data
-        if self._sdk_arg == "segment":
-            common_json = (
-                self._project.dir
-                / "schemas"
-                / ".reflekt"
-                / "segment"
-                / "common"
-                / "1-0.json"
+        if self.sdk_arg == "segment":
+            common_schema = json.loads(
+                pkgutil.get_data("reflekt", "builder/_schemas/segment_common/1-0.json")
             )
-        # elif self._sdk_arg == "rudderstack":
+        # elif self.sdk_arg == "rudderstack":
         #     pass
-        # elif self._sdk_arg == "snowplow":
+        # elif self.sdk_arg == "snowplow":
         #     pass
-        # elif self._sdk_arg == "amplitude":
+        # elif self.sdk_arg == "amplitude":
         #     pass
 
+        # Convert nested schema fields (e.g., context.page.url) to flat column names
+        # (e.g., context_page_url)
         common_columns = [
             {
                 "name": underscore(
@@ -513,14 +521,14 @@ class DbtBuilder:
                 ),
                 "description": field.schema["description"],
             }
-            for field in Flatson.from_schemafile(common_json).fields
+            for field in Flatson(common_schema).fields
         ]
 
-        models_config: Dict = self._project.artifacts["dbt"]["models"]
+        models_config: Dict = self.project.artifacts["dbt"]["models"]
         self._filter = models_config.get("filter", None)
 
         # Iterate through all schemas to build artifacts
-        for schema_path in self._schema_paths:
+        for schema_path in self.schema_paths:
             logger.info(f"Building dbt artifacts for schema: {schema_path}")
 
             with schema_path.open("r") as f:
@@ -530,9 +538,9 @@ class DbtBuilder:
             event_name = schema_json["self"]["name"]
             event_desc = schema_json["description"]
             table_name = underscore(event_name.lower().replace(" ", "_"))
-            metadata = schema_json["metadata"]
+            metadata = schema_json["self"]["metadata"]
 
-            if self._sdk_arg == "segment":  # Handle Segment-specific table naming
+            if self.sdk_arg == "segment":  # Handle Segment-specific table naming
                 table_name = (
                     table_name.replace("identify", "identifies")
                     .replace("group", "groups")
@@ -548,13 +556,13 @@ class DbtBuilder:
                 for field in Flatson.from_schemafile(schema_path).fields
             ]
             columns_to_search = common_columns + schema_columns
-            columns, warehouse_error = self._warehouse.find_columns(
+            columns, warehouse_error = self.warehouse.find_columns(
                 table_name=table_name,
                 columns_to_search=columns_to_search,
             )
 
             if warehouse_error is not None:
-                self.wh_errors.append(warehouse_error)
+                self.warehouse_errors.append(warehouse_error)
             else:
                 self._build_dbt_table(
                     source=source_obj,
@@ -563,7 +571,7 @@ class DbtBuilder:
                 )
                 self._build_dbt_model(
                     schema_id=schema_id,
-                    source_schema=self._schema,
+                    source_schema=self.warehouse_schema,
                     table_name=table_name,
                     columns=columns,
                     metadata=metadata,
@@ -578,17 +586,18 @@ class DbtBuilder:
                 )
 
                 # Build Segment users table/model/doc
-                if self._sdk_arg == "segment" and table_name == "identifies":
+                if self.sdk_arg == "segment" and table_name == "identifies":
                     logger.info(
-                        "Building dbt artifacts for schema: [magenta]Segment 'users' table[magenta/]"  # noqa: E501
+                        "Building dbt artifacts for schema: "
+                        "[magenta]Segment 'users' table[magenta/]"
                     )
-                    columns, warehouse_error = self._warehouse.find_columns(
+                    columns, warehouse_error = self.warehouse.find_columns(
                         table_name="users",
                         columns_to_search=common_columns,
                     )
 
                     if warehouse_error is not None:
-                        self.wh_errors.append(warehouse_error)
+                        self.warehouse_errors.append(warehouse_error)
                     else:
                         self._build_dbt_table(
                             source=source_obj,
@@ -597,7 +606,7 @@ class DbtBuilder:
                         )
                         self._build_dbt_model(
                             schema_id=schema_id,
-                            source_schema=self._schema,
+                            source_schema=self.warehouse_schema,
                             table_name="users",
                             columns=columns,
                             metadata={},
@@ -611,17 +620,18 @@ class DbtBuilder:
                         )
 
         # Build Segment tracks table/model/doc
-        if self._sdk_arg == "segment":
+        if self.sdk_arg == "segment":
             logger.info(
-                "Building dbt artifacts for schema: [magenta]Segment 'tracks' table[magenta/]"  # noqa: E501
+                "Building dbt artifacts for schema: "
+                "[magenta]Segment 'tracks' table[magenta/]"
             )
-            columns, warehouse_error = self._warehouse.find_columns(
+            columns, warehouse_error = self.warehouse.find_columns(
                 table_name="tracks",
                 columns_to_search=common_columns,
             )
 
             if warehouse_error is not None:
-                self.wh_errors.append(warehouse_error)
+                self.warehouse_errors.append(warehouse_error)
             else:
                 self._build_dbt_table(
                     source=source_obj,
@@ -633,7 +643,7 @@ class DbtBuilder:
                 )
                 self._build_dbt_model(
                     schema_id=schema_id,
-                    source_schema=self._schema,
+                    source_schema=self.warehouse_schema,
                     table_name="tracks",
                     columns=columns,
                     metadata={},
@@ -663,14 +673,13 @@ class DbtBuilder:
                 encoding=("utf-8"),
             )
 
-        wh_errors_list = [error + "\n" for error in self.wh_errors]
+        wh_errors_list = [error + "\n" for error in self.warehouse_errors]
         wh_errors_str = ""
 
         for wh_error in wh_errors_list:
             wh_errors_str += wh_error
 
-        if self.wh_errors:
-            print("")
+        if self.warehouse_errors:
             logger.warning(
                 f"The data warehouse returned the following warning(s) while "
                 f"building the dbt package."
@@ -679,13 +688,13 @@ class DbtBuilder:
 
         logger.info(
             f"Copying dbt package from temporary path "
-            f"{self._tmp_pkg_dir} to {self._pkg_dir}"
+            f"{self.tmp_pkg_dir} to {self.pkg_dir}"
         )
 
-        if self._pkg_dir.exists():
-            shutil.rmtree(self._pkg_dir)
+        if self.pkg_dir.exists():
+            shutil.rmtree(self.pkg_dir)
 
-        shutil.copytree(self._tmp_pkg_dir, self._pkg_dir)
+        shutil.copytree(self.tmp_pkg_dir, self.pkg_dir)
 
         print("")
         logger.info("[green]Successfully built dbt package[green/]")

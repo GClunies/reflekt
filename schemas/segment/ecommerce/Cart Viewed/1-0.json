@@ -6,21 +6,26 @@
         "vendor": "com.reflekt-ci",
         "name": "Cart Viewed",
         "format": "jsonschema",
-        "version": "1-0"
-    },
-    "metadata": {
-        "code_owner": "Maura",
-        "product_owner": "Greg"
+        "version": "1-0",
+        "metadata": {
+            "code_owner": "Maura",
+            "product_owner": "Greg"
+        }
     },
     "type": "object",
     "properties": {
         "cart_id": {
             "description": "Cart ID to which the product was added to",
             "type": "string"
+        },
+        "products": {
+            "description": "Products in the cart",
+            "type": "array"
         }
     },
     "required": [
-        "cart_id"
+        "cart_id",
+        "products"
     ],
     "additionalProperties": false
 }

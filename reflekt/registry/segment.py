@@ -201,8 +201,8 @@ class SegmentRegistry:
 
         return response.json()["data"]
 
-    def _pull_segment(self, select: str) -> List:
-        """Fetch Segment tracking plan schemas from API based on --select from CLI.
+    def _get_segment(self, select: str) -> List:
+        """Get Segment tracking plan schemas from API based on --select from CLI.
 
         Args:
             select (str): The --select argument passed to Reflekt CLI.
@@ -253,12 +253,15 @@ class SegmentRegistry:
 
         return s_schemas
 
-    def _push_segment(
+    def _post_put_patch_del_segment(
         self, select: str, plan_name: str, schemas: List, delete: bool = False
     ) -> None:
         """Sync Reflekt schemas to Segment Protocols based on --select from CLI.
 
-        If the tracking plan does not exist, it will be created.
+        Tracking plan does not exists -> POST request to create tracking plan
+        Tracking plan exists -> PUT request to update tracking plan
+        Specific schema(s) selected -> PATCH request to update tracking plan
+        Delete flag set -> DELETE request to delete schema(s) from tracking plan
 
         Args:
             select (str): The --select argument passed to Reflekt CLI.
@@ -280,19 +283,21 @@ class SegmentRegistry:
                 )
                 plan_data = self._handle_response(r)
                 plan_id = plan_data["trackingPlan"]["id"]
-
-            if schema_name is None:  # Update all schemas in tracking plan
-                r = requests.put(
-                    url=self.base_url + f"/{plan_id}/rules",
-                    headers=self.headers,
-                    json={"trackingPlanId": plan_id, "rules": schemas},
-                )
-            elif schema_name is not None:  # Update specified schema(s) in tracking plan
-                r = requests.patch(
-                    url=self.base_url + f"/{plan_id}/rules",
-                    headers=self.headers,
-                    json={"trackingPlanId": plan_id, "rules": schemas},
-                )
+            else:
+                if schema_name is None:  # Update all schemas in tracking plan
+                    r = requests.put(
+                        url=self.base_url + f"/{plan_id}/rules",
+                        headers=self.headers,
+                        json={"trackingPlanId": plan_id, "rules": schemas},
+                    )
+                elif (
+                    schema_name is not None
+                ):  # Update specified schema(s) in tracking plan
+                    r = requests.patch(
+                        url=self.base_url + f"/{plan_id}/rules",
+                        headers=self.headers,
+                        json={"trackingPlanId": plan_id, "rules": schemas},
+                    )
         else:  # Delete schemas
             r = requests.delete(
                 url=self.base_url + f"/{plan_id}/rules",
@@ -304,14 +309,17 @@ class SegmentRegistry:
         print("")
         logger.info("[green]Completed successfully[green/]")
 
-    def pull(self, select: str) -> None:
+    def pull(self, select: str) -> int:
         """Pull schemas from Segment Protocols and write to Reflekt JSON schemas files.
 
         Args:
             select (str): The --select argument passed to Reflekt CLI.
+
+        Returns:
+            int: The count of schemas pulled from Segment Protocols.
         """
         plan_name, _, _ = self._parse_select(select)
-        s_schemas = self._pull_segment(select=select)  # Segment schemas
+        s_schemas = self._get_segment(select=select)  # Segment schemas
 
         for i, s_schema in enumerate(s_schemas, start=1):
             if s_schema["type"] in ["IDENTIFY", "GROUP"]:
@@ -377,30 +385,33 @@ class SegmentRegistry:
             # Copy empty Reflekt jsonschema and set values
             r_schema = copy.deepcopy(REFLEKT_JSON_SCHEMA)
             r_schema["$id"] = id
+            r_schema["description"] = description
             r_schema["self"]["vendor"] = self.profile.project.vendor
             r_schema["self"]["name"] = name
-            r_schema["description"] = description
             r_schema["self"]["version"] = version
+            r_schema["self"]["metadata"] = metadata
             r_schema["properties"] = properties
             r_schema["required"] = required
             r_schema["additionalProperties"] = additional_properties
-            r_schema["metadata"] = metadata
 
-            write_path = Path(self.profile.project.dir / "schemas" / r_schema["$id"])
+            json_file = Path(self.profile.project.dir / "schemas" / r_schema["$id"])
 
-            if not write_path.parent.exists():
-                write_path.parent.mkdir(parents=True)
+            if not json_file.parent.exists():
+                json_file.parent.mkdir(parents=True)
 
             logger.info(
-                f"{i} of {len(s_schemas)} Writing to [magenta]{write_path}[magenta/]"
+                f"{i} of {len(s_schemas)} Writing to [magenta]{json_file}[magenta/]"
             )
-            with open(write_path, "w", encoding="utf-8") as f:
+            with open(json_file, "w", encoding="utf-8") as f:
                 json.dump(r_schema, f, indent=4, ensure_ascii=False)
+                f.write("\n")  # Add newline at end of file
 
         print("")
         logger.info("[green]Completed successfully[green/]")
 
-    def push(self, select: str, delete: bool = False) -> None:
+        return len(s_schemas)  # Return the count of schemas pulled
+
+    def push(self, select: str, delete: bool = False) -> int:
         """Push Reflekt JSON schemas to Segment Protocols.
 
         Args:
@@ -410,6 +421,9 @@ class SegmentRegistry:
 
         Raises:
             SelectArgError: Error with the --select argument.
+
+        Returns:
+            int: The count of schemas pushed to Segment Protocols.
         """
         plan_name, _, schema_version = self._parse_select(select)
 
@@ -470,7 +484,7 @@ class SegmentRegistry:
                 s_schema["key"] = r_schema["self"]["name"]
                 s_schema["type"] = "TRACK"
                 s_schema["version"] = int(r_schema["self"]["version"].split("-")[0])
-                s_schema["jsonSchema"]["labels"] = r_schema["metadata"]
+                s_schema["jsonSchema"]["labels"] = r_schema["self"]["metadata"]
                 s_schema["jsonSchema"]["description"] = r_schema["description"]
                 s_schema["jsonSchema"]["properties"]["properties"][
                     "properties"
@@ -484,9 +498,11 @@ class SegmentRegistry:
 
             s_schemas.append(s_schema)
 
-        self._push_segment(
+        self._post_put_patch_del_segment(
             select=select, plan_name=plan_name, schemas=s_schemas, delete=delete
         )
+
+        return len(r_schemas)  # Return the count of schemas pushed
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -6,11 +6,11 @@
         "vendor": "com.reflekt-ci",
         "name": "Checkout Started",
         "format": "jsonschema",
-        "version": "1-0"
-    },
-    "metadata": {
-        "code_owner": "Maura",
-        "product_owner": "Greg"
+        "version": "1-0",
+        "metadata": {
+            "code_owner": "Maura",
+            "product_owner": "Greg"
+        }
     },
     "type": "object",
     "properties": {

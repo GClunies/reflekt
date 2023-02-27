@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # flake8: noqa  -- Readability is more important than style here
+import hashlib
 import json
 import os
 import shutil
@@ -34,11 +35,21 @@ from reflekt.linter import Linter
 from reflekt.profile import Profile, ProfileError
 from reflekt.project import Project, ProjectError
 from reflekt.registry.handler import RegistryHandler
+from reflekt.tracking import ReflektUser, track_event
 
 
 # Prettify traceback messages
 app = typer.Typer(pretty_exceptions_show_locals=SHOW_LOCALS)  # Typer app
 install(show_locals=SHOW_LOCALS)  # Any other uncaught exceptions
+
+
+user = ReflektUser()  # Create Reflekt user, but do not initialize (no ID set)
+default_context = {  # Default context for anonymous usage stats (if not disabled)
+    "app": {
+        "name": "reflekt",
+        "version": __version__,
+    }
+}
 
 
 class ExistingProjectError(Exception):
@@ -261,15 +272,44 @@ def init(
     console.print(table)
     print("")
 
+    if not profile.do_not_track:  # False by default
+        user.initialize()
+        track_event(
+            user_id=user.id,
+            event_name="Project Initialized",
+            properties={
+                "project_id": hashlib.md5(project.name.encode("utf-8")).hexdigest(),
+                "profile_id": hashlib.md5(profile.name.encode("utf-8")).hexdigest(),
+                "schema_registry": profile.registry[0]["type"],
+                "data_warehouse": profile.source[0]["type"],
+                "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+            },
+            context=default_context,
+        )
+
 
 @app.command()
 def debug():
-    """Check reflekt_project.yml and reflekt_profiles.yml are configured correctly."""
+    """Check Reflekt project configuration."""
     try:
         project = Project()
         profile = Profile(project=project)
+
+        if user.id is not None:
+            track_event(
+                user_id=user.id,
+                event_name="Project Debugged",
+                properties={
+                    "project_id": hashlib.md5(project.name.encode("utf-8")).hexdigest(),
+                    "profile_id": hashlib.md5(profile.name.encode("utf-8")).hexdigest(),
+                    "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+                },
+                context=default_context,
+            )
+
     except Union[ValidationError, ProjectError, ProfileError] as e:
         raise e
+
     else:
         logger.info(
             "[green]Reflekt project and profiles are configured correctly![green/]"
@@ -292,7 +332,21 @@ def pull(
     project = Project()
     profile = Profile(project=project, profile_name=profile_name)
     registry = RegistryHandler(select=select, profile=profile).get_registry()
-    registry.pull(select=select)
+    count_schemas = registry.pull(select=select)
+
+    if user.id is not None:
+        track_event(
+            user_id=user.id,
+            event_name="Schemas Pulled",
+            properties={
+                "project_id": hashlib.md5(project.name.encode("utf-8")).hexdigest(),
+                "profile_id": hashlib.md5(profile.name.encode("utf-8")).hexdigest(),
+                "schema_registry": registry.type,
+                "count_schemas": count_schemas,
+                "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+            },
+            context=default_context,
+        )
 
 
 @app.command()
@@ -339,20 +393,35 @@ def push(
             f"   --select {select}\n",
         )
         if delete_confirmed:
-            registry.push(select=select, delete=delete)  # delete=True
+            count_schemas = registry.push(select=select, delete=delete)  # delete=True
     else:
-        registry.push(select=select, delete=delete)
+        count_schemas = registry.push(select=select, delete=delete)
+
+    if user.id is not None:
+        track_event(
+            user_id=user.id,
+            event_name="Schemas Pushed",
+            properties={
+                "project_id": hashlib.md5(project.name.encode("utf-8")).hexdigest(),
+                "profile_id": hashlib.md5(profile.name.encode("utf-8")).hexdigest(),
+                "schema_registry": registry.type,
+                "count_schemas": count_schemas,
+                "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+            },
+            context=default_context,
+        )
 
 
 @app.command()
 def lint(
     select: str = typer.Option(..., "--select", "-s", help="Schema(s) to lint."),
 ):
-    """Lint schema(s) against schemas/.reflekt/meta/1-0.json and conventions in reflekt_project.yml."""
+    """Lint schema(s) to test for naming and metadata conventions."""
     errors = []
     schema_paths = []  # List of schema IDs (Paths) to pull
     select = clean_select(select)
     project = Project()
+    profile = Profile(project=project)
     select_path = project.dir / "schemas" / select
     logger.info(f"Searching for JSON schemas in: {str(select_path)}")
     print("")
@@ -363,6 +432,7 @@ def lint(
                 if file.endswith(".json"):
                     schema_paths.append(Path(root) / file)
     else:  # Get single schema file
+        select_path = select_path.with_suffix(".json")
         if select_path.exists():
             schema_paths.append(select_path)
 
@@ -391,6 +461,20 @@ def lint(
         print("")
         logger.info("[green]Completed successfully[green/]")
 
+    if user.id is not None:
+        track_event(
+            user_id=user.id,
+            event_name="Schemas Linted",
+            properties={
+                "project_id": hashlib.md5(project.name.encode("utf-8")).hexdigest(),
+                "profile_id": hashlib.md5(profile.name.encode("utf-8")).hexdigest(),
+                "count_schemas": len(schema_paths),
+                "count_errors": len(errors),
+                "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+            },
+            context=default_context,
+        )
+
 
 @app.command()
 def build(
@@ -401,19 +485,22 @@ def build(
         ..., "--select", "-s", help="Schema(s) to build data artifacts for."
     ),
     sdk: SdkEnum = typer.Option(
-        ..., "--sdk", "-sdk", help="The type of SDK that generated the data."
+        ..., "--sdk", "-sdk", help="The SDK used to collect the event data."
     ),
     source: str = typer.Option(
-        ..., "--source", "-t", help="Schema in database where event data is loaded."
+        ...,
+        "--source",
+        "-t",
+        help="Data source where the raw event data is stored. In the format `--source source_id.database.schema`, matching a configured source in reflekt_profiles.yml.",
     ),
     profile_name: str = typer.Option(
         None,
         "--profile",
         "-p",
-        help="Profile in reflekt_profiles.yml to use for source (i.e., data warehouse) connection.",
+        help="Profile in reflekt_profiles.yml to use when connecting to the .",
     ),
 ):
-    """Build data artifact(s) based on schema(s)."""
+    """Build data artifacts based on schemas."""
     select = clean_select(select)
     project = Project()
     profile = Profile(project=project, profile_name=profile_name)
@@ -425,6 +512,25 @@ def build(
         profile=profile,
     ).get_builder()
     builder.build()
+
+    if user.id is not None:
+        track_event(
+            user_id=user.id,
+            event_name="Artifact Built",
+            properties={
+                "project_id": hashlib.md5(project.name.encode("utf-8")).hexdigest(),
+                "profile_id": hashlib.md5(profile.name.encode("utf-8")).hexdigest(),
+                "data_artifact": artifact.value,
+                "data_warehouse": builder.warehouse_type,
+                "source_id": hashlib.md5(
+                    builder.source_arg.encode("utf-8")
+                ).hexdigest(),
+                "count_schemas": len(builder.schema_paths),
+                "sdk": sdk.value,
+                "ci": os.getenv("CI") if os.getenv("CI") is True else False,
+            },
+            context=default_context,
+        )
 
 
 def version_callback(value: bool):
@@ -439,14 +545,19 @@ def main(
         None, "--version", callback=version_callback, is_eager=True
     ),
 ):
-    """Entry point into the Reflekt CLI."""
+    """Reflekt CLI."""
     try:
         project = Project()
+        profile = Profile(project=project)
+
+        if not profile.do_not_track:  # User has not opted out of tracking
+            user.initialize()  # Init active user for anonymous usage stats
+
     except ProjectError:  # This happens when Reflekt project has not yet been created
         project = Project(use_defaults=True)  # Set a dummy project
 
     # Configure logging
-    if not project.exists:
+    if not project.exists:  # Project has not yet been created
         logger.configure(
             handlers=[
                 {
@@ -462,7 +573,7 @@ def main(
                 }
             ],
         )
-    else:
+    else:  # Project has been created
         logger.configure(
             handlers=[
                 {
@@ -496,7 +607,7 @@ if __name__ == "__main__":
     build(
         artifact="dbt",
         select="segment/ecommerce",
-        source="snowflake.raw.my_app_web",
+        source="snowflake.raw.ecomm_demo",
         sdk="segment",
         profile_name=None,  # Must have value when using Vscode debugger
     )

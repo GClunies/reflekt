@@ -7,9 +7,9 @@ import os
 from dotenv import load_dotenv
 
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 
-load_dotenv()  # load environment variables from .env file (if exists)
+load_dotenv()  # Load environment variables from .env file (if exists)
 
 SHOW_LOCALS = os.getenv("REFLEKT_SHOW_LOCALS") == "true"

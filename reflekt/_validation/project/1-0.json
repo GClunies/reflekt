@@ -1,6 +1,5 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": ".reflekt/project/1-0.json",
     "description": "Schema for Reflekt projects",
     "self": {
         "vendor": "com.reflekt-ci",
@@ -109,7 +108,9 @@
                             "required": ["prefix", "in_folder", "tests"],
                             "additionalProperties": false
                         }
-                    }
+                    },
+                    "required": ["sources", "models", "docs"],
+                    "additionalProperties": false
                 }
             }
         }

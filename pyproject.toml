@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "reflekt"
-version = "0.3.1"
+version = "0.3.2"
 description = "A CLI tool to define event schemas, lint them, interact with schema registries, and build corresponding data artifacts (e.g., dbt package)."
 license = "Apache-2.0"
 authors = ["Gregory Clunies <greg.clunies@gmail.com>"]
 readme = "README.md"
 repository = "https://github.com/GClunies/Reflekt"
 keywords = ["events", "jsonchema", "analytics", "business-intelligence", "data-modeling", "dbt", "snowflake", "redshift", "segment", "avo"]
-include = ["reflekt/_templates/**/*"]
+include = ["reflekt/_templates/**/*", "reflekt/_validation/**/*"]
 
 [tool.poetry.scripts]
 reflekt = "reflekt.cli:app"
@@ -23,9 +23,10 @@ jsonschema = "^4.16.0"
 python-dotenv = "^0.21.0"
 inflection = "^0.5.1"
 redshift-connector = "^2.0.909"
-snowflake-sqlalchemy = "1.4.5"
+snowflake-sqlalchemy = "^1.4.6"
 snowflake-connector-python = "^2.9.0"
 sqlalchemy-redshift = "^0.8.12"
+segment-analytics-python = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "^1.6.0"

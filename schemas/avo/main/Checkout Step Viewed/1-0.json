@@ -6,12 +6,12 @@
         "vendor": "com.reflekt-ci",
         "name": "Checkout Step Viewed",
         "format": "jsonschema",
-        "version": "1-0"
+        "version": "1-0",
+        "metadata": {
+            "code_owner": "Maura",
+            "product_owner": "Greg"
+        }
     },
-    "metadata": [
-        "code_owner: Maura",
-        "product_owner: Greg"
-    ],
     "type": "object",
     "properties": {
         "checkout_id": {
@@ -40,9 +40,5 @@
         "checkout_id",
         "step"
     ],
-    "additionalProperties": false,
-    "metrics": {
-        "dimensions": [],
-        "measures": []
-    }
+    "additionalProperties": false
 }
