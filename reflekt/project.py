@@ -54,13 +54,13 @@ class Project:
             self.schemas = {
                 "conventions": {
                     "event": {
-                        "casing": "title",
+                        "casing": "any",
                         "capitalize_camel": True,
                         "numbers": False,
                         "reserved": [],
                     },
                     "property": {
-                        "casing": "title",
+                        "casing": "any",
                         "capitalize_camel": True,
                         "numbers": False,
                         "reserved": [],
