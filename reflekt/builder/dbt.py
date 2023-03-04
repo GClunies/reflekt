@@ -251,19 +251,6 @@ class DbtBuilder:
                         col_sql = f"\n        {col_name},"
                         taken_cols.append(col_name)
 
-                    # col_sql = (  # Rename column from schema, check for duplicate names
-                    #     f"\n        {col_name},"
-                    #     if col_name not in taken_cols
-                    #     and col_name
-                    #     not in [  # These columns are added to the model later
-                    #         "call_type",
-                    #         "source_schema",
-                    #         "source_table",
-                    #         "schema_id",
-                    #     ]
-                    #     else f"\n        {col_name} as _{col_name},"
-                    # )
-
                 mdl_sql += col_sql  # Add column to SQL
 
             # Columns to describe the Segment call type and where the data came from
