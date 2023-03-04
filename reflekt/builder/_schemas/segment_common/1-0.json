@@ -46,6 +46,10 @@
             "type": "string",
             "description": "Unique identifier for the user in your database. A userId or an anonymousId is required. See the Identities docs for more details."
         },
+        "name": {
+            "type": "string",
+            "description": "The name of the page or screen."
+        },
         "context": {
             "type": "object",
             "properties": {
