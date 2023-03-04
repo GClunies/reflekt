@@ -614,8 +614,8 @@ if __name__ == "__main__":
 
     build(
         artifact="dbt",
-        select="segment/buoyweather-web",
-        source="snowflake.raw.buoyweather",
+        select="segment/surfline-web/identify",
+        source="snowflake.raw.surfline",
         sdk="segment",
         profile_name="wavetrak_segment",  # Must have value when using Vscode debugger
     )

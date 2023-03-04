@@ -231,9 +231,9 @@ class DbtBuilder:
                     taken_cols.append(alias_name)
                     col_sql = f"\n        {col_name} as {alias_name},"
                 elif "context_" in col_name:  # Context columns
-                    alias_name = f"{col_name.replace('context_', '')},"
+                    alias_name = f"{col_name.replace('context_', '')}"
                     taken_cols.append(alias_name)
-                    col_sql = f"\n        {col_name} as {alias_name}"
+                    col_sql = f"\n        {col_name} as {alias_name},"
                 else:  # Other columns (i.e., from schema properties)
                     if col_name in taken_cols or col_name in [
                         "call_type",
@@ -596,6 +596,7 @@ class DbtBuilder:
                         "[magenta]Segment 'users' table[magenta/]"
                     )
 
+                    # Search users table for columns in identify schema
                     columns, warehouse_error = self.warehouse.find_columns(
                         table_name="users",
                         columns_to_search=columns_to_search,
