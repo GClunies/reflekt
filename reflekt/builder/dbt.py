@@ -185,36 +185,43 @@ class DbtBuilder:
 
         if self.sdk_arg == "segment":  # TODO - should this be its own method?
             taken_cols = []  # Used to check for duplicates
+            count_id = 0  # Used to check for duplicates
 
             for col in columns:
                 col_name = underscore(col["name"])
 
                 # Rename columns for staging models
                 if col_name == "id":  # ID column
-                    if table_name == "identifies":
-                        alias_name = "identify_id"
-                        taken_cols.append(alias_name)
-                        col_sql = f"\n        {col_name} as {alias_name},"
-                    elif table_name == "users":
-                        alias_name = "user_id"
-                        taken_cols.append(alias_name)
-                        col_sql = f"\n        {col_name} as {alias_name},"
-                    elif table_name == "groups":
-                        alias_name = "group_id"
-                        taken_cols.append(alias_name)
-                        col_sql = f"\n        {col_name} as {alias_name},"
-                    elif table_name == "pages":
-                        alias_name = "page_id"
-                        taken_cols.append(alias_name)
-                        col_sql = f"\n        {col_name} as {alias_name},"
-                    elif table_name == "screens":
-                        alias_name = "screen_id"
-                        taken_cols.append(alias_name)
-                        col_sql = f"\n        {col_name} as {alias_name},"
-                    else:  # 'tracks' table and custom events
-                        alias_name = "event_id"
-                        taken_cols.append(alias_name)
-                        col_sql = f"\n        {col_name} as {alias_name},"
+                    count_id += 1
+                    if count_id == 1:
+                        if table_name == "identifies":
+                            alias_name = "identify_id"
+                            taken_cols.append(alias_name)
+                            col_sql = f"\n        {col_name} as {alias_name},"
+                        elif table_name == "users":
+                            alias_name = "user_id"
+                            taken_cols.append(alias_name)
+                            col_sql = f"\n        {col_name} as {alias_name},"
+                        elif table_name == "groups":
+                            alias_name = "group_id"
+                            taken_cols.append(alias_name)
+                            col_sql = f"\n        {col_name} as {alias_name},"
+                        elif table_name == "pages":
+                            alias_name = "page_id"
+                            taken_cols.append(alias_name)
+                            col_sql = f"\n        {col_name} as {alias_name},"
+                        elif table_name == "screens":
+                            alias_name = "screen_id"
+                            taken_cols.append(alias_name)
+                            col_sql = f"\n        {col_name} as {alias_name},"
+                        else:  # 'tracks' table and custom events
+                            alias_name = "event_id"
+                            taken_cols.append(alias_name)
+                            col_sql = f"\n        {col_name} as {alias_name},"
+                    else:  # Duplicate ID column, add prefix
+                        prefix_name = f"_{col_name}"
+                        col_sql = f"\n        {prefix_name},"
+                        taken_cols.append(prefix_name)
                 elif col_name == "event_text":  # Event name column
                     alias_name = "event_name"
                     taken_cols.append(alias_name)
