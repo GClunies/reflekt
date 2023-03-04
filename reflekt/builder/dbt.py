@@ -590,15 +590,11 @@ class DbtBuilder:
                         metadata=metadata,
                     )
 
-                    # Build users table/model/doc
+                    # Build users table/model/doc (use columns from identifies table)
                     logger.info(
                         "Building dbt artifacts for schema: "
                         "[magenta]Segment 'users' table[magenta/]"
                     )
-                    # columns, warehouse_error = self.warehouse.find_columns(
-                    #     table_name="users",
-                    #     columns_to_search=common_columns,
-                    # )
 
                     if warehouse_error is not None:
                         self.warehouse_errors.append(warehouse_error)
