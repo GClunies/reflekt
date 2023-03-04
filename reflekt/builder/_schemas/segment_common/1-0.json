@@ -91,7 +91,37 @@
                 },
                 "device": {
                     "type": "object",
-                    "description": "Dictionary of information about the device, containing: id, advertisingId, manufacturer, model, name, type, and version."
+                    "description": "Dictionary of information about the device, containing: id, advertisingId, manufacturer, model, name, type, and version.",
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "description": "The unique ID of the device."
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "The name of the device."
+                        },
+                        "type": {
+                            "type": "string",
+                            "description": "The type of device (e.g., android)."
+                        },
+                        "manufacturer": {
+                            "type": "string",
+                            "description": "The manufacturer of the device."
+                        },
+                        "model": {
+                            "type": "string",
+                            "description": "The model of the device."
+                        },
+                        "advertisingId": {
+                            "type": "string",
+                            "description": "The advertising ID of the device."
+                        },
+                        "adTrackingEnabled": {
+                            "type": "boolean",
+                            "description": "Whether the device has advertising tracking enabled."
+                        }
+                    }
                 },
                 "ip": {
                     "type": "string",
