@@ -604,10 +604,18 @@ if __name__ == "__main__":
     # pull(select="segment/surfline-web")
     # push(select="segment/ecommerce", delete=False)
     # lint(select="segment/ecommerce")
+    # build(
+    #     artifact="dbt",
+    #     select="segment/ecommerce",
+    #     source="snowflake.raw.ecomm_demo",
+    #     sdk="segment",
+    #     profile_name=None,  # Must have value when using Vscode debugger
+    # )
+
     build(
         artifact="dbt",
-        select="segment/ecommerce",
-        source="snowflake.raw.ecomm_demo",
+        select="segment/buoyweather-web",
+        source="snowflake.raw.buoyweather",
         sdk="segment",
-        profile_name=None,  # Must have value when using Vscode debugger
+        profile_name="wavetrak_segment",  # Must have value when using Vscode debugger
     )
