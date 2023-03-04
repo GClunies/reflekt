@@ -6,6 +6,11 @@ SPDX-License-Identifier: Apache-2.0
 
 # Reflekt Changelog
 
+## [0.3.5] - 2023-03--03
+
+### Fixes
+- Fix bug where `_user_id` column was added to models of Segment users data.
+
 ## [0.3.4] - 2023-03--03
 
 ### Fixes
