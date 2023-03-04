@@ -5,28 +5,33 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt Changelog
-## [0.3.7] - 2023-03--03
+## [0.3.8] - 2023-03-04
+
+### Fixes
+- Fix bug that would add timestamp cols that don't exist in Segment users table.
+
+## [0.3.7] - 2023-03-04
 
 ### Fixes
 - Fix bug that prevented columns from `identify` schemas being used to model segment users data.
 - Ensure page/screen `name` is modelled in dbt regardless of whether they are in the schema `properties`.
 
-## [0.3.6] - 2023-03--03
+## [0.3.6] - 2023-03-03
 
 ### Fixes
 - Fix to force as alias for duplicated properties when building dbt pkg models.
 
-## [0.3.5] - 2023-03--03
+## [0.3.5] - 2023-03-03
 
 ### Fixes
 - Fix bug where `_user_id` column was added to models of Segment users data.
 
-## [0.3.4] - 2023-03--03
+## [0.3.4] - 2023-03-03
 
 ### Fixes
 - Fix bug where `version` column could be duplicated in dbt pkg models for Segment events.
 
-## [0.3.3] - 2023-03--03
+## [0.3.3] - 2023-03-03
 
 ### Fixes
 - Fix bug where `reflekt build dbt` would fail when building a dbt pkg with Segment `group()` call data.
