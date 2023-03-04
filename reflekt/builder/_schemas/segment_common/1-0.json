@@ -86,6 +86,14 @@
                         "medium": {
                             "type": "string",
                             "description": "The medium of the campaign."
+                        },
+                        "term": {
+                            "type": "string",
+                            "description": "The term of the campaign."
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "The content of the campaign."
                         }
                     }
                 },
