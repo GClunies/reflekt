@@ -6,6 +6,12 @@ SPDX-License-Identifier: Apache-2.0
 
 # Reflekt Changelog
 
+
+## [0.3.3] - 2023-03--03
+
+### Fixes
+- Fix bug where `reflekt build dbt` would fail when building a dbt pkg with Segment `group()` call data.
+
 ## [0.3.2] - 2023-02-26
 ### Added
 - Missing docstrings to Reflekt code.
