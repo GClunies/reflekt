@@ -564,29 +564,30 @@ class DbtBuilder:
             if warehouse_error is not None:
                 self.warehouse_errors.append(warehouse_error)
             else:
-                self._build_dbt_table(
-                    source=source_obj,
-                    table_name=table_name,
-                    description=event_desc,
-                )
-                self._build_dbt_model(
-                    schema_id=schema_id,
-                    source_schema=self.warehouse_schema,
-                    table_name=table_name,
-                    columns=columns,
-                    metadata=metadata,
-                    filter=self._filter,
-                )
-                self._build_dbt_doc(
-                    schema_id=schema_id,
-                    table_name=table_name,
-                    description=event_desc,
-                    columns=columns,
-                    metadata=metadata,
-                )
-
-                # Build Segment users table/model/doc
                 if self.sdk_arg == "segment" and table_name == "identifies":
+                    # Build identifies table/model/doc
+                    self._build_dbt_table(
+                        source=source_obj,
+                        table_name=table_name,
+                        description=event_desc,
+                    )
+                    self._build_dbt_model(
+                        schema_id=schema_id,
+                        source_schema=self.warehouse_schema,
+                        table_name=table_name,
+                        columns=columns,
+                        metadata=metadata,
+                        filter=self._filter,
+                    )
+                    self._build_dbt_doc(
+                        schema_id=schema_id,
+                        table_name=table_name,
+                        description=event_desc,
+                        columns=columns,
+                        metadata=metadata,
+                    )
+
+                    # Build users table/model/doc
                     logger.info(
                         "Building dbt artifacts for schema: "
                         "[magenta]Segment 'users' table[magenta/]"
@@ -618,6 +619,59 @@ class DbtBuilder:
                             columns=columns,
                             metadata={},
                         )
+                elif self.sdk_arg == "segment" and table_name == "groups":
+                    logger.info(
+                        "Building dbt artifacts for schema: "
+                        "[magenta]Segment 'groups' table[magenta/]"
+                    )
+                    columns, warehouse_error = self.warehouse.find_columns(
+                        table_name="groups",
+                        columns_to_search=common_columns,
+                    )
+
+                    if warehouse_error is not None:
+                        self.warehouse_errors.append(warehouse_error)
+                    else:
+                        self._build_dbt_table(
+                            source=source_obj,
+                            table_name="groups",
+                            description="Group traits set by group() calls.",
+                        )
+                        self._build_dbt_model(
+                            schema_id=schema_id,
+                            source_schema=self.warehouse_schema,
+                            table_name="groups",
+                            columns=columns,
+                            metadata={},
+                        )
+                        self._build_dbt_doc(
+                            schema_id=schema_id,
+                            table_name="groups",
+                            description="Group traits set by group() calls.",
+                            columns=columns,
+                            metadata={},
+                        )
+                else:
+                    self._build_dbt_table(
+                        source=source_obj,
+                        table_name=table_name,
+                        description=event_desc,
+                    )
+                    self._build_dbt_model(
+                        schema_id=schema_id,
+                        source_schema=self.warehouse_schema,
+                        table_name=table_name,
+                        columns=columns,
+                        metadata=metadata,
+                        filter=self._filter,
+                    )
+                    self._build_dbt_doc(
+                        schema_id=schema_id,
+                        table_name=table_name,
+                        description=event_desc,
+                        columns=columns,
+                        metadata=metadata,
+                    )
 
         # Build Segment tracks table/model/doc
         if self.sdk_arg == "segment":

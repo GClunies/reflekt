@@ -149,3 +149,13 @@ dmypy.json
 TODO.md
 .DS_Store
 .internal
+
+# To help test building pkgs at Wavetrak
+schemas/segment/surfline*
+schemas/segment/magicseaweed*
+schemas/segment/buoyweather*
+schemas/segment/fishtrack*
+artifacts/dbt/reflekt_demo/models/surfline*
+artifacts/dbt/reflekt_demo/models/magicseaweed*
+artifacts/dbt/reflekt_demo/models/buoyweather*
+artifacts/dbt/reflekt_demo/models/fishtrack*
