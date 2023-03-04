@@ -9,6 +9,7 @@ SPDX-License-Identifier: Apache-2.0
 
 ### Fixes
 - Fix bug that prevented columns from `identify` schemas being used to model segment users data.
+- Ensure page/screen `name` is modelled in dbt regardless of whether they are in the schema `properties`.
 
 ## [0.3.6] - 2023-03--03
 
