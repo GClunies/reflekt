@@ -6,6 +6,11 @@ SPDX-License-Identifier: Apache-2.0
 
 # Reflekt Changelog
 
+## [0.3.12] - 2023-03-04
+
+### Adds
+- Campaign contexts to common Segment schema.
+
 ## [0.3.11] - 2023-03-04
 
 ### Adds
