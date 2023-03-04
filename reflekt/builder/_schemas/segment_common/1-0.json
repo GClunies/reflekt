@@ -289,10 +289,6 @@
         "integrations": {
             "type": "object",
             "description": "Dictionary of destinations to either enable or disable See the Destinations field docs for more details."
-        },
-        "version": {
-            "type": "string",
-            "description": "Version of the Tracking API that received the message, automatically set by Segment."
         }
     }
 }
