@@ -5,6 +5,12 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt Changelog
+
+## [0.3.9] - 2023-03-04
+
+### Fixes
+- Fix how duplicated columns are aliased in dbt pkg models.
+
 ## [0.3.8] - 2023-03-04
 
 ### Fixes
