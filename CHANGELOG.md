@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 # Reflekt Changelog
 
+## [0.3.4] - 2023-03--03
+
+### Fixes
+- Fix bug where `version` column could be duplicated in dbt pkg models for Segment events.
 
 ## [0.3.3] - 2023-03--03
 
