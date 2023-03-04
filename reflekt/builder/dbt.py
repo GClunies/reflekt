@@ -235,18 +235,34 @@ class DbtBuilder:
                     taken_cols.append(alias_name)
                     col_sql = f"\n        {col_name} as {alias_name}"
                 else:  # Other columns (i.e., from schema properties)
-                    col_sql = (  # Rename column from schema, check for duplicate names
-                        f"\n        {col_name},"
-                        if col_name not in taken_cols
-                        and col_name
-                        not in [  # These columns are added to the model later
-                            "call_type",
-                            "source_schema",
-                            "source_table",
-                            "schema_id",
-                        ]
-                        else f"\n        _{col_name},"
-                    )
+                    if col_name in taken_cols or col_name in [
+                        "call_type",
+                        "source_schema",
+                        "source_table",
+                        "schema_id",
+                    ]:
+                        alias_name = f"_{col_name}"
+                        taken_cols.append(alias_name)
+                        col_sql = f"\n        {col_name} as {alias_name},"
+                    elif col_name == "id":
+                        col_sql = "\n        _id,"
+                        taken_cols.append("_id")
+                    else:
+                        col_sql = f"\n        {col_name},"
+                        taken_cols.append(col_name)
+
+                    # col_sql = (  # Rename column from schema, check for duplicate names
+                    #     f"\n        {col_name},"
+                    #     if col_name not in taken_cols
+                    #     and col_name
+                    #     not in [  # These columns are added to the model later
+                    #         "call_type",
+                    #         "source_schema",
+                    #         "source_table",
+                    #         "schema_id",
+                    #     ]
+                    #     else f"\n        {col_name} as _{col_name},"
+                    # )
 
                 mdl_sql += col_sql  # Add column to SQL
 

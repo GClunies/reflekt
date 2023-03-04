@@ -155,7 +155,11 @@ schemas/segment/surfline*
 schemas/segment/magicseaweed*
 schemas/segment/buoyweather*
 schemas/segment/fishtrack*
+schemas/segment/sprig*
+schemas/segment/split*
 artifacts/dbt/reflekt_demo/models/surfline*
 artifacts/dbt/reflekt_demo/models/magicseaweed*
 artifacts/dbt/reflekt_demo/models/buoyweather*
 artifacts/dbt/reflekt_demo/models/fishtrack*
+artifacts/dbt/reflekt_demo/models/sprig*
+artifacts/dbt/reflekt_demo/models/split*
