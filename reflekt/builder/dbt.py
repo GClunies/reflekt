@@ -600,6 +600,11 @@ class DbtBuilder:
                     if warehouse_error is not None:
                         self.warehouse_errors.append(warehouse_error)
                     else:
+                        columns = [
+                            column
+                            for column in columns
+                            if column["name"] not in ["user_id"]
+                        ]
                         self._build_dbt_table(
                             source=source_obj,
                             table_name="users",
