@@ -23,23 +23,21 @@
                         "event": {
                             "type": "object",
                             "properties": {
-                                "casing": {"type": "string", "enum": ["snake", "camel", "title", "any"]},
-                                "capitalize_camel": {"type": "boolean"},
+                                "casing": {"type": "string", "enum": ["snake", "camel", "pascal", "title", "any"]},
                                 "numbers": {"type": "boolean"},
                                 "reserved": {"type": "array", "items": {"type": "string"}}
                             },
-                            "required": ["casing", "capitalize_camel", "numbers", "reserved"],
+                            "required": ["casing", "numbers", "reserved"],
                             "additionalProperties": false
                         },
                         "property": {
                             "type": "object",
                             "properties": {
-                                "casing": {"type": "string", "enum": ["snake", "camel", "title", "any"]},
-                                "capitalize_camel": {"type": "boolean"},
+                                "casing": {"type": "string", "enum": ["snake", "camel", "pascal", "title", "any"]},
                                 "numbers": {"type": "boolean"},
                                 "reserved": {"type": "array", "items": {"type": "string"}}
                             },
-                            "required": ["casing", "capitalize_camel", "numbers", "reserved"],
+                            "required": ["casing", "numbers", "reserved"],
                             "additionalProperties": false
                         },
                         "data_types": {

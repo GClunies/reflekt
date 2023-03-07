@@ -8,7 +8,7 @@ with
 
 source as (
     select *
-    from {{ source('ecomm_demo', 'checkout_started') }}
+    from {{ source('cli_dev_segment', 'tracks') }}
     where received_at < get_date()
 ),
 
@@ -20,21 +20,16 @@ renamed as (
         sent_at as sent_at_tstamp,
         received_at as received_at_tstamp,
         timestamp as tstamp,
-        anonymous_id,
         user_id,
+        context_app_name as app_name,
+        context_app_version as app_version,
         context_library_name as library_name,
         context_library_version as library_version,
-        checkout_id,
-        currency,
-        products,
-        revenue,
-        shipping,
-        tax,
+        context_protocols_source_id as protocols_source_id,
         'track'::varchar as call_type,
-        'ecomm_demo'::varchar as source_schema,
-        'checkout_started'::varchar as source_table,
-        'segment/ecommerce/Checkout_Started/1-0.json'::varchar as schema_id,
-        '{"code_owner": "Maura", "product_owner": "Greg"}'::varchar as schema_metadata
+        'cli_dev_segment'::varchar as source_schema,
+        'tracks'::varchar as source_table,
+        'segment/reflekt_cli/Project_Debugged/1-0.json'::varchar as schema_id
     from source
 )
 

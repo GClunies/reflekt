@@ -18,14 +18,13 @@ def event_case(string: str) -> str:
     """
     project = Project()
     case = project.conventions["event"]["casing"]
-    capitalize_camel = project.conventions["event"]["capitalize_camel"]
     numbers = project.conventions["event"]["numbers"]
     if case == "snake":
         fmt_string = underscore(string).replace(" ", "_")
     elif case == "camel":
-        fmt_string = camelize(string, uppercase_first_letter=capitalize_camel).replace(
-            " ", ""
-        )
+        fmt_string = camelize(string, uppercase_first_letter=False).replace(" ", "")
+    elif case == "pascal":
+        fmt_string = camelize(string, uppercase_first_letter=True).replace(" ", "")
     elif case == "title":
         fmt_string = titleize(string)
     elif case == "any":
@@ -48,14 +47,13 @@ def property_case(string: str) -> str:
     """
     project = Project()
     case = project.conventions["property"]["casing"]
-    capitalize_camel = project.conventions["property"]["capitalize_camel"]
     numbers = project.conventions["property"]["numbers"]
     if case == "snake":
         fmt_string = underscore(string).replace(" ", "_")
     elif case == "camel":
-        fmt_string = camelize(string, uppercase_first_letter=capitalize_camel).replace(
-            " ", ""
-        )
+        fmt_string = camelize(string, uppercase_first_letter=False).replace(" ", "")
+    elif case == "pascal":
+        fmt_string = camelize(string, uppercase_first_letter=True).replace(" ", "")
     elif case == "title":
         fmt_string = titleize(string)
     elif case == "any":

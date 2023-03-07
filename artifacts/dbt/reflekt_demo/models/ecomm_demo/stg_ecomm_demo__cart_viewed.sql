@@ -31,7 +31,7 @@ renamed as (
         'track'::varchar as call_type,
         'ecomm_demo'::varchar as source_schema,
         'cart_viewed'::varchar as source_table,
-        'segment/ecommerce/Cart Viewed/1-0.json'::varchar as schema_id,
+        'segment/ecommerce/Cart_Viewed/1-0.json'::varchar as schema_id,
         '{"code_owner": "Maura", "product_owner": "Greg"}'::varchar as schema_metadata
     from source
 )

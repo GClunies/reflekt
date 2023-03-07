@@ -1,0 +1,63 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/ecommerce/Product_Added/1-0.json",
+    "description": "User adds a product to their shopping cart.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Product Added",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {
+            "code_owner": "Maura",
+            "product_owner": "Greg"
+        }
+    },
+    "type": "object",
+    "properties": {
+        "box_size": {
+            "description": "The size of the box (e.g. 12, 24, 36 patties)",
+            "type": [
+                "number",
+                "null"
+            ]
+        },
+        "cart_id": {
+            "description": "Cart ID to which the product was added to",
+            "type": "string"
+        },
+        "name": {
+            "description": "Name of the product being viewed",
+            "type": "string"
+        },
+        "price": {
+            "description": "Price ($) of the product being viewed",
+            "type": "number"
+        },
+        "product_id": {
+            "description": "Database id of the product being viewed",
+            "type": "number"
+        },
+        "quantity": {
+            "description": "Quantity of the product",
+            "type": "number"
+        },
+        "variant": {
+            "description": "Variant of the product (e.g. mild, medium, spicy)",
+            "enum": [
+                "mild",
+                "medium",
+                "spicy"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+        "cart_id",
+        "name",
+        "price",
+        "product_id",
+        "quantity",
+        "variant"
+    ],
+    "additionalProperties": false
+}

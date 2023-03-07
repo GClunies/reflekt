@@ -380,7 +380,8 @@ class SegmentRegistry:
                                 properties[key]["type"] = properties[key]["type"][0]
 
             version = f"{str(s_schema['version'])}-0"
-            id = f"{self.type}/{plan_name}/{name}/{version}.json"
+            # Schema IDs never have a space in them
+            id = f"{self.type}/{plan_name}/{name.replace(' ', '_')}/{version}.json"
 
             # Copy empty Reflekt jsonschema and set values
             r_schema = copy.deepcopy(REFLEKT_JSON_SCHEMA)

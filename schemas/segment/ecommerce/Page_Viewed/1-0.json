@@ -1,0 +1,51 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "segment/ecommerce/Page_Viewed/1-0.json",
+    "description": "User viewed a page on the website.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Page Viewed",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {
+            "code_owner": "Maura",
+            "product_owner": "Greg"
+        }
+    },
+    "type": "object",
+    "properties": {
+        "path": {
+            "description": "Path portion of the page’s URL. Equivalent to canonical path which defaults to location.pathname from the DOM API.",
+            "type": "string"
+        },
+        "product_type": {
+            "description": "The product type shown on the page.",
+            "type": "string"
+        },
+        "referrer": {
+            "description": "Previous page’s full URL. Equivalent to document.referrer from the DOM API.",
+            "type": "string"
+        },
+        "search": {
+            "description": "Query string portion of the page’s URL. Equivalent to location.search from the DOM API.",
+            "type": "string"
+        },
+        "title": {
+            "description": "Page’s title. Equivalent to document.title from the DOM API.",
+            "type": "string"
+        },
+        "url": {
+            "description": "Page’s full URL. Segment first looks for the canonical URL. If the canonical URL is not provided, Segment uses location.href from the DOM API.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "path",
+        "product_type",
+        "referrer",
+        "search",
+        "title",
+        "url"
+    ],
+    "additionalProperties": false
+}

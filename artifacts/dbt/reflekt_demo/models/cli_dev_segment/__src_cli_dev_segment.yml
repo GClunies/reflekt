@@ -1,0 +1,21 @@
+version: 2
+sources:
+  - name: cli_dev_segment
+    schema: cli_dev_segment
+    database: raw
+    description: Schema in snowflake with raw Segment event data.
+    tables:
+      - name: schemas_linted
+        description: Schemas linted to test for naming and meta data conventions.
+      - name: schemas_pushed
+        description: Schemas linted to test for naming and meta data conventions.
+      - name: project_initialized
+        description: Reflekt project initialized (aka created).
+      - name: schemas_pulled
+        description: Schemas linted to test for naming and meta data conventions.
+      - name: project_debugged
+        description: Reflekt project was debugged to check for configuration
+          errors.
+      - name: tracks
+        description: A summary of track() calls from all events. Properties
+          unique to each event's track() call are omitted.

@@ -30,6 +30,20 @@ class Linter:
         with self._meta_path.open() as f:
             self._meta_schema = json.load(f)
 
+    def lint_no_space_in_schema_id(self, schema_id: str, errors: List):
+        """Check that there are no spaces in the schema ID.
+
+        Args:
+            schema_id (str): Reflekt schema ID.
+            errors (List): A list of linting errors.
+        """
+        abs_path = self._project.dir / "schemas" / schema_id
+
+        if " " in schema_id:
+            err_msg = f"Schema ID '{schema_id}' contains space (' ') in {abs_path}"
+            logger.error(err_msg)
+            errors.append(err_msg)
+
     def lint_event_name_matches_id(
         self, schema_event_name: str, schema_id: str, errors: List
     ):
@@ -41,12 +55,16 @@ class Linter:
             errors (List): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
+        # NOTE - reflekt converts space in event name to be underscore in the file path
         name_from_id = schema_id.split("/")[-2]
+        event_name_space_to_underscore = schema_event_name.replace(" ", "_")
 
-        if schema_event_name != name_from_id:
+        if event_name_space_to_underscore != name_from_id:
             err_msg = (
                 f"Event name '{schema_event_name}' does not match schema ID "
-                f"'{schema_id}' in {abs_path}"
+                f"'{schema_id}'in {abs_path}.\n\n"
+                f"NOTE: Space (' ') in event names are converted to underscore when "
+                f"setting schema ID"
             )
             logger.error(err_msg)
             errors.append(err_msg)
@@ -263,6 +281,7 @@ class Linter:
                     errors.append(error_msg)
 
         # Lint event conventions
+        self.lint_no_space_in_schema_id(r_schema["$id"], errors)
         self.lint_event_name_matches_id(
             r_schema["self"]["name"], r_schema["$id"], errors
         )
