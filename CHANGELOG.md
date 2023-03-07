@@ -5,56 +5,60 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt Changelog
+## [0.3.13] - 2023-03-07
+
+### Fixed
+- Log schema *before* linting, not after.
 
 ## [0.3.12] - 2023-03-04
 
-### Adds
+### Added
 - Campaign contexts to common Segment schema.
 
 ## [0.3.11] - 2023-03-04
 
-### Adds
+### Added
 - Device contexts to common Segment schema.
 
 ## [0.3.10] - 2023-03-04
 
-### Fixes
+### Fixed
 - Handle case where `id` in schema properties so it doesn't get aliased to `event_id` (already used by Reflekt).
 
 ## [0.3.9] - 2023-03-04
 
-### Fixes
+### Fixed
 - Fix how duplicated columns are aliased in dbt pkg models.
 
 ## [0.3.8] - 2023-03-04
 
-### Fixes
+### Fixed
 - Fix bug that would add timestamp cols that don't exist in Segment users table.
 
 ## [0.3.7] - 2023-03-04
 
-### Fixes
+### Fixed
 - Fix bug that prevented columns from `identify` schemas being used to model segment users data.
 - Ensure page/screen `name` is modelled in dbt regardless of whether they are in the schema `properties`.
 
 ## [0.3.6] - 2023-03-03
 
-### Fixes
+### Fixed
 - Fix to force as alias for duplicated properties when building dbt pkg models.
 
 ## [0.3.5] - 2023-03-03
 
-### Fixes
+### Fixed
 - Fix bug where `_user_id` column was added to models of Segment users data.
 
 ## [0.3.4] - 2023-03-03
 
-### Fixes
+### Fixed
 - Fix bug where `version` column could be duplicated in dbt pkg models for Segment events.
 
 ## [0.3.3] - 2023-03-03
 
-### Fixes
+### Fixed
 - Fix bug where `reflekt build dbt` would fail when building a dbt pkg with Segment `group()` call data.
 
 ## [0.3.2] - 2023-02-26
@@ -73,12 +77,12 @@ SPDX-License-Identifier: Apache-2.0
 
 ## [0.3.1] - 2023-02-08
 ### Added
-- Adds a required filter: config to reflekt_project.yml (can be empty string).
+- Added a required filter: config to reflekt_project.yml (can be empty string).
 
 ### Changed
 - Improves schema checks on reflekt_project.yml and reflekt_profiles.yml.
 - Cleanup example schemas and artifacts.
-- Fixes templated README when running `reflekt build dbt ...`
+- Fixed templated README when running `reflekt build dbt ...`
 
 ## [0.3.0] - 2023-02-06
 
