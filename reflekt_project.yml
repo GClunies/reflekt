@@ -19,8 +19,8 @@ schemas:                        # Define schema conventions
       numbers: false            # Allow numbers in event names
       reserved: []              # Reserved event names
     property:
-      casing: snake             # title | snake | camel | any
-      capitalize_camel: true    # Only used if 'casing: camel'
+      casing: camel             # title | snake | camel | any
+      capitalize_camel: false    # Only used if 'casing: camel'
       numbers: false            # Allow numbers in property names
       reserved: []              # Reserved property names
     data_types: [               # Allowed data types

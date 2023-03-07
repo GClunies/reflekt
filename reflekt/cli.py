@@ -442,12 +442,13 @@ def lint(
     linter = Linter(project=project)
 
     for i, schema_path in enumerate(schema_paths, start=1):  # Get all Reflekt schemas
-        with schema_path.open("r") as f:
-            r_schema = json.load(f)
-
         logger.info(
             f"{i} of {len(schema_paths)} Linting [magenta]{schema_path}[magenta/]"
         )
+
+        with schema_path.open("r") as f:
+            r_schema = json.load(f)
+
         linter.lint_schema(r_schema, errors)  # If errors
 
     if errors:
