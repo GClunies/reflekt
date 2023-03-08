@@ -148,34 +148,33 @@ class SegmentRegistry:
         if len(select.split("/")) == 2:
             plan_name = select.split("/")[1]
             schema_name = None
-            schema_model_version = None
+            schema_major_version = None
         elif len(select.split("/")) == 3:
             plan_name = select.split("/")[1]
             schema_name = select.split("/")[2]
-            schema_model_version = None
+            schema_major_version = None
         elif len(select.split("/")) == 4:
             plan_name = select.split("/")[1]
             schema_name = select.split("/")[2]
             raw_schema_version = select.split("/")[3]
 
-            schema_model_version = int(raw_schema_version.split("-")[0])
-            schema_revision_version = int(raw_schema_version.split("-")[1])
-            schema_addition_version = int(
-                raw_schema_version.split("-")[2].replace(".json", "")
+            schema_major_version = int(raw_schema_version.split("-")[0])
+            schema_minor_version = int(
+                raw_schema_version.split("-")[1].replace(".json", "")
             )
 
-            if schema_revision_version > 0 or schema_addition_version > 0:
+            if schema_minor_version > 0:
                 raise SelectArgError(
                     message=(
                         f"Invalid argument '--select {select}' provided to CLI.\n"  # noqa: E501
-                        f"Segment schema registry only supports MODEL version numbers (e.g., MODEL-ADDITION.json):\n"  # noqa: E501
+                        f"Segment schema registry only supports MAJOR version numbers (e.g., MAJOR-0.json):\n"  # noqa: E501
                         f"    Valid: 1-0, 2-0, 3-0, etc.\n"
                         f"    Invalid: 1-1, 2-1, 3-7, etc."
                     ),
                     select=select,
                 )
 
-        return plan_name, schema_name, schema_model_version
+        return plan_name, schema_name, schema_major_version
 
     def _handle_response(self, response: Response) -> Dict:
         """Handle response from the Segment API, returning requested data as a dict.

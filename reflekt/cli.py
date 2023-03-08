@@ -603,8 +603,11 @@ def main(
 if __name__ == "__main__":
     # debug()
     # pull(select="segment/surfline-web")
+    push(
+        select="segment/ecommerce/Cart_Viewed/1-0.json", profile_name="wavetrak_segment"
+    )
     # push(select="segment/ecommerce", delete=False)
-    lint(select="segment/ecommerce")
+    # lint(select="segment/ecommerce/Cart_Viewed/1-0.json")
     # build(
     #     artifact="dbt",
     #     select="segment/ecommerce",
