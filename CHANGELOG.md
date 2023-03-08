@@ -5,6 +5,10 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt Changelog
+## [0.3.15] - 2023-03-07
+### Added
+- `reflekt lint` checks for properties that do not have a `type` defined.
+
 ## [0.3.14] - 2023-03-07
 ### Added
 - Add `pascal` as a case option for events and properties in event schemas.
