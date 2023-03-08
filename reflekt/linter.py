@@ -219,6 +219,27 @@ class Linter:
             logger.error(err_msg)
             errors.append(err_msg)
 
+    def lint_property_has_type(
+        self, prop_name: str, prop_dict: dict, schema_id: str, errors: List
+    ):
+        """Check that the property has a type.
+
+        Args:
+            prop_name (str): The property name.
+            prop_dict (dict): The property's dictionary with type, description, etc.
+            schema_id (str): Reflekt schema ID.
+            errors (List): A list of linting errors.
+        """
+        abs_path = self._project.dir / "schemas" / schema_id
+
+        if "type" not in prop_dict:
+            err_msg = (
+                f"Property '{prop_name}' in {abs_path} does not have a type. "
+                f"Please add a type to the property."
+            )
+            logger.error(err_msg)
+            errors.append(err_msg)
+
     def lint_property_type(
         self, prop_name: str, prop_type_list: list, schema_id: str, errors: List
     ):
@@ -300,12 +321,16 @@ class Linter:
             self.lint_property_description(
                 prop_key, prop_dict["description"], r_schema["$id"], errors
             )
+            self.lint_property_has_type(prop_key, prop_dict, r_schema["$id"], errors)
 
-            if isinstance(prop_dict["type"], str):
-                prop_type_list = [prop_dict["type"]]
-            else:
-                prop_type_list = prop_dict["type"]
+            if "type" in prop_dict:
+                if isinstance(prop_dict["type"], str):
+                    prop_type_list = [prop_dict["type"]]
+                else:
+                    prop_type_list = prop_dict["type"]
 
-            self.lint_property_type(prop_key, prop_type_list, r_schema["$id"], errors)
+                self.lint_property_type(
+                    prop_key, prop_type_list, r_schema["$id"], errors
+                )
 
         return errors
