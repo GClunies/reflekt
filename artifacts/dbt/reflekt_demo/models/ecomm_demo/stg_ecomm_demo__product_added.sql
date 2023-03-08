@@ -30,8 +30,9 @@ renamed as (
         context_page_title as page_title,
         context_page_url as page_url,
         context_user_agent as user_agent,
-        cart_id,
         name,
+        cart_id,
+        name as _name,
         price,
         product_id,
         quantity,
@@ -39,7 +40,7 @@ renamed as (
         'track'::varchar as call_type,
         'ecomm_demo'::varchar as source_schema,
         'product_added'::varchar as source_table,
-        'segment/ecommerce/Product Added/1-0.json'::varchar as schema_id,
+        'segment/ecommerce/Product_Added/1-0.json'::varchar as schema_id,
         '{"code_owner": "Maura", "product_owner": "Greg"}'::varchar as schema_metadata
     from source
 )

@@ -59,6 +59,8 @@ models:
         description: The url of the current page.
       - name: user_agent
         description: User agent of the device making the request.
+      - name: name
+        description: The name of the page or screen.
       - name: path
         description: Path portion of the page’s URL. Equivalent to canonical
           path which defaults to location.pathname from the DOM API.

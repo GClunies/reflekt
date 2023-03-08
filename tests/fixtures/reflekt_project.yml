@@ -13,13 +13,11 @@ profiles_path: ./tests/fixtures/reflekt_profiles.yml  # Used for test suite
 schemas:
   conventions:
     event:
-      casing: title             # title | snake | camel | any
-      capitalize_camel: true    # Only used if 'casing: camel'
+      casing: title             # title | snake | camel | pascal | any
       numbers: false
       reserved: []
     property:
-      casing: snake             # title | snake | camel | any
-      capitalize_camel: true    # Only used if 'casing: camel'
+      casing: snake             # title | snake | camel | pascal | any
       numbers: false
       reserved: []
     data_types: [string, integer, number, boolean, object, array, any, 'null']

@@ -5,6 +5,13 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt Changelog
+## [0.3.14] - 2023-03-07
+### Added
+- Add `pascal` as a case option for events and properties in event schemas.
+### Fixed
+- Do not allow spaces in schema paths.
+- Removes `capitalize_camel` config from `reflekt_project.yml`
+-
 ## [0.3.13] - 2023-03-07
 
 ### Fixed

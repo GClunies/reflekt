@@ -32,13 +32,11 @@ def test_project_init():
         "conventions": {
             "event": {
                 "casing": "title",
-                "capitalize_camel": True,
                 "numbers": False,
                 "reserved": [],
             },
             "property": {
                 "casing": "snake",
-                "capitalize_camel": True,
                 "numbers": False,
                 "reserved": [],
             },
@@ -97,13 +95,11 @@ def test_project_init_from_path():
         "conventions": {
             "event": {
                 "casing": "title",
-                "capitalize_camel": True,
                 "numbers": False,
                 "reserved": [],
             },
             "property": {
                 "casing": "snake",
-                "capitalize_camel": True,
                 "numbers": False,
                 "reserved": [],
             },
@@ -153,13 +149,11 @@ def test_project_init_use_defaults():
         "conventions": {
             "event": {
                 "casing": "any",
-                "capitalize_camel": True,
                 "numbers": False,
                 "reserved": [],
             },
             "property": {
                 "casing": "any",
-                "capitalize_camel": True,
                 "numbers": False,
                 "reserved": [],
             },
@@ -218,13 +212,11 @@ def test_project_to_yaml():
         "conventions": {
             "event": {
                 "casing": "title",
-                "capitalize_camel": True,
                 "numbers": False,
                 "reserved": [],
             },
             "property": {
                 "casing": "snake",
-                "capitalize_camel": True,
                 "numbers": False,
                 "reserved": [],
             },

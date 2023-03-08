@@ -55,13 +55,11 @@ class Project:
                 "conventions": {
                     "event": {
                         "casing": "any",
-                        "capitalize_camel": True,
                         "numbers": False,
                         "reserved": [],
                     },
                     "property": {
                         "casing": "any",
-                        "capitalize_camel": True,
                         "numbers": False,
                         "reserved": [],
                     },

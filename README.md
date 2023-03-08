@@ -132,13 +132,11 @@ profiles_path: ~/.reflekt/reflekt_profiles.yml  # Path to reflekt_profiles.yml
 schemas:                        # Define schema conventions
   conventions:
     event:
-      casing: title             # title | snake | camel | any
-      capitalize_camel: true    # Only applies if 'casing: camel'
+      casing: title             # title | snake | camel | pascal | any
       numbers: false            # Allow numbers in event names
       reserved: []              # Reserved event names
     property:
-      casing: snake             # title | snake | camel | any
-      capitalize_camel: true    # Only applies if 'casing: camel'
+      casing: snake             # title | snake | camel | pascal | any
       numbers: false            # Allow numbers in property names
       reserved: []              # Reserved property names
     data_types: [               # Allowed data types

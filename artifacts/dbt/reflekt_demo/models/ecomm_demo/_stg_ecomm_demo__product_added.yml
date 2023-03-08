@@ -59,9 +59,11 @@ models:
         description: The url of the current page.
       - name: user_agent
         description: User agent of the device making the request.
+      - name: name
+        description: The name of the page or screen.
       - name: cart_id
         description: Cart ID to which the product was added to
-      - name: name
+      - name: _name
         description: Name of the product being viewed
       - name: price
         description: Price ($) of the product being viewed

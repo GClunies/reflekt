@@ -221,7 +221,8 @@ class AvoRegistry:
                         properties[key]["type"] = properties[key]["type"][0]
 
             version = "1-0"  # Lock version for Avo, only used to build data artifacts
-            id = f"{self.type}/{branch}/{name}/{version}.json"
+            # Schema IDs never have a space in them
+            id = f"{self.type}/{branch}/{name.replace(' ', '_')}/{version}.json"
 
             # Copy empty Reflekt jsonschema and set values
             r_schema = copy.deepcopy(REFLEKT_JSON_SCHEMA)
