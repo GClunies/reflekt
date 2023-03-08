@@ -5,6 +5,10 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt Changelog
+## [0.3.16] - 2023-03-07
+### Fixed
+- Bug in `segment.py` that would caused error when trying to push a single schema to Segment schema registry.
+
 ## [0.3.15] - 2023-03-07
 ### Added
 - `reflekt lint` checks for properties that do not have a `type` defined.
