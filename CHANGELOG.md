@@ -5,6 +5,10 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt Changelog
+## [0.3.17] - 2023-03-14
+### Fixed
+- Handle case where schema author specifies `id` in schema. This is transformed by Segment to `_id` when loading the table in the warehouse. Reflekt now knows to look for a `_id` column when parsing the source table.
+
 ## [0.3.16] - 2023-03-07
 ### Fixed
 - Bug in `segment.py` that would caused error when trying to push a single schema to Segment schema registry.
@@ -21,58 +25,47 @@ SPDX-License-Identifier: Apache-2.0
 - Removes `capitalize_camel` config from `reflekt_project.yml`
 -
 ## [0.3.13] - 2023-03-07
-
 ### Fixed
 - Log schema *before* linting, not after.
 
 ## [0.3.12] - 2023-03-04
-
 ### Added
 - Campaign contexts to common Segment schema.
 
 ## [0.3.11] - 2023-03-04
-
 ### Added
 - Device contexts to common Segment schema.
 
 ## [0.3.10] - 2023-03-04
-
 ### Fixed
 - Handle case where `id` in schema properties so it doesn't get aliased to `event_id` (already used by Reflekt).
 
 ## [0.3.9] - 2023-03-04
-
 ### Fixed
 - Fix how duplicated columns are aliased in dbt pkg models.
 
 ## [0.3.8] - 2023-03-04
-
 ### Fixed
 - Fix bug that would add timestamp cols that don't exist in Segment users table.
 
 ## [0.3.7] - 2023-03-04
-
 ### Fixed
 - Fix bug that prevented columns from `identify` schemas being used to model segment users data.
 - Ensure page/screen `name` is modelled in dbt regardless of whether they are in the schema `properties`.
 
 ## [0.3.6] - 2023-03-03
-
 ### Fixed
 - Fix to force as alias for duplicated properties when building dbt pkg models.
 
 ## [0.3.5] - 2023-03-03
-
 ### Fixed
 - Fix bug where `_user_id` column was added to models of Segment users data.
 
 ## [0.3.4] - 2023-03-03
-
 ### Fixed
 - Fix bug where `version` column could be duplicated in dbt pkg models for Segment events.
 
 ## [0.3.3] - 2023-03-03
-
 ### Fixed
 - Fix bug where `reflekt build dbt` would fail when building a dbt pkg with Segment `group()` call data.
 
@@ -100,7 +93,6 @@ SPDX-License-Identifier: Apache-2.0
 - Fixed templated README when running `reflekt build dbt ...`
 
 ## [0.3.0] - 2023-02-06
-
 ### Added
 - Tests can be run using `tox`.
 - Schemas used internally by Reflekt are stored in `schemas/.reflekt/` of a Reflekt project.
