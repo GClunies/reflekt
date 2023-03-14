@@ -218,31 +218,35 @@ class DbtBuilder:
                             alias_name = "event_id"
                             taken_cols.append(alias_name)
                             col_sql = f"\n        {col_name} as {alias_name},"
-                    else:  # Duplicate ID column, add prefix
-                        prefix_name = f"_{col_name}"
-                        col_sql = f"\n        {prefix_name},"
-                        taken_cols.append(prefix_name)
-                elif col_name == "event_text":  # Event name column
-                    alias_name = "event_name"
-                    taken_cols.append(alias_name)
-                    col_sql = f"\n        {col_name} as {alias_name},"
-                elif col_name in [  # Timestamp columns
-                    "original_timestamp",
-                    "sent_at",
-                    "received_at",
-                    "timestamp",
-                ]:
-                    alias_name = col_name.replace("timestamp", "tstamp").replace(
-                        "_at", "_at_tstamp"
-                    )
-                    taken_cols.append(alias_name)
-                    col_sql = f"\n        {col_name} as {alias_name},"
-                elif "context_" in col_name:  # Context columns
-                    alias_name = f"{col_name.replace('context_', '')}"
-                    taken_cols.append(alias_name)
-                    col_sql = f"\n        {col_name} as {alias_name},"
-                else:  # Other columns (i.e., from schema properties)
-                    if col_name in taken_cols or col_name in [
+                    # Segment prefixes any ID property from schema with underscore
+                    elif count_id > 1 and "_id" in columns:  # _id must be in the table
+                        col_sql = "\n        _id,"
+                        taken_cols.append("_id")
+                    else:
+                        # Next loop iteration
+                        # otherwise duplicates previous property/column
+                        continue
+                else:
+                    if col_name == "event_text":  # Event name column
+                        alias_name = "event_name"
+                        taken_cols.append(alias_name)
+                        col_sql = f"\n        {col_name} as {alias_name},"
+                    elif col_name in [  # Timestamp columns
+                        "original_timestamp",
+                        "sent_at",
+                        "received_at",
+                        "timestamp",
+                    ]:
+                        alias_name = col_name.replace("timestamp", "tstamp").replace(
+                            "_at", "_at_tstamp"
+                        )
+                        taken_cols.append(alias_name)
+                        col_sql = f"\n        {col_name} as {alias_name},"
+                    elif "context_" in col_name:  # Context columns
+                        alias_name = f"{col_name.replace('context_', '')}"
+                        taken_cols.append(alias_name)
+                        col_sql = f"\n        {col_name} as {alias_name},"
+                    elif col_name in taken_cols or col_name in [
                         "call_type",
                         "source_schema",
                         "source_table",
@@ -251,12 +255,10 @@ class DbtBuilder:
                         alias_name = f"_{col_name}"
                         taken_cols.append(alias_name)
                         col_sql = f"\n        {col_name} as {alias_name},"
-                    elif col_name == "id":
-                        col_sql = "\n        _id,"
-                        taken_cols.append("_id")
                     else:
-                        col_sql = f"\n        {col_name},"
-                        taken_cols.append(col_name)
+                        if col_name not in taken_cols:
+                            col_sql = f"\n        {col_name},"
+                            taken_cols.append(col_name)
 
                 mdl_sql += col_sql  # Add column to SQL
 
