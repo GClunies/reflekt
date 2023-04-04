@@ -12,7 +12,6 @@ from loguru import logger
 from requests import Response
 from requests.auth import HTTPBasicAuth
 from rich import print
-from rich.pretty import pretty_repr
 from rich.traceback import install
 
 from reflekt import SHOW_LOCALS
@@ -158,11 +157,15 @@ class AvoRegistry:
             auth=HTTPBasicAuth(self.service_account_name, self.service_account_secret),
         )
 
-        logger.debug("Response from Avo API:")
+        logger.debug("Logging request details sent to Avo API...")
+        logger.debug(f"Request Method: {r.request.method}")
+        logger.debug(f"Request URL: {r.url}")
+        logger.debug(f"Request Headers: {r.headers}")
+        print("")
+        logger.debug("Logging Avo API response details...")
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")
-        logger.debug(f"    Headers: {pretty_repr(dict(r.headers))}")
-        logger.debug(f"    Response: {pretty_repr(json.loads(r.text))}")
+        logger.debug(f"    Response: {r.text}")
         print("")
 
         a_schemas = self._handle_response(r)

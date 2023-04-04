@@ -13,7 +13,6 @@ from inflection import titleize
 from loguru import logger
 from requests import Response
 from rich import print
-from rich.pretty import pretty_repr
 from rich.traceback import install
 
 from reflekt import SHOW_LOCALS
@@ -224,11 +223,15 @@ class SegmentRegistry:
         )
 
         print("")
-        logger.debug("Response from Segment API:")
+        logger.debug("Logging request details sent to Segment API...")
+        logger.debug(f"Request Method: {r.request.method}")
+        logger.debug(f"Request URL: {r.url}")
+        logger.debug(f"Request Headers: {r.headers}")
+        print("")
+        logger.debug("Logging Segment API response details...")
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")
-        logger.debug(f"    Headers: {pretty_repr(dict(r.headers))}")
-        logger.debug(f"    Response: {pretty_repr(json.loads(r.text))}")
+        logger.debug(f"    Response: {r.text}")
 
         plan = self._handle_response(r)
         s_schemas = [
@@ -314,15 +317,16 @@ class SegmentRegistry:
             )
 
         print("")
-        logger.debug("Response from Segment API:")
+        logger.debug("Logging request details sent to Segment API...")
+        logger.debug(f"Request Method: {r.request.method}")
+        logger.debug(f"Request URL: {r.url}")
+        logger.debug(f"Request Headers: {r.headers}")
+        logger.debug(f"Request body: {r.request.body.decode('utf-8')}")
+        print("")
+        logger.debug("Logging Segment API response details...")
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")
         logger.debug(f"    Response: {r.text}")
-        logger.debug(f"    Headers: {pretty_repr(dict(r.headers))}")
-        logger.debug(
-            f"    Request Body: "
-            f"{pretty_repr(json.loads(r.request.body.decode('utf-8')))}"
-        )
 
         self._handle_response(r)
         print("")
