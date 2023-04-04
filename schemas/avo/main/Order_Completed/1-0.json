@@ -1,0 +1,62 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "avo/main/Order_Completed/1-0.json",
+    "description": "Order successfully completed by the user.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Order Completed",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {
+            "code_owner": "Maura",
+            "product_owner": "Greg"
+        }
+    },
+    "type": "object",
+    "properties": {
+        "checkout_id": {
+            "description": "Checkout transaction ID",
+            "type": "string"
+        },
+        "order_id": {
+            "description": "Order ID",
+            "type": "string"
+        },
+        "tax": {
+            "description": "Total tax associated with the transaction",
+            "type": "number"
+        },
+        "shipping": {
+            "description": "Shipping cost associated with the transaction",
+            "type": "number"
+        },
+        "currency": {
+            "description": "Currency code associated with the transaction",
+            "type": "string",
+            "enum": [
+                "USD"
+            ]
+        },
+        "products": {
+            "description": "Products in the order",
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        },
+        "revenue": {
+            "description": "Revenue ($) associated with the transaction (excluding shipping and tax)",
+            "type": "number"
+        }
+    },
+    "required": [
+        "checkout_id",
+        "order_id",
+        "tax",
+        "shipping",
+        "currency",
+        "products",
+        "revenue"
+    ],
+    "additionalProperties": false
+}

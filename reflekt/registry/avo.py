@@ -158,16 +158,12 @@ class AvoRegistry:
             auth=HTTPBasicAuth(self.service_account_name, self.service_account_secret),
         )
 
-        print("")
         logger.debug("Response from Avo API:")
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")
-        logger.debug(f"    Response: {r.text}")
         logger.debug(f"    Headers: {pretty_repr(dict(r.headers))}")
-        logger.debug(
-            f"    Request Body: "
-            f"{pretty_repr(json.loads(r.request.body.decode('utf-8')))}"
-        )
+        logger.debug(f"    Response: {pretty_repr(json.loads(r.text))}")
+        print("")
 
         a_schemas = self._handle_response(r)
 

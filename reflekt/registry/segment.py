@@ -227,12 +227,8 @@ class SegmentRegistry:
         logger.debug("Response from Segment API:")
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")
-        logger.debug(f"    Response: {r.text}")
         logger.debug(f"    Headers: {pretty_repr(dict(r.headers))}")
-        logger.debug(
-            f"    Request Body: "
-            f"{pretty_repr(json.loads(r.request.body.decode('utf-8')))}"
-        )
+        logger.debug(f"    Response: {pretty_repr(json.loads(r.text))}")
 
         plan = self._handle_response(r)
         s_schemas = [
