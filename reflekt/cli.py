@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import shutil
+import sys
 from pathlib import Path
 from typing import Optional, Union
 
@@ -87,18 +88,58 @@ def clean_select(select: str) -> str:
     return str(cleaned)
 
 
+def version_callback(value: bool):
+    if value:
+        print(f"Reflekt CLI Version: {__version__}")
+        raise typer.Exit()
+
+
+def configure_logging(verbose: bool, project: Project):
+    LEVEL = "DEBUG" if verbose else "INFO"
+    logger.remove()  # Remove default loguru logger
+    logger.add(  # Add loguru logger with rich formatting
+        RichHandler(
+            rich_tracebacks=True,
+            markup=True,
+            show_path=False,
+            log_time_format="[%X]",
+            omit_repeated_times=False,
+            tracebacks_show_locals=SHOW_LOCALS,
+        ),
+        format="{message}",
+        level=LEVEL,
+    )
+
+    if project.exists:
+        logger.add(  # Log to file
+            str(project.dir) + "/.logs/reflekt_{time:YYYY-MM-DD_HH-mm-ss}.log",
+            format="{time:HH:mm:ss} | {level} | {message}",
+            level=LEVEL,
+        )
+
+    if verbose:
+        logger.debug("Verbose logging enabled")
+        print("")
+
+
 @app.command()
 def init(
     dir: str = typer.Option(
         ".", "--dir", help="Directory where project will be initialized."
-    )
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Verbose logging for debugging.",
+    ),
 ) -> None:
     """Initialize a Reflekt project.
 
     Raises:
         ProjectError: A Reflekt project already exists in the directory.
     """
-    project = Project(use_defaults=True)
+    configure_logging(verbose=verbose, project=project)
     project.dir = Path(dir).expanduser()
     project.path = project.dir / "reflekt_project.yml"
 
@@ -292,7 +333,6 @@ def init(
 def debug():
     """Check Reflekt project configuration."""
     try:
-        project = Project()
         profile = Profile(project=project)
 
         if user.id is not None:
@@ -327,9 +367,12 @@ def pull(
         "-p",
         help="Profile in reflekt_profiles.yml to use for schema registry connection.",
     ),
+    verbose: bool = typer.Option(
+        False, "--verbose", "-v", help="Verbose logging for debugging."
+    ),
 ):
     """Pull schema(s) from a schema registry."""
-    project = Project()
+    configure_logging(verbose=verbose, project=project)
     profile = Profile(project=project, profile_name=profile_name)
     registry = RegistryHandler(select=select, profile=profile).get_registry()
     count_schemas = registry.pull(select=select)
@@ -369,10 +412,16 @@ def push(
         "-p",
         help="Profile in reflekt_profiles.yml to use for schema registry connection.",
     ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Verbose logging for debugging.",
+    ),
 ):
     """Push schema(s) to a schema registry."""
+    configure_logging(verbose=verbose, project=project)
     select = clean_select(select)
-    project = Project()
     profile = Profile(project=project, profile_name=profile_name)
     registry = RegistryHandler(select=select, profile=profile).get_registry()
 
@@ -415,12 +464,18 @@ def push(
 @app.command()
 def lint(
     select: str = typer.Option(..., "--select", "-s", help="Schema(s) to lint."),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Verbose logging for debugging.",
+    ),
 ):
     """Lint schema(s) to test for naming and metadata conventions."""
+    configure_logging(verbose=verbose, project=project)
     errors = []
     schema_paths = []  # List of schema IDs (Paths) to pull
     select = clean_select(select)
-    project = Project()
     profile = Profile(project=project)
     select_path = project.dir / "schemas" / select
     logger.info(f"Searching for JSON schemas in: {str(select_path)}")
@@ -500,10 +555,15 @@ def build(
         "-p",
         help="Profile in reflekt_profiles.yml to use when connecting to the .",
     ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Verbose logging for debugging.",
+    ),
 ):
     """Build data artifacts based on schemas."""
     select = clean_select(select)
-    project = Project()
     profile = Profile(project=project, profile_name=profile_name)
     builder = BuilderHandler(
         artifact_arg=artifact,
@@ -534,12 +594,6 @@ def build(
         )
 
 
-def version_callback(value: bool):
-    if value:
-        print(f"Reflekt CLI Version: {__version__}")
-        raise typer.Exit()
-
-
 @app.callback()
 def main(
     version: Optional[bool] = typer.Option(
@@ -548,6 +602,7 @@ def main(
 ):
     """Reflekt CLI."""
     try:
+        global project
         project = Project()
         profile = Profile(project=project)
 
@@ -557,44 +612,7 @@ def main(
     except ProjectError:  # This happens when Reflekt project has not yet been created
         project = Project(use_defaults=True)  # Set a dummy project
 
-    # Configure logging
-    if not project.exists:  # Project has not yet been created
-        logger.configure(
-            handlers=[
-                {
-                    "sink": RichHandler(
-                        rich_tracebacks=True,
-                        markup=True,
-                        show_path=False,
-                        log_time_format="[%X]",
-                        omit_repeated_times=False,
-                        tracebacks_show_locals=SHOW_LOCALS,
-                    ),
-                    "format": "{message}",
-                }
-            ],
-        )
-    else:  # Project has been created
-        logger.configure(
-            handlers=[
-                {
-                    "sink": RichHandler(
-                        rich_tracebacks=True,
-                        markup=True,
-                        show_path=False,
-                        log_time_format="[%X]",
-                        omit_repeated_times=False,
-                        tracebacks_show_locals=SHOW_LOCALS,
-                    ),
-                    "format": "{message}",
-                },
-                {
-                    "sink": str(project.dir)
-                    + "/.logs/reflekt_{time:YYYY-MM-DD_HH-mm-ss}.log",
-                    "format": "{time:HH:mm:ss} | {level} | {message}",
-                },
-            ],
-        )
+    configure_logging(verbose=False, project=project)
 
     logger.info(f"Running with reflekt={__version__}")
     print("")
