@@ -306,7 +306,7 @@ class Linter:
 
         if not r_schema["self"].get("lint", True):
             logger.info(
-                f"    Skipped linting for event name '{r_schema['self']['name']}'"
+                f"    Skipped linting for event '{r_schema['self']['name']}'"
                 " because lint config is set to false"
             )
         else:
