@@ -301,7 +301,7 @@ class DbtBuilder:
 
         mdl_sql = mdl_sql[:-1]  # Remove final trailing comma from last rename
         mdl_sql += "\n    from source\n)"  # Rename CTE end
-        mdl_sql += "\n\nselect * from renamed"  # Final select
+        mdl_sql += "\n\nselect * from renamed\n"  # Final select
 
         if not model_path.parent.exists():
             model_path.parent.mkdir(parents=True)

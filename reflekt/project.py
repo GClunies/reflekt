@@ -243,4 +243,3 @@ class ProjectError(Exception):
 
 if __name__ == "__main__":  # pragma: no cover
     project = Project()
-    pass

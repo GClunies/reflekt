@@ -303,34 +303,52 @@ class Linter:
 
         # Lint event conventions
         self.lint_no_space_in_schema_id(r_schema["$id"], errors)
-        self.lint_event_name_matches_id(
-            r_schema["self"]["name"], r_schema["$id"], errors
-        )
-        self.lint_event_version_matches_id(
-            r_schema["self"]["version"], r_schema["$id"], errors
-        )
-        self.lint_event_casing(r_schema["self"]["name"], r_schema["$id"], errors)
-        self.lint_event_numbers(r_schema["self"]["name"], r_schema["$id"], errors)
-        self.lint_event_reserved(r_schema["self"]["name"], r_schema["$id"], errors)
+
+        if not r_schema["self"].get("lint", True):
+            logger.info(
+                f"    Skipped linting for event '{r_schema['self']['name']}'"
+                " due to 'lint: false' config in schema."
+            )
+        else:
+            self.lint_event_name_matches_id(
+                r_schema["self"]["name"], r_schema["$id"], errors
+            )
+            self.lint_event_version_matches_id(
+                r_schema["self"]["version"], r_schema["$id"], errors
+            )
+            self.lint_event_casing(r_schema["self"]["name"], r_schema["$id"], errors)
+            self.lint_event_numbers(r_schema["self"]["name"], r_schema["$id"], errors)
+            self.lint_event_reserved(r_schema["self"]["name"], r_schema["$id"], errors)
 
         # Lint property conventions
         for prop_key, prop_dict in r_schema["properties"].items():
-            self.lint_property_casing(prop_key, r_schema["$id"], errors)
-            self.lint_property_numbers(prop_key, r_schema["$id"], errors)
-            self.lint_property_reserved(prop_key, r_schema["$id"], errors)
-            self.lint_property_description(
-                prop_key, prop_dict["description"], r_schema["$id"], errors
-            )
-            self.lint_property_has_type(prop_key, prop_dict, r_schema["$id"], errors)
-
-            if "type" in prop_dict:
-                if isinstance(prop_dict["type"], str):
-                    prop_type_list = [prop_dict["type"]]
-                else:
-                    prop_type_list = prop_dict["type"]
-
-                self.lint_property_type(
-                    prop_key, prop_type_list, r_schema["$id"], errors
+            if not prop_dict.get("lint", True):
+                logger.info(
+                    f"    Skipped linting for property '{prop_key}' due to"
+                    " 'lint: false' config in schema."
                 )
+            else:
+                self.lint_property_casing(prop_key, r_schema["$id"], errors)
+                self.lint_property_numbers(prop_key, r_schema["$id"], errors)
+                self.lint_property_reserved(prop_key, r_schema["$id"], errors)
+                self.lint_property_description(
+                    prop_key, prop_dict["description"], r_schema["$id"], errors
+                )
+                self.lint_property_has_type(
+                    prop_key,
+                    prop_dict,
+                    r_schema["$id"],
+                    errors,
+                )
+
+                if "type" in prop_dict:
+                    if isinstance(prop_dict["type"], str):
+                        prop_type_list = [prop_dict["type"]]
+                    else:
+                        prop_type_list = prop_dict["type"]
+
+                    self.lint_property_type(
+                        prop_key, prop_type_list, r_schema["$id"], errors
+                    )
 
         return errors
