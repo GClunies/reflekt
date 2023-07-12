@@ -35,7 +35,9 @@
         },
         "revenue": {
             "description": "Revenue ($) associated with the transaction (excluding shipping and tax)",
-            "type": "number"
+            "type": "number",
+            "lint": false,
+            "coalesce": "total"
         },
         "shipping": {
             "description": "Shipping cost associated with the transaction",
