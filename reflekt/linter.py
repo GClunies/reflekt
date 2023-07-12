@@ -307,7 +307,7 @@ class Linter:
         if not r_schema["self"].get("lint", True):
             logger.info(
                 f"    Skipped linting for event '{r_schema['self']['name']}'"
-                " because lint config is set to false"
+                " due to 'lint: false' config in schema."
             )
         else:
             self.lint_event_name_matches_id(
@@ -324,8 +324,8 @@ class Linter:
         for prop_key, prop_dict in r_schema["properties"].items():
             if not prop_dict.get("lint", True):
                 logger.info(
-                    f"    Skipped linting for property '{prop_key}' because lint config"
-                    " is set to false."
+                    f"    Skipped linting for property '{prop_key}' due to"
+                    " 'lint: false' config in schema."
                 )
             else:
                 self.lint_property_casing(prop_key, r_schema["$id"], errors)
