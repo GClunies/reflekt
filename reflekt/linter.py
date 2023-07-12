@@ -303,22 +303,29 @@ class Linter:
 
         # Lint event conventions
         self.lint_no_space_in_schema_id(r_schema["$id"], errors)
-        self.lint_event_name_matches_id(
-            r_schema["self"]["name"], r_schema["$id"], errors
-        )
-        self.lint_event_version_matches_id(
-            r_schema["self"]["version"], r_schema["$id"], errors
-        )
-        self.lint_event_casing(r_schema["self"]["name"], r_schema["$id"], errors)
-        self.lint_event_numbers(r_schema["self"]["name"], r_schema["$id"], errors)
-        self.lint_event_reserved(r_schema["self"]["name"], r_schema["$id"], errors)
+
+        if not r_schema["self"].get("lint", True):
+            logger.info(
+                f"    Skipped linting for event name '{r_schema['self']['name']}'"
+                " because lint config is set to false"
+            )
+        else:
+            self.lint_event_name_matches_id(
+                r_schema["self"]["name"], r_schema["$id"], errors
+            )
+            self.lint_event_version_matches_id(
+                r_schema["self"]["version"], r_schema["$id"], errors
+            )
+            self.lint_event_casing(r_schema["self"]["name"], r_schema["$id"], errors)
+            self.lint_event_numbers(r_schema["self"]["name"], r_schema["$id"], errors)
+            self.lint_event_reserved(r_schema["self"]["name"], r_schema["$id"], errors)
 
         # Lint property conventions
         for prop_key, prop_dict in r_schema["properties"].items():
             if not prop_dict.get("lint", True):
                 logger.info(
-                    f"    Skipped linting property '{prop_key}' because it has "
-                    " `lint: false`."
+                    f"    Skipped linting for property '{prop_key}' because lint config"
+                    " is set to false."
                 )
             else:
                 self.lint_property_casing(prop_key, r_schema["$id"], errors)

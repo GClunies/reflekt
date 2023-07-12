@@ -10,7 +10,8 @@
         "metadata": {
             "code_owner": "Maura",
             "product_owner": "Greg"
-        }
+        },
+        "lint": false
     },
     "type": "object",
     "properties": {
