@@ -91,7 +91,7 @@ Create a new directory, initialize a new Git repo, and run `reflekt init` to cre
 ❯ mkdir ~/Repos/my-reflekt-project  # Create a new directory for the project
 ❯ cd ~/Repos/my-reflekt-project     # Navigate to the project directory
 ❯ git init                          # Initialize a new Git repo
-❯ reflekt init --dir .              # Initialize a new Reflekt project in the current directory
+❯ reflekt init                      # Initialize a new Reflekt project in the current directory
 
 # Follow the prompts to configure the project
 ```
