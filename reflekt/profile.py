@@ -25,13 +25,20 @@ class Profile:
     Describes a Reflekt profile and its configuration from reflekt_profiles.yml.
     """
 
-    def __init__(self, project: Project, profile_name: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        project: Project,
+        profile_name: Optional[str] = None,
+        from_reflekt_init: bool = False,
+    ) -> None:
         """Initialize a Reflekt profile.
 
         Args:
             project (Project): A Reflekt project class object.
             profile_name (Optional[str]): Name of profile to initialize. If None,
                 initialize default_profile in reflekt_project.yml.
+            from_reflekt_init (bool): Whether or not the profile is being initialized
+                from the 'reflekt init' command. Defaults to False.
 
         Raises:
             ProfileError: An error occurred while initializing the profile.
@@ -53,40 +60,43 @@ class Profile:
         self.source: List = []
 
         if self.project.exists:  # False when running 'reflekt init'
-            if not self.path.exists():
-                error_msg = (
-                    f"'profiles_path: {self.project.profiles_path}' specified in "
-                    f"{self.project.path} does not exist"
-                )
-                raise ProfileError(error_msg, profile=self)
+            if (
+                not from_reflekt_init
+            ):  # Only validate profile if not running 'reflekt init'
+                if not self.path.exists():
+                    error_msg = (
+                        f"'profiles_path: {self.project.profiles_path}' specified in "
+                        f"{self.project.path} does not exist"
+                    )
+                    raise ProfileError(error_msg, profile=self)
 
-            with self.path.open() as f:
-                profiles = yaml.safe_load(f)
+                with self.path.open() as f:
+                    profiles = yaml.safe_load(f)
 
-            try:
-                self.config = profiles[self.name]
-            except KeyError:
-                error_msg = f"Profile '{self.name}' not found in {self.path}"
-                raise ProfileError(error_msg, profile=self)
+                try:
+                    self.config = profiles[self.name]
+                except KeyError:
+                    error_msg = f"Profile '{self.name}' not found in {self.path}"
+                    raise ProfileError(error_msg, profile=self)
 
-            try:
-                self.validate_profile()
-            except ValidationError as e:
-                raise ProfileError(
-                    message=(
-                        f"Invalid reflekt_profile.yml: {e.message} at "
-                        f"'{e.json_path.replace('$.', '')}'. See the docs at "
-                        f"https://github.com/GClunies/Reflekt#reflekt_profilesyml "
-                        f"for details on project configuration."
-                    ),
-                    project=self,
-                )
+                try:
+                    self.validate_profile()
+                except ValidationError as e:
+                    raise ProfileError(
+                        message=(
+                            f"Invalid reflekt_profile.yml: {e.message} at "
+                            f"'{e.json_path.replace('$.', '')}'. See the docs at "
+                            f"https://github.com/GClunies/Reflekt#reflekt_profilesyml "
+                            f"for details on project configuration."
+                        ),
+                        project=self,
+                    )
 
-            self.do_not_track = self.config.get("do_not_track")
-            self.registry = self.config.get("registry")
-            self.source = self.config.get("source")
+                self.do_not_track = self.config.get("do_not_track")
+                self.registry = self.config.get("registry")
+                self.source = self.config.get("source")
 
-            self._check_unique_source_ids()
+                self._check_unique_source_ids()
 
     def to_yaml(self):
         """Convert Profile class to YAML and write to reflekt_profiles.yml."""
