@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import sqlalchemy
 from snowflake.sqlalchemy import URL as snow_url
@@ -24,7 +24,7 @@ class Warehouse:
         """
         self._source_arg = source_arg
         self._profile = profile
-        self.credentials: Optional[dict] = None
+        self.credentials: Optional[Dict] = None
         self._create_warehouse_engine()
 
     def _create_warehouse_engine(self) -> None:
@@ -87,7 +87,7 @@ class Warehouse:
         #     pass
 
     def find_columns(
-        self, table_name: str, columns_to_search: list[dict]
+        self, table_name: str, columns_to_search: List[Dict]
     ) -> Tuple[list, Optional[str]]:
         """For a given dict of columns, find matching columns in table in the DWH.
 
