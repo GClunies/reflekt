@@ -52,6 +52,40 @@ default_context = {  # Default context for anonymous usage stats (if not disable
 }
 
 
+def version_callback(value: bool):
+    if value:
+        print(f"Reflekt CLI Version: {__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def main(
+    version: Optional[bool] = typer.Option(
+        None, "--version", callback=version_callback, is_eager=True
+    ),
+):
+    """Main entrypoint for Reflekt CLI.
+
+    Sets up the global project object and logging to be used throughout the CLI.
+    """
+    global project
+
+    try:
+        project = Project()
+        profile = Profile(project=project)
+
+        if not profile.do_not_track:  # User has not opted out of tracking
+            user.initialize()  # Init active user for anonymous usage stats
+
+    except ProjectError:  # This happens when Reflekt project has not yet been created
+        project = Project(use_defaults=True)  # Set a dummy project
+
+    configure_logging(verbose=False, project=project)
+
+    logger.info(f"Running with reflekt={__version__}")
+    print("")
+
+
 class ExistingProjectError(Exception):
     """Custom error raised when Reflekt project already exists in directory.
 
@@ -85,12 +119,6 @@ def clean_select(select: str) -> str:
         cleaned = cleaned[:-1]
 
     return str(cleaned)
-
-
-def version_callback(value: bool):
-    if value:
-        print(f"Reflekt CLI Version: {__version__}")
-        raise typer.Exit()
 
 
 def configure_logging(verbose: bool, project: Project):
@@ -138,7 +166,7 @@ def init(
     Raises:
         ProjectError: A Reflekt project already exists in the directory.
     """
-    # NOTE: `project`` defined in main() callback
+    # NOTE: `project` defined in main() callback
     # Since the project doesn't exist yet, we don't log to file
     configure_logging(verbose=verbose, project=project)
     project.dir = Path(dir).expanduser()
@@ -153,7 +181,7 @@ def init(
             project=project,
         )
 
-    # Prompt user for project details
+    # Prompt user for Project details
     project.name = typer.prompt("Project name [letters, digits, underscore]", type=str)
     project.vendor = typer.prompt("Schema vendor [e.g com.your_company]", type=str)
 
@@ -166,15 +194,23 @@ def init(
         default=str(Path.home() / ".reflekt/reflekt_profiles.yml"),
         show_default=True,
     )
+    project.profiles_path = Path(profile_path).expanduser()
+
+    if not project.profiles_path.suffix == ".yml":
+        raise typer.BadParameter(
+            f"Profile path must be a path to a YAML (.yml/.yaml) file. "
+            f"'{project.profiles_path}' is not a YAML file."
+        )
+
     profile_name = typer.prompt(
         "Profile name [identifies profile in 'reflekt_profiles.yml']",
         type=str,
     )
-    project.profiles_path = Path(profile_path)
+
     project.default_profile = profile_name
 
-    profile = Profile(project=project)
-    profile.path = Path(profile_path)
+    profile = Profile(project=project, from_reflekt_init=True)
+    profile.path = project.profiles_path
     profile.name = profile_name
     profile.registry = [{}]
     profile.registry[0]["type"] = str.lower(
@@ -248,17 +284,18 @@ def init(
         )
         profile.source.append(source_credentials)
 
-    # Create project directory and copy template files
+    # Create project directory, reflekt_project.yml, reflekt_profiles.yml, and README
     project_folders = pkg_resources.resource_filename(  # Get template folder
         "reflekt", "_templates/reflekt_project/"
     )
+
     shutil.copytree(  # Create Reflekt project directory
         project_folders,
         project.dir,
         dirs_exist_ok=True,
     )
 
-    # Personalize project README
+    # Personalize project README with project name
     readme_file = project.dir / "README.md"
 
     with readme_file.open("r") as f:
@@ -269,9 +306,8 @@ def init(
     with readme_file.open("w") as f:
         f.write(readme)
 
-    # Create reflekt_project.yml and reflekt_profiles.yml in project dir
-    project.to_yaml()
-    profile.to_yaml()
+    project.to_yaml()  # Create reflekt_project.yml
+    profile.to_yaml()  # Create reflekt_profiles.yml
 
     # Success msg and get started table
     print("")
@@ -289,27 +325,27 @@ def init(
     table.add_column("Example", no_wrap=True)
     table.add_row(
         "init",
-        "Initialize a Reflekt project.",
+        "Initialize a Reflekt project",
         "reflekt init --dir ./in/this/dir",
     )
     table.add_row(
         "pull",
-        "Pull schemas from a schema registry.",
+        "Pull schema(s) from a schema registry",
         "reflekt pull --select segment/ecommerce",
     )
     table.add_row(
         "push",
-        "Push schemas to a schema registry.",
+        "Push schema(s) to a schema registry",
         "reflekt push --select segment/ecommerce/CartViewed",
     )
     table.add_row(
         "lint",
-        "Lint schemas against naming and metadata conventions in reflekt_project.yml.",
+        "Lint schemas against naming and metadata conventions in reflekt_project.yml",
         "reflekt lint --select segment/ecommerce/CartViewed/1-0",
     )
     table.add_row(
         "build",
-        "Build dbt package modeling Segment event data stored at the specified source.",
+        "Build data artifacts (e.g. dbt models) that match schemas in Reflekt project",
         "reflekt build dbt --select segment/ecommerce --sdk segment --source snowflake.raw.segment_prod",
     )
     console = Console()
@@ -597,32 +633,10 @@ def build(
         )
 
 
-@app.callback()
-def main(
-    version: Optional[bool] = typer.Option(
-        None, "--version", callback=version_callback, is_eager=True
-    ),
-):
-    """Reflekt CLI."""
-    try:
-        global project
-        project = Project()
-        profile = Profile(project=project)
-
-        if not profile.do_not_track:  # User has not opted out of tracking
-            user.initialize()  # Init active user for anonymous usage stats
-
-    except ProjectError:  # This happens when Reflekt project has not yet been created
-        project = Project(use_defaults=True)  # Set a dummy project
-
-    configure_logging(verbose=False, project=project)
-
-    logger.info(f"Running with reflekt={__version__}")
-    print("")
-
-
 if __name__ == "__main__":
-    debug()
+    main()  # Main entrypoint for CLI and sets global `project` variable
+    # debug()
+    init("~/repos/tmp/test_reflekt")
     # pull(select="segment/surfline-web")
     # push(select="segment/ecommerce", delete=False)
     # lint(select="segment/ecommerce/Cart_Viewed/1-0.json")
