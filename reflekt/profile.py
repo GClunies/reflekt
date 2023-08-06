@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import os
 import pkgutil
 from pathlib import Path
 from typing import List, Optional
@@ -37,6 +38,7 @@ class Profile:
         """
         self.project: Project = project
         self.path: Path = project.profiles_path
+        self.dir = self.path.parent
 
         if profile_name is not None:
             self.name: str = profile_name
@@ -92,13 +94,23 @@ class Profile:
             with self.path.open() as f:
                 profiles = yaml.safe_load(f)
 
-            profile = {
-                self.name: {
-                    "registry": self.registry,
-                    "source": self.source,
-                },
-            }
-            profiles.update(profile)
+            if self.do_not_track:
+                profile = {
+                    self.name: {
+                        "do_not_track": self.do_not_track,
+                        "registry": self.registry,
+                        "source": self.source,
+                    },
+                }
+            else:
+                profile = {
+                    self.name: {
+                        "registry": self.registry,
+                        "source": self.source,
+                    },
+                }
+
+            profiles.update(profile)  # Add profile to profiles dict
 
         else:
             profiles = {
@@ -108,6 +120,10 @@ class Profile:
                     "source": self.source,
                 },
             }
+
+        # Check that that profile directory exists
+        if not self.dir.exists():
+            os.makedirs(self.dir)
 
         with self.path.open("w") as f:
             yaml.dump(

@@ -138,16 +138,22 @@ def init(
     Raises:
         ProjectError: A Reflekt project already exists in the directory.
     """
+    # NOTE: `project`` defined in main() callback
+    # Since the project doesn't exist yet, we don't log to file
     configure_logging(verbose=verbose, project=project)
     project.dir = Path(dir).expanduser()
     project.path = project.dir / "reflekt_project.yml"
 
     if project.path.exists():
         raise ProjectError(
-            message=f"Reflekt project configuration already defined at: {project.path}!",
+            message=(
+                f"Reflekt project already found: {project.dir} \n"
+                f"  Existing project configuration: {project.path}"
+            ),
             project=project,
         )
 
+    # Prompt user for project details
     project.name = typer.prompt("Project name [letters, digits, underscore]", type=str)
     project.vendor = typer.prompt("Schema vendor [e.g com.your_company]", type=str)
 
@@ -200,12 +206,6 @@ def init(
             type=str,
             hide_input=True,
         )
-    # elif profile.registry["type"] == "rudderstack_govern":
-    #     pass
-    # elif profile.registry["type"] == "snowplow_iglu":
-    #     pass
-    # elif profile.registry["type"] == "amplitude_data":
-    #     pass
 
     source_credentials = {}
     source_credentials["type"] = str.lower(
@@ -248,6 +248,7 @@ def init(
         )
         profile.source.append(source_credentials)
 
+    # Create project directory and copy template files
     project_folders = pkg_resources.resource_filename(  # Get template folder
         "reflekt", "_templates/reflekt_project/"
     )
@@ -259,9 +260,12 @@ def init(
 
     # Personalize project README
     readme_file = project.dir / "README.md"
+
     with readme_file.open("r") as f:
         readme = f.read()
+
     readme = readme.replace("PROJECT_NAME", project.name)
+
     with readme_file.open("w") as f:
         f.write(readme)
 

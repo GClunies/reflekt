@@ -156,6 +156,10 @@ class Project:
                 "artifacts": self.artifacts,
             }
 
+        # Check that that project directory exists
+        if not self.dir.exists():
+            os.makedirs(self.dir)
+
         with self.path.open("w") as f:
             yaml.dump(
                 data,
