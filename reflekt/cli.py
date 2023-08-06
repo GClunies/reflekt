@@ -633,6 +633,37 @@ def build(
         )
 
 
+@app.command()
+def document(
+
+):
+
+
+
+@app.callback()
+def main(
+    version: Optional[bool] = typer.Option(
+        None, "--version", callback=version_callback, is_eager=True
+    ),
+):
+    """Reflekt CLI."""
+    try:
+        global project
+        project = Project()
+        profile = Profile(project=project)
+
+        if not profile.do_not_track:  # User has not opted out of tracking
+            user.initialize()  # Init active user for anonymous usage stats
+
+    except ProjectError:  # This happens when Reflekt project has not yet been created
+        project = Project(use_defaults=True)  # Set a dummy project
+
+    configure_logging(verbose=False, project=project)
+
+    logger.info(f"Running with reflekt={__version__}")
+    print("")
+
+
 if __name__ == "__main__":
     main()  # Main entrypoint for CLI and sets global `project` variable
     # debug()
