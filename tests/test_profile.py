@@ -44,6 +44,50 @@ def test_profile():
     }
 
 
+def test_profile_to_yaml():
+    """Test that profile can be written to yaml."""
+    project = Project(use_defaults=False, path="./tests/fixtures/reflekt_project.yml")
+    profile = Profile(project=project)
+    profile.path = Path("./tests/fixtures/tmp_reflekt_profiles.yml").resolve()
+    profile.to_yaml()
+
+    # Read tmp_reflekt_profiles.yml
+    with profile.path.open() as f:
+        profile_yml = yaml.safe_load(f)
+
+    # NOTE - do_not_track is not written to yaml if False
+    assert profile_yml == {
+        "version": 1.0,
+        "test_profile": {
+            "registry": [
+                {
+                    "type": "segment",
+                    "api_token": "test_token",
+                },
+                {
+                    "type": "avo",
+                    "workspace_id": "test_workspace_id",
+                    "service_account_name": "test_service_account_name",
+                    "service_account_secret": "test_secret",
+                },
+            ],
+            "source": [
+                {
+                    "id": "test_source",
+                    "type": "snowflake",
+                    "account": "test_account",
+                    "database": "test_database",
+                    "warehouse": "test_warehouse",
+                    "role": "test_role",
+                    "user": "test_user",
+                    "password": "test_password",
+                }
+            ],
+        },
+    }
+    profile.path.unlink(missing_ok=True)  # Cleanup
+
+
 def test_non_existent_profiles_path():
     """Test that a non-existent profile errors."""
     project = Project(path="./tests/fixtures/reflekt_project.yml")
