@@ -9,10 +9,10 @@
 #   3. Run `poetry install` ... this will install the dependencies from poetry.lock INSIDE the conda env (magic!)
 name: reflekt-conda
 channels:
-- conda-forge
-- defaults
+  - conda-forge
+  - defaults
 dependencies:
-- pip
-- python =3.9
-- pip:
-  - poetry
+  - pip
+  - python =3.9
+  - pip:
+    - poetry
