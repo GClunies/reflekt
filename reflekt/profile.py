@@ -45,6 +45,16 @@ class Profile:
         """
         self.project: Project = project
         self.path: Path = project.profiles_path
+
+        if not self.path.exists():
+            raise ProfileError(
+                message=(
+                    f"Profile path '{self.path}' specified in "
+                    f"{self.project.path} does not exist"
+                ),
+                profile=self,
+            )
+
         self.dir = self.path.parent
 
         if profile_name is not None:

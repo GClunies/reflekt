@@ -9,6 +9,7 @@ from typing import List
 from loguru import logger
 
 from reflekt.builder.dbt import DbtBuilder
+from reflekt.errors import SelectArgError
 from reflekt.profile import Profile
 from reflekt.project import Project
 
@@ -66,6 +67,9 @@ class BuilderHandler:
         Args:
             select (str): The --select argument passed to Reflekt CLI.
 
+        Raises:
+            SelectArgError: If --select argument is invalid.
+
         Returns:
             List[Path]: List of schemas to build.
         """
@@ -75,14 +79,20 @@ class BuilderHandler:
         logger.info(f"Searching for JSON schemas in: {str(select_path)}")
         print("")
 
+        if not select_path.exists():
+            raise SelectArgError(
+                f"--select arg '{select_path}' does not point to a valid schema or "
+                f"directory of schemas.",
+                select,
+            )
+
         if select_path.is_dir():  # Get all schemas in directory
             for root, _, files in os.walk(select_path):
                 for file in files:
                     if file.endswith(".json"):
                         schema_paths.append(Path(root) / file)
         else:  # Get single schema file
-            if select_path.exists():
-                schema_paths.append(select_path)
+            schema_paths.append(select_path)
 
         logger.info(f"Found {len(schema_paths)} schemas to build")
 
