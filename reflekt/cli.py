@@ -36,6 +36,7 @@ from reflekt.profile import Profile, ProfileError
 from reflekt.project import Project, ProjectError
 from reflekt.registry.handler import RegistryHandler
 from reflekt.tracking import ReflektUser, track_event
+from reflekt.documenter import Documenter
 
 
 # Prettify traceback messages
@@ -635,9 +636,48 @@ def build(
 
 @app.command()
 def document(
-
+select: str = typer.Option(..., "--select", "-s", help="Schema(s) to lint."),
+verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Verbose logging for debugging.",
+    ),
 ):
+    """Build Documentation as md based on the schema files"""
+    configure_logging(verbose=verbose, project=project)
+    errors = []
+    schema_paths = []  # List of schema IDs (Paths) to pull
+    select = clean_select(select)
+    profile = Profile(project=project)
+    select_path = project.dir / "schemas" / select
+    logger.info(f"Searching for JSON schemas in: {str(select_path)}")
+    print("")
 
+    if select_path.is_dir():  # Get all schemas in directory
+        for root, _, files in os.walk(select_path):
+            for file in files:
+                if file.endswith(".json"):
+                    schema_paths.append(Path(root) / file)
+    else:  # Get single schema file
+        select_path = select_path.with_suffix(".json")
+        if select_path.exists():
+            schema_paths.append(select_path)
+
+    logger.info(f"Found {len(schema_paths)} schema(s) to document")
+    print("")
+
+    documenter = Documenter(project=project)
+
+    for i, schema_path in enumerate(schema_paths, start=1):  # Get all Reflekt schemas
+        logger.info(
+            f"{i} of {len(schema_paths)} Documenting [magenta]{schema_path}[magenta/]"
+        )
+
+        documenter.reflekt_to_md(schema_path, f"{schema_path}.md")
+
+    print("")
+    logger.info("[green]Completed successfully[green/]")
 
 
 @app.callback()
