@@ -445,6 +445,9 @@ class DbtBuilder:
                 }
                 doc_obj["models"][0]["columns"].append(metadata_col)
 
+        if not doc_path.parent.exists():
+            doc_path.parent.mkdir(parents=True)
+
         with doc_path.open("w") as f:
             yaml.dump(
                 doc_obj,
