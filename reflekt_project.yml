@@ -43,6 +43,6 @@ artifacts:                      # Configure how data artifacts are built
         where received_at < get_date()
     docs:
       prefix: _stg_             # Docs files start with this prefix
-      in_folder: true          # Docs files in separate folder?
+      in_folder: false          # Docs files in separate folder?
       tests:                    # Add generic dbt tests for columns found in schemas
         id: [unique, not_null]
