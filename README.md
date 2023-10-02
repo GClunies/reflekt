@@ -9,14 +9,16 @@ SPDX-License-Identifier: Apache-2.0
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/reflekt?style=for-the-badge)
 ![GitHub](https://img.shields.io/github/license/gclunies/reflekt?style=for-the-badge)
 
-> ***Product analytics is a team sport***
+> /rəˈflek(t)/ <br>
+> _To embody or represent (something) in a faithful or appropriate way_
 
-Reflekt helps Data, Engineering, and Product teams work together to define, manage, and model events for product analytics. Reflekt integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts).
+`reflekt` is a CLI tool to help Data, Engineering, and Product teams work together to define, manage, and model event data for product analytics. Reflekt integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts). 
 
-- Define event schemas (aka data contracts) as `code` using [jsonschema](https://json-schema.org/). Schemas are version controlled, and stored in a GitHub repo.
-- Configure naming and metadata conventions for events and properties. Lint schemas to test for compliance.
-- Open pull requests (PRs) to propose schema changes, get input, and request reviews.
-- Easily build a CI suite to [lint](#linting-schemas) schemas, [push](#push-schemas-to-a-registry) them to a schema registry, and [build corresponding dbt artifacts](#building-private-dbt-packages).
+- Define event schemas using [JSON schema](https://json-schema.org/), creating a version controlled source of truth.
+- Open pull requests (PRs) to propose event changes, get input, and request reviews.
+- Configure naming and metadata rules and conventions for your events.
+- Easy CI integration: run [`reflekt lint`](#linting-schemas) to test schemas and [`reflekt push`](#push-schemas-to-a-registry) to sync them to a schema registry,
+- Automate the build of your [dbt sources, staging models, and docs](#building-private-dbt-packages) with `reflekt build dbt` - perfectly reflecting your event schemas.
 
 https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
 
