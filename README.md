@@ -12,13 +12,13 @@ SPDX-License-Identifier: Apache-2.0
 > /rəˈflek(t)/ <br>
 > _To embody or represent (something) in a faithful or appropriate way_
 
-`reflekt` is a CLI tool to help Data, Engineering, and Product teams work together to define, manage, and model event data for product analytics. Reflekt integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts). 
+Reflekt helps Data, Engineering, and Product teams work together to define, manage, and model event data for product analytics. The `reflekt` CLI integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts). 
 
 - Define event schemas using [JSON schema](https://json-schema.org/), creating a version controlled source of truth.
-- Open pull requests (PRs) to propose event changes, get input, and request reviews.
+- Open pull requests (PRs) to propose event changes, get stakeholder input, and request reviews.
 - Configure naming and metadata rules and conventions for your events.
-- Easy CI integration: run [`reflekt lint`](#linting-schemas) to test schemas and [`reflekt push`](#push-schemas-to-a-registry) to sync them to a schema registry,
-- Automate the build of your [dbt sources, staging models, and docs](#building-private-dbt-packages) with `reflekt build dbt` - perfectly reflecting your event schemas.
+- Easily integrate in CI suite: run [`reflekt lint`](#linting-schemas) to test schemas then [`reflekt push`](#push-schemas-to-a-registry) to sync them to a schema registry,
+- Automate the build of [dbt sources, staging models, and docs](#building-private-dbt-packages) with `reflekt build dbt` - perfectly reflecting your event schemas.
 
 https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
 
