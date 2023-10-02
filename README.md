@@ -18,7 +18,7 @@ Reflekt helps Data, Engineering, and Product teams work together to define, mana
 - Open pull requests (PRs) to propose event changes, get stakeholder input, and request reviews.
 - Configure naming and metadata rules and conventions for your events.
 - Easily integrate in CI suite: run [`reflekt lint`](#linting-schemas) to test schemas then [`reflekt push`](#push-schemas-to-a-registry) to sync them to a schema registry,
-- Automate the build of [dbt sources, staging models, and docs](#building-private-dbt-packages) with `reflekt build dbt` - perfectly reflecting your event schemas.
+- Automate the build of dbt sources, staging models, and docs with [`reflekt build dbt`](#building-private-dbt-packages) - perfectly reflecting your event schemas.
 
 https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
 
