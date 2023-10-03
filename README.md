@@ -16,9 +16,9 @@ Reflekt helps Data, Engineering, and Product teams work together to define, mana
 
 - Define event contracts using [JSON schema](https://json-schema.org/), creating a version controlled source of truth.
 - Configure contract naming and metadata conventions and enforce them with [`reflekt lint`](#linting-schemas).
-- Push event contracts to a schema registry with [`reflekt push`](#push-schemas-to-a-registry) for use in event validation. Pull existing contracts with [`reflekt pull`](#pull-schemas-to-a-registry).
+- Push contracts to a schema registry with [`reflekt push`](#push-schemas-to-a-registry) for use in event validation. Pull existing contracts with [`reflekt pull`](#pull-schemas-to-a-registry).
 - Open pull requests to propose contract changes, tag stakeholders for input, and request reviews.
-- Build dbt sources, staging models, and docs that _reflekt_ your event contracts with [`reflekt build dbt`](#building-private-dbt-packages).
+- Build dbt sources, staging models, and docs that _reflekt_ event contracts with [`reflekt build dbt`](#building-private-dbt-packages).
 
 https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
 
