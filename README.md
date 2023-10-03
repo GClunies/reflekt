@@ -12,13 +12,13 @@ SPDX-License-Identifier: Apache-2.0
 > /rəˈflek(t)/ <br>
 > _To embody or represent (something) in a faithful or appropriate way_
 
-Reflekt helps Data, Engineering, and Product teams work together to define, manage, and model event data for product analytics. The `reflekt` CLI integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts). 
+Reflekt helps Data, Engineering, and Product teams work together to define, manage, and model events for product analytics. The `reflekt` CLI integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts). 
 
-- Define event schemas using [JSON schema](https://json-schema.org/), creating a version controlled source of truth.
-- Open pull requests (PRs) to propose event changes, get stakeholder input, and request reviews.
-- Configure naming and metadata rules and conventions for your events.
-- Easily integrate in CI suite: run [`reflekt lint`](#linting-schemas) to test schemas then [`reflekt push`](#push-schemas-to-a-registry) to sync them to a schema registry,
-- Automate the build of dbt sources, staging models, and docs with [`reflekt build dbt`](#building-private-dbt-packages), perfectly reflecting your event schemas.
+- Define event contracts using [JSON schema](https://json-schema.org/), creating a version controlled source of truth.
+- Configure naming and metadata conventions for contracts, enforcing them with [`reflekt lint`](#linting-schemas).
+- Push event contracts to a schema registry with [`reflekt push`](#push-schemas-to-a-registry) for use in event validation. Pull existing contracts with [`reflekt pull`](#pull-schemas-to-a-registry).
+- Open pull requests to propose contract changes, tag stakeholders for input, and request reviews.
+- Build dbt sources, staging models, and docs that _reflekt_ your event contracts with [`reflekt build dbt`](#building-private-dbt-packages).
 
 https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
 
