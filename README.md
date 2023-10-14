@@ -14,7 +14,7 @@ SPDX-License-Identifier: Apache-2.0
 
 Reflekt helps Data, Engineering, and Product teams work together to define, manage, and model events for product analytics. The `reflekt` CLI integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts). 
 
-- Define event schemas using [JSON schema](https://json-schema.org/), creating a version controlled source of truth.
+- Define event schemas/contracts using [JSON schema](https://json-schema.org/), creating a version controlled source of truth.
 - Configure schema naming and metadata conventions and enforce them with [`reflekt lint`](#linting-schemas).
 - Push schemas to a schema registry with [`reflekt push`](#push-schemas-to-a-registry) for use in event validation. Pull existing schemas with [`reflekt pull`](#pull-schemas-to-a-registry).
 - Open pull requests to propose schemas changes, tag stakeholders for input, and request reviews.
