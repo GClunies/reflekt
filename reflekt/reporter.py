@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-from typing import Union
 
 import jsonschema2md
 from loguru import logger
