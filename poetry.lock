@@ -799,6 +799,21 @@ files = [
 referencing = ">=0.28.0"
 
 [[package]]
+name = "jsonschema2md"
+version = "1.0.0"
+description = "Convert JSON Schema to human-readable Markdown documentation"
+category = "main"
+optional = false
+python-versions = ">=3.9,<4.0"
+files = [
+    {file = "jsonschema2md-1.0.0-py3-none-any.whl", hash = "sha256:1d1333cb6d55a152ce10051b05651bc71122c0ec5e572b3433046825661569d4"},
+    {file = "jsonschema2md-1.0.0.tar.gz", hash = "sha256:01e18693c8dcdd643aa79ce757c5896877c590493422d23fd0bd76562fbc424b"},
+]
+
+[package.dependencies]
+PyYAML = ">=6.0.0,<7.0.0"
+
+[[package]]
 name = "license-expression"
 version = "30.1.1"
 description = "license-expression is a comprehensive utility library to parse, compare, simplify and normalize license expressions (such as SPDX license expressions) using boolean logic."
@@ -2150,4 +2165,4 @@ dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "1a58dd769f693d8d22d96dc0d22743e7e8b305f4a40ebf3d8e10981de5748e81"
+content-hash = "d6f24b1d69802b97ca2a8446d0ea398aba3dd03023da944c459b7c40ec0ad808"

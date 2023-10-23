@@ -5,6 +5,14 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt Changelog
+## [0.4.0] - 2023-10
+### Added
+
+### Breaking
+
+### Fixed
+
+
 ## [0.3.17] - 2023-03-14
 ### Fixed
 - Handle case where schema author specifies `id` in schema. This is transformed by Segment to `_id` when loading the table in the warehouse. Reflekt now knows to look for a `_id` column when parsing the source table.
