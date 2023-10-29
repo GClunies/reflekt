@@ -26,10 +26,13 @@ class Reporter:
 
         md_lines = self.parser.parse_schema(schema_obj)
         md_lines[0] = md_lines[0].replace(
-            # Reflekt does not use `title` keyword. Replace default with event name.
-            # While we're at it, add schema `$id` to report.
+            # Schemas in Reflekt do not use `title` keyword.
+            # Replace default `JSON Schema` value with event name.
             "# JSON Schema",
-            f"# {schema_obj['self']['name']}\n`$id`: `{schema_obj['$id']}`",
+            f"# {schema_obj['self']['name']}",
+        )
+        md_lines.insert(  # Add schema `$id` to report
+            1, f"`$id`: {schema_obj['$id']}\n\n"
         )
         md_str = "".join(md_lines)
 

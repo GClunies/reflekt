@@ -605,13 +605,15 @@ def report(
     if not to_file:
         if len(schema_paths) == 1:
             logger.info(f"Generating Markdown report for schema: {len(schema_paths)}")
-            md_str = reporter.build_md(schema_path)
+            md_str = reporter.build_md(schema_paths[0])
+            print()
             print(md_str)
         else:
             raise SelectArgError(
                 message=(
-                    "Multiple schemas selected but cannot write multiple Markdown "
-                    "reports to stdout. Use `--to-file` to write to files instead."
+                    f"Command: 'reflekt report --select {select}' cannot output "
+                    f"multiple Markdown reports to stdout. Use `--to-file` to write to "
+                    f"files instead."
                 ),
                 select=select,
             )
@@ -697,7 +699,7 @@ if __name__ == "__main__":
     # lint(select="segment/ecommerce/Cart_Viewed/1-0.json")
     report(
         select="segment/ecommerce/Cart_Viewed/1-0.json",
-        to_file=True,
+        to_file=False,
     )
     # build(
     #     artifact="dbt",

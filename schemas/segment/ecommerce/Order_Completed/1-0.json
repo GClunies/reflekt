@@ -32,7 +32,36 @@
         },
         "products": {
             "description": "Products in the order",
-            "type": "array"
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "product_id": {
+                        "description": "Product ID",
+                        "type": "string"
+                    },
+                    "sku": {
+                        "description": "Product SKU",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Product name",
+                        "type": "string"
+                    },
+                    "price": {
+                        "description": "Product price",
+                        "type": "number"
+                    },
+                    "quantity": {
+                        "description": "Product quantity",
+                        "type": "integer"
+                    },
+                    "category": {
+                        "description": "Product category",
+                        "type": "string"
+                    }
+                }
+            }
         },
         "revenue": {
             "description": "Revenue ($) associated with the transaction (excluding shipping and tax)",
