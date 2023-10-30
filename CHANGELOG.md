@@ -5,6 +5,16 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt Changelog
+## [0.4.0] - 2023-10
+### Added
+- `reflekt report` CLI command - create a Markdown formatted report of an event schema. Output to `stdout` or `.md` in same directory as the `.json` file.
+- Add common `get_schema_paths()` to `cli.py` so that it can be used by all CLI commands that `--select` schemas.
+- Update example schemas in `schemas/segment/ecommerce/`
+
+### Fixed
+Use `from __future__ import annotations` so that `form typing import List, Dict, Tuple` is not required in python 3.8.
+
+
 ## [0.3.17] - 2023-03-14
 ### Fixed
 - Handle case where schema author specifies `id` in schema. This is transformed by Segment to `_id` when loading the table in the warehouse. Reflekt now knows to look for a `_id` column when parsing the source table.

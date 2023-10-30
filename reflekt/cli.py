@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # flake8: noqa  -- Readability is more important than style here
+from __future__ import annotations
+
 import hashlib
 import json
 import os
@@ -35,6 +37,7 @@ from reflekt.linter import Linter
 from reflekt.profile import Profile, ProfileError
 from reflekt.project import Project, ProjectError
 from reflekt.registry.handler import RegistryHandler
+from reflekt.reporter.reporter import Reporter
 from reflekt.tracking import ReflektUser, track_event
 
 
@@ -119,6 +122,27 @@ def clean_select(select: str) -> str:
         cleaned = cleaned[:-1]
 
     return str(cleaned)
+
+
+def get_schema_paths(select: str, project: Project) -> list[Path]:
+    select_path = project.dir / "schemas" / select
+
+    logger.info(f"Searching for JSON schemas in: {str(select_path)}")
+    print("")
+
+    schema_paths = []  # List of schema IDs (Paths) to pull
+
+    if select_path.is_dir():  # Get all schemas in directory
+        for root, _, files in os.walk(select_path):
+            for file in files:
+                if file.endswith(".json"):
+                    schema_paths.append(Path(root) / file)
+    else:  # Get single schema file
+        select_path = select_path.with_suffix(".json")
+        if select_path.exists():
+            schema_paths.append(select_path)
+
+    return schema_paths
 
 
 def configure_logging(verbose: bool, project: Project):
@@ -512,23 +536,9 @@ def lint(
 ):
     """Lint schema(s) to test for naming and metadata conventions."""
     configure_logging(verbose=verbose, project=project)
-    errors = []
-    schema_paths = []  # List of schema IDs (Paths) to pull
-    select = clean_select(select)
     profile = Profile(project=project)
-    select_path = project.dir / "schemas" / select
-    logger.info(f"Searching for JSON schemas in: {str(select_path)}")
-    print("")
-
-    if select_path.is_dir():  # Get all schemas in directory
-        for root, _, files in os.walk(select_path):
-            for file in files:
-                if file.endswith(".json"):
-                    schema_paths.append(Path(root) / file)
-    else:  # Get single schema file
-        select_path = select_path.with_suffix(".json")
-        if select_path.exists():
-            schema_paths.append(select_path)
+    schema_paths = get_schema_paths(select=select, project=project)
+    errors = []  # TODO: Linter should have its own errors attribute
 
     logger.info(f"Found {len(schema_paths)} schema(s) to lint")
     print("")
@@ -572,6 +582,56 @@ def lint(
 
 
 @app.command()
+def report(
+    select: str = typer.Option(
+        ..., "--select", "-s", help="Schema(s) to generate Markdown report(s) for."
+    ),
+    to_file: bool = typer.Option(
+        False,
+        "--to-file",
+        "-f",
+        help="Write report(s) to file instead of stdout.",
+    ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        "-v",
+        help="Verbose logging for debugging.",
+    ),
+):
+    """Generate Markdown report(s) for schema(s)."""
+    configure_logging(verbose=verbose, project=project)
+    schema_paths = get_schema_paths(select=select, project=project)
+    reporter = Reporter()
+
+    if not to_file:
+        if len(schema_paths) == 1:
+            logger.info(f"Generating Markdown report for schema: {len(schema_paths)}")
+            md_str = reporter.build_md(schema_paths[0])
+            print()
+            print(md_str)
+
+            return md_str
+        else:
+            raise SelectArgError(
+                message=(
+                    f"Command: 'reflekt report --select {select}' cannot output "
+                    f"multiple Markdown reports to stdout. Use `--to-file` to write to "
+                    f"files instead."
+                ),
+                select=select,
+            )
+
+    else:
+        for schema_path in schema_paths:
+            md_str = reporter.build_md(schema_path)
+            report_path = Path(schema_path._str.replace(".json", ".md"))
+
+            with report_path.open("w") as f:
+                f.write(md_str)
+
+
+@app.command()
 def build(
     artifact: ArtifactEnum = typer.Argument(
         ..., help="Type of data artifact to build."
@@ -602,6 +662,7 @@ def build(
     ),
 ):
     """Build data artifacts based on schemas."""
+    configure_logging(verbose=verbose, project=project)
     select = clean_select(select)
     profile = Profile(project=project, profile_name=profile_name)
     builder = BuilderHandler(
@@ -636,10 +697,14 @@ def build(
 if __name__ == "__main__":
     main()  # Main entrypoint for CLI and sets global `project` variable
     # debug()
-    init("~/repos/tmp/test_reflekt")
+    # init("~/repos/tmp/test_reflekt")
     # pull(select="segment/surfline-web")
     # push(select="segment/ecommerce", delete=False)
     # lint(select="segment/ecommerce/Cart_Viewed/1-0.json")
+    report(
+        select="segment/ecommerce/Cart_Viewed/1-0.json",
+        to_file=False,
+    )
     # build(
     #     artifact="dbt",
     #     select="segment/ecommerce",

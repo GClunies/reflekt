@@ -1,11 +1,13 @@
 # SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 #
 # SPDX-License-Identifier: Apache-2.0
+from __future__ import annotations
+
 import json
 import os
 import pkgutil
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional
 
 import yaml
 from git import InvalidGitRepositoryError, Repo
@@ -178,7 +180,7 @@ class Project:
         schema = json.loads(pkgutil.get_data("reflekt", "_validation/project/1-0.json"))
         validate(self.config, schema)
 
-    def _get_project_dir(self, dir: Path) -> Tuple[Path, Path]:
+    def _get_project_dir(self, dir: Path) -> tuple[Path, Path]:
         """Get project dir and path to reflekt_project.yml. Set flag if project exists.
 
         Args:
@@ -188,7 +190,7 @@ class Project:
             ProjectError: An error occurred while getting project root directory.
 
         Returns:
-            Tuple[Path, Path, bool]: Path to project directory, path to
+            tuple[Path, Path, bool]: Path to project directory, path to
                 reflekt_project.yml, boolean flag indicating if project exists.
         """
         try:

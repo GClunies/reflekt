@@ -1,12 +1,13 @@
 # SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 #
 # SPDX-License-Identifier: Apache-2.0
+from __future__ import annotations
 
 import json
 import os
 import pkgutil
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import yaml
 from jsonschema import ValidationError, validate
@@ -66,8 +67,8 @@ class Profile:
         self.exists: bool = False
         self.config: dict = {}
         self.do_not_track = False
-        self.registry: List = []
-        self.source: List = []
+        self.registry: list = []
+        self.source: list = []
 
         if self.project.exists:  # False when running 'reflekt init'
             if (

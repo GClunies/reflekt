@@ -1,10 +1,10 @@
 # SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 #
 # SPDX-License-Identifier: Apache-2.0
+from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import List
 
 from loguru import logger
 
@@ -61,7 +61,7 @@ class BuilderHandler:
         else:
             return artifact
 
-    def _parse_select(self, select: str) -> List[Path]:
+    def _parse_select(self, select: str) -> list[Path]:
         """Parse the select argument.
 
         Args:
@@ -71,9 +71,9 @@ class BuilderHandler:
             SelectArgError: If --select argument is invalid.
 
         Returns:
-            List[Path]: List of schemas to build.
+            list[Path]: list of schemas to build.
         """
-        schema_paths = []  # List of schema paths to pull
+        schema_paths = []  # list of schema paths to pull
         project = Project()
         select_path = project.dir / "schemas" / select
         logger.info(f"Searching for JSON schemas in: {str(select_path)}")
