@@ -1,11 +1,11 @@
 # SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 #
 # SPDX-License-Identifier: Apache-2.0
+from __future__ import annotations
 
 import copy
 import json
 from pathlib import Path
-from typing import Dict, List
 
 import requests
 from loguru import logger
@@ -111,7 +111,7 @@ class AvoRegistry:
 
         return select.split("/")[1]
 
-    def _handle_response(self, response: Response) -> Dict:
+    def _handle_response(self, response: Response) -> dict:
         """Handle response from the Segment API, returning requested data as a dict.
 
         Args:
@@ -121,7 +121,7 @@ class AvoRegistry:
             ApiResponseError: An error occurred when handling the response.
 
         Returns:
-            Dict: The data requested from the Segment API.
+            dict: The data requested from the Segment API.
         """
         if response.status_code != 200:
             raise ApiResponseError(
@@ -135,7 +135,7 @@ class AvoRegistry:
 
         return response.json()["events"]
 
-    def _get_avo(self, select: str, branch: str) -> List:
+    def _get_avo(self, select: str, branch: str) -> list:
         """Get Avo tracking plan schemas from API based on --select from CLI.
 
         Args:
@@ -146,7 +146,7 @@ class AvoRegistry:
             SelectArgError: Error with the --select argument.
 
         Returns:
-            List: Tracking plan schemas from Avo.
+            list: Tracking plan schemas from Avo.
         """
         logger.info("Searching Avo for schemas")
         print("")

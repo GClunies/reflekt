@@ -1,12 +1,13 @@
 # SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 #
 # SPDX-License-Identifier: Apache-2.0
+from __future__ import annotations
 
 import json
 import pkgutil
 import shutil
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 
 import pkg_resources
 import yaml
@@ -30,7 +31,7 @@ class DbtBuilder:
     def __init__(
         self,
         select_arg: str,
-        schema_paths: List[Path],
+        schema_paths: list[Path],
         sdk_arg: str,
         source_arg: str,
         profile: Profile,
@@ -39,7 +40,7 @@ class DbtBuilder:
 
         Args:
             select_arg (str): The --select argument passed to Reflekt CLI.
-            schema_paths (List[Path]): List of schema paths to build.
+            schema_paths (list[Path]): list of schema paths to build.
             sdk_arg (str): The --sdk argument passed to Reflekt CLI.
             source_arg (str): The --source argument passed to Reflekt CLI.
             profile (Profile): Reflekt Profile object.
@@ -69,11 +70,11 @@ class DbtBuilder:
         self.warehouse_schema = self.warehouse.schema
         self.warehouse_errors = []
 
-    def _build_dbt_source(self) -> Dict:
+    def _build_dbt_source(self) -> dict:
         """Build dbt source.
 
         Returns:
-            Dict: dbt source object.
+            dict: dbt source object.
         """
         src_path = (
             self.tmp_pkg_dir
@@ -107,11 +108,11 @@ class DbtBuilder:
 
         return dbt_source
 
-    def _build_dbt_table(self, source: Dict, table_name: str, description: str) -> None:
+    def _build_dbt_table(self, source: dict, table_name: str, description: str) -> None:
         """Build dbt table.
 
         Args:
-            source (Dict): dbt source object.
+            source (dict): dbt source object.
             table_name (str): Table name.
             description (str): Table description.
         """
@@ -130,8 +131,8 @@ class DbtBuilder:
         schema_id: str,
         source_schema: str,
         table_name: str,
-        columns: List[Dict],
-        metadata: Dict,
+        columns: list[dict],
+        metadata: dict,
         filter: Optional[str] = None,
     ) -> None:
         """Build dbt model.
@@ -140,8 +141,8 @@ class DbtBuilder:
             schema_id (str): Reflekt schema ID.
             source_schema (str): source schema.
             table_name (str): Table name.
-            columns (List[Dict]): List of column dicts (with name, description, etc).
-            metadata (Dict): Schema metadata.
+            columns (list[dict]): list of column dicts (with name, description, etc).
+            metadata (dict): Schema metadata.
             filter (Optional[str]): Filter to apply to model. Defaults to None.
         """
         schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
@@ -320,8 +321,8 @@ class DbtBuilder:
         schema_id: str,
         table_name: str,
         description: str,
-        columns: List[Dict],
-        metadata: Dict,
+        columns: list[dict],
+        metadata: dict,
     ) -> None:
         """Build dbt documentation for model.
 
@@ -329,8 +330,8 @@ class DbtBuilder:
             schema_id (str): Reflekt schema ID.
             table_name (str): Table name.
             description (str): Model description.
-            columns (List[Dict]): List of column dicts (with name, description, etc).
-            metadata (Dict): Schema metadata.
+            columns (list[dict]): list of column dicts (with name, description, etc).
+            metadata (dict): Schema metadata.
         """
         schema_version = underscore(schema_id.split("/")[-1].replace(".json", ""))
         model_name = (
@@ -539,7 +540,7 @@ class DbtBuilder:
             for field in Flatson(common_schema).fields
         ]
 
-        models_config: Dict = self.project.artifacts["dbt"]["models"]
+        models_config: dict = self.project.artifacts["dbt"]["models"]
         self._filter = models_config.get("filter", None)
 
         # Iterate through all schemas to build artifacts

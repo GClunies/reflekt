@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # flake8: noqa  -- Readability is more important than style here
+from __future__ import annotations
+
 import hashlib
 import json
 import os

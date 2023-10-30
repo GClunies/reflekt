@@ -7,10 +7,11 @@
 #
 # Changes are made to modify the `Parser` class to fit the needs of Reflekt.
 
+from __future__ import annotations
+
 import io
 import json
 import re
-from collections.abc import Sequence
 from typing import Optional, Union
 
 
@@ -43,7 +44,7 @@ class JSONParser:
 
     def _construct_description_line(
         self, obj: dict, add_type: bool = False
-    ) -> Sequence[str]:
+    ) -> list[str]:
         """Construct description line of property, definition, or item.
 
         Args:
@@ -52,7 +53,7 @@ class JSONParser:
                 Defaults to False.
 
         Returns:
-            Sequence[str]: Description line as a list of strings.
+            list[str]: Description line as a list of strings.
         """
         description_line = []
 
@@ -115,7 +116,7 @@ class JSONParser:
 
     def _construct_examples(
         self, obj: dict, indent_level: int = 0, add_header: bool = True
-    ) -> Sequence[str]:
+    ) -> list[str]:
         def dump_json_with_line_head(obj, line_head, **kwargs):
             result = [
                 line_head + line
@@ -151,7 +152,7 @@ class JSONParser:
         indent_level: int = 0,
         path: Optional[list[str]] = None,
         required: bool = True,
-    ) -> Sequence[str]:
+    ) -> list[str]:
         """Parse JSON object and its items, definitions, and properties recursively.
 
         Args:
@@ -166,7 +167,7 @@ class JSONParser:
             required (bool): Whether to include "required" in the description line.
 
         Returns:
-            Sequence[str]: Output lines.
+            list[str]: Output lines.
 
         Raises:
             TypeError: If a non-object type is found in the properties list.
@@ -289,14 +290,14 @@ class JSONParser:
 
         return output_lines
 
-    def parse_schema(self, schema_object: dict) -> Sequence[str]:
+    def parse_schema(self, schema_object: dict) -> list[str]:
         """Parse JSON Schema object to Markdown text.
 
         Args:
             schema_object (dict): JSON Schema object.
 
         Returns:
-            Sequence[str]: Markdown text.
+            list[str]: Markdown text.
         """
         output_lines = []
 

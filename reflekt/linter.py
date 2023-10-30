@@ -2,8 +2,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from __future__ import annotations
+
 import json
-from typing import List
 
 from jsonschema import Draft7Validator
 from loguru import logger
@@ -30,12 +31,12 @@ class Linter:
         with self._meta_path.open() as f:
             self._meta_schema = json.load(f)
 
-    def lint_no_space_in_schema_id(self, schema_id: str, errors: List):
+    def lint_no_space_in_schema_id(self, schema_id: str, errors: list):
         """Check that there are no spaces in the schema ID.
 
         Args:
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
 
@@ -45,14 +46,14 @@ class Linter:
             errors.append(err_msg)
 
     def lint_event_name_matches_id(
-        self, schema_event_name: str, schema_id: str, errors: List
+        self, schema_event_name: str, schema_id: str, errors: list
     ):
         """Check that the schema event name matches the schema ID.
 
         Args:
             schema_event_name (str): The event name from the schema.
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
         # NOTE - reflekt converts space in event name to be underscore in the file path
@@ -70,14 +71,14 @@ class Linter:
             errors.append(err_msg)
 
     def lint_event_version_matches_id(
-        self, schema_event_version: str, schema_id: str, errors: List
+        self, schema_event_version: str, schema_id: str, errors: list
     ):
         """Check that the schema event version matches the schema ID.
 
         Args:
             schema_event_version (str): The event version from the schema.
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
         version_from_id = schema_id.split("/")[-1].replace(".json", "")
@@ -90,13 +91,13 @@ class Linter:
             logger.error(err_msg)
             errors.append(err_msg)
 
-    def lint_event_casing(self, event_name: str, schema_id: str, errors: List):
+    def lint_event_casing(self, event_name: str, schema_id: str, errors: list):
         """Check that the event name is in the correct casing.
 
         Args:
             event_name (str): The event name.
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
         if event_name != event_case(event_name):
@@ -108,13 +109,13 @@ class Linter:
             logger.error(err_msg)
             errors.append(err_msg)
 
-    def lint_event_numbers(self, event_name: str, schema_id: str, errors: List):
+    def lint_event_numbers(self, event_name: str, schema_id: str, errors: list):
         """Check that the event name does not contain numbers.
 
         Args:
             event_name (str): The event name.
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
         if any(char.isdigit() for char in event_name):
@@ -126,13 +127,13 @@ class Linter:
             logger.error(err_msg)
             errors.append(err_msg)
 
-    def lint_event_reserved(self, event_name: str, schema_id: str, errors: List):
+    def lint_event_reserved(self, event_name: str, schema_id: str, errors: list):
         """Check that the event name is not a reserved name.
 
         Args:
             event_name (str): The event name.
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
         if event_name in self._project.conventions["event"]["reserved"]:
@@ -144,13 +145,13 @@ class Linter:
             logger.error(err_msg)
             errors.append(err_msg)
 
-    def lint_property_casing(self, prop_name: str, schema_id: str, errors: List):
+    def lint_property_casing(self, prop_name: str, schema_id: str, errors: list):
         """Check that the property name is in the correct casing.
 
         Args:
             prop_name (str): The property name.
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
         if prop_name != property_case(prop_name):
@@ -163,13 +164,13 @@ class Linter:
             logger.error(err_msg)
             errors.append(err_msg)
 
-    def lint_property_numbers(self, prop_name: str, schema_id: str, errors: List):
+    def lint_property_numbers(self, prop_name: str, schema_id: str, errors: list):
         """Check that the property name does not contain numbers.
 
         Args:
             prop_name (str): The property name.
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
         if any(char.isdigit() for char in prop_name):
@@ -182,13 +183,13 @@ class Linter:
             logger.error(err_msg)
             errors.append(err_msg)
 
-    def lint_property_reserved(self, prop_name: str, schema_id: str, errors: List):
+    def lint_property_reserved(self, prop_name: str, schema_id: str, errors: list):
         """Check that the property name is not a reserved name.
 
         Args:
             prop_name (str): The property name.
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
         if prop_name in self._project.conventions["property"]["reserved"]:
@@ -201,7 +202,7 @@ class Linter:
             errors.append(err_msg)
 
     def lint_property_description(
-        self, prop_name: str, description: str, schema_id: str, errors: List
+        self, prop_name: str, description: str, schema_id: str, errors: list
     ):
         """Check that the property description is not empty.
 
@@ -209,7 +210,7 @@ class Linter:
             prop_name (str): The property name.
             description (str): The property description.
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
         if not description:
@@ -220,7 +221,7 @@ class Linter:
             errors.append(err_msg)
 
     def lint_property_has_type(
-        self, prop_name: str, prop_dict: dict, schema_id: str, errors: List
+        self, prop_name: str, prop_dict: dict, schema_id: str, errors: list
     ):
         """Check that the property has a type.
 
@@ -228,7 +229,7 @@ class Linter:
             prop_name (str): The property name.
             prop_dict (dict): The property's dictionary with type, description, etc.
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
 
@@ -241,15 +242,15 @@ class Linter:
             errors.append(err_msg)
 
     def lint_property_type(
-        self, prop_name: str, prop_type_list: list, schema_id: str, errors: List
+        self, prop_name: str, prop_type_list: list, schema_id: str, errors: list
     ):
         """Check that the property data type is valid.
 
         Args:
             prop_name (str): The property name.
-            prop_type_list (list): List of valid property data types.
+            prop_type_list (list): list of valid property data types.
             schema_id (str): Reflekt schema ID.
-            errors (List): A list of linting errors.
+            errors (list): A list of linting errors.
         """
         abs_path = self._project.dir / "schemas" / schema_id
         for prop_type in prop_type_list:

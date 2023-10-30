@@ -13,7 +13,7 @@ include = ["reflekt/_templates/**/*", "reflekt/_validation/**/*"]
 reflekt = "reflekt.cli:app"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 typer = "^0.6.1"
 rich = "^12.5.1"
 loguru = "^0.6.0"
@@ -27,7 +27,6 @@ snowflake-sqlalchemy = "^1.4.6"
 snowflake-connector-python = "^2.9.0"
 sqlalchemy-redshift = "^0.8.12"
 segment-analytics-python = "^2.2.2"
-jsonschema2md = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 autoflake = "^1.6.0"
@@ -79,7 +78,7 @@ testpaths = ["tests"]
 legacy_tox_ini = """
 [tox]
 isolated_build = true
-envlist = py39,py310
+envlist = py38,py39,py310
 
 [testenv]
 whitelist_externals = poetry

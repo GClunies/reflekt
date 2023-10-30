@@ -1,8 +1,9 @@
 # SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 #
 # SPDX-License-Identifier: Apache-2.0
+from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 import sqlalchemy
 from snowflake.sqlalchemy import URL as snow_url
@@ -24,7 +25,7 @@ class Warehouse:
         """
         self._source_arg = source_arg
         self._profile = profile
-        self.credentials: Optional[Dict] = None
+        self.credentials: Optional[dict] = None
         self._create_warehouse_engine()
 
     def _create_warehouse_engine(self) -> None:
@@ -87,18 +88,18 @@ class Warehouse:
         #     pass
 
     def find_columns(
-        self, table_name: str, columns_to_search: List[Dict]
-    ) -> Tuple[list, Optional[str]]:
+        self, table_name: str, columns_to_search: list[dict]
+    ) -> tuple[list, Optional[str]]:
         """For a given dict of columns, find matching columns in table in the DWH.
 
         Args:
             table_name (str): Table name in the data warehouse.
-            columns_to_search (list[dict]): List of dictionaries that contain column
+            columns_to_search (list[dict]): list of dictionaries that contain column
                 names and descriptions. The column names are used to search for columns
                 in the table.
 
         Returns:
-            Tuple[list, Optional[str]]: List of columns that were found in
+            tuple[list, Optional[str]]: list of columns that were found in
                 the table and error message.
         """
         # Set default values

@@ -2,11 +2,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+
+from __future__ import annotations
+
 import copy
 import json
 import os
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import requests
 from inflection import titleize
@@ -84,11 +86,11 @@ class SegmentRegistry:
                 profile=self.profile,
             )
 
-    def _get_plans(self) -> List:
+    def _get_plans(self) -> list:
         """Retrieve list of dicts describing tracking plans and their attributes.
 
         Returns:
-            List: A list of dicts describing tracking plans and their attributes.
+            list: A list of dicts describing tracking plans and their attributes.
         """
         r = requests.get(
             url=self.base_url, headers=self.headers, params={"pagination[count]": 200}
@@ -119,7 +121,7 @@ class SegmentRegistry:
 
         return plan_id
 
-    def _parse_select(self, select: str) -> Tuple[str, str, int]:
+    def _parse_select(self, select: str) -> tuple[str, str, int]:
         """Parse --select arg into a tuple of (plan_name, schema_name, schema_ver).
 
         Args:
@@ -129,7 +131,7 @@ class SegmentRegistry:
             SelectArgError: The --select arg is not compatible with Segment.
 
         Returns:
-            Tuple[str, str, int]: A tuple of (plan_name, schema_name, schema_ver).
+            tuple[str, str, int]: A tuple of (plan_name, schema_name, schema_ver).
         """
         select_error_msg = (
             f"Invalid --select argument: {select}\n"  # noqa: E501
@@ -176,7 +178,7 @@ class SegmentRegistry:
 
         return plan_name, schema_name, schema_major_version
 
-    def _handle_response(self, response: Response) -> Dict:
+    def _handle_response(self, response: Response) -> dict:
         """Handle response from the Segment API, returning requested data as a dict.
 
         Args:
@@ -186,7 +188,7 @@ class SegmentRegistry:
             ApiResponseError: An error occurred when handling the response.
 
         Returns:
-            Dict: The data requested from the Segment API.
+            dict: The data requested from the Segment API.
         """
         if response.status_code not in [200, 201]:
             raise ApiResponseError(
@@ -200,7 +202,7 @@ class SegmentRegistry:
 
         return response.json()["data"]
 
-    def _get_segment(self, select: str) -> List:
+    def _get_segment(self, select: str) -> list:
         """Get Segment tracking plan schemas from API based on --select from CLI.
 
         Args:
@@ -210,7 +212,7 @@ class SegmentRegistry:
             SelectArgError: Error with the --select argument.
 
         Returns:
-            List: Tracking plan schemas from Segment Protocols.
+            list: Tracking plan schemas from Segment Protocols.
         """
         logger.info("Searching Segment for schemas")
         print("")
@@ -265,7 +267,7 @@ class SegmentRegistry:
         return s_schemas
 
     def _post_put_patch_del_segment(
-        self, select: str, plan_name: str, schemas: List, delete: bool = False
+        self, select: str, plan_name: str, schemas: list, delete: bool = False
     ) -> None:
         """Sync Reflekt schemas to Segment Protocols based on --select from CLI.
 
@@ -277,7 +279,7 @@ class SegmentRegistry:
         Args:
             select (str): The --select argument passed to Reflekt CLI.
             plan_name (str): The name of the tracking plan.
-            schemas (List): A list of schemas to be updated in the tracking plan.
+            schemas (list): A list of schemas to be updated in the tracking plan.
             delete (bool): Flag to delete the schemas identified by the --select
                 argument.
         """
@@ -455,7 +457,7 @@ class SegmentRegistry:
             select = f"{select}.json"
 
         project = Project()
-        schema_paths = []  # List of schema paths to push
+        schema_paths = []  # list of schema paths to push
         s_schemas = []  # Segment schemas
         r_schemas = []  # Reflekt schemas
         select_path = project.dir / "schemas" / select
