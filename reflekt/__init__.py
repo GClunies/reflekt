@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 
 
-__version__ = "0.3.25"
+__version__ = "0.4.0"
 
 
 load_dotenv()  # Load environment variables from .env file (if exists)
