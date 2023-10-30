@@ -35,7 +35,7 @@ from reflekt.linter import Linter
 from reflekt.profile import Profile, ProfileError
 from reflekt.project import Project, ProjectError
 from reflekt.registry.handler import RegistryHandler
-from reflekt.reporter import Reporter
+from reflekt.reporter.reporter import Reporter
 from reflekt.tracking import ReflektUser, track_event
 
 
@@ -608,6 +608,8 @@ def report(
             md_str = reporter.build_md(schema_paths[0])
             print()
             print(md_str)
+
+            return md_str
         else:
             raise SelectArgError(
                 message=(
