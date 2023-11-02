@@ -5,7 +5,7 @@
 .PHONY: format
 format:
 	@ruff format ./reflekt ./tests
-	@ruff check ./reflekt ./tests --fix
+	@ruff check --fix ./reflekt ./tests
 
 .PHONY: lint
 lint:
