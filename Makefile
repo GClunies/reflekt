@@ -4,14 +4,12 @@
 
 .PHONY: format
 format:
-	@autoflake --remove-all-unused-imports --remove-unused-variables --ignore-init-module-imports --recursive --in-place .
-	@isort .
-	@black .
+	@ruff format ./reflekt ./tests
+	@ruff check --fix ./reflekt ./tests
 
 .PHONY: lint
 lint:
-	@flake8 ./reflekt ./tests
-	@black --check .
+	@ruff check ./reflekt ./tests
 
 .PHONY: type-check
 type-check:

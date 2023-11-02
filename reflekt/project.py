@@ -200,8 +200,7 @@ class Project:
             projects = [
                 path
                 for path in list(repo_root.glob("**/reflekt_project.yml"))
-                if "_templates/" not in str(path)
-                and "tests/fixtures/" not in str(path)  # noqa: W503
+                if "_templates/" not in str(path) and "tests/fixtures/" not in str(path)  # noqa: W503
             ]
 
             if len(projects) == 1:

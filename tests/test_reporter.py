@@ -2,15 +2,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import copy
-import os
-import shutil
 from pathlib import Path
 
-import pytest
-import yaml
-
-from reflekt.project import Project, ProjectError
 from reflekt.reporter.reporter import Reporter
 
 
@@ -20,7 +13,6 @@ def test_reflekt_report():
     reporter = Reporter()
     md_str = reporter.build_md(schema_path)
 
-    # flake8: noqa - readibility is more important than line length here
     assert md_str == (
         "# Order Completed\n\n"
         "#### `$id: segment/ecommerce/Order_Completed/1-0.json`\n\n"
