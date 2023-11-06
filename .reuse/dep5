@@ -15,6 +15,10 @@ Files: tests/fixtures/*
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
 License: Apache-2.0
 
+Files: scripts/jaffle-shop/data/*
+Copyright: dbt labs
+License: Apache-2.0
+
 Files: poetry.lock
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
 License: Apache-2.0
