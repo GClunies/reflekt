@@ -8,7 +8,7 @@ SPDX-License-Identifier: Apache-2.0
 
 ## [0.5.0] - 2023-10
 ### Breaking
-- Only support python versions `>=3.9`. Support for pyhton `3.8` is DEPRECATED.
+- Only support python versions `>=3.9,<3.13`. Support for pyhton `3.8` is DEPRECATED.
 
 
 ## [0.4.0] - 2023-10
