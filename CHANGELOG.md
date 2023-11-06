@@ -5,6 +5,12 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt Changelog
+
+## [0.5.0] - 2023-10
+### Breaking
+- Only support python versions `>=3.9`. Support for pyhton `3.8` is DEPRECATED.
+
+
 ## [0.4.0] - 2023-10
 ### Added
 - `reflekt report` CLI command - create a Markdown formatted report of an event schema. Output to `stdout` or `.md` in same directory as the `.json` file.
@@ -12,7 +18,7 @@ SPDX-License-Identifier: Apache-2.0
 - Update example schemas in `schemas/segment/ecommerce/`
 
 ### Fixed
-Use `from __future__ import annotations` so that `form typing import List, Dict, Tuple` is not required in python 3.8.
+Use `from __future__ import annotations` so that `from typing import List, Dict, Tuple` is not required in python 3.8.
 
 
 ## [0.3.17] - 2023-03-14
