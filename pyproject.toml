@@ -13,7 +13,7 @@ include = ["reflekt/_templates/**/*", "reflekt/_validation/**/*"]
 reflekt = "reflekt.cli:app"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 typer = "^0.6.1"
 rich = "^12.5.1"
 loguru = "^0.6.0"
@@ -75,7 +75,7 @@ testpaths = ["tests"]
 legacy_tox_ini = """
 [tox]
 isolated_build = true
-envlist = py38,py39,py310
+envlist = py39,py310,py311
 
 [testenv]
 whitelist_externals = poetry
