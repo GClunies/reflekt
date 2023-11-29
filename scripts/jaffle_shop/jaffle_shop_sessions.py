@@ -36,16 +36,24 @@ PRODUCT_CATEGORIES = ["jaffles"] * 10
 ACTIONS = [
     "Home Page",
     "Menu Page",
+    "Contact Page",
     "Product Page",
     "Cart Page",
-    "Checkout Page",
-    "Order Confirmation Page",
+    "Checkout Page - Shipping",
+    "Checkout Page - Payment",
+    "Checkout Page - Confirmation",
     "Product Clicked",
     "Product Added",
     "Product Removed",
+    "Cart Viewed",
     "Checkout Started",
     "Checkout Step Viewed",
-    "Checkout Step Completed",
+    "Checkout Step Viewed - Shipping",
+    "Checkout Step Viewed - Payment",
+    "Checkout Step Viewed - Confirmation",
+    "Checkout Step Completed - Shipping",
+    "Checkout Step Completed - Payment",
+    "Checkout Step Completed - Confirmation",
     "Order Completed",
     "Drop",
 ]
@@ -93,19 +101,93 @@ def generate_products(names, prices, categories):
     return pd.DataFrame(products)
 
 
-def session_action(
-    user,
-    in_tstamp,
-    in_action,
-    in_page,
-    session_id,
-):
+def home_page_action():
+    pass
+
+
+def menu_page_action():
+    pass
+
+
+def contact_page_action():
+    pass
+
+
+def product_page_action():
+    pass
+
+
+def product_clicked_action():
+    pass
+
+
+def product_added_action():
+    pass
+
+
+def product_removed_action():
+    pass
+
+
+def cart_page_action():
+    pass
+
+
+def cart_viewed_action():
+    pass
+
+
+def checkout_page_shipping_action():
+    pass
+
+
+def checkout_step_viewed_shipping_action():
+    pass
+
+
+def checkout_step_completed_shipping_action():
+    pass
+
+
+def checkout_page_payment_action():
+    pass
+
+
+def checkout_step_viewed_payment_action():
+    pass
+
+
+def checkout_step_completed_payment_action():
+    pass
+
+
+def checkout_page_confirmation_action():
+    pass
+
+
+def checkout_step_viewed_confirmation_action():
+    pass
+
+
+def checkout_step_completed_confirmation_action():
+    pass
+
+
+def order_completed_action():
+    pass
+
+
+def drop_action():
+    pass
+
+
+def session_action(user, in_tstamp, in_action, in_page, session_id, cart):
     """Make an action in a user session."""
     out_tstamp = in_tstamp + pd.Timedelta(
         seconds=random.randint(1, SESSION_MAX_TIMESTEP)
     )
 
-    if in_action is None:  # For simplicity, all sessions start on home page
+    if in_action is None:  # First action, all sessions start on home page
         segment_analytics.identify(
             anonymous_id=user["anonymous_id"],
             user_id=user["user_id"],
@@ -180,8 +262,8 @@ def session_action(
 
     elif in_action == "Contact Page":
         out_action = random.choices(
-            ["Home Page", "Drop"],
-            [0.9, 0.1],
+            ["Home Page", "Menu Page", "Drop"],
+            [0.2, 0.7, 0.1],
         )
 
         if out_action == "Home Page":
@@ -270,7 +352,16 @@ def session_action(
 
         if out_action == "Product Added":
             # User added a product to their cart
-            product = random.choice(products)
+            product_added = random.choice(products)
+            product = {
+                "product_id": product_added["id"],
+                "sku": product_added["sku"],
+                "category": product_added["category"],
+                "name": product_added["name"],
+                "price": product_added["price"],
+                "quantity": random.choice([1, 2, 3]),
+            }
+            cart["products"].append(product)
             segment_analytics.track(
                 event="Product Added",
                 timestamp=out_tstamp,
@@ -283,14 +374,7 @@ def session_action(
                         "title": in_page["title"],
                     }
                 },
-                properties={
-                    "product_id": product["id"],
-                    "sku": product["sku"],
-                    "category": product["category"],
-                    "name": product["name"],
-                    "price": product["price"],
-                    "session_id": session_id,
-                },
+                properties=product,
             )
         elif out_action == "Home Page":
             segment_analytics.identify(
@@ -315,8 +399,103 @@ def session_action(
             )
 
     elif in_action == "Product Added":
-        # TODO - pick up from here
-        pass
+        out_action = random.choices(
+            ["Cart Page", "Menu Page", "Drop"],
+            [0.75, 0.15, 0.1],
+        )
+
+        if out_action == "Cart Page":
+            segment_analytics.identify(
+                anonymous_id=user["anonymous_id"],
+                user_id=user["user_id"],
+                timestamp=out_tstamp,
+            )
+            out_action = "Cart Page"
+            out_page = {
+                "name": "Cart",
+                "url": "https://thejaffleshop.com/cart",
+                "path": urlparse("https://thejaffleshop.com/cart").path,
+                "search": urlparse("https://thejaffleshop.com/cart").query,
+                "title": "Jaffle Shop - Cart",
+                "referrer": in_page["url"],
+            }
+            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
+            segment_analytics.page(
+                name="Cart",
+                timestamp=out_tstamp,
+                properties=out_page.update({"session_id": session_id}),
+            )
+            out_action = "Cart Viewed"
+            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
+            segment_analytics.track(
+                event="Cart Viewed",
+                timestamp=out_tstamp,
+                context={
+                    "page": {
+                        "url": in_page["url"],
+                        "path": in_page["path"],
+                        "referrer": in_page["referrer"],
+                        "search": in_page["search"],
+                        "title": in_page["title"],
+                    }
+                },
+                properties={
+                    "cart_id": cart["cart_id"],
+                    "products": cart["products"],
+                    "session_id": session_id,
+                },
+            )
+
+        else:
+            out_action = "Drop"
+
+    elif in_action == "Cart Viewed":
+        out_action = random.choices(
+            ["Checkout Page - Shipping", "Menu Page", "Drop"],
+            [0.85, 0.05, 0.10],
+        )
+
+        if out_action == "Checkout Page - Shipping":
+            segment_analytics.identify(
+                anonymous_id=user["anonymous_id"],
+                user_id=user["user_id"],
+                timestamp=out_tstamp,
+            )
+            out_action = "Checkout Page - shipping"
+            out_page = {
+                "name": "Checkout - Shipping",
+                "url": "https://thejaffleshop.com/checkout/shipping",
+                "path": urlparse("https://thejaffleshop.com/checkout/shipping").path,
+                "search": urlparse("https://thejaffleshop.com/checkout/shipping").query,
+                "title": "Jaffle Shop - Checkout - shipping",
+                "referrer": in_page["url"],
+            }
+            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
+            segment_analytics.page(
+                name="Checkout - shipping",
+                timestamp=out_tstamp,
+                properties=out_page.update({"session_id": session_id}),
+            )
+            out_action = "Checkout Step Viewed - Shipping"
+            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
+            segment_analytics.track(
+                event="Checkout Step Viewed",
+                timestamp=out_tstamp,
+                context={
+                    "page": {
+                        "url": in_page["url"],
+                        "path": in_page["path"],
+                        "referrer": in_page["referrer"],
+                        "search": in_page["search"],
+                        "title": in_page["title"],
+                    }
+                },
+                properties={
+                    "cart_id": cart["cart_id"],
+                    "products": cart["products"],
+                    "session_id": session_id,
+                },
+            )
 
     return user, out_action, out_page, out_tstamp
 
@@ -348,6 +527,10 @@ for _ in range(N_SESSIONS):
         datetime_start=pd.Timestamp("2023-01-01").tz_localize("UTC"),
         datetime_end=pd.Timestamp("2023-01-31").tz_localize("UTC"),
     )
+    cart = {
+        "cart_id": uuid.uuid4(),
+        "products": [],
+    }
 
     if action_number == 0:
         action = None
@@ -363,10 +546,11 @@ for _ in range(N_SESSIONS):
         # }
 
     while action != "Drop":
-        user, action, page, tstamp = session_action(
+        user, action, page, tstamp, cart = session_action(
             user=user,
             in_tstamp=tstamp,
             in_action=action,
             in_page=page,
             session_id=session_id,
+            cart=cart,
         )
