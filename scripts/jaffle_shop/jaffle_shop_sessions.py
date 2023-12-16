@@ -101,405 +101,6 @@ def generate_products(names, prices, categories):
     return pd.DataFrame(products)
 
 
-def home_page_action():
-    pass
-
-
-def menu_page_action():
-    pass
-
-
-def contact_page_action():
-    pass
-
-
-def product_page_action():
-    pass
-
-
-def product_clicked_action():
-    pass
-
-
-def product_added_action():
-    pass
-
-
-def product_removed_action():
-    pass
-
-
-def cart_page_action():
-    pass
-
-
-def cart_viewed_action():
-    pass
-
-
-def checkout_page_shipping_action():
-    pass
-
-
-def checkout_step_viewed_shipping_action():
-    pass
-
-
-def checkout_step_completed_shipping_action():
-    pass
-
-
-def checkout_page_payment_action():
-    pass
-
-
-def checkout_step_viewed_payment_action():
-    pass
-
-
-def checkout_step_completed_payment_action():
-    pass
-
-
-def checkout_page_confirmation_action():
-    pass
-
-
-def checkout_step_viewed_confirmation_action():
-    pass
-
-
-def checkout_step_completed_confirmation_action():
-    pass
-
-
-def order_completed_action():
-    pass
-
-
-def drop_action():
-    pass
-
-
-def session_action(user, in_tstamp, in_action, in_page, session_id, cart):
-    """Make an action in a user session."""
-    out_tstamp = in_tstamp + pd.Timedelta(
-        seconds=random.randint(1, SESSION_MAX_TIMESTEP)
-    )
-
-    if in_action is None:  # First action, all sessions start on home page
-        segment_analytics.identify(
-            anonymous_id=user["anonymous_id"],
-            user_id=user["user_id"],
-            timestamp=out_tstamp,
-        )
-        out_action = "Home Page"
-        out_page = {
-            "name": "Home",
-            "path": "/",
-            "referrer": None,
-            "search": None,
-            "title": "Jaffle Shop - Home",
-            "url": "https://thejaffleshop.com/",
-        }
-        out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
-        segment_analytics.page(
-            name="Home",
-            timestamp=out_tstamp,
-            properties=out_page.update({"session_id": session_id}),
-        )
-
-    elif in_action == "Home Page":
-        out_action = random.choices(
-            ["Menu Page", "Contact Page", "Drop"],
-            [0.85, 0.05, 0.1],
-        )
-
-        if out_action == "Menu Page":
-            segment_analytics.identify(
-                anonymous_id=user["anonymus_id"],
-                user_id=user["user_id"],
-                timestamp=out_tstamp,
-            )
-            out_page = {
-                "name": "Menu",
-                "url": "https://thejaffleshop.com/menu",
-                "path": urlparse("https://thejaffleshop.com/menu").path,
-                "search": urlparse("https://thejaffleshop.com/menu").query,
-                "title": "Jaffle Shop - Menu",
-                "referrer": in_page["url"],
-            }
-            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
-            segment_analytics.page(
-                name="Menu",
-                timestamp=out_tstamp,
-                properties=out_page.update({"session_id": session_id}),
-            )
-
-        elif out_action == "Contact Page":
-            segment_analytics.identify(
-                anonymous_id=user["anonymous_id"],
-                user_id=user["user_id"],
-                timestamp=out_tstamp,
-            )
-            out_page = {
-                "name": "Contact",
-                "url": "https://thejaffleshop.com/contact",
-                "path": urlparse("https://thejaffleshop.com/contact").path,
-                "search": urlparse("https://thejaffleshop.com/contact").query,
-                "title": "Jaffle Shop - Contact",
-                "referrer": in_page["url"],
-            }
-            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
-            segment_analytics.page(
-                name="Contact",
-                timestamp=out_tstamp,
-                properties=out_page.update({"session_id": session_id}),
-            )
-
-        else:
-            out_action = "Drop"
-
-    elif in_action == "Contact Page":
-        out_action = random.choices(
-            ["Home Page", "Menu Page", "Drop"],
-            [0.2, 0.7, 0.1],
-        )
-
-        if out_action == "Home Page":
-            segment_analytics.identify(
-                anonymous_id=user["anonymous_id"],
-                user_id=user["user_id"],
-                timestamp=out_tstamp,
-            )
-            out_action = "Home Page"
-            out_page = {
-                "name": "Home",
-                "url": "https://thejaffleshop.com/",
-                "path": urlparse("https://thejaffleshop.com/").path,
-                "search": urlparse("https://thejaffleshop.com/").query,
-                "title": "Jaffle Shop - Home",
-                "referrer": in_page["url"],
-            }
-            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
-            segment_analytics.page(
-                name="Home",
-                timestamp=out_tstamp,
-                properties=out_page.update({"session_id": session_id}),
-            )
-
-        else:
-            out_action = "Drop"
-
-    elif in_action == "Menu Page":
-        out_action = random.choices(
-            ["Product Clicked", "Drop"],
-            [0.9, 0.1],
-        )
-
-        if out_action == "Product Clicked":
-            # User clicked on a product
-            product = random.choice(products)
-            segment_analytics.track(
-                event="Product Clicked",
-                timestamp=out_tstamp,
-                context={
-                    "page": {
-                        "url": in_page["url"],
-                        "path": in_page["path"],
-                        "referrer": in_page["referrer"],
-                        "search": in_page["search"],
-                        "title": in_page["title"],
-                    }
-                },
-                properties={
-                    "product_id": product["id"],
-                    "sku": product["sku"],
-                    "category": product["category"],
-                    "name": product["name"],
-                    "price": product["price"],
-                    "session_id": session_id,
-                },
-            )
-            out_action = "Product Page"  # Page loads after click
-            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
-            out_page = {
-                "name": "Product",
-                "url": f"https://thejaffleshop.com/product/{product['id']}",
-                "path": urlparse(
-                    f"https://thejaffleshop.com/product/{product['id']}"
-                ).path,
-                "search": urlparse(
-                    f"https://thejaffleshop.com/product/{product['id']}"
-                ).query,
-                "title": f"Jaffle Shop - {product['name']}",
-                "referrer": in_page["url"],
-            }
-            segment_analytics.page(
-                name="Product",
-                timestamp=out_tstamp,
-                properties=out_page.update({"session_id": session_id}),
-            )
-
-        else:
-            out_action = "Drop"
-
-    elif in_action == "Product Page":
-        out_action = random.choices(
-            ["Product Added", "Home Page", "Drop"],
-            [0.75, 0.15, 0.1],
-        )
-
-        if out_action == "Product Added":
-            # User added a product to their cart
-            product_added = random.choice(products)
-            product = {
-                "product_id": product_added["id"],
-                "sku": product_added["sku"],
-                "category": product_added["category"],
-                "name": product_added["name"],
-                "price": product_added["price"],
-                "quantity": random.choice([1, 2, 3]),
-            }
-            cart["products"].append(product)
-            segment_analytics.track(
-                event="Product Added",
-                timestamp=out_tstamp,
-                context={
-                    "page": {
-                        "url": in_page["url"],
-                        "path": in_page["path"],
-                        "referrer": in_page["referrer"],
-                        "search": in_page["search"],
-                        "title": in_page["title"],
-                    }
-                },
-                properties=product,
-            )
-        elif out_action == "Home Page":
-            segment_analytics.identify(
-                anonymous_id=user["anonymous_id"],
-                user_id=user["user_id"],
-                timestamp=out_tstamp,
-            )
-            out_action = "Home Page"
-            out_page = {
-                "name": "Home",
-                "url": "https://thejaffleshop.com/",
-                "path": urlparse("https://thejaffleshop.com/").path,
-                "search": urlparse("https://thejaffleshop.com/").query,
-                "title": "Jaffle Shop - Home",
-                "referrer": in_page["url"],
-            }
-            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
-            segment_analytics.page(
-                name="Home",
-                timestamp=out_tstamp,
-                properties=out_page.update({"session_id": session_id}),
-            )
-
-    elif in_action == "Product Added":
-        out_action = random.choices(
-            ["Cart Page", "Menu Page", "Drop"],
-            [0.75, 0.15, 0.1],
-        )
-
-        if out_action == "Cart Page":
-            segment_analytics.identify(
-                anonymous_id=user["anonymous_id"],
-                user_id=user["user_id"],
-                timestamp=out_tstamp,
-            )
-            out_action = "Cart Page"
-            out_page = {
-                "name": "Cart",
-                "url": "https://thejaffleshop.com/cart",
-                "path": urlparse("https://thejaffleshop.com/cart").path,
-                "search": urlparse("https://thejaffleshop.com/cart").query,
-                "title": "Jaffle Shop - Cart",
-                "referrer": in_page["url"],
-            }
-            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
-            segment_analytics.page(
-                name="Cart",
-                timestamp=out_tstamp,
-                properties=out_page.update({"session_id": session_id}),
-            )
-            out_action = "Cart Viewed"
-            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
-            segment_analytics.track(
-                event="Cart Viewed",
-                timestamp=out_tstamp,
-                context={
-                    "page": {
-                        "url": in_page["url"],
-                        "path": in_page["path"],
-                        "referrer": in_page["referrer"],
-                        "search": in_page["search"],
-                        "title": in_page["title"],
-                    }
-                },
-                properties={
-                    "cart_id": cart["cart_id"],
-                    "products": cart["products"],
-                    "session_id": session_id,
-                },
-            )
-
-        else:
-            out_action = "Drop"
-
-    elif in_action == "Cart Viewed":
-        out_action = random.choices(
-            ["Checkout Page - Shipping", "Menu Page", "Drop"],
-            [0.85, 0.05, 0.10],
-        )
-
-        if out_action == "Checkout Page - Shipping":
-            segment_analytics.identify(
-                anonymous_id=user["anonymous_id"],
-                user_id=user["user_id"],
-                timestamp=out_tstamp,
-            )
-            out_action = "Checkout Page - shipping"
-            out_page = {
-                "name": "Checkout - Shipping",
-                "url": "https://thejaffleshop.com/checkout/shipping",
-                "path": urlparse("https://thejaffleshop.com/checkout/shipping").path,
-                "search": urlparse("https://thejaffleshop.com/checkout/shipping").query,
-                "title": "Jaffle Shop - Checkout - shipping",
-                "referrer": in_page["url"],
-            }
-            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
-            segment_analytics.page(
-                name="Checkout - shipping",
-                timestamp=out_tstamp,
-                properties=out_page.update({"session_id": session_id}),
-            )
-            out_action = "Checkout Step Viewed - Shipping"
-            out_tstamp = out_tstamp + pd.Timedelta(seconds=1)
-            segment_analytics.track(
-                event="Checkout Step Viewed",
-                timestamp=out_tstamp,
-                context={
-                    "page": {
-                        "url": in_page["url"],
-                        "path": in_page["path"],
-                        "referrer": in_page["referrer"],
-                        "search": in_page["search"],
-                        "title": in_page["title"],
-                    }
-                },
-                properties={
-                    "cart_id": cart["cart_id"],
-                    "products": cart["products"],
-                    "session_id": session_id,
-                },
-            )
-
-    return user, out_action, out_page, out_tstamp
-
-
 # Generate users
 if USERS_PATH.exists():
     users = pd.read_csv(USERS_PATH)
@@ -518,6 +119,901 @@ else:
     )
     products.to_csv("products.csv", index=False)
 
+
+def home_page(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Page Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Home",
+                    "path": "/",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Home",
+                    "url": "https://thejaffleshop.com/",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "name": "Home",
+                    "path": "/",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Home",
+                    "url": "https://thejaffleshop.com/",
+                },
+                "cart": {},
+            },
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Identify",
+                "timestamp": tstamp + pd.Timedelta(seconds=random.random()),
+                "page": {
+                    "name": "Home",
+                    "path": "/",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Home",
+                    "url": "https://thejaffleshop.com/",
+                },
+                "properties": {},
+                "cart": {},
+            },
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def menu_page(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Page Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Menu",
+                    "path": "/menu",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Menu",
+                    "url": "https://thejaffleshop.com/menu",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "name": "Menu",
+                    "path": "/menu",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Menu",
+                    "url": "https://thejaffleshop.com/menu",
+                },
+                "cart": {},
+            },
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Identify",
+                "timestamp": tstamp + pd.Timedelta(seconds=random.random()),
+                "page": {
+                    "name": "Menu",
+                    "path": "/menu",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Menu",
+                    "url": "https://thejaffleshop.com/menu",
+                },
+                "properties": {},
+                "cart": {},
+            },
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def contact_page(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Page Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Contact",
+                    "path": "/contact",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Contact",
+                    "url": "https://thejaffleshop.com/contact",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "name": "Contact",
+                    "path": "/contact",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Contact",
+                    "url": "https://thejaffleshop.com/contact",
+                },
+                "cart": {},
+            },
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Identify",
+                "timestamp": tstamp + pd.Timedelta(seconds=random.random()),
+                "page": {
+                    "name": "Contact",
+                    "path": "/contact",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Contact",
+                    "url": "https://thejaffleshop.com/contact",
+                },
+                "properties": {},
+                "cart": {},
+            },
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def product_clicked(df, user, session_id, tstamp, cart):
+    product = random.choice(products)
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Product Clicked",
+                "timestamp": tstamp,
+                "page": {  # Products are only clicked on the menu page
+                    "name": "Menu",
+                    "path": "/menu",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Menu",
+                    "url": "https://thejaffleshop.com/menu",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "product_id": product["id"],
+                    "sku": product["sku"],
+                    "category": product["category"],
+                    "name": product["name"],
+                    "price": product["price"],
+                },
+                "cart": {},
+            },
+        ]
+    )
+
+    return df
+
+
+def product_page(df, user, session_id, tstamp, cart):
+    product_id = df.get("properties")[-1]["product_id"]  # Product ID from last event
+    product = products[products["id"] == product_id]
+
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Page Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Product",
+                    "path": f"/products/{product['id']}",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": f"Jaffle Shop - {product['name']}",
+                    "url": f"https://thejaffleshop.com/products/{product['id']}",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "name": "Product",
+                    "path": f"/products/{product['id']}",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": f"Jaffle Shop - {product['name']}",
+                    "url": f"https://thejaffleshop.com/products/{product['id']}",
+                    "product_id": product["id"],
+                },
+                "cart": {},
+            },
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Identify",
+                "timestamp": tstamp + pd.Timedelta(seconds=random.random()),
+                "page": {
+                    "name": "Product",
+                    "path": f"/products/{product['id']}",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": f"Jaffle Shop - {product['name']}",
+                    "url": f"https://thejaffleshop.com/products/{product['id']}",
+                },
+                "properties": {},
+                "cart": {},
+            },
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def product_added(df, user, session_id, tstamp, cart):
+    product_id = df.get("properties")[-1]["product_id"]  # Product ID from last event
+    product = products[products["id"] == product_id]
+    quantity = random.randint(1, 3)
+
+    # Get product IDs in cart
+    cart_product_ids = [p["product_id"] for p in cart["products"]]
+
+    if product_id not in cart_product_ids:
+        cart["products"].append(
+            {
+                "product_id": product_id,
+                "sku": product["sku"],
+                "category": product["category"],
+                "name": product["name"],
+                "price": product["price"],
+                "quantity": quantity,
+            }
+        )
+    else:
+        cart["products"][cart_product_ids.index(product_id)]["quantity"] += quantity
+
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Product Added",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Product",
+                    "path": f"/products/{product['id']}",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": f"Jaffle Shop - {product['name']}",
+                    "url": f"https://thejaffleshop.com/products/{product['id']}",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "cart_id": cart["cart_id"],
+                    "product_id": product["id"],
+                    "sku": product["sku"],
+                    "category": product["category"],
+                    "name": product["name"],
+                    "price": product["price"],
+                    "quantity": quantity,
+                },
+            }
+        ],
+        ignore_index=True,
+    )
+
+
+def product_removed(df, user, session_id, tstamp, cart):
+    cart_products = [
+        {"product_id": p["product_id"], "quantity": p["quantity"]}
+        for p in cart["products"]
+    ]
+    product_removed = random.choice(cart_products)
+    quantity_removed = random.randint(1, product_removed["quantity"])
+    product_removed_details = products[products["id"] == product_removed["product_id"]]
+
+    for product in cart["products"]:
+        if product["product_id"] == product_removed["product_id"]:
+            product["quantity"] -= quantity_removed
+
+        if product["quantity"] == 0:
+            cart["products"].remove(product)
+
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Product Removed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Cart",
+                    "path": "/cart",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Cart",
+                    "url": "https://thejaffleshop.com/cart",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "cart_id": cart["cart_id"],
+                    "product_id": product_removed["product_id"],
+                    "sku": product_removed_details["sku"],
+                    "category": product_removed_details["category"],
+                    "name": product_removed_details["name"],
+                    "price": product_removed_details["price"],
+                    "quantity": quantity_removed,
+                },
+            }
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def cart_page(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Page Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Cart",
+                    "path": "/cart",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Cart",
+                    "url": "https://thejaffleshop.com/cart",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "name": "Cart",
+                    "path": "/cart",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Cart",
+                    "url": "https://thejaffleshop.com/cart",
+                    "cart_id": cart["cart_id"],
+                },
+            }
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def cart_viewed(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Cart Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Cart",
+                    "path": "/cart",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Cart",
+                    "url": "https://thejaffleshop.com/cart",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "cart_id": cart["cart_id"],
+                },
+            }
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+# def checkout_started(df, user, session_id, tstamp, cart):
+#     order_id = uuid.uuid4()  # Checkout starts order process
+#     cart["order_id"] = order_id
+#     shipping = random.choice(
+#         [0.00, 5.00, 10.00]
+#     )  # 0 = pickup, 5 = bike order, 10 = car order
+#     revenue = sum([p["price"] * p["quantity"] for p in cart["products"]])
+#     tax = revenue * 0.1  # 10% tax
+#     value = revenue + shipping + tax
+
+#     df.concat(
+#         [
+#             {
+#                 "session_id": session_id,
+#                 "user_id": user["user_id"],
+#                 "event": "Checkout Started",
+#                 "timestamp": tstamp,
+#                 "page": {
+#                     "name": "Cart",
+#                     "path": "/cart",
+#                     "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+#                     "search": None,
+#                     "title": "Jaffle Shop - Cart",
+#                     "url": "https://thejaffleshop.com/cart",
+#                 },
+#                 "properties": {
+#                     "session_id": session_id,
+#                     "order_id": order_id,
+#                     "value": value,
+#                     "revenue": revenue,
+#                     "shipping": shipping,
+#                     "tax": tax,
+#                     "currency": "USD",
+#                     "products": cart["products"],
+#                 },
+#             }
+#         ],
+#         ignore_index=True,
+#     )
+
+#     return df
+
+
+def checkout_page_shipping(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Page Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Checkout - Shipping",
+                    "path": "/checkout/shipping",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Shipping",
+                    "url": "https://thejaffleshop.com/checkout/shipping",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "name": "Checkout - Shipping",
+                    "path": "/checkout/shipping",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Shipping",
+                    "url": "https://thejaffleshop.com/checkout/shipping",
+                    "order_id": cart["order_id"],
+                },
+            },
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Identify",
+                "timestamp": tstamp + pd.Timedelta(seconds=random.random()),
+                "page": {
+                    "name": "Checkout - Shipping",
+                    "path": "/checkout/shipping",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Shipping",
+                    "url": "https://thejaffleshop.com/checkout/shipping",
+                },
+                "properties": {},
+            },
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def checkout_step_viewed_shipping(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Checkout Step Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Checkout - Shipping",
+                    "path": "/checkout/shipping",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Shipping",
+                    "url": "https://thejaffleshop.com/checkout/shipping",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "order_id": cart["order_id"],
+                    "step": 1,
+                    "name": "Shipping",
+                },
+            }
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def checkout_step_completed_shipping(df, user, session_id, tstamp, cart):
+    cart["shipping"] = random.choice(
+        [
+            {"method": "pickup", "cost": 0.00},
+            {"method": "bike", "cost": 5.00},
+            {"method": "car", "cost": 10.00},
+        ]
+    )
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Checkout Step Completed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Checkout - Shipping",
+                    "path": "/checkout/shipping",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Shipping",
+                    "url": "https://thejaffleshop.com/checkout/shipping",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "order_id": cart["order_id"],
+                    "step": 1,
+                    "name": "Shipping",
+                    "shipping_method": cart["shipping"]["method"],
+                },
+            }
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def checkout_page_payment(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Page Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Checkout - Payment",
+                    "path": "/checkout/payment",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Payment",
+                    "url": "https://thejaffleshop.com/checkout/payment",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "name": "Checkout - Payment",
+                    "path": "/checkout/payment",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Payment",
+                    "url": "https://thejaffleshop.com/checkout/payment",
+                    "order_id": cart["order_id"],
+                },
+            },
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Identify",
+                "timestamp": tstamp + pd.Timedelta(seconds=random.random()),
+                "page": {
+                    "name": "Checkout - Payment",
+                    "path": "/checkout/payment",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Payment",
+                    "url": "https://thejaffleshop.com/checkout/payment",
+                },
+                "properties": {},
+            },
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def checkout_step_viewed_payment(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Checkout Step Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Checkout - Payment",
+                    "path": "/checkout/payment",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Payment",
+                    "url": "https://thejaffleshop.com/checkout/payment",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "order_id": cart["order_id"],
+                    "step": 2,
+                    "name": "Payment",
+                    "shipping_method": cart["shipping"]["method"],
+                },
+            }
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def checkout_step_completed_payment(df, user, session_id, tstamp, cart):
+    cart["payment_method"] = (
+        random.choice(["cash", "credit"])
+        if cart["shipping"]["method"] == "pickup"
+        else "credit"
+    )
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Checkout Step Completed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Checkout - Payment",
+                    "path": "/checkout/payment",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Payment",
+                    "url": "https://thejaffleshop.com/checkout/payment",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "order_id": cart["order_id"],
+                    "step": 2,
+                    "name": "Payment",
+                    "shipping_method": cart["shipping"]["method"],
+                    "payment_method": cart["payment_method"],
+                },
+            }
+        ],
+        ignore_index=True,
+    )
+
+
+def checkout_page_confirmation(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Page Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Checkout - Confirmation",
+                    "path": "/checkout/confirmation",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Confirmation",
+                    "url": "https://thejaffleshop.com/checkout/confirmation",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "name": "Checkout - Confirmation",
+                    "path": "/checkout/confirmation",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Confirmation",
+                    "url": "https://thejaffleshop.com/checkout/confirmation",
+                    "order_id": cart["order_id"],
+                },
+            },
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Identify",
+                "timestamp": tstamp + pd.Timedelta(seconds=random.random()),
+                "page": {
+                    "name": "Checkout - Confirmation",
+                    "path": "/checkout/confirmation",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Confirmation",
+                    "url": "https://thejaffleshop.com/checkout/confirmation",
+                },
+                "properties": {},
+            },
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def checkout_step_viewed_confirmation(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Checkout Step Viewed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Checkout - Confirmation",
+                    "path": "/checkout/confirmation",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Confirmation",
+                    "url": "https://thejaffleshop.com/checkout/confirmation",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "order_id": cart["order_id"],
+                    "step": 3,
+                    "name": "Confirmation",
+                    "shipping_method": cart["shipping"]["method"],
+                    "payment_method": cart["payment_method"],
+                },
+            }
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def checkout_step_completed_confirmation(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Checkout Step Completed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Checkout - Confirmation",
+                    "path": "/checkout/confirmation",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Confirmation",
+                    "url": "https://thejaffleshop.com/checkout/confirmation",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "order_id": cart["order_id"],
+                    "step": 3,
+                    "name": "Confirmation",
+                    "shipping_method": cart["shipping"]["method"],
+                    "payment_method": cart["payment_method"],
+                },
+            }
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def order_completed(df, user, session_id, tstamp, cart):
+    shipping = cart["shipping"]["cost"]
+    revenue = sum([p["price"] * p["quantity"] for p in cart["products"]])
+    tax = revenue * 0.1  # 10% tax
+    coupon = None  # No coupons and discounts for now
+    discount = 0.00
+
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Order Completed",
+                "timestamp": tstamp,
+                "page": {
+                    "name": "Checkout - Confirmation",
+                    "path": "/checkout/confirmation",
+                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "search": None,
+                    "title": "Jaffle Shop - Checkout - Confirmation",
+                    "url": "https://thejaffleshop.com/checkout/confirmation",
+                },
+                "properties": {
+                    "session_id": session_id,
+                    "order_id": cart["order_id"],
+                    "revenue": revenue,
+                    "coupon": coupon,
+                    "discount": discount,
+                    "subtotal": revenue - discount,
+                    "shipping": shipping,
+                    "tax": tax,
+                    "total": revenue - discount + shipping + tax,
+                    "currency": "USD",
+                    "products": cart["products"],
+                },
+            }
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def drop(df, user, session_id, tstamp, cart):
+    df.concat(
+        [
+            {
+                "session_id": session_id,
+                "user_id": user["user_id"],
+                "event": "Drop",
+                "timestamp": tstamp,
+                "page": {},
+                "properties": {},
+            }
+        ],
+        ignore_index=True,
+    )
+
+    return df
+
+
+def session_event(df, user, session_id):
+    """Make an event in a user session."""
+
+    if len(df) == 0:  # First event in session starts on home page
+        tstamp = fake.date_time_between_dates(
+            datetime_start=pd.Timestamp("2023-01-01").tz_localize("UTC"),
+            datetime_end=pd.Timestamp("2023-01-31").tz_localize("UTC"),
+        )
+        home_page(df, user, session_id, tstamp)
+
+    else:
+        tstamp = df["timestamp"][-1] + pd.Timedelta(
+            seconds=random.randint(1, SESSION_MAX_TIMESTEP)
+        )
+
+        if df["event"][-1] == "Page Viewed" and df["page"][-1]["name"] == "Home":
+            user_action = random.choices(
+                ["Menu Page", "Contact Page", "Drop"],
+                [0.85, 0.05, 0.1],
+            )
+
+            if user_action == "Menu Page":
+                menu_page(df, user, session_id, tstamp)
+            elif user_action == "Contact Page":
+                contact_page(df, user, session_id, tstamp)
+            else:
+                drop(df, user, session_id, tstamp)
+
+    return df
+
+
+df_sessions = pd.DataFrame(
+    columns=[
+        "session_id",
+        "anonymous_id",
+        "user_id",
+        "event",
+        "timestamp",
+        "page",
+        "properties",
+        "cart",
+    ]
+)
+
 # SIMULATE USER SESSIONS
 for _ in range(N_SESSIONS):
     action_number = 0
@@ -532,25 +1028,9 @@ for _ in range(N_SESSIONS):
         "products": [],
     }
 
-    if action_number == 0:
-        action = None
-        page = None
-
-        # page = {  # For simplicity, all sessions start on the home page
-        #     "name": "Home",
-        #     "url": "https://thejaffleshop.com/",
-        #     "path": urlparse("https://thejaffleshop.com/").path,
-        #     "search": urlparse("https://thejaffleshop.com/").query,
-        #     "title": "Jaffle Shop - Home",
-        #     "referrer": None,
-        # }
-
-    while action != "Drop":
-        user, action, page, tstamp, cart = session_action(
+    while df_sessions["event"][-1] != "Drop":
+        user, action, page, tstamp, cart = session_event(
+            df=df_sessions,
             user=user,
-            in_tstamp=tstamp,
-            in_action=action,
-            in_page=page,
             session_id=session_id,
-            cart=cart,
         )
