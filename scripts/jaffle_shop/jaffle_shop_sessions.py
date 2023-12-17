@@ -7,18 +7,19 @@ from __future__ import annotations
 import random
 import uuid
 from pathlib import Path
-from urllib.parse import urlparse
 
+# from urllib.parse import urlparse
 import faker
 import pandas as pd
 from loguru import logger
-from segment import analytics as segment_analytics
+
+# from segment import analytics as segment_analytics
 
 N_USERS = 100
 N_SESSIONS = 1000
 SESSION_MAX_TIMESTEP = 60 * 5  # 5 minutes between actions
-USERS_PATH = Path.cwd() / "users.csv"
-PRODUCTS_PATH = Path.cwd() / "products.csv"
+USERS_PATH = Path.cwd() / "data" / "users.csv"
+PRODUCTS_PATH = Path.cwd() / "data" / "products.csv"
 PRODUCT_NAMES = [
     "Bacon, Egg, and Cheese",
     "Ham and Cheese",
@@ -70,58 +71,85 @@ def generate_users(n_users=10000):
     We assume all users have an account and are *always* signed in. This is a
     simplification, but makes generating events *much* easier.
     """
-    users = pd.DataFrame(
+    users = [
         {
-            "user_id": [uuid.uuid4() for _ in range(n_users)],
-            "email": [fake.email() for _ in range(n_users)],
-            "first_name": [fake.first_name() for _ in range(n_users)],
-            "last_name": [fake.last_name() for _ in range(n_users)],
+            "user_id": uuid.uuid4(),
+            "email": fake.email(),
+            "first_name": fake.first_name(),
+            "last_name": fake.last_name(),
         }
-    )
+        for _ in range(n_users)
+    ]
 
     return users
 
 
 def generate_products(names, prices, categories):
-    products = {
-        "id": [],
-        "sku": [],
-        "category": [],
-        "name": [],
-        "price": [],
-    }
+    products = []
 
     for name, price, category in zip(names, prices, categories):
-        products["id"].append(uuid.uuid4())
-        products["sku"].append(fake.ean(length=13))
-        products["category"].append(category)
-        products["name"].append(name)
-        products["price"].append(price)
+        product = {
+            "id": uuid.uuid4(),
+            "sku": fake.ean(length=13),
+            "category": category,
+            "name": name,
+            "price": price,
+        }
+        products.append(product)
 
-    return pd.DataFrame(products)
+    return products
+
+
+def get_product(product_id, products):
+    for product in products:
+        if product["id"] == product_id:
+            return product
 
 
 # Generate users
-if USERS_PATH.exists():
-    users = pd.read_csv(USERS_PATH)
-else:
-    users = generate_users(n_users=10000).pirnt()
-    users.to_csv("users.csv", index=False)
+users = generate_users(n_users=10000)
+# if USERS_PATH.exists():
+#     users = pd.read_csv(USERS_PATH)
+#     # TODO - csv to list of dicts
+# else:
+#     logger.info("Generating list of users ...")
+#     users = generate_users(n_users=10000)
+#     logger.info("Users generated")
+#     # TODO - list of dicts to csv
+#     users.to_csv(USERS_PATH, index=False)
+#     logger.info(f"Saved user data to: {str(USERS_PATH)}")
 
-signed_in_users = users[users["user_id"].notnull()]
+# # Generate products
+products = generate_products(
+    names=PRODUCT_NAMES, prices=PRODUCT_PRICES, categories=PRODUCT_CATEGORIES
+)
+# if PRODUCTS_PATH.exists():
+#     products = pd.read_csv(PRODUCTS_PATH)
+#     # TODO - csv to list of dicts
+# else:
+#     logger.info("Generating list of products ...")
+#     products = generate_products(
+#         names=PRODUCT_NAMES, prices=PRODUCT_PRICES, categories=PRODUCT_CATEGORIES
+#     )
+#     logger.info("Products generated")
+#     # TODO - list of dicts to csv
+#     products.to_csv(PRODUCTS_PATH, index=False)
+#     logger.info(f"Saved product data to: {str(PRODUCTS_PATH)}")
 
-# Generate products
-if PRODUCTS_PATH.exists():
-    products = pd.read_csv(PRODUCTS_PATH)
-else:
-    products = generate_products(
-        names=PRODUCT_NAMES, prices=PRODUCT_PRICES, categories=PRODUCT_CATEGORIES
-    )
-    products.to_csv("products.csv", index=False)
+
+def get_last_event(events):
+    """Get the last event in a list of events, NOT including Identify events."""
+    if len(events) == 0:
+        last_event = None
+    else:
+        last_event = events[-1] if events[-1]["event"] != "Identify" else events[-2]
+
+    return last_event
 
 
-def home_page(df, user, session_id, tstamp, cart):
-    df.concat(
+def home_page(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -131,7 +159,9 @@ def home_page(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Home",
                     "path": "/",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"]
+                    if last_event is not None
+                    else None,
                     "search": None,
                     "title": "Jaffle Shop - Home",
                     "url": "https://thejaffleshop.com/",
@@ -140,7 +170,9 @@ def home_page(df, user, session_id, tstamp, cart):
                     "session_id": session_id,
                     "name": "Home",
                     "path": "/",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"]
+                    if last_event is not None
+                    else None,
                     "search": None,
                     "title": "Jaffle Shop - Home",
                     "url": "https://thejaffleshop.com/",
@@ -155,7 +187,9 @@ def home_page(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Home",
                     "path": "/",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"]
+                    if last_event is not None
+                    else None,
                     "search": None,
                     "title": "Jaffle Shop - Home",
                     "url": "https://thejaffleshop.com/",
@@ -164,14 +198,20 @@ def home_page(df, user, session_id, tstamp, cart):
                 "cart": {},
             },
         ],
-        ignore_index=True,
+    )
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Page Viewed, Page: Home"
+    )
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Identitfy"
     )
 
-    return df
+    return events
 
 
-def menu_page(df, user, session_id, tstamp, cart):
-    df.concat(
+def menu_page(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -181,7 +221,7 @@ def menu_page(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Menu",
                     "path": "/menu",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Menu",
                     "url": "https://thejaffleshop.com/menu",
@@ -190,7 +230,7 @@ def menu_page(df, user, session_id, tstamp, cart):
                     "session_id": session_id,
                     "name": "Menu",
                     "path": "/menu",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Menu",
                     "url": "https://thejaffleshop.com/menu",
@@ -205,7 +245,7 @@ def menu_page(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Menu",
                     "path": "/menu",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Menu",
                     "url": "https://thejaffleshop.com/menu",
@@ -214,14 +254,20 @@ def menu_page(df, user, session_id, tstamp, cart):
                 "cart": {},
             },
         ],
-        ignore_index=True,
+    )
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Page Viewed, Page: Menu"
+    )
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Identitfy"
     )
 
-    return df
+    return events
 
 
-def contact_page(df, user, session_id, tstamp, cart):
-    df.concat(
+def contact_page(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -229,21 +275,21 @@ def contact_page(df, user, session_id, tstamp, cart):
                 "event": "Page Viewed",
                 "timestamp": tstamp,
                 "page": {
-                    "name": "Contact",
-                    "path": "/contact",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "name": "Contact Us",
+                    "path": "/contact-us",
+                    "referrer": last_event["page"]["url"],
                     "search": None,
-                    "title": "Jaffle Shop - Contact",
-                    "url": "https://thejaffleshop.com/contact",
+                    "title": "Jaffle Shop - Contact Us",
+                    "url": "https://thejaffleshop.com/contact-us",
                 },
                 "properties": {
                     "session_id": session_id,
-                    "name": "Contact",
-                    "path": "/contact",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "name": "Contact Us",
+                    "path": "/contact-us",
+                    "referrer": last_event["page"]["url"],
                     "search": None,
-                    "title": "Jaffle Shop - Contact",
-                    "url": "https://thejaffleshop.com/contact",
+                    "title": "Jaffle Shop - Contact Us",
+                    "url": "https://thejaffleshop.com/contact-us",
                 },
                 "cart": {},
             },
@@ -253,26 +299,33 @@ def contact_page(df, user, session_id, tstamp, cart):
                 "event": "Identify",
                 "timestamp": tstamp + pd.Timedelta(seconds=random.random()),
                 "page": {
-                    "name": "Contact",
-                    "path": "/contact",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "name": "Contact Us",
+                    "path": "/contact-us",
+                    "referrer": last_event["page"]["url"],
                     "search": None,
-                    "title": "Jaffle Shop - Contact",
-                    "url": "https://thejaffleshop.com/contact",
+                    "title": "Jaffle Shop - Contact Us",
+                    "url": "https://thejaffleshop.com/contact-us",
                 },
                 "properties": {},
                 "cart": {},
             },
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Page Viewed, Page: Contact Us"
+    )
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Identitfy"
+    )
+
+    return events
 
 
-def product_clicked(df, user, session_id, tstamp, cart):
+def product_clicked(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
     product = random.choice(products)
-    df.concat(
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -282,7 +335,7 @@ def product_clicked(df, user, session_id, tstamp, cart):
                 "page": {  # Products are only clicked on the menu page
                     "name": "Menu",
                     "path": "/menu",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Menu",
                     "url": "https://thejaffleshop.com/menu",
@@ -299,15 +352,18 @@ def product_clicked(df, user, session_id, tstamp, cart):
             },
         ]
     )
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Product Clicked, Product: {product['name']}"
+    )
 
-    return df
+    return events
 
 
-def product_page(df, user, session_id, tstamp, cart):
-    product_id = df.get("properties")[-1]["product_id"]  # Product ID from last event
-    product = products[products["id"] == product_id]
-
-    df.concat(
+def product_page(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    product_id = last_event["properties"]["product_id"]
+    product = get_product(product_id, products)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -317,7 +373,7 @@ def product_page(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Product",
                     "path": f"/products/{product['id']}",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": f"Jaffle Shop - {product['name']}",
                     "url": f"https://thejaffleshop.com/products/{product['id']}",
@@ -326,7 +382,7 @@ def product_page(df, user, session_id, tstamp, cart):
                     "session_id": session_id,
                     "name": "Product",
                     "path": f"/products/{product['id']}",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": f"Jaffle Shop - {product['name']}",
                     "url": f"https://thejaffleshop.com/products/{product['id']}",
@@ -342,7 +398,7 @@ def product_page(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Product",
                     "path": f"/products/{product['id']}",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": f"Jaffle Shop - {product['name']}",
                     "url": f"https://thejaffleshop.com/products/{product['id']}",
@@ -351,15 +407,22 @@ def product_page(df, user, session_id, tstamp, cart):
                 "cart": {},
             },
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Page Viewed, Page: Product"
+    )
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Identitfy"
+    )
+
+    return events
 
 
-def product_added(df, user, session_id, tstamp, cart):
-    product_id = df.get("properties")[-1]["product_id"]  # Product ID from last event
-    product = products[products["id"] == product_id]
+def product_added(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    product_id = last_event["properties"]["product_id"]
+    product = get_product(product_id, products)
     quantity = random.randint(1, 3)
 
     # Get product IDs in cart
@@ -379,7 +442,7 @@ def product_added(df, user, session_id, tstamp, cart):
     else:
         cart["products"][cart_product_ids.index(product_id)]["quantity"] += quantity
 
-    df.concat(
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -389,7 +452,7 @@ def product_added(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Product",
                     "path": f"/products/{product['id']}",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": f"Jaffle Shop - {product['name']}",
                     "url": f"https://thejaffleshop.com/products/{product['id']}",
@@ -406,11 +469,17 @@ def product_added(df, user, session_id, tstamp, cart):
                 },
             }
         ],
-        ignore_index=True,
     )
 
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Product Added, Product: {product['name']}"
+    )
 
-def product_removed(df, user, session_id, tstamp, cart):
+    return events
+
+
+def product_removed(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
     cart_products = [
         {"product_id": p["product_id"], "quantity": p["quantity"]}
         for p in cart["products"]
@@ -426,7 +495,7 @@ def product_removed(df, user, session_id, tstamp, cart):
         if product["quantity"] == 0:
             cart["products"].remove(product)
 
-    df.concat(
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -436,7 +505,7 @@ def product_removed(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Cart",
                     "path": "/cart",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Cart",
                     "url": "https://thejaffleshop.com/cart",
@@ -453,14 +522,18 @@ def product_removed(df, user, session_id, tstamp, cart):
                 },
             }
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Product Removed, Product: {product_removed_details['name']}"
+    )
+
+    return events
 
 
-def cart_page(df, user, session_id, tstamp, cart):
-    df.concat(
+def cart_page(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -470,7 +543,7 @@ def cart_page(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Cart",
                     "path": "/cart",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Cart",
                     "url": "https://thejaffleshop.com/cart",
@@ -479,7 +552,7 @@ def cart_page(df, user, session_id, tstamp, cart):
                     "session_id": session_id,
                     "name": "Cart",
                     "path": "/cart",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Cart",
                     "url": "https://thejaffleshop.com/cart",
@@ -487,14 +560,18 @@ def cart_page(df, user, session_id, tstamp, cart):
                 },
             }
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Page Viewed, Page: Cart"
+    )
+
+    return events
 
 
-def cart_viewed(df, user, session_id, tstamp, cart):
-    df.concat(
+def cart_viewed(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -504,7 +581,7 @@ def cart_viewed(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Cart",
                     "path": "/cart",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Cart",
                     "url": "https://thejaffleshop.com/cart",
@@ -515,57 +592,19 @@ def cart_viewed(df, user, session_id, tstamp, cart):
                 },
             }
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Cart Viewed"
+    )
+
+    return events
 
 
-# def checkout_started(df, user, session_id, tstamp, cart):
-#     order_id = uuid.uuid4()  # Checkout starts order process
-#     cart["order_id"] = order_id
-#     shipping = random.choice(
-#         [0.00, 5.00, 10.00]
-#     )  # 0 = pickup, 5 = bike order, 10 = car order
-#     revenue = sum([p["price"] * p["quantity"] for p in cart["products"]])
-#     tax = revenue * 0.1  # 10% tax
-#     value = revenue + shipping + tax
-
-#     df.concat(
-#         [
-#             {
-#                 "session_id": session_id,
-#                 "user_id": user["user_id"],
-#                 "event": "Checkout Started",
-#                 "timestamp": tstamp,
-#                 "page": {
-#                     "name": "Cart",
-#                     "path": "/cart",
-#                     "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
-#                     "search": None,
-#                     "title": "Jaffle Shop - Cart",
-#                     "url": "https://thejaffleshop.com/cart",
-#                 },
-#                 "properties": {
-#                     "session_id": session_id,
-#                     "order_id": order_id,
-#                     "value": value,
-#                     "revenue": revenue,
-#                     "shipping": shipping,
-#                     "tax": tax,
-#                     "currency": "USD",
-#                     "products": cart["products"],
-#                 },
-#             }
-#         ],
-#         ignore_index=True,
-#     )
-
-#     return df
-
-
-def checkout_page_shipping(df, user, session_id, tstamp, cart):
-    df.concat(
+def checkout_page_shipping(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    cart["order_id"] = uuid.uuid4()
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -575,7 +614,7 @@ def checkout_page_shipping(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Shipping",
                     "path": "/checkout/shipping",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Shipping",
                     "url": "https://thejaffleshop.com/checkout/shipping",
@@ -584,7 +623,7 @@ def checkout_page_shipping(df, user, session_id, tstamp, cart):
                     "session_id": session_id,
                     "name": "Checkout - Shipping",
                     "path": "/checkout/shipping",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Shipping",
                     "url": "https://thejaffleshop.com/checkout/shipping",
@@ -599,7 +638,7 @@ def checkout_page_shipping(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Shipping",
                     "path": "/checkout/shipping",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Shipping",
                     "url": "https://thejaffleshop.com/checkout/shipping",
@@ -607,14 +646,21 @@ def checkout_page_shipping(df, user, session_id, tstamp, cart):
                 "properties": {},
             },
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Page Viewed, Page: Checkout - Shipping"
+    )
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Identitfy"
+    )
+
+    return events
 
 
-def checkout_step_viewed_shipping(df, user, session_id, tstamp, cart):
-    df.concat(
+def checkout_step_viewed_shipping(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -624,7 +670,7 @@ def checkout_step_viewed_shipping(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Shipping",
                     "path": "/checkout/shipping",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Shipping",
                     "url": "https://thejaffleshop.com/checkout/shipping",
@@ -637,13 +683,17 @@ def checkout_step_viewed_shipping(df, user, session_id, tstamp, cart):
                 },
             }
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Checkout Step Viewed, Step: Shipping"
+    )
+
+    return events
 
 
-def checkout_step_completed_shipping(df, user, session_id, tstamp, cart):
+def checkout_step_completed_shipping(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
     cart["shipping"] = random.choice(
         [
             {"method": "pickup", "cost": 0.00},
@@ -651,7 +701,7 @@ def checkout_step_completed_shipping(df, user, session_id, tstamp, cart):
             {"method": "car", "cost": 10.00},
         ]
     )
-    df.concat(
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -661,7 +711,7 @@ def checkout_step_completed_shipping(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Shipping",
                     "path": "/checkout/shipping",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Shipping",
                     "url": "https://thejaffleshop.com/checkout/shipping",
@@ -675,14 +725,18 @@ def checkout_step_completed_shipping(df, user, session_id, tstamp, cart):
                 },
             }
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Checkout Step Completed, Step: Shipping"
+    )
+
+    return events
 
 
-def checkout_page_payment(df, user, session_id, tstamp, cart):
-    df.concat(
+def checkout_page_payment(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -692,7 +746,7 @@ def checkout_page_payment(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Payment",
                     "path": "/checkout/payment",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Payment",
                     "url": "https://thejaffleshop.com/checkout/payment",
@@ -701,7 +755,7 @@ def checkout_page_payment(df, user, session_id, tstamp, cart):
                     "session_id": session_id,
                     "name": "Checkout - Payment",
                     "path": "/checkout/payment",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Payment",
                     "url": "https://thejaffleshop.com/checkout/payment",
@@ -716,7 +770,7 @@ def checkout_page_payment(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Payment",
                     "path": "/checkout/payment",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Payment",
                     "url": "https://thejaffleshop.com/checkout/payment",
@@ -724,14 +778,21 @@ def checkout_page_payment(df, user, session_id, tstamp, cart):
                 "properties": {},
             },
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Page Viewed, Page: Checkout - Payment"
+    )
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Identitfy"
+    )
+
+    return events
 
 
-def checkout_step_viewed_payment(df, user, session_id, tstamp, cart):
-    df.concat(
+def checkout_step_viewed_payment(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -741,7 +802,7 @@ def checkout_step_viewed_payment(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Payment",
                     "path": "/checkout/payment",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Payment",
                     "url": "https://thejaffleshop.com/checkout/payment",
@@ -755,19 +816,23 @@ def checkout_step_viewed_payment(df, user, session_id, tstamp, cart):
                 },
             }
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Checkout Step Viewed, Step: Payment"
+    )
+
+    return events
 
 
-def checkout_step_completed_payment(df, user, session_id, tstamp, cart):
+def checkout_step_completed_payment(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
     cart["payment_method"] = (
         random.choice(["cash", "credit"])
         if cart["shipping"]["method"] == "pickup"
         else "credit"
     )
-    df.concat(
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -777,7 +842,7 @@ def checkout_step_completed_payment(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Payment",
                     "path": "/checkout/payment",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Payment",
                     "url": "https://thejaffleshop.com/checkout/payment",
@@ -792,12 +857,18 @@ def checkout_step_completed_payment(df, user, session_id, tstamp, cart):
                 },
             }
         ],
-        ignore_index=True,
     )
 
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Checkout Step Completed, Step: Payment"
+    )
 
-def checkout_page_confirmation(df, user, session_id, tstamp, cart):
-    df.concat(
+    return events
+
+
+def checkout_page_confirmation(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -807,7 +878,7 @@ def checkout_page_confirmation(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Confirmation",
                     "path": "/checkout/confirmation",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Confirmation",
                     "url": "https://thejaffleshop.com/checkout/confirmation",
@@ -816,7 +887,7 @@ def checkout_page_confirmation(df, user, session_id, tstamp, cart):
                     "session_id": session_id,
                     "name": "Checkout - Confirmation",
                     "path": "/checkout/confirmation",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Confirmation",
                     "url": "https://thejaffleshop.com/checkout/confirmation",
@@ -831,7 +902,7 @@ def checkout_page_confirmation(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Confirmation",
                     "path": "/checkout/confirmation",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Confirmation",
                     "url": "https://thejaffleshop.com/checkout/confirmation",
@@ -839,14 +910,21 @@ def checkout_page_confirmation(df, user, session_id, tstamp, cart):
                 "properties": {},
             },
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Page Viewed, Page: Checkout - Confirmation"
+    )
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Identitfy"
+    )
+
+    return events
 
 
-def checkout_step_viewed_confirmation(df, user, session_id, tstamp, cart):
-    df.concat(
+def checkout_step_viewed_confirmation(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -856,7 +934,7 @@ def checkout_step_viewed_confirmation(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Confirmation",
                     "path": "/checkout/confirmation",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Confirmation",
                     "url": "https://thejaffleshop.com/checkout/confirmation",
@@ -871,14 +949,18 @@ def checkout_step_viewed_confirmation(df, user, session_id, tstamp, cart):
                 },
             }
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Checkout Step Viewed, Step: Confirmation"
+    )
+
+    return events
 
 
-def checkout_step_completed_confirmation(df, user, session_id, tstamp, cart):
-    df.concat(
+def checkout_step_completed_confirmation(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -888,7 +970,7 @@ def checkout_step_completed_confirmation(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Confirmation",
                     "path": "/checkout/confirmation",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Confirmation",
                     "url": "https://thejaffleshop.com/checkout/confirmation",
@@ -903,20 +985,24 @@ def checkout_step_completed_confirmation(df, user, session_id, tstamp, cart):
                 },
             }
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Checkout Step Completed, Step: Confirmation"
+    )
+
+    return events
 
 
-def order_completed(df, user, session_id, tstamp, cart):
+def order_completed(events, user, session_id, tstamp, cart):
+    last_event = get_last_event(events)
     shipping = cart["shipping"]["cost"]
     revenue = sum([p["price"] * p["quantity"] for p in cart["products"]])
     tax = revenue * 0.1  # 10% tax
     coupon = None  # No coupons and discounts for now
     discount = 0.00
 
-    df.concat(
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -926,7 +1012,7 @@ def order_completed(df, user, session_id, tstamp, cart):
                 "page": {
                     "name": "Checkout - Confirmation",
                     "path": "/checkout/confirmation",
-                    "referrer": df.get("page")[-1]["url"] if len(df) > 0 else None,
+                    "referrer": last_event["page"]["url"],
                     "search": None,
                     "title": "Jaffle Shop - Checkout - Confirmation",
                     "url": "https://thejaffleshop.com/checkout/confirmation",
@@ -946,14 +1032,17 @@ def order_completed(df, user, session_id, tstamp, cart):
                 },
             }
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(
+        f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Order Completed"
+    )
+
+    return events
 
 
-def drop(df, user, session_id, tstamp, cart):
-    df.concat(
+def drop(events, user, session_id, tstamp, cart):
+    events.extend(
         [
             {
                 "session_id": session_id,
@@ -964,73 +1053,322 @@ def drop(df, user, session_id, tstamp, cart):
                 "properties": {},
             }
         ],
-        ignore_index=True,
     )
 
-    return df
+    logger.info(f"Session ID: {session_id}, User ID: {user['user_id']}, Event: Drop")
+
+    return events
 
 
-def session_event(df, user, session_id):
+def session_event(events, user, session_id, cart):
     """Make an event in a user session."""
 
-    if len(df) == 0:  # First event in session starts on home page
+    if len(events) == 0:  # Sessions start on the homepage for simplicity
         tstamp = fake.date_time_between_dates(
             datetime_start=pd.Timestamp("2023-01-01").tz_localize("UTC"),
             datetime_end=pd.Timestamp("2023-01-31").tz_localize("UTC"),
         )
-        home_page(df, user, session_id, tstamp)
+        home_page(events, user, session_id, tstamp, cart)
 
     else:
-        tstamp = df["timestamp"][-1] + pd.Timedelta(
+        last_event = get_last_event(events)
+        tstamp = last_event["timestamp"] + pd.Timedelta(
             seconds=random.randint(1, SESSION_MAX_TIMESTEP)
         )
 
-        if df["event"][-1] == "Page Viewed" and df["page"][-1]["name"] == "Home":
-            user_action = random.choices(
+        if (
+            last_event["event"] == "Page Viewed"
+            and last_event["page"]["name"] == "Home"
+        ):
+            next_event = random.choices(
                 ["Menu Page", "Contact Page", "Drop"],
                 [0.85, 0.05, 0.1],
-            )
+            )[0]
 
-            if user_action == "Menu Page":
-                menu_page(df, user, session_id, tstamp)
-            elif user_action == "Contact Page":
-                contact_page(df, user, session_id, tstamp)
+            if next_event == "Menu Page":
+                menu_page(events, user, session_id, tstamp, cart)
+            elif next_event == "Contact Page":
+                contact_page(events, user, session_id, tstamp, cart)
             else:
-                drop(df, user, session_id, tstamp)
+                drop(events, user, session_id, tstamp, cart)
 
-    return df
+        elif (
+            last_event["event"] == "Page Viewed"
+            and last_event["page"]["name"] == "Menu"
+        ):
+            next_event = random.choices(
+                ["Product Clicked", "Home Page", "Contact Page", "Drop"],
+                [0.8, 0.08, 0.02, 0.1],
+            )[0]
 
+            if next_event == "Product Clicked":
+                product_clicked(events, user, session_id, tstamp, cart)
+            elif next_event == "Home Page":
+                home_page(events, user, session_id, tstamp, cart)
+            elif next_event == "Contact Page":
+                contact_page(events, user, session_id, tstamp, cart)
+            else:
+                drop(events, user, session_id, tstamp, cart)
 
-df_sessions = pd.DataFrame(
-    columns=[
-        "session_id",
-        "anonymous_id",
-        "user_id",
-        "event",
-        "timestamp",
-        "page",
-        "properties",
-        "cart",
-    ]
-)
+        elif (
+            last_event["event"] == "Page Viewed"
+            and last_event["page"]["name"] == "Contact Us"
+        ):
+            next_event = random.choices(
+                ["Home Page", "Menu Page", "Drop"],
+                [0.3, 0.65, 0.05],
+            )[0]
+
+            if next_event == "Home Page":
+                home_page(events, user, session_id, tstamp, cart)
+            elif next_event == "Menu Page":
+                menu_page(events, user, session_id, tstamp, cart)
+            else:
+                drop(events, user, session_id, tstamp, cart)
+
+        elif last_event["event"] == "Product Clicked":
+            product_page(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Page Viewed"
+            and last_event["page"]["name"] == "Product"
+        ):
+            next_event = random.choices(
+                ["Product Added", "Menu Page", "Home Page", "Drop"],
+                [0.7, 0.15, 0.1, 0.05],
+            )[0]
+
+            if next_event == "Product Added":
+                product_added(events, user, session_id, tstamp, cart)
+            elif next_event == "Menu Page":
+                menu_page(events, user, session_id, tstamp, cart)
+            elif next_event == "Home Page":
+                home_page(events, user, session_id, tstamp, cart)
+            else:
+                drop(events, user, session_id, tstamp, cart)
+
+        elif last_event["event"] == "Product Added":
+            next_event = random.choices(
+                ["Cart Page", "Menu Page", "Home Page", "Drop"],
+                [0.7, 0.15, 0.1, 0.05],
+            )[0]
+
+            if next_event == "Cart Page":
+                cart_page(events, user, session_id, tstamp, cart)
+            elif next_event == "Menu Page":
+                menu_page(events, user, session_id, tstamp, cart)
+            elif next_event == "Home Page":
+                home_page(events, user, session_id, tstamp, cart)
+            else:
+                drop(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Page Viewed"
+            and last_event["page"]["name"] == "Cart"
+        ):
+            cart_viewed(events, user, session_id, tstamp, cart)
+
+        elif last_event["event"] == "Cart Viewed":
+            next_event = random.choices(
+                [
+                    "Checkout Page - Shipping",
+                    "Product Removed",
+                    "Menu Page",
+                    "Home Page",
+                    "Drop",
+                ],
+                [0.7, 0.05, 0.15, 0.05, 0.05],
+            )[0]
+
+            if next_event == "Checkout Page - Shipping":
+                checkout_page_shipping(events, user, session_id, tstamp, cart)
+            elif next_event == "Product Removed":
+                product_removed(events, user, session_id, tstamp, cart)
+            elif next_event == "Menu Page":
+                menu_page(events, user, session_id, tstamp, cart)
+            elif next_event == "Home Page":
+                home_page(events, user, session_id, tstamp, cart)
+            else:
+                drop(events, user, session_id, tstamp, cart)
+
+        elif last_event["event"] == "Product Removed":
+            # If product removal resulted in empty cart
+            if len(cart["products"]) == 0:
+                next_event = random.choices(
+                    ["Menu Page", "Home Page", "Drop"],
+                    [0.8, 0.15, 0.05],
+                )[0]
+            else:
+                next_event == random.choices(
+                    ["Checkout - Shipping", "Menu Page", "Home Page", "Drop"],
+                    [0.7, 0.15, 0.1, 0.05],
+                )[0]
+
+            if next_event == "Checkout - Shipping":
+                checkout_page_shipping(events, user, session_id, tstamp, cart)
+            elif next_event == "Menu Page":
+                menu_page(events, user, session_id, tstamp, cart)
+            elif next_event == "Home Page":
+                home_page(events, user, session_id, tstamp, cart)
+            else:
+                drop(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Page Viewed"
+            and last_event["page"]["name"] == "Checkout - Shipping"
+        ):
+            checkout_step_viewed_shipping(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Checkout Step Viewed"
+            and last_event["properties"]["name"] == "Shipping"
+        ):
+            next_event = random.choices(
+                ["Checkout Shipping Completed", "Menu Page", "Home Page", "Drop"],
+                [0.75, 0.1, 0.1, 0.05],
+            )[0]
+
+            if next_event == "Checkout Shipping Completed":
+                checkout_step_completed_shipping(events, user, session_id, tstamp, cart)
+            elif next_event == "Menu Page":
+                menu_page(events, user, session_id, tstamp, cart)
+            elif next_event == "Home Page":
+                home_page(events, user, session_id, tstamp, cart)
+            else:
+                drop(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Checkout Step Completed"
+            and last_event["properties"]["name"] == "Shipping"
+        ):
+            checkout_step_viewed_payment(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Checkout Step Completed"
+            and last_event["properties"]["name"] == "Shipping"
+        ):
+            checkout_page_payment(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Page Viewed"
+            and last_event["page"]["name"] == "Checkout - Payment"
+        ):
+            checkout_step_viewed_payment(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Checkout Step Viewed"
+            and last_event["properties"]["name"] == "Payment"
+        ):
+            next_event = random.choices(
+                ["Checkout Payment Completed", "Menu Page", "Home Page", "Drop"],
+                [0.75, 0.1, 0.1, 0.05],
+            )[0]
+
+            if next_event == "Checkout Payment Completed":
+                checkout_step_completed_payment(events, user, session_id, tstamp, cart)
+            elif next_event == "Menu Page":
+                menu_page(events, user, session_id, tstamp, cart)
+            elif next_event == "Home Page":
+                home_page(events, user, session_id, tstamp, cart)
+            else:
+                drop(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Checkout Step Completed"
+            and last_event["properties"]["name"] == "Payment"
+        ):
+            checkout_page_confirmation(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Page Viewed"
+            and last_event["page"]["name"] == "Checkout - Confirmation"
+        ):
+            checkout_step_viewed_confirmation(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Checkout Step Viewed"
+            and last_event["properties"]["name"] == "Confirmation"
+        ):
+            next_event = random.choices(
+                ["Checkout Confirmation Completed", "Menu Page", "Home Page", "Drop"],
+                [0.75, 0.1, 0.1, 0.05],
+            )[0]
+
+            if next_event == "Checkout Confrimation Completed":
+                checkout_step_completed_confirmation(
+                    events, user, session_id, tstamp, cart
+                )
+            elif next_event == "Menu Page":
+                menu_page(events, user, session_id, tstamp, cart)
+            elif next_event == "Home Page":
+                home_page(events, user, session_id, tstamp, cart)
+            else:
+                drop(events, user, session_id, tstamp, cart)
+
+        elif (
+            last_event["event"] == "Checkout Step Completed"
+            and last_event["properties"]["name"] == "Confirmation"
+        ):
+            order_completed(events, user, session_id, tstamp, cart)
+
+        elif last_event["event"] == "Order Completed":
+            drop(events, user, session_id, tstamp, cart)
+
+        # elif last_event["event"] == "Drop":
+        #     pass
+
+    return events
+
 
 # SIMULATE USER SESSIONS
-for _ in range(N_SESSIONS):
-    action_number = 0
-    user = random.choice(users)
-    session_id = uuid.uuid4()
-    tstamp = fake.date_time_between_dates(
-        datetime_start=pd.Timestamp("2023-01-01").tz_localize("UTC"),
-        datetime_end=pd.Timestamp("2023-01-31").tz_localize("UTC"),
-    )
-    cart = {
-        "cart_id": uuid.uuid4(),
-        "products": [],
-    }
+def make_sessions(n_sessions=N_SESSIONS):
+    logger.info(f"Making Jaffle Shop {n_sessions} sessions ... ")
+    events = []
 
-    while df_sessions["event"][-1] != "Drop":
-        user, action, page, tstamp, cart = session_event(
-            df=df_sessions,
-            user=user,
-            session_id=session_id,
+    for _ in range(N_SESSIONS):
+        session_id = uuid.uuid4()
+        user = random.choice(users)
+        cart = {
+            "cart_id": uuid.uuid4(),
+            "products": [],
+        }
+        logger.info(f"Starting Session for user: {user['user_id']}")
+
+        if len(events) == 0:
+            events = session_event(
+                events=events,
+                user=user,
+                session_id=session_id,
+                cart=cart,
+            )
+
+        # TODO - while should only apply for one session, then move to the next (up to n_sessions)
+        while events[-1]["event"] != "Drop":
+            events = session_event(
+                events=events,
+                user=user,
+                session_id=session_id,
+                cart=cart,
+            )
+
+        df = pd.DataFrame(
+            [
+                {
+                    "session_id": event["session_id"],
+                    "user_id": event["user_id"],
+                    "event": event["event"],
+                    "timestamp": event["timestamp"],
+                    "page": event["page"],
+                    "properties": event["properties"],
+                    "cart": cart,
+                }
+                for event in events
+            ]
         )
+
+        return df
+
+
+if __name__ == "__main__":
+    df_sessions = make_sessions(n_sessions=1000)
+    df_sessions.head()
