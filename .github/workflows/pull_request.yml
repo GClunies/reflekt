@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
 name: Lint & Test
 
 on: pull_request
@@ -17,6 +21,7 @@ jobs:
 
       - name: Install Python
         uses: actions/setup-python@v4
+        id: setup-python
         with:
           python-version: ${{ matrix.python-version }}
 

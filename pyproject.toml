@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "reflekt"
-version = "0.4.0"
+version = "0.5.0"
 description = "A CLI tool to define event schemas, lint them to enforce conventions, publish to a schema registry, and build corresponding data artifacts (e.g., dbt sources/models/docs)."
 license = "Apache-2.0"
-authors = ["Gregory Clunies <greg.clunies@gmail.com>"]
+authors = ["Gregory Clunies <greg.clunies@gmail.com> / <greg@reflekt-ci.com>"]
 readme = "README.md"
 repository = "https://github.com/GClunies/Reflekt"
 keywords = ["events", "jsonchema", "analytics", "business-intelligence", "data-modeling", "dbt", "snowflake", "redshift", "segment", "avo"]
@@ -13,7 +13,7 @@ include = ["reflekt/_templates/**/*", "reflekt/_validation/**/*"]
 reflekt = "reflekt.cli:app"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9,<3.12"
 typer = "^0.6.1"
 rich = "^12.5.1"
 loguru = "^0.6.0"
@@ -36,35 +36,12 @@ pytest = "^7.1.3"
 tox = "^3.26.0"
 coverage = "^6.5.0"
 pytest-cov = "^4.0.0"
-flake8-docstrings = "^1.6.0"
 darglint = "^1.8.1"
 toml = "^0.10.2"
 python-dotenv = "^0.21.0"
 ruff = "^0.1.3"
-
-[tool.black]
-line-length = 88
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
-
-[tool.isort]
-known_first_party = 'reflekt'
-multi_line_output = 3
-lines_after_imports = 2
-force_grid_wrap = 0
-combine_as_imports = true
-include_trailing_comma = true
+pandas = "^2.1.2"
+faker = "^19.13.0"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -75,17 +52,13 @@ testpaths = ["tests"]
 legacy_tox_ini = """
 [tox]
 isolated_build = true
-envlist = py38,py39,py310
+envlist = py39,py310,py311
 
 [testenv]
 whitelist_externals = poetry
 commands =
     poetry install -v
     poetry run pytest tests/
-
-[flake8]
-exclude =
-  tests
 """
 
 [build-system]

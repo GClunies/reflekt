@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 #
 # SPDX-License-Identifier: Apache-2.0
+
 from __future__ import annotations
 
 import json
@@ -14,7 +15,6 @@ from jsonschema import ValidationError, validate
 
 from reflekt.dumper import ReflektYamlDumper
 from reflekt.project import Project
-
 
 PROFILE_VERSION = 1.0
 
