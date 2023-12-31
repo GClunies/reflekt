@@ -10,7 +10,6 @@
 #    - extract_key_values()
 #    - Flatson._serialize_array_value()
 
-
 from __future__ import absolute_import, print_function, unicode_literals
 
 import json

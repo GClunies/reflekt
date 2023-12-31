@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
 #
 # SPDX-License-Identifier: Apache-2.0
+
 from __future__ import annotations
 
 import copy
@@ -19,7 +20,6 @@ from reflekt.constants import REFLEKT_JSON_SCHEMA
 from reflekt.errors import ApiResponseError, RegistryError, SelectArgError
 from reflekt.profile import Profile
 from reflekt.project import Project
-
 
 install(show_locals=SHOW_LOCALS)
 
