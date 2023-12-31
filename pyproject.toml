@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "reflekt"
-version = "0.4.1"
+version = "0.5.0"
 description = "A CLI tool to define event schemas, lint them to enforce conventions, publish to a schema registry, and build corresponding data artifacts (e.g., dbt sources/models/docs)."
 license = "Apache-2.0"
 authors = ["Gregory Clunies <greg.clunies@gmail.com> / <greg@reflekt-ci.com>"]
