@@ -73,7 +73,7 @@ def generate_users(n_users=10000):
     """
     users = [
         {
-            "user_id": uuid.uuid4(),
+            "user_id": str(uuid.uuid4()),
             "email": fake.email(),
             "first_name": fake.first_name(),
             "last_name": fake.last_name(),
@@ -89,7 +89,7 @@ def generate_products(names, prices, categories):
 
     for name, price, category in zip(names, prices, categories):
         product = {
-            "id": uuid.uuid4(),
+            "id": str(uuid.uuid4()),
             "sku": fake.ean(length=13),
             "category": category,
             "name": name,
@@ -486,7 +486,15 @@ def product_removed(events, user, session_id, tstamp, cart):
     ]
     product_removed = random.choice(cart_products)
     quantity_removed = random.randint(1, product_removed["quantity"])
-    product_removed_details = products[products["id"] == product_removed["product_id"]]
+
+    product_removed_details = next(
+        (
+            product
+            for product in products
+            if product["id"] == product_removed["product_id"]
+        ),
+        None,
+    )
 
     for product in cart["products"]:
         if product["product_id"] == product_removed["product_id"]:
@@ -603,7 +611,7 @@ def cart_viewed(events, user, session_id, tstamp, cart):
 
 def checkout_page_shipping(events, user, session_id, tstamp, cart):
     last_event = get_last_event(events)
-    cart["order_id"] = uuid.uuid4()
+    cart["order_id"] = str(uuid.uuid4())
     events.extend(
         [
             {
@@ -1199,7 +1207,7 @@ def session_event(events, user, session_id, cart):
                     [0.8, 0.15, 0.05],
                 )[0]
             else:
-                next_event == random.choices(
+                next_event = random.choices(
                     ["Checkout - Shipping", "Menu Page", "Home Page", "Drop"],
                     [0.7, 0.15, 0.1, 0.05],
                 )[0]
@@ -1273,6 +1281,8 @@ def session_event(events, user, session_id, cart):
             else:
                 drop(events, user, session_id, tstamp, cart)
 
+        # TODO - fix something here so that order completed fires
+
         elif (
             last_event["event"] == "Checkout Step Completed"
             and last_event["properties"]["name"] == "Payment"
@@ -1294,7 +1304,7 @@ def session_event(events, user, session_id, cart):
                 [0.75, 0.1, 0.1, 0.05],
             )[0]
 
-            if next_event == "Checkout Confrimation Completed":
+            if next_event == "Checkout Confirmation Completed":
                 checkout_step_completed_confirmation(
                     events, user, session_id, tstamp, cart
                 )
@@ -1323,13 +1333,14 @@ def session_event(events, user, session_id, cart):
 # SIMULATE USER SESSIONS
 def make_sessions(n_sessions=N_SESSIONS):
     logger.info(f"Making Jaffle Shop {n_sessions} sessions ... ")
-    events = []
+    sessions = []
 
     for _ in range(N_SESSIONS):
-        session_id = uuid.uuid4()
+        events = []
+        session_id = str(uuid.uuid4())
         user = random.choice(users)
         cart = {
-            "cart_id": uuid.uuid4(),
+            "cart_id": str(uuid.uuid4()),
             "products": [],
         }
         logger.info(f"Starting Session for user: {user['user_id']}")
@@ -1351,24 +1362,28 @@ def make_sessions(n_sessions=N_SESSIONS):
                 cart=cart,
             )
 
-        df = pd.DataFrame(
-            [
-                {
-                    "session_id": event["session_id"],
-                    "user_id": event["user_id"],
-                    "event": event["event"],
-                    "timestamp": event["timestamp"],
-                    "page": event["page"],
-                    "properties": event["properties"],
-                    "cart": cart,
-                }
-                for event in events
-            ]
-        )
+        logger.info(f"Session ended for user: {user['user_id']}")
+        sessions.extend(events)
 
-        return df
+    df = pd.DataFrame(
+        [
+            {
+                "session_id": event["session_id"],
+                "user_id": event["user_id"],
+                "event": event["event"],
+                "timestamp": event["timestamp"],
+                "page": event["page"],
+                "properties": event["properties"],
+                "cart": cart,
+            }
+            for event in sessions
+        ]
+    )
+
+    return df
 
 
 if __name__ == "__main__":
     df_sessions = make_sessions(n_sessions=1000)
-    df_sessions.head()
+    df_sessions.to_csv("data/jaffle_shop_sessions.csv", index=False)
+    print(df_sessions.head())
