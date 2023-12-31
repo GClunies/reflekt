@@ -7,16 +7,36 @@ Files: .vscode/*
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
 License: Apache-2.0
 
+Files: artifacts/*
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
+Files: data/*
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
 Files: reflekt/_templates/*
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
+Files: reflekt/_validation/*
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
+Files: reflekt/builder/_schemas/*
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
+Files: schemas/*
+Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
+License: Apache-2.0
+
+Files: scripts/*
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
 License: Apache-2.0
 
 Files: tests/fixtures/*
 Copyright: 2022 Gregory Clunies <greg@reflekt-ci.com>
-License: Apache-2.0
-
-Files: scripts/jaffle-shop/data/*
-Copyright: dbt labs
 License: Apache-2.0
 
 Files: poetry.lock
