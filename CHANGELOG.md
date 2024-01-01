@@ -6,10 +6,15 @@ SPDX-License-Identifier: Apache-2.0
 
 # Reflekt Changelog
 
-## [0.5.0] - 2023-10
+## [0.5.0] - 2023-12-31
 ### Breaking
-- Only support python versions `>=3.9,<3.13`. Support for pyhton `3.8` is DEPRECATED.
+- Only support python versions `>=3.9,<3.13`. Support for python `3.8` is DEPRECATED.
 
+### Added
+- Add [jaffle_shop_sessions.py](scripts/jaffle_shop/jaffle_shop_sessions.py) script to create example events and user [session data](data/jaffle_shop_sessions.csv).
+
+## Fixed
+- [#99](https://github.com/GClunies/Reflekt/issues/99) which caused an error when pulling events without an event description from Segment protocols.
 
 ## [0.4.0] - 2023-10
 ### Added
