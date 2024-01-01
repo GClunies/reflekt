@@ -375,7 +375,7 @@ class SegmentRegistry:
                 )
             elif s_schema["type"] == "TRACK":
                 name = s_schema["key"]
-                description = s_schema["jsonSchema"]["description"]
+                description = s_schema["jsonSchema"].get("description", "")
                 metadata = s_schema["jsonSchema"].get("labels", {})
                 properties = (
                     s_schema["jsonSchema"]
