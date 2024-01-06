@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+"""Generate example events (with session_id) for www.thejaffleshop.com"""
+
 from __future__ import annotations
 
 import random
