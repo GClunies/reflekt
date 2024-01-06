@@ -149,6 +149,7 @@ dmypy.json
 TODO.md
 .DS_Store
 .internal
+.ruff_cache
 
 # To help test building pkgs at Wavetrak
 schemas/segment/test
