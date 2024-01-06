@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+"""Generate example events (with session_id) for www.thejaffleshop.com"""
+
 from __future__ import annotations
 
 import random
@@ -1385,5 +1387,6 @@ def make_sessions(n_sessions=N_SESSIONS):
 
 if __name__ == "__main__":
     df_sessions = make_sessions(n_sessions=1000)
-    df_sessions.to_csv("data/jaffle_shop_sessions.csv", index=False)
+    output_path = Path(__file__).parents[0] / "jaffle_shop_sessions.csv"
+    df_sessions.to_csv(output_path, index=False)
     print(df_sessions.head())
