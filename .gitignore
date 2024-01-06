@@ -150,6 +150,7 @@ TODO.md
 .DS_Store
 .internal
 .ruff_cache
+tools/jaffle_shop_sessions.csv
 
 # To help test building pkgs at Wavetrak
 schemas/segment/test
