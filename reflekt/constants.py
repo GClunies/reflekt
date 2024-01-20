@@ -27,19 +27,18 @@ REGISTRY = [
     "segment",
 ]
 
+WAREHOUSE = [
+    "snowflake",
+    "redshift",
+    # "bigquery",
+]
+
 
 class RegistryEnum(str, Enum):
     """Enum of supported schema registries."""
 
     avo = "avo"
     segment = "segment"
-
-
-WAREHOUSE = [
-    "snowflake",
-    "redshift",
-    # "bigquery",
-]
 
 
 class WarehouseEnum(str, Enum):
