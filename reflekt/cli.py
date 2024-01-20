@@ -32,7 +32,7 @@ from reflekt.constants import (
     RegistryEnum,
     SdkEnum,
 )
-from reflekt.errors import SelectArgError
+from reflekt.errors import RegistryArgError, SelectArgError
 from reflekt.linter import Linter
 from reflekt.profile import Profile, ProfileError
 from reflekt.project import Project, ProjectError
@@ -430,7 +430,7 @@ def pull(
         ...,
         "--select",
         "-s",
-        help="Path-like string specifying the schema(s) to pull from schema registry. For registry specific syntax, see: https://bit.ly/reflekt-pull",
+        help="Path-like string specifying the schema(s) to pull from schema registry. Starting with 'schemas/' is optional.",
     ),
     profile_name: str = typer.Option(
         None,
@@ -470,8 +470,17 @@ def pull(
 
 @app.command()
 def push(
+    registry: RegistryEnum = typer.Option(
+        ...,
+        "--registry",
+        "-r",
+        help="Schema registry to push to.",
+    ),
     select: str = typer.Option(
-        ..., "--select", "-s", help="Schema(s) to push to schema registry."
+        ...,
+        "--select",
+        "-s",
+        help="Path-like string specifying the schema(s) to push to schema registry. Starting with 'schemas/' is optional.",
     ),
     delete: bool = typer.Option(
         False,
@@ -499,17 +508,19 @@ def push(
     configure_logging(verbose=verbose, project=project)
     select = clean_select(select)
     profile = Profile(project=project, profile_name=profile_name)
-    registry = RegistryHandler(select=select, profile=profile).get_registry()
+    registry = RegistryHandler(
+        registry=registry, select=select, profile=profile
+    ).get_registry()
 
     if registry.type == RegistryEnum.avo:
-        raise SelectArgError(
+        raise RegistryArgError(
             message=(
                 "'reflekt push' is not supported for Avo. Use the Avo UI to define and "
                 "manage your event schemas. Then you can run:\n"
-                "    reflekt pull --select avo/main                                     # Pull schemas from Avo\n"  # noqa: E501
-                "    reflekt build --artifact dbt --select avo/main --source db_schema  # Build dbt pkg"  # noqa: E501
+                "    reflekt pull --registry --select main                    # Pull schemas from main trackign plan\n"  # noqa: E501
+                "    reflekt build --artifact dbt --select main --source ...  # Build dbt pkg"  # noqa: E501
             ),
-            select=select,
+            registry=registry.type,
         )
 
     if delete and not force:
@@ -539,7 +550,12 @@ def push(
 
 @app.command()
 def lint(
-    select: str = typer.Option(..., "--select", "-s", help="Schema(s) to lint."),
+    select: str = typer.Option(
+        ...,
+        "--select",
+        "-s",
+        help="Path-like string specifying the schema(s) to lint. Starting with 'schemas/' is optional.",
+    ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
@@ -597,7 +613,10 @@ def lint(
 @app.command()
 def report(
     select: str = typer.Option(
-        ..., "--select", "-s", help="Schema(s) to generate Markdown report(s) for."
+        ...,
+        "--select",
+        "-s",
+        help="Path-like string specifying the schema(s) to generate Markdown report(s) for. Starting with 'schemas/' is optional.",
     ),
     to_file: bool = typer.Option(
         False,
@@ -646,19 +665,26 @@ def report(
 
 @app.command()
 def build(
-    artifact: ArtifactEnum = typer.Argument(
-        ..., help="Type of data artifact to build."
+    artifact: ArtifactEnum = typer.Option(
+        ...,
+        "--artifact",
+        "-a",
+        help="Type of data artifact to build.",
     ),
     select: str = typer.Option(
-        ..., "--select", "-s", help="Schema(s) to build data artifacts for."
+        ...,
+        "--select",
+        "-s",
+        help="Path-like string specifying the schema(s) to build data artifacts for. Starting with 'schemas/' is optional.",
     ),
     sdk: SdkEnum = typer.Option(
-        ..., "--sdk", "-sdk", help="The SDK used to collect the event data."
+        ...,
+        "--sdk",
+        help="The SDK used to collect the event data.",
     ),
     source: str = typer.Option(
         ...,
         "--source",
-        "-t",
         help="Data source where the raw event data is stored. In the format `--source source_id.database.schema`, matching a configured source in reflekt_profiles.yml.",
     ),
     profile_name: str = typer.Option(

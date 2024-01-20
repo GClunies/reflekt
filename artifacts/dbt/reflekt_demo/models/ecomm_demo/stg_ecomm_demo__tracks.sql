@@ -33,7 +33,7 @@ renamed as (
         'track'::varchar as call_type,
         'ecomm_demo'::varchar as source_schema,
         'tracks'::varchar as source_table,
-        'segment/ecommerce/Page_Viewed/1-0.json'::varchar as schema_id
+        'ecommerce/Page_Viewed/1-0.json'::varchar as schema_id
     from source
 )
 

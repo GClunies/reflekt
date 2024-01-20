@@ -33,7 +33,7 @@ renamed as (
         'identify'::varchar as call_type,
         'ecomm_demo'::varchar as source_schema,
         'identifies'::varchar as source_table,
-        'segment/ecommerce/Identify/1-0.json'::varchar as schema_id
+        'ecommerce/Identify/1-0.json'::varchar as schema_id
     from source
 )
 

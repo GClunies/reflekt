@@ -4,7 +4,6 @@
 
 from enum import Enum
 
-
 SCHEMA_DIALECT = "http://json-schema.org/draft-07/schema#"
 
 REFLEKT_JSON_SCHEMA = {
@@ -62,5 +61,11 @@ class ArtifactEnum(str, Enum):
 
 class SdkEnum(str, Enum):
     """Enum of supported SDKs that generate event data."""
+
+    segment = "segment"
+
+
+class CollectorEnum(str, Enum):
+    """Enum of supported event collectors that generate event data."""
 
     segment = "segment"

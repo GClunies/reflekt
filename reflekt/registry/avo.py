@@ -97,19 +97,7 @@ class AvoRegistry:
         Returns:
             str: The Avo branch
         """
-        if select.split("/")[0] != str.lower("avo"):
-            raise SelectArgError(
-                message=(
-                    f"Invalid --select argument: {select}\n"
-                    f"When pulling from Avo schema registry, --select args must follow the format:\n"  # noqa: E501
-                    f"   --select avo/main           # All schemas in 'main' branch\n"  # noqa: E501
-                    f"   --select avo/staging        # All schemas in 'staging' branch"  # noqa: E501
-                ),
-                type=self.type,
-                profile=self.profile,
-            )
-
-        return select.split("/")[1]
+        return select.split("/")[0]
 
     def _handle_response(self, response: Response) -> dict:
         """Handle response from the Segment API, returning requested data as a dict.
@@ -234,7 +222,7 @@ class AvoRegistry:
 
             version = "1-0"  # Lock version for Avo, only used to build data artifacts
             # Schema IDs never have a space in them
-            id = f"{self.type}/{branch}/{name.replace(' ', '_')}/{version}.json"
+            id = f"{branch}/{name.replace(' ', '_')}/{version}.json"
 
             # Copy empty Reflekt jsonschema and set values
             r_schema = copy.deepcopy(REFLEKT_JSON_SCHEMA)
