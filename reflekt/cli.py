@@ -40,7 +40,6 @@ from reflekt.registry.handler import RegistryHandler
 from reflekt.reporter.reporter import Reporter
 from reflekt.tracking import ReflektUser, track_event
 
-
 # Prettify traceback messages
 app = typer.Typer(pretty_exceptions_show_locals=SHOW_LOCALS)  # Typer app
 install(show_locals=SHOW_LOCALS)  # Any other uncaught exceptions
@@ -116,12 +115,12 @@ def clean_select(select: str) -> str:
     Returns:
         str: --select argument without '.json' extension.
     """
-    cleaned = select.strip().replace(".json", "")
+    select_cleaned = select.strip().replace(".json", "").replace("schemas/", "")
 
-    if cleaned.endswith("/"):
-        cleaned = cleaned[:-1]
+    if select_cleaned.endswith("/"):
+        select_cleaned = select_cleaned[:-1]
 
-    return str(cleaned)
+    return str(select_cleaned)
 
 
 def get_schema_paths(select: str, project: Project) -> list[Path]:
@@ -421,8 +420,17 @@ def debug():
 
 @app.command()
 def pull(
+    registry: RegistryEnum = typer.Option(
+        ...,
+        "--registry",
+        "-r",
+        help="Schema registry to pull from.",
+    ),
     select: str = typer.Option(
-        ..., "--select", "-s", help="Schema(s) to pull from schema registry."
+        ...,
+        "--select",
+        "-s",
+        help="Path-like string specifying the schema(s) to pull from schema registry. For registry specific syntax, see: https://bit.ly/reflekt-pull",
     ),
     profile_name: str = typer.Option(
         None,
@@ -431,13 +439,18 @@ def pull(
         help="Profile in reflekt_profiles.yml to use for schema registry connection.",
     ),
     verbose: bool = typer.Option(
-        False, "--verbose", "-v", help="Verbose logging for debugging."
+        False,
+        "--verbose",
+        "-v",
+        help="Verbose logging for debugging.",
     ),
 ):
     """Pull schema(s) from a schema registry."""
     configure_logging(verbose=verbose, project=project)
     profile = Profile(project=project, profile_name=profile_name)
-    registry = RegistryHandler(select=select, profile=profile).get_registry()
+    registry = RegistryHandler(
+        registry=registry, select=select, profile=profile
+    ).get_registry()
     count_schemas = registry.pull(select=select)
 
     if user.id is not None:

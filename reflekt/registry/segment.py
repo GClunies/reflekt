@@ -134,30 +134,26 @@ class SegmentRegistry:
         select_error_msg = (
             f"Invalid --select argument: {select}\n"  # noqa: E501
             f"When pulling from Segment schema registry, --select args must follow the format(s):\n"  # noqa: E501
-            f"   --select segment/plan_name                             # all schemas from a plan_name\n"  # noqa: E501
-            f"   --select segment/plan_name/schema_name                 # schema_name in plan_name\n"  # noqa: E501
-            f"   --select segment/plan_name/schema_name/schema_version  # schema_version for schema_name in plan_name"  # noqa: E501
+            f"   --select plan_name                             # all schemas from a plan_name\n"  # noqa: E501
+            f"   --select plan_name/schema_name                 # schema_name in plan_name\n"  # noqa: E501
+            f"   --select plan_name/schema_name/schema_version  # schema_version for schema_name in plan_name"  # noqa: E501
         )
 
-        if select.split("/")[0] != str.lower("segment"):
+        if len(select.split("/")) > 3:
             raise SelectArgError(message=select_error_msg, select=select)
 
-        if len(select.split("/")) > 4 or len(select.split("/")) < 2:
-            raise SelectArgError(message=select_error_msg, select=select)
-
-        if len(select.split("/")) == 2:
-            plan_name = select.split("/")[1]
+        if len(select.split("/")) == 1:
+            plan_name = select.split("/")[0]
             schema_name = None
             schema_major_version = None
-        elif len(select.split("/")) == 3:
-            plan_name = select.split("/")[1]
-            schema_name = select.split("/")[2]
+        elif len(select.split("/")) == 2:
+            plan_name = select.split("/")[0]
+            schema_name = select.split("/")[1]
             schema_major_version = None
-        elif len(select.split("/")) == 4:
-            plan_name = select.split("/")[1]
-            schema_name = select.split("/")[2]
-            raw_schema_version = select.split("/")[3]
-
+        elif len(select.split("/")) == 3:
+            plan_name = select.split("/")[0]
+            schema_name = select.split("/")[1]
+            raw_schema_version = select.split("/")[2]
             schema_major_version = int(raw_schema_version.split("-")[0])
             schema_minor_version = int(
                 raw_schema_version.split("-")[1].replace(".json", "")
@@ -267,7 +263,7 @@ class SegmentRegistry:
     def _post_put_patch_del_segment(
         self, select: str, plan_name: str, schemas: list, delete: bool = False
     ) -> None:
-        """Sync Reflekt schemas to Segment Protocols based on --select from CLI.
+        """Sync `--select`-ed schemas from Reflekt to Segment Protocols.
 
         Tracking plan does not exists -> POST request to create tracking plan
         Tracking plan exists -> PUT request to update tracking plan
@@ -404,7 +400,7 @@ class SegmentRegistry:
 
             version = f"{str(s_schema['version'])}-0"
             # Schema IDs never have a space in them
-            id = f"{self.type}/{plan_name}/{name.replace(' ', '_')}/{version}.json"
+            id = f"{plan_name}/{name.replace(' ', '_')}/{version}.json"
 
             # Copy empty Reflekt jsonschema and set values
             r_schema = copy.deepcopy(REFLEKT_JSON_SCHEMA)

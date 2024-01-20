@@ -1,0 +1,51 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "reflekt_cli/Project_Initialized/1-0.json",
+    "description": "Reflekt project initialized (aka created).",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Project Initialized",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {}
+    },
+    "type": "object",
+    "properties": {
+        "ci": {
+            "description": "Whether the command was knowingly run in a CI/CD environment.",
+            "type": "boolean"
+        },
+        "data_warehouse": {
+            "description": "The type of data warehouse configured when `reflekt init` was run.",
+            "enum": [
+                "snowflake",
+                "redshift"
+            ],
+            "type": "string"
+        },
+        "profile_id": {
+            "description": "Unique identifier for the Reflekt profile. MD5 hash of the profile name.",
+            "type": "string"
+        },
+        "project_id": {
+            "description": "Unique identifier for the Reflekt project. MD5 hash of the project name.",
+            "type": "string"
+        },
+        "schema_registry": {
+            "description": "The type of schema registry configured when `reflekt init` was run.",
+            "enum": [
+                "segment",
+                "avo"
+            ],
+            "type": "string"
+        }
+    },
+    "required": [
+        "project_id",
+        "profile_id",
+        "schema_registry",
+        "data_warehouse",
+        "ci"
+    ],
+    "additionalProperties": false
+}

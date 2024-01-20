@@ -1,0 +1,67 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "reflekt_cli/Artifact_Built/1-0.json",
+    "description": "Data artifact build based on schemas defined in a Reflekt project.",
+    "self": {
+        "vendor": "com.reflekt-ci",
+        "name": "Artifact Built",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {}
+    },
+    "type": "object",
+    "properties": {
+        "ci": {
+            "description": "Whether the command was knowingly run in a CI/CD environment.",
+            "type": "boolean"
+        },
+        "count_schemas": {
+            "description": "The number of schemas for which the data artifact was built.",
+            "type": "integer"
+        },
+        "data_artifact": {
+            "description": "The type of data artifact that was built.",
+            "enum": [
+                "dbt"
+            ],
+            "type": "string"
+        },
+        "data_warehouse": {
+            "description": "The type of data warehouse storing the raw event data.",
+            "enum": [
+                "snowflake",
+                "redshift"
+            ],
+            "type": "string"
+        },
+        "profile_id": {
+            "description": "Unique identifier for the Reflekt profile. MD5 hash of the profile name.",
+            "type": "string"
+        },
+        "project_id": {
+            "description": "Unique identifier for the Reflekt project. MD5 hash of the project name.",
+            "type": "string"
+        },
+        "sdk": {
+            "description": "The SDK used to collect the event data.",
+            "enum": [
+                "segment"
+            ],
+            "type": "string"
+        },
+        "source_id": {
+            "description": "Unique identifier for the Reflekt source. MD5 hash of the --source argument.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "project_id",
+        "profile_id",
+        "data_artifact",
+        "data_warehouse",
+        "source_id",
+        "count_schemas",
+        "ci"
+    ],
+    "additionalProperties": false
+}
