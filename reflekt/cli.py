@@ -22,6 +22,7 @@ from rich.console import Console
 from rich.logging import RichHandler
 from rich.table import Table
 from rich.traceback import install
+from typing_extensions import Annotated
 
 from reflekt import SHOW_LOCALS, __version__
 from reflekt.builder.handler import BuilderHandler
@@ -125,10 +126,8 @@ def clean_select(select: str) -> str:
 
 def get_schema_paths(select: str, project: Project) -> list[Path]:
     select_path = project.dir / "schemas" / select
-
     logger.info(f"Searching for JSON schemas in: {str(select_path)}")
     print("")
-
     schema_paths = []  # List of schema IDs (Paths) to pull
 
     if select_path.is_dir():  # Get all schemas in directory
@@ -174,15 +173,21 @@ def configure_logging(verbose: bool, project: Project):
 
 @app.command()
 def init(
-    dir: str = typer.Option(
-        ".", "--dir", help="Directory where project will be initialized."
-    ),
-    verbose: bool = typer.Option(
-        False,
-        "--verbose",
-        "-v",
-        help="Verbose logging for debugging.",
-    ),
+    dir: Annotated[
+        str,
+        typer.Option(
+            "--dir",
+            help="Directory where project will be initialized.",
+        ),
+    ] = ".",
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            "-v",
+            help="Verbose logging for debugging.",
+        ),
+    ] = False,
 ) -> None:
     """Initialize a Reflekt project.
 
@@ -420,38 +425,51 @@ def debug():
 
 @app.command()
 def pull(
-    registry: RegistryEnum = typer.Option(
-        ...,
-        "--registry",
-        "-r",
-        help="Schema registry to pull from.",
-    ),
-    select: str = typer.Option(
-        ...,
-        "--select",
-        "-s",
-        help="Path-like string specifying the schema(s) to pull from schema registry. Starting with 'schemas/' is optional.",
-    ),
-    profile_name: str = typer.Option(
-        None,
-        "--profile",
-        "-p",
-        help="Profile in reflekt_profiles.yml to use for schema registry connection.",
-    ),
-    verbose: bool = typer.Option(
-        False,
-        "--verbose",
-        "-v",
-        help="Verbose logging for debugging.",
-    ),
+    registry: Annotated[
+        RegistryEnum,
+        typer.Option(
+            "--registry",
+            "-r",
+            help="Schema registry to pull from.",
+        ),
+    ] = "",
+    select: Annotated[
+        str,
+        typer.Option(
+            "--select",
+            "-s",
+            help="Path-like string specifying the schema(s) to pull from schema registry. Starting with 'schemas/' is optional.",
+        ),
+    ] = "",
+    profile_name: Annotated[
+        str,
+        typer.Option(
+            "--profile",
+            "-p",
+            help="Profile in reflekt_profiles.yml to use for schema registry connection.",
+        ),
+    ] = "",
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            "-v",
+            help="Verbose logging for debugging.",
+        ),
+    ] = False,
 ):
     """Pull schema(s) from a schema registry."""
+    logger.debug(verbose)
     configure_logging(verbose=verbose, project=project)
-    profile = Profile(project=project, profile_name=profile_name)
-    registry = RegistryHandler(
+    profile = (
+        profile_name
+        if profile_name != ""
+        else Profile(project=project, profile_name=profile_name)
+    )
+    schema_registry = RegistryHandler(
         registry=registry, select=select, profile=profile
     ).get_registry()
-    count_schemas = registry.pull(select=select)
+    count_schemas = schema_registry.pull(select=select)
 
     if user.id is not None:
         track_event(
@@ -460,7 +478,7 @@ def pull(
             properties={
                 "project_id": hashlib.md5(project.name.encode("utf-8")).hexdigest(),
                 "profile_id": hashlib.md5(profile.name.encode("utf-8")).hexdigest(),
-                "schema_registry": registry.type,
+                "schema_registry": schema_registry.type,
                 "count_schemas": count_schemas,
                 "ci": os.getenv("CI") if os.getenv("CI") is True else False,
             },
@@ -470,49 +488,71 @@ def pull(
 
 @app.command()
 def push(
-    registry: RegistryEnum = typer.Option(
-        ...,
-        "--registry",
-        "-r",
-        help="Schema registry to push to.",
-    ),
-    select: str = typer.Option(
-        ...,
-        "--select",
-        "-s",
-        help="Path-like string specifying the schema(s) to push to schema registry. Starting with 'schemas/' is optional.",
-    ),
-    delete: bool = typer.Option(
-        False,
-        "--delete",
-        "-d",
-        help="Delete schema(s) from schema registry. Prompts for confirmation",
-    ),
-    force: bool = typer.Option(
-        False, "--force", "-f", help="Force command to run without confirmation."
-    ),
-    profile_name: str = typer.Option(
-        None,
-        "--profile",
-        "-p",
-        help="Profile in reflekt_profiles.yml to use for schema registry connection.",
-    ),
-    verbose: bool = typer.Option(
-        False,
-        "--verbose",
-        "-v",
-        help="Verbose logging for debugging.",
-    ),
+    registry: Annotated[
+        RegistryEnum,
+        typer.Option(
+            "--registry",
+            "-r",
+            help="Schema registry to push to.",
+        ),
+    ],
+    select: Annotated[
+        str,
+        typer.Option(
+            "--select",
+            "-s",
+            help="Path-like string specifying the schema(s) to push to schema registry. Starting with 'schemas/' is optional.",
+        ),
+    ],
+    delete: Annotated[
+        bool,
+        typer.Option(
+            False,
+            "--delete",
+            "-D",
+            help="Delete schema(s) from schema registry. Prompts for confirmation",
+        ),
+    ] = False,
+    force: Annotated[
+        bool,
+        typer.Option(
+            False,
+            "--force",
+            "-F",
+            help="Force command to run without confirmation.",
+        ),
+    ] = False,
+    profile_name: Annotated[
+        str,
+        typer.Option(
+            None,
+            "--profile",
+            "-p",
+            help="Profile in reflekt_profiles.yml to use for schema registry connection.",
+        ),
+    ] = "",
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            "-v",
+            help="Verbose logging for debugging.",
+        ),
+    ] = False,
 ):
     """Push schema(s) to a schema registry."""
     configure_logging(verbose=verbose, project=project)
     select = clean_select(select)
-    profile = Profile(project=project, profile_name=profile_name)
-    registry = RegistryHandler(
+    profile = (
+        profile_name
+        if profile_name != ""
+        else Profile(project=project, profile_name=profile_name)
+    )
+    schema_registry = RegistryHandler(
         registry=registry, select=select, profile=profile
     ).get_registry()
 
-    if registry.type == RegistryEnum.avo:
+    if schema_registry.type == RegistryEnum.avo:
         raise RegistryArgError(
             message=(
                 "'reflekt push' is not supported for Avo. Use the Avo UI to define and "
@@ -529,9 +569,9 @@ def push(
             f"   --select {select}\n",
         )
         if delete_confirmed:
-            count_schemas = registry.push(select=select, delete=delete)  # delete=True
+            count_schemas = schema_registry.push(select=select, delete=delete)
     else:
-        count_schemas = registry.push(select=select, delete=delete)
+        count_schemas = schema_registry.push(select=select, delete=delete)
 
     if user.id is not None:
         track_event(
@@ -540,7 +580,7 @@ def push(
             properties={
                 "project_id": hashlib.md5(project.name.encode("utf-8")).hexdigest(),
                 "profile_id": hashlib.md5(profile.name.encode("utf-8")).hexdigest(),
-                "schema_registry": registry.type,
+                "schema_registry": schema_registry.type,
                 "count_schemas": count_schemas,
                 "ci": os.getenv("CI") if os.getenv("CI") is True else False,
             },
@@ -550,18 +590,22 @@ def push(
 
 @app.command()
 def lint(
-    select: str = typer.Option(
-        ...,
-        "--select",
-        "-s",
-        help="Path-like string specifying the schema(s) to lint. Starting with 'schemas/' is optional.",
-    ),
-    verbose: bool = typer.Option(
-        False,
-        "--verbose",
-        "-v",
-        help="Verbose logging for debugging.",
-    ),
+    select: Annotated[
+        str,
+        typer.Option(
+            "--select",
+            "-s",
+            help="Path-like string specifying the schema(s) to lint. Starting with 'schemas/' is optional.",
+        ),
+    ],
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            "-v",
+            help="Verbose logging for debugging.",
+        ),
+    ] = False,
 ):
     """Lint schema(s) to test for naming and metadata conventions."""
     configure_logging(verbose=verbose, project=project)
@@ -612,24 +656,30 @@ def lint(
 
 @app.command()
 def report(
-    select: str = typer.Option(
-        ...,
-        "--select",
-        "-s",
-        help="Path-like string specifying the schema(s) to generate Markdown report(s) for. Starting with 'schemas/' is optional.",
-    ),
-    to_file: bool = typer.Option(
-        False,
-        "--to-file",
-        "-f",
-        help="Write report(s) to file instead of stdout.",
-    ),
-    verbose: bool = typer.Option(
-        False,
-        "--verbose",
-        "-v",
-        help="Verbose logging for debugging.",
-    ),
+    select: Annotated[
+        str,
+        typer.Option(
+            "--select",
+            "-s",
+            help="Path-like string specifying the schema(s) to generate Markdown report(s) for. Starting with 'schemas/' is optional.",
+        ),
+    ],
+    to_file: Annotated[
+        bool,
+        typer.Option(
+            "--to-file",
+            "-f",
+            help="Write report(s) to file instead of stdout.",
+        ),
+    ] = False,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            "-v",
+            help="Verbose logging for debugging.",
+        ),
+    ] = False,
 ):
     """Generate Markdown report(s) for schema(s)."""
     configure_logging(verbose=verbose, project=project)
@@ -665,45 +715,61 @@ def report(
 
 @app.command()
 def build(
-    artifact: ArtifactEnum = typer.Option(
-        ...,
-        "--artifact",
-        "-a",
-        help="Type of data artifact to build.",
-    ),
-    select: str = typer.Option(
-        ...,
-        "--select",
-        "-s",
-        help="Path-like string specifying the schema(s) to build data artifacts for. Starting with 'schemas/' is optional.",
-    ),
-    sdk: SdkEnum = typer.Option(
-        ...,
-        "--sdk",
-        help="The SDK used to collect the event data.",
-    ),
-    source: str = typer.Option(
-        ...,
-        "--source",
-        help="Data source where the raw event data is stored. In the format `--source source_id.database.schema`, matching a configured source in reflekt_profiles.yml.",
-    ),
-    profile_name: str = typer.Option(
-        None,
-        "--profile",
-        "-p",
-        help="Profile in reflekt_profiles.yml to use when connecting to the .",
-    ),
-    verbose: bool = typer.Option(
-        False,
-        "--verbose",
-        "-v",
-        help="Verbose logging for debugging.",
-    ),
+    artifact: Annotated[
+        ArtifactEnum,
+        typer.Option(
+            "--artifact",
+            "-a",
+            help="Type of data artifact to build.",
+        ),
+    ],
+    select: Annotated[
+        str,
+        typer.Option(
+            "--select",
+            "-s",
+            help="Path-like string specifying the schema(s) to build data artifacts for. Starting with 'schemas/' is optional.",
+        ),
+    ],
+    sdk: Annotated[
+        SdkEnum,
+        typer.Option(
+            "--sdk",
+            help="The SDK used to collect the event data.",
+        ),
+    ],
+    source: Annotated[
+        str,
+        typer.Option(
+            "--source",
+            help="Source where the raw event data is stored (i.e., data warehouse). In the format `--source source_id.database_name.schema_name`, where `source_id` matches a source configured in `reflekt_profiles.yml`",
+        ),
+    ],
+    profile_name: Annotated[
+        str,
+        typer.Option(
+            "--profile",
+            "-p",
+            help="Profile in reflekt_profiles.yml to use for data warehouse connection.",
+        ),
+    ] = "",
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            "-v",
+            help="Verbose logging for debugging.",
+        ),
+    ] = False,
 ):
     """Build data artifacts based on schemas."""
     configure_logging(verbose=verbose, project=project)
     select = clean_select(select)
-    profile = Profile(project=project, profile_name=profile_name)
+    profile = (
+        profile_name
+        if profile_name != ""
+        else Profile(project=project, profile_name=profile_name)
+    )
     builder = BuilderHandler(
         artifact_arg=artifact,
         select_arg=select,
@@ -737,13 +803,17 @@ if __name__ == "__main__":
     main()  # Main entrypoint for CLI and sets global `project` variable
     # debug()
     # init("~/repos/tmp/test_reflekt")
-    # pull(select="segment/surfline-web")
+    pull(
+        registry="segment",
+        select="ecommerce/Cart Viewed",
+        # profile_name="test",
+    )
     # push(select="segment/ecommerce", delete=False)
     # lint(select="segment/ecommerce/Cart_Viewed/1-0.json")
-    report(
-        select="segment/ecommerce/Cart_Viewed/1-0.json",
-        to_file=False,
-    )
+    # report(
+    #     select="segment/ecommerce/Cart_Viewed/1-0.json",
+    #     to_file=False,
+    # )
     # build(
     #     artifact="dbt",
     #     select="segment/ecommerce",

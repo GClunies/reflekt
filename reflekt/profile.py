@@ -29,7 +29,7 @@ class Profile:
     def __init__(
         self,
         project: Project,
-        profile_name: Optional[str] = None,
+        profile_name: Optional[str] = "",
         from_reflekt_init: bool = False,
     ) -> None:
         """Initialize a Reflekt profile.
@@ -58,7 +58,7 @@ class Profile:
 
         self.dir = self.path.parent
 
-        if profile_name is not None:
+        if profile_name != "":
             self.name: str = profile_name
         else:
             self.name: str = project.default_profile
@@ -71,9 +71,7 @@ class Profile:
         self.source: list = []
 
         if self.project.exists:  # False when running 'reflekt init'
-            if (
-                not from_reflekt_init
-            ):  # Only validate profile if not running 'reflekt init'
+            if not from_reflekt_init:  # If not 'reflekt init', load profile
                 if not self.path.exists():
                     error_msg = (
                         f"'profiles_path: {self.project.profiles_path}' specified in "

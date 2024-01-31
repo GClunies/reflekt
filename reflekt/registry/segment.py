@@ -235,6 +235,7 @@ class SegmentRegistry:
         ]
 
         if schema_name is not None:
+            # Seeach using exact match
             s_schemas = [
                 s_schema
                 for s_schema in s_schemas
@@ -251,7 +252,13 @@ class SegmentRegistry:
 
         if len(s_schemas) == 0:
             raise SelectArgError(
-                message=(f"No Segment schemas found for: --select {select}\n"),
+                message=(
+                    f"No Segment schemas found for: --select {select}\n\n"
+                    f"NOTE:\n"
+                    f"'reflekt pull --registry segment --select plan_name/event_name' "
+                    f"requires 'event_name' match the event name in Segment Protocols "
+                    f"exactly (case-sensitive, inlcude spaces)."
+                ),
                 select=select,
             )
         else:
@@ -531,7 +538,7 @@ if __name__ == "__main__":  # pragma: no cover
     registry = SegmentRegistry(profile=profile)
 
     # --- PULL SEGMENT TO REFLEKT ---
-    # registry.pull(select="segment/ecommerce")
+    # registry.pull(select="ecommerce")
 
     # --- PUSH REFLEKT TO SEGMENT ---
-    registry.push(select="segment/ecommerce/CartViewed")
+    # registry.push(select="ecommerce/Cart Viewed")
