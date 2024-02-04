@@ -160,7 +160,10 @@ class AvoRegistry:
 
         if len(a_schemas) == 0:
             raise SelectArgError(
-                message=(f"No JSON schemas found for: --select {select}\n"),
+                message=(
+                    f"No schemas found in Reflekt project for: '--select {select}'\n\n"
+                    f"Check that --select arg exactly matches path to JSON schema(s)."
+                ),
                 select=select,
             )
         else:

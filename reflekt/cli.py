@@ -43,10 +43,10 @@ from reflekt.tracking import ReflektUser, track_event
 
 # Prettify traceback messages
 app = typer.Typer(pretty_exceptions_show_locals=SHOW_LOCALS)  # Typer app
-install(show_locals=SHOW_LOCALS)  # Any other uncaught exceptions
+install(show_locals=SHOW_LOCALS)  # Other uncaught exceptions
 
 
-user = ReflektUser()  # Create Reflekt user, but do not initialize (no ID set)
+user = ReflektUser()  # Create Reflekt user object, but do not initialize (no ID set)
 default_context = {  # Default context for anonymous usage stats (if not disabled)
     "app": {
         "name": "reflekt",
@@ -63,6 +63,7 @@ def version_callback(value: bool):
 
 @app.callback()
 def main(
+    # NOTE: Use old Typer syntax for --version flag
     version: Optional[bool] = typer.Option(
         None, "--version", callback=version_callback, is_eager=True
     ),
@@ -77,14 +78,13 @@ def main(
         project = Project()
         profile = Profile(project=project)
 
-        if not profile.do_not_track:  # User has not opted out of tracking
-            user.initialize()  # Init active user for anonymous usage stats
+        if not profile.do_not_track:
+            user.initialize()
 
-    except ProjectError:  # This happens when Reflekt project has not yet been created
-        project = Project(use_defaults=True)  # Set a dummy project
+    except ProjectError:  # No Reflekt project (i.e., before `reflekt init`)
+        project = Project(use_defaults=True)  # Make a placeholder project
 
     configure_logging(verbose=False, project=project)
-
     logger.info(f"Running with reflekt={__version__}")
     print("")
 
@@ -217,7 +217,7 @@ def init(
         raise typer.BadParameter("Vendor cannot be empty string")
 
     profile_path = typer.prompt(
-        "Path for 'reflekt_profiles.yml' [for connection to schema registry and data warehouse].",
+        "Path for 'reflekt_profiles.yml' [connection to schema registry and data warehouse].",  # noqa: E501
         type=str,
         default=str(Path.home() / ".reflekt/reflekt_profiles.yml"),
         show_default=True,
@@ -374,7 +374,7 @@ def init(
     table.add_row(
         "build",
         "Build data artifacts (e.g. dbt models) that match schemas in Reflekt project",
-        "reflekt build dbt --select segment/ecommerce --sdk segment --source snowflake.raw.segment_prod",
+        "reflekt build dbt --select segment/ecommerce --sdk segment --source snowflake.raw.segment_prod",  # noqa: E501
     )
     console = Console()
     console.print(table)
@@ -438,7 +438,10 @@ def pull(
         typer.Option(
             "--select",
             "-s",
-            help="Path-like string specifying the schema(s) to pull from schema registry. Starting with 'schemas/' is optional.",
+            help=(
+                "Path-like string specifying the schema(s) to pull from schema "
+                "registry. Starting with 'schemas/' is optional."
+            ),
         ),
     ] = "",
     profile_name: Annotated[
@@ -446,7 +449,9 @@ def pull(
         typer.Option(
             "--profile",
             "-p",
-            help="Profile in reflekt_profiles.yml to use for schema registry connection.",
+            help=(
+                "Profile in reflekt_profiles.yml to use for schema registry connection."
+            ),
         ),
     ] = "",
     verbose: Annotated[
@@ -458,7 +463,16 @@ def pull(
         ),
     ] = False,
 ):
-    """Pull schema(s) from a schema registry."""
+    """Pull schema(s) from a schema registry.
+
+    Args:
+        registry (RegistryEnum): The schema registry to pull from.
+        select (str): Path-like string specifying the schema(s) to pull from schema
+            registry. Starting with 'schemas/' is optional.
+        profile_name (str): Profile in reflekt_profiles.yml to use for schema registry
+            connection.
+        verbose (bool): Verbose logging for debugging.
+    """
     logger.debug(verbose)
     configure_logging(verbose=verbose, project=project)
     profile = (
@@ -495,15 +509,18 @@ def push(
             "-r",
             help="Schema registry to push to.",
         ),
-    ],
+    ] = "",
     select: Annotated[
         str,
         typer.Option(
             "--select",
             "-s",
-            help="Path-like string specifying the schema(s) to push to schema registry. Starting with 'schemas/' is optional.",
+            help=(
+                "Path-like string specifying the schema(s) to push to schema registry. "
+                "Starting with 'schemas/' is optional.",
+            ),
         ),
-    ],
+    ] = "",
     delete: Annotated[
         bool,
         typer.Option(
@@ -528,7 +545,9 @@ def push(
             None,
             "--profile",
             "-p",
-            help="Profile in reflekt_profiles.yml to use for schema registry connection.",
+            help=(
+                "Profile in reflekt_profiles.yml to use for schema registry connection."
+            ),
         ),
     ] = "",
     verbose: Annotated[
@@ -540,7 +559,18 @@ def push(
         ),
     ] = False,
 ):
-    """Push schema(s) to a schema registry."""
+    """Push schema(s) to a schema registry.
+
+    Args:
+        registry (RegistryEnum): The schema registry to push to.
+        select (str): Path-like string specifying the schema(s) to push to schema
+            registry. Starting with 'schemas/' is optional.
+        delete (bool): Delete schema(s) from schema registry. Prompts for confirmation.
+        force (bool): Force command to run without confirmation.
+        profile_name (str): Profile in reflekt_profiles.yml to use for schema registry
+            connection.
+        verbose (bool): Verbose logging for debugging.
+    """
     configure_logging(verbose=verbose, project=project)
     select = clean_select(select)
     profile = (
@@ -595,9 +625,12 @@ def lint(
         typer.Option(
             "--select",
             "-s",
-            help="Path-like string specifying the schema(s) to lint. Starting with 'schemas/' is optional.",
+            help=(
+                "Path-like string specifying the schema(s) to lint. Starting with "
+                "'schemas/' is optional."
+            ),
         ),
-    ],
+    ] = "",
     verbose: Annotated[
         bool,
         typer.Option(
@@ -607,7 +640,13 @@ def lint(
         ),
     ] = False,
 ):
-    """Lint schema(s) to test for naming and metadata conventions."""
+    """Lint schema(s) to test for naming and metadata conventions.
+
+    Args:
+        select (str): Path-like string specifying the schema(s) to lint. Starting with
+            'schemas/' is optional.
+        verbose (bool): Verbose logging for debugging.
+    """
     configure_logging(verbose=verbose, project=project)
     profile = Profile(project=project)
     schema_paths = get_schema_paths(select=select, project=project)
@@ -661,9 +700,12 @@ def report(
         typer.Option(
             "--select",
             "-s",
-            help="Path-like string specifying the schema(s) to generate Markdown report(s) for. Starting with 'schemas/' is optional.",
+            help=(
+                "Path-like string specifying the schema(s) to generate Markdown "
+                "report(s) for. Starting with 'schemas/' is optional."
+            ),
         ),
-    ],
+    ] = "",
     to_file: Annotated[
         bool,
         typer.Option(
@@ -722,35 +764,44 @@ def build(
             "-a",
             help="Type of data artifact to build.",
         ),
-    ],
+    ] = "",
     select: Annotated[
         str,
         typer.Option(
             "--select",
             "-s",
-            help="Path-like string specifying the schema(s) to build data artifacts for. Starting with 'schemas/' is optional.",
+            help=(
+                "Path-like string specifying the schema(s) to build data artifacts "
+                "for. Starting with 'schemas/' is optional."
+            ),
         ),
-    ],
+    ] = "",
     sdk: Annotated[
         SdkEnum,
         typer.Option(
             "--sdk",
             help="The SDK used to collect the event data.",
         ),
-    ],
+    ] = "",
     source: Annotated[
         str,
         typer.Option(
             "--source",
-            help="Source where the raw event data is stored (i.e., data warehouse). In the format `--source source_id.database_name.schema_name`, where `source_id` matches a source configured in `reflekt_profiles.yml`",
+            help=(
+                "Source where the raw event data is stored (i.e., data warehouse). In "
+                "the format `--source source_id.database_name.schema_name`, where "
+                "`source_id` matches a source configured in `reflekt_profiles.yml`"
+            ),
         ),
-    ],
+    ] = "",
     profile_name: Annotated[
         str,
         typer.Option(
             "--profile",
             "-p",
-            help="Profile in reflekt_profiles.yml to use for data warehouse connection.",
+            help=(
+                "Profile in reflekt_profiles.yml to use for data warehouse connection."
+            ),
         ),
     ] = "",
     verbose: Annotated[
