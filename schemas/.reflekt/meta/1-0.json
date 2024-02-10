@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": ".reflekt/meta/1-0.json",
-    "description": "Meta-schema for all Reflekt events",
+    "description": "Meta-schema used to ensure schemas defined in a Reflekt project have a Reflekt compatible structure. Not used to define or validate events collected by analytics SDKs.",
     "self": {
         "vendor": "reflekt",
         "name": "meta",
