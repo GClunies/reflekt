@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "jaffle_shop/Product_Clicked/1-0.json",
+    "description": "User clicked on a product.",
+    "self": {
+        "vendor": "com.thejaffleshop",
+        "name": "Product Clicked",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {}
+    },
+    "type": "object",
+    "properties": {
+        "session_id": {
+            "type": "string",
+            "description": "Unique identifier for the session."
+        },
+        "product_id": {
+            "type": "string",
+            "description": "Unique identifier for the product."
+        },
+        "sku": {
+            "type": "string",
+            "description": "Stock keeping unit (SKU) for the product."
+        },
+        "category": {
+            "type": "string",
+            "description": "Category of the product."
+        },
+        "name": {
+            "type": "string",
+            "description": "Name of the product."
+        },
+        "price": {
+            "type": "number",
+            "description": "Price of the product."
+        }
+    },
+    "required": [
+        "session_id",
+        "product_id",
+        "sku",
+        "category",
+        "name",
+        "price"
+    ],
+    "additionalProperties": false
+}

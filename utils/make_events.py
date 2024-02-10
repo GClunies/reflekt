@@ -49,7 +49,6 @@ ACTIONS = [
     "Product Added",
     "Product Removed",
     "Cart Viewed",
-    "Checkout Started",
     "Checkout Step Viewed",
     "Checkout Step Viewed - Shipping",
     "Checkout Step Viewed - Payment",
@@ -575,6 +574,7 @@ def cart_viewed(events, user, session_id, tstamp, cart):
                 "properties": {
                     "session_id": session_id,
                     "cart_id": cart["cart_id"],
+                    "products": cart["products"],
                 },
             }
         ],

@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "jaffle_shop/Identify/1-0.json",
+    "description": "User identified on the product along with any specified traits.",
+    "self": {
+        "vendor": "com.thejaffleshop",
+        "name": "Identify",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {}
+    },
+    "type": "object",
+    "properties": {
+        "user_id": {
+            "type": "string",
+            "description": "Unique identifier for the user."
+        },
+        "email": {
+            "type": "string",
+            "description": "Email address of the user."
+        }
+    },
+    "required": [],
+    "additionalProperties": false
+}

@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "jaffle_shop/Checkout_Step_Viewed/1-0.json",
+    "description": "User viewed a checkout step (e.g., shipping, payment, confrimation) in the checkout process.",
+    "self": {
+        "vendor": "com.thejaffleshop",
+        "name": "Checkout Step Viewed",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {}
+    },
+    "type": "object",
+    "properties": {
+        "session_id": {
+            "type": "string",
+            "description": "Unique identifier for the session."
+        },
+        "order_id": {
+            "type": "string",
+            "description": "Unique identifier for the order."
+        },
+        "step": {
+            "type": "string",
+            "description": "The checkout step that was viewed."
+        },
+        "name" : {
+            "type": "string",
+            "description": "The name of the checkout step that was viewed."
+        }
+    },
+    "required": [
+        "session_id",
+        "order_id",
+        "step",
+        "name"
+    ],
+    "additionalProperties": false
+}

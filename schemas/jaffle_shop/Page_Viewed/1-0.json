@@ -1,0 +1,53 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "jaffle_shop/Page_Viewed/1-0.json",
+    "description": "User viewed a page.",
+    "self": {
+        "vendor": "com.thejaffleshop",
+        "name": "Page Viewed",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {}
+    },
+    "type": "object",
+    "properties": {
+        "session_id": {
+            "type": "string",
+            "description": "Unique identifier for the session."
+        },
+        "name": {
+            "type": "string",
+            "description": "Name of the page."
+        },
+        "path": {
+            "type": "string",
+            "description": "Path of the page."
+        },
+        "referrer": {
+            "type": "string",
+            "description": "Referrer of the page."
+        },
+        "search": {
+            "type": "string",
+            "description": "Search query."
+        },
+        "title": {
+            "type": "string",
+            "description": "Title of the page."
+        },
+        "url": {
+            "type": "string",
+            "description": "URL of the page."
+        }
+    },
+    "required": [
+        "session_id",
+        "name",
+        "path",
+        "referrer",
+        "search",
+        "title",
+        "url"
+    ],
+    "additionalProperties": false
+}
