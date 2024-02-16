@@ -43,6 +43,10 @@
             "type": "string",
             "description": "ID of the product associated with the page."
         },
+        "cart_id": {
+            "type": "string",
+            "description": "ID of the cart associated with the page."
+        },
         "order_id": {
             "type": "string",
             "description": "ID of the order associated with the page."

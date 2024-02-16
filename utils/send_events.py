@@ -164,13 +164,13 @@ if __name__ == "__main__":
             row = parse_csv_row(csv_row)
 
             if send_to_segment:
-                logger.info(f"Sending event '{row["event"]}' to Segment")
+                logger.info(f"Sending event '{row['event']}' to Segment")
                 csv_to_cdp("segment", row)
             if send_to_rudderstack:
-                logger.info(f"Sending event '{row["event"]}' to Ruddderstack")
+                logger.info(f"Sending event '{row['event']}' to Ruddderstack")
                 csv_to_cdp("rudderstack", row)
             if send_to_amplitude:
-                logger.info(f"Sending event '{row["event"]}' to Amplitude")
+                logger.info(f"Sending event '{row['event']}' to Amplitude")
                 csv_to_cdp("amplitude", row)
 
     segment.flush()
