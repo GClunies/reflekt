@@ -20,7 +20,7 @@
             "description": "Unique identifier for the order."
         },
         "step": {
-            "type": "string",
+            "type": "integer",
             "description": "The checkout step that was viewed."
         },
         "name" : {
