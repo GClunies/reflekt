@@ -24,11 +24,11 @@
             "description": "Path of the page."
         },
         "referrer": {
-            "type": "string",
+            "type": ["string", "null"],
             "description": "Referrer of the page."
         },
         "search": {
-            "type": "string",
+            "type": ["string", "null"],
             "description": "Search query."
         },
         "title": {
@@ -38,6 +38,14 @@
         "url": {
             "type": "string",
             "description": "URL of the page."
+        },
+        "product_id": {
+            "type": "string",
+            "description": "ID of the product associated with the page."
+        },
+        "order_id": {
+            "type": "string",
+            "description": "ID of the order associated with the page."
         }
     },
     "required": [

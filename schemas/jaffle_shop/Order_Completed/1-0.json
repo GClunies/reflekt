@@ -24,7 +24,7 @@
             "description": "Total revenue for the order."
         },
         "coupon": {
-            "type": "string",
+            "type": ["string", "null"],
             "description": "Coupon code used for the order."
         },
         "discount": {
