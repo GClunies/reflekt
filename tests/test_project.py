@@ -66,7 +66,7 @@ def test_project_init():
             "sources": {"prefix": "__src_"},
             "models": {
                 "prefix": "stg_",
-                "filter": "where received_at < get_date()",
+                "filter": "where received_at < getdate()",
             },
             "docs": {
                 "prefix": "_stg_",

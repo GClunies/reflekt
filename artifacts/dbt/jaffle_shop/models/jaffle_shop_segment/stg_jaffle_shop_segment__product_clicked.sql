@@ -9,7 +9,7 @@ with
 source as (
     select *
     from {{ source('jaffle_shop_segment', 'product_clicked') }}
-    where received_at < get_date()
+    where received_at < getdate()
 ),
 
 renamed as (

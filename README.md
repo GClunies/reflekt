@@ -466,11 +466,17 @@ You no longer have to choose between speed and best practice. Automate writing S
 [18:56:31] INFO     Successfully built dbt package
 ```
 
-
 ---
 
-## CLI Command Reference
+## CLI Commands
+
+
+
+
 ### `reflekt init`
+
+
+
 ### `reflekt debug`
 ### `reflekt lint`
 ### `reflekt push`
@@ -480,6 +486,7 @@ You no longer have to choose between speed and best practice. Automate writing S
 ---
 
 ## Integrations
+
 ### Customer Data Platform (CDP)
 Reflekt understands how popular Customer Data Platforms (CDPs) collect event data and load it into cloud data warehouses. This understanding allows Reflekt to:
   - Parse the schemas in a Reflekt project.
