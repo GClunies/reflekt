@@ -113,7 +113,6 @@ artifacts:                      # Configure how data artifacts are built
       in_folder: false          # Docs files in separate folder?
       tests:                    # dbt tests to add based on column name (can be empty dict {})
         id: [unique, not_null]
-
 ```
 </details>
 
@@ -124,21 +123,20 @@ artifacts:                      # Configure how data artifacts are built
 ```yaml
 # Example reflekt_profiles.yml
 version: 1.0
-dev_reflekt:                                              # Profile name (multiple profiles can be defined)
-  # Define connections to schema registries (multiple allowed)
+dev_reflekt:                                         # Profile name (multiple profiles can be defined)
+  # Connections to schema registries
   registry:
     - type: segment
-      api_token: segment_api_token                        # https://docs.segmentapis.com/tag/Getting-Started#section/Get-an-API-token
+      api_token: segment_api_token                   # https://docs.segmentapis.com/tag/Getting-Started#section/Get-an-API-token
     - type: avo
-      workspace_id: avo_workspace_id                      # https://www.avo.app/docs/public-api/export-tracking-plan#endpoint
-      service_account_name: avo_service_account_name      # https://www.avo.app/docs/public-api/authentication#creating-service-accounts
+      workspace_id: avo_workspace_id                 # https://www.avo.app/docs/public-api/export-tracking-plan#endpoint
+      service_account_name: avo_service_account_name # https://www.avo.app/docs/public-api/authentication#creating-service-accounts
       service_account_secret: avo_service_account_secret
 
-  # Connections to data sources (data warehouses) where event data is stored.
-  # Sources are uniquely identified by their ID and are used in the `--source` arg when running `reflekt build`.
+  # Connection to data warehouses where event data is stored
   source:
-    - id: snowflake             # For simplicity, we use the same ID as the source type.
-      type: snowflake           # Snowflake DWH. Credentials follow.
+    - id: snowflake             # ID must be unique per profile
+      type: snowflake
       account: abc12345
       database: raw
       warehouse: transforming
@@ -146,14 +144,13 @@ dev_reflekt:                                              # Profile name (multip
       user: reflekt_user
       password: reflekt_user_password
 
-    - id: redshift              # For simplicity, we use the same ID as the source type.
-      type: redshift            # Redshift DWH. Credentials follow.
+    - id: redshift              # ID must be unique per profile
+      type: redshift
       host: example-redshift-cluster-1.abc123.us-west-1.redshift.amazonaws.com
       database: analytics
       port: 5439
       user: reflekt_user
       password: reflekt_user_password
-
 ```
 </details>
 

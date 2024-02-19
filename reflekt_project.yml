@@ -7,7 +7,7 @@ version: 1.0
 name: jaffle_shop               # Project name
 vendor: com.thejaffleshop       # Default vendor for schemas in reflekt project
 
-default_profile: dev_reflekt    # Default profile to use from reflekt_profiles.yml
+default_profile: dev_segment_snowflake # Default profile to use from reflekt_profiles.yml
 profiles_path: ./reflekt_profiles.yml  # Path to reflekt_profiles.yml
 
 # SCHEMAS CONFIG ----------------------------------------------------------------------
