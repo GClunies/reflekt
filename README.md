@@ -10,37 +10,21 @@ SPDX-License-Identifier: Apache-2.0
 ![GitHub](https://img.shields.io/github/license/gclunies/reflekt?style=for-the-badge)
 
 > /rəˈflek(t)/ <br>
-> _To embody or represent (something) in a faithful or appropriate way_
+> _To embody or represent in a faithful or appropriate way_
 
-Reflekt helps Data, Engineering, and Product teams work together to define, manage, and model events for product analytics. The `reflekt` CLI integrates with [schema registries](#interacting-with-schema-registries), cloud [data warehouses]((#supported-data-warehouses)), and [dbt](#dbt-artifacts). 
+`reflekt` helps Data, Engineering, and Product teams by providing tooling and a shared process to define, manage, and model event data for product analytics.
+- Configure conventions for events and properties. Enforced by `reflekt lint`.
+- Define events using [JSON schema](https://json-schema.org/), creating a codified, version controlled spec for event instrumentation.
+- `reflekt push` event schemas to a registry where they can validate events as they flow from **Application -> Registry -> Customer Data Platform (CDP) -> Data Warehouse**.
+- Automate the creation of private dbt packages with sources, staging models, and documentation for event data with `reflekt build --artifact dbt`.
 
-- Define event schemas/contracts using [JSON schema](https://json-schema.org/), creating a version controlled source of truth.
-- Configure schema naming and metadata conventions and enforce them with [`reflekt lint`](#linting-schemas).
-- Push schemas to a schema registry with [`reflekt push`](#push-schemas-to-a-registry) for use in event validation. Pull existing schemas with [`reflekt pull`](#pull-schemas-to-a-registry).
-- Open pull requests to propose schemas changes, tag stakeholders for input, and request reviews.
-- Build dbt sources, staging models, and docs that _reflekt_ event schemas with [`reflekt build dbt`](#building-private-dbt-packages).
+The `reflekt` CLI integrates with [Customer Data Platforms (CDPs)](#customer-data-platform-cdp), [Schema Registries](#schema-registry), [Cloud data Warehouses](#cloud-data-warehouse), and [dbt](#dbt).
 
 https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
 
-## Table of Contents
-- [Getting Started](#usage)<br>
-  - [Installation](#installation)<br>
-  - [Reflekt `--help`](#reflekt-help)<br>
-  - [Creating a project](#creating-a-project)<br>
-  - [Project configuration](#project-configuration)<br>
-- [Using Reflekt](#using-schemas)<br>
-  - [Defining schemas](#defining-schemas)<br>
-  - [Identifying and selecting schemas](#identifying-and-selecting-schemas)<br>
-  - [Schema versions](#schema-versions)<br>
-  - [Linting schemas](#linting-schemas)<br>
-  - [Interacting with schema registries](#interacting-with-schema-registries)<br>
-  - [Building dbt artifacts](#dbt-artifacts)<br>
-  - [Supported data warehouses](#supported-data-warehouses)<br>
-
 ## Getting Started
-
-### Installation
-Reflekt is available on [PyPI](https://pypi.org/project/my-reflekt-project/). Install with `pip` (or package manager of choice), preferably in a virtual environment:
+### Install
+Reflekt is available on [PyPI](https://pypi.org/project/reflekt/). Install with `pip` or your preferred package manager, preferably in a virtual environment:
 ```bash
 ❯ source /path/to/venv/bin/activate  # Activate virtual environment
 ❯ pip install reflekt                # Install Reflekt
@@ -48,51 +32,12 @@ Reflekt is available on [PyPI](https://pypi.org/project/my-reflekt-project/). In
 Reflekt CLI Version: 0.3.1
 ```
 
-### Reflekt `--help`
-The `--help` flag provides an overview of available `reflekt` commands.
-```bash
-❯ reflekt --help  # Show general --help details
-
- Usage: reflekt [OPTIONS] COMMAND [ARGS]...
-
- Reflekt CLI.
-
-╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ --version                                                                                                                                                        │
-│ --install-completion        [bash|zsh|fish|powershell|pwsh]  Install completion for the specified shell. [default: None]                                         │
-│ --show-completion           [bash|zsh|fish|powershell|pwsh]  Show completion for the specified shell, to copy it or customize the installation. [default: None]  │
-│ --help                                                       Show this message and exit.                                                                         │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ build             Build data artifacts based on schemas.                                                                                                         │
-│ debug             Check Reflekt project configuration.                                                                                                           │
-│ init              Initialize a Reflekt project.                                                                                                                  │
-│ lint              Lint schema(s) to test for naming and metadata conventions.                                                                                    │
-│ pull              Pull schema(s) from a schema registry.                                                                                                         │
-│ push              Push schema(s) to a schema registry.                                                                                                           │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-```
-
-Each command also has a `--help` flag providing command details (arguments, options, syntax, etc.).
-```bash
-❯ reflekt lint --help  # Show --help details for `reflekt lint`
-
- Usage: reflekt lint [OPTIONS]
-
- Lint schema(s) to test for naming and metadata conventions.
-
-╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ *  --select  -s      TEXT  Schema(s) to lint. [default: None] [required]                                                                                         │
-│    --help                  Show this message and exit.                                                                                                           │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-```
-
-### Creating a project
-Create a new directory, initialize a new Git repo, and run `reflekt init` to create a new Reflekt project.
+### Create a Reflekt Project
+To create a new Reflekt project: create a new directory, initialize a Git repo, and run `reflekt init`.
 ```bash
 ❯ mkdir ~/Repos/my-reflekt-project  # Create a new directory for the project
 ❯ cd ~/Repos/my-reflekt-project     # Navigate to the project directory
-❯ git init                          # Initialize a new Git repo
+❯ git init                          # Initialize a new Git repo (REQUIRED)
 ❯ reflekt init                      # Initialize a new Reflekt project in the current directory
 
 # Follow the prompts to configure the project
@@ -101,23 +46,27 @@ Create a new directory, initialize a new Git repo, and run `reflekt init` to cre
 This will create a new Reflekt project with the following structure:
 ```bash
 my-reflekt-project
-├── .logs/                # Reflekt command logs
-├── .reflekt_cache/       # Local cache used by Reflekt
-├── artifacts/            # Where Reflekt builds data artifacts (i.e., dbt packages)
-├── schemas/              # Where event schemas are defined and stored
+├── .logs/                # CLI command logs
+├── .reflekt_cache/       # Local cache used by CLI
+├── artifacts/            # Data artifacts from `reflekt build`
+├── schemas/              # Event schema definitions
 ├── .gitignore
 ├── README.md
 └── reflekt_project.yml   # Project configuration
 ```
 
-### Project configuration
-Reflekt uses 3 files to configure a project: `reflekt_project.yml`, `reflekt_profiles.yml`, and `schemas/.reflekt/meta/1-0.json`. Under the hood, Reflekt validates these configuration files before running, raising errors if an invalid configuration is detected. Examples of each file with configuration details are found below.
+### Configure a Reflekt Project
+Reflekt uses 3 configuration files (see the table below)
+| Configuration File               | Purpose |
+|----------------------------------|---------|
+| `reflekt_project.yml`            | Project settings, event and property conventions, data artifact generation, <br>additional Avo registry config (optional) |
+| `reflekt_profiles.yml`           | Connection details to schema registries and cloud data warehouses. |
+| `schemas/.reflekt/meta/1-0.json` | Meta-schema used to:<br> 1. Events in `schemas/` follow the Reflekt format.<br> 2. Define global `"metadata": {}` requirement for all schemas.  |
 
-#### **reflekt_project.yml**
-Contains general project settings as well as configuration for schema conventions, schema registry details (if needed), and data artifact generation. Click to expand the example below with details on each setting.
+Example configurations for each file in the table above can be found below (click to expand).
 
 <details>
-<summary><code>example_reflekt_project.yml</code>(CLICK TO EXPAND)</summary>
+<summary>Example: <code>reflekt_project.yml</code></summary>
 <br>
 
 ```yaml
@@ -167,18 +116,14 @@ artifacts:                      # Configure how data artifacts are built
 
 ```
 </details>
-<br>
 
-#### **reflekt_profiles.yml**
-Contains connection details for schema registries (used to validate event data) and data sources (i.e., data warehouse with raw event data). Click to expand the example below with details on each setting.
 <details>
-<summary><code>example_reflekt_profiles.yml</code>(CLICK TO EXPAND)</summary>
+<summary>Example: <code>reflekt_profiles.yml</code></summary>
 <br>
 
 ```yaml
 # Example reflekt_profiles.yml
 version: 1.0
-
 dev_reflekt:                                              # Profile name (multiple profiles can be defined)
   # Define connections to schema registries (multiple allowed)
   registry:
@@ -211,15 +156,9 @@ dev_reflekt:                                              # Profile name (multip
 
 ```
 </details>
-<br>
-
-#### **schemas/.reflekt/meta/1-0.json**
-A meta-schema used to validate all event schemas in the project. Under the hood, Reflekt uses this meta-schema along with the naming conventions defined in the `reflekt_project.yml` file to validate all event schemas.
-
-To define ***required metadata*** for all event schemas in your project, you can update the `metadata` object in `schemas/.reflekt/meta/1-0.json`. See the example below showing how to require both **code owner** and **product owner** metadata.
 
 <details>
-<summary><code>schemas/.reflekt/meta/1-0.json</code>(CLICK TO EXPAND)</summary>
+<summary>Example: <code>schemas/.reflekt/meta/1-0.json</code></summary>
 <br>
 
 ```json
@@ -284,18 +223,14 @@ To define ***required metadata*** for all event schemas in your project, you can
 }
 
 ```
-
 </details>
-
-<br>
 <br>
 
-## Using Reflekt
-### Defining schemas
-Event schemas are defined using [jsonschema](https://json-schema.org/). Each schema is defined as a separate JSON file, stored in the `schemas/` directory of a Reflekt project. An example `ProductClicked` event schema is shown below.
+### Defining Event Schemas
+Event schemas are defined using [JSON schema](https://json-schema.org/) specification, stored in the `schemas/` directory of a Reflekt project. Click to expand the `ProductClicked` event schema example below.
 
 <details>
-<summary><code>my-reflekt-project/schemas/segment/ecommerce/ProductClicked/1-0.json</code>(CLICK TO EXPAND)</summary>
+<summary>Example: <code>my-reflekt-project/schemas/segment/ecommerce/ProductClicked/1-0.json</code>(CLICK TO EXPAND)</summary>
 <br>
 
 ```json
@@ -376,258 +311,220 @@ Event schemas are defined using [jsonschema](https://json-schema.org/). Each sch
   "additionalProperties": false,   // No additional properties allowed
 }
 ```
-
 </details>
-<br>
 
-### Identifying and selecting schemas
-Schemas are uniquely identified by their `$id`, which is determine by their path relative to the `schemas/` directory. For example:
 
-| Path to schema                                                      | Schema `$id`                             |
-|---------------------------------------------------------------------|------------------------------------------|
-| `my-reflekt-project/schemas/segment/ecommerce/CartViewed/1-0.json`  | `segment/ecommerce/CartViewed/1-0.json`  |
-| `my-reflekt-project/schemas/segment/ecommerce/LinkClicked/2-1.json` | `segment/ecommerce/LinkClicked/2-1.json` |
+#### Schema `$id` and `version`
+Schemas in a Reflekt project are identified and `--select`ed by their `$id`, which is their path relative to the `schemas/` directory. For example:
+| File Path to Schema                                          | Schema `$id`                       |
+|---------------------------------------------------------------|------------------------------------|
+| `~/repos/my-reflekt-project/schemas/jaffle_shop/Cart_Viewed/1-0.json` | `jaffle_shop/Cart_Viewed/1-0.json` |
+| `~/repos/my-reflekt-project/schemas/jaffle_shop/Cart_Viewed/2-1.json` | `jaffle_shop/Cart_Viewed/2-1.json` |
 
-These `$id`s are used to `--select` schemas when running Reflekt commands. For example:
+Each schema has a `version` (e.g., `1-0`, `2-1`), used to indicate changes to data collection requirements. New event schemas start at `1-0` and follow a `MAJOR-MINOR` version spec, as shown in the table below.
+| Type  | Description | Example | Use Case |
+|-------|---------------------------------------------------|---------|----------|
+| MAJOR | Breaking change incompatible with previous data. | `1-0`, `2-0`<br>(ends in `-0) | - Add/remove/rename a *required* property<br> - Change a property from *optional to required*<br> - Change a property's type |
+| MINOR | Non-breaking change compatible with previous data. | `1-1`, `2-3` | - Add/remove/rename an *optional* property<br> - Change a property from *required to optional* |
 
-```bash
-❯ reflekt lint --select segment/ecommerce/CartViewed/1-0.json      # Lint version 1-0 of the CartViewed schema
-❯ reflekt lint --select "segment/ecommerce/Link Clicked/2-1.json"  # $ids with spaces must be surrounded by quotes
-❯ reflekt lint --select segment/ecommerce                          # Lint all schemas in the segment/ecommerce directory
-```
+> [!WARNING]
+> For `MINOR` schema versions (non-breaking changes), you can either:
+> - Update the existing schema and increment the MINOR version number.
+> - Create a new `.json` file with the updated schema and increment the MINOR version number.
+>
+> For `MAJOR` schema versions (breaking changes), you MUST:
+> - **Create a new `.json` file** with the updated schema. This way, an application/product/feature can begin using the new schema while others continue to use the old schema (migrating later).
 
-### Schema versions
-As data collection requirements change, event schemas must be updated to *reflekt* the new schema. Reflekt supports schema evolution by defining a `version` for each schema, starting at `1-0` and following a `MAJOR-MINOR` version spec. The definition of `MAJOR` and `MINOR` is as follows:
-
-- **MAJOR** - Breaking schema changes incompatible with previous data. Examples:
-  - Add/remove/rename a required property
-  - Change a property from *optional to required*
-  - Change a property's type
-- **MINOR** - Non-breaking schema changes compatible with previous data. Examples:
-  - Add/remove/rename an optional property
-  - Change a property from *required to optional*
-
-When defining a new schema version, **create a new file** with the incremented version and updated schema definition.
-
-### Interacting with schema registries
-Schema registries are used to store and serve schemas. Once a schema is in a registry, it can be used to validate event data against the schema to ensure event data quality. Reflekt supports interacting with schema registries to push (publish) and pull (retrieve) schemas. Currently, the following registries are supported:
-
-| **Registry**          | **`--push` support** | **`--pull` support** | **Schema `--select` syntax**            | **Schema `version` support**                                                                                                                                                                                            |
-|-----------------------|:--------:|:--------:|----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Segment Protocols** |     ✅    |     ✅    | `--select segment/tracking_plan_name` | Only supports `MAJOR-0` versions.                                                                                                                                              |
-| **Avo**               |     ❌    |     ✅    | `--select avo/branch_name`            | Schema changes managed in Avo [branches](https://www.avo.app/docs/workspace/branches) - `"version": "1-0"` (always).<br> Avo customers pull schemas with `reflekt pull` and build dbt artifacts with `reflekt build`. |
-
-#### Pull schemas from a registry
-Pulling schemas from a registry is as easy as ...
-```bash
-❯ reflekt pull --select segment/ecommerce
-[19:28:32] INFO     Running with reflekt=0.3.1
-
-[19:28:32] INFO     Searching Segment for schemas
-
-[19:28:33] INFO     Found 9 schemas to pull:
-
-[19:28:33] INFO     1 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Identify/1-0.json
-[19:28:34] INFO     2 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Group/1-0.json
-[19:28:34] INFO     3 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json
-[19:28:34] INFO     4 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Started/1-0.json
-[19:28:34] INFO     5 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Completed/1-0.json
-[19:28:34] INFO     6 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Viewed/1-0.json
-[19:28:34] INFO     7 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Order Completed/1-0.json
-[19:28:34] INFO     8 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Page Viewed/1-0.json
-[19:28:34] INFO     9 of 9 Writing to /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Product Added/1-0.json
-
-[19:28:34] INFO     Completed successfully
-```
-The `reflekt pull` command builds the corresponding JSON files in the `schemas/` directory. For the example above, the resulting directory structure would be:
-```bash
-schemas
-├── .reflekt
-└── segment
-    └── ecommerce
-        ├── Cart Viewed
-        │   └── 1-0.json
-        ├── Checkout Started
-        │   └── 1-0.json
-        ├── Checkout Step Completed
-        │   └── 1-0.json
-        ├── Checkout Step Viewed
-        │   └── 1-0.json
-        ├── Group
-        │   └── 1-0.json
-        ├── Identify
-        │   └── 1-0.json
-        ├── Order Completed
-        │   └── 1-0.json
-        ├── Page Viewed
-        │   └── 1-0.json
-        └── Product Added
-            └── 1-0.json
-```
-
-#### Push schemas to a registry
-Publishing schemas to a registry follows the same pattern ...
+### Linting Event Schemas
+Schemas can be linted to test if they follow the naming conventions in your [`reflekt_project.yml`] and metadata conventions in `schemas/.reflekt/meta/1-0.json`.
 
 ```bash
-❯ reflekt push --select segment/ecommerce
-[19:29:06] INFO     Running with reflekt=0.3.1
+❯ reflekt lint --select schemas/jaffle_shop
+[18:31:12] INFO     Running with reflekt=0.5.0
 
-[19:29:07] INFO     Searching for JSON schemas in: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce
+[18:31:12] INFO     Searching for JSON schemas in: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop
 
-[19:29:07] INFO     Found 9 schemas to push
+[18:31:12] INFO     Found 9 schema(s) to lint
 
-[19:29:07] INFO     1 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Identify/1-0.json
-[19:29:07] INFO     2 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json
-[19:29:07] INFO     3 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Viewed/1-0.json
-[19:29:07] INFO     4 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Group/1-0.json
-[19:29:07] INFO     5 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Order Completed/1-0.json
-[19:29:07] INFO     6 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Completed/1-0.json
-[19:29:07] INFO     7 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Started/1-0.json
-[19:29:07] INFO     8 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Page Viewed/1-0.json
-[19:29:07] INFO     9 of 9 Pushing /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Product Added/1-0.json
+[18:31:12] INFO     1 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Order_Completed/1-0.json
+[18:31:19] INFO     2 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Identify/1-0.json
+[18:31:20] INFO     3 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Clicked/1-0.json
+[18:31:24] INFO     4 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Cart_Viewed/1-0.json
+[18:31:26] INFO     5 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Removed/1-0.json
+[18:31:32] INFO     6 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Added/1-0.json
+[18:31:37] INFO     7 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Viewed/1-0.json
+[18:31:40] INFO     8 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Completed/1-0.json
+[18:31:44] INFO     9 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Page_Viewed/1-0.json
 
-[19:29:08] INFO     Completed successfully
+[18:31:51] INFO     Completed successfully
 ```
 
-<br>
-
-### Linting schemas
-Schemas can be linted to test if they follow the naming and metadata conventions configured for a Reflekt project.
+### Sending Event Schemas to a Schema Registry
+In order to validate events as they flow from **Application -> Registry -> Customer Data Platform (CDP) -> Data Warehouse**, we need to send a copy of our event schemas to a schema registry (see [supported registries](#schema-registry)). This is done with the `reflekt push` command.
 
 ```bash
-❯ reflekt lint --select segment/ecommerce
-[18:57:45] INFO     Running with reflekt=0.3.1
+❯ reflekt push --registry segment --select schemas/jaffle_shop
+[18:41:05] INFO     Running with reflekt=0.5.0
 
-[18:57:46] INFO     Searching for JSON schemas in: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce
+[18:41:06] INFO     Searching for JSON schemas in: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop
 
-[18:57:46] INFO     Found 9 schema(s) to lint
+[18:41:06] INFO     Found 9 schemas to push
 
-[18:57:46] INFO     1 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Identify/1-0.json
-[18:57:47] INFO     2 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json
-[18:57:48] ERROR    Property 'cartId' in /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json does not match naming convention 'casing: snake' in
-                    /Users/myuser/Repos/my-reflekt-project/reflekt_project.yml.
-[18:57:48] INFO     3 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Viewed/1-0.json
-[18:57:50] INFO     4 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Group/1-0.json
-[18:57:50] INFO     5 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Order Completed/1-0.json
-[18:57:54] INFO     6 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Step Completed/1-0.json
-[18:57:55] INFO     7 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Checkout Started/1-0.json
-[18:57:58] INFO     8 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Page Viewed/1-0.json
-[18:58:01] INFO     9 of 9 Linting /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Product Added/1-0.json
+[18:41:06] INFO     1 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Order_Completed/1-0.json
+[18:41:06] INFO     2 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Identify/1-0.json
+[18:41:06] INFO     3 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Clicked/1-0.json
+[18:41:06] INFO     4 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Cart_Viewed/1-0.json
+[18:41:06] INFO     5 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Removed/1-0.json
+[18:41:06] INFO     6 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Added/1-0.json
+[18:41:06] INFO     7 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Viewed/1-0.json
+[18:41:06] INFO     8 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Completed/1-0.json
+[18:41:06] INFO     9 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Page_Viewed/1-0.json
 
-[18:58:04] ERROR    Linting failed with 1 error(s):
-
-[18:58:04] ERROR    Property 'cartId' in /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json does not match naming convention 'casing: snake' in
-                    /Users/myuser/Repos/my-reflekt-project/reflekt_project.yml.
+[18:41:08] INFO     Completed successfully
 ```
 
-Running `reflekt lint` in a CI/CD pipeline is a great way to ensure schema consistency and quality before pushing schemas to a schema registry.
+### Building `dbt` packages to Model Event Data
+Modeling event data in `dbt` a lot of work. Do we want staging models that are clean, documented, and tested? **OF COURSE!**
 
-<br>
+Do we want to write and maintain SQL and YAML docs for hundreds of events? **ABSOLUTELY NOT!**
 
-## dbt artifacts
-[dbt](https://www.getdbt.com/) is a popular data tool to transformation and model data. When modeling data in dbt, it is [best practice](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview) to:
+You no longer have to choose between speed and best practice. Automate writing SQL for staging models and YAML for documentation and testing, packaged up in your very own provate dbt package. All you need is a single CLI command.
+
+```bash
+❯ reflekt build --artifact dbt --select schemas/jaffle_shop --source snowflake.raw.jaffle_shop_segment --sdk segment
+[18:56:25] INFO     Running with reflekt=0.5.0
+
+[18:56:26] INFO     Searching for JSON schemas in: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop
+
+[18:56:26] INFO     Found 9 schemas to build
+
+[18:56:27] INFO     Building dbt package:
+                        name: jaffle_shop
+                        dir: /Users/gclunies/Repos/reflekt/artifacts/dbt/jaffle_shop
+                        --select: jaffle_shop
+                        --sdk_arg: segment
+                        --source: snowflake.raw.jaffle_shop_segment
+
+[18:56:27] INFO     Building dbt source 'jaffle_shop_segment'
+[18:56:27] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Order_Completed/1-0.json
+[18:56:28] INFO     Building dbt table 'order_completed' in source 'jaffle_shop_segment'
+[18:56:28] INFO     Building staging model 'stg_jaffle_shop_segment__order_completed.sql'
+[18:56:28] INFO     Building dbt documentation '_stg_jaffle_shop_segment__order_completed.yml'
+
+[18:56:28] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Identify/1-0.json
+[18:56:29] INFO     Building dbt table 'identifies' in source 'jaffle_shop_segment'
+[18:56:29] INFO     Building staging model 'stg_jaffle_shop_segment__identifies.sql'
+[18:56:29] INFO     Building dbt documentation '_stg_jaffle_shop_segment__identifies.yml'
+
+[18:56:29] INFO     Building dbt artifacts for schema: Segment 'users' table
+[18:56:29] INFO     Building dbt table 'users' in source 'jaffle_shop_segment'
+[18:56:29] INFO     Building staging model 'stg_jaffle_shop_segment__users.sql'
+[18:56:29] INFO     Building dbt documentation '_stg_jaffle_shop_segment__users.yml'
+
+[18:56:29] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Clicked/1-0.json
+[18:56:29] INFO     Building dbt table 'product_clicked' in source 'jaffle_shop_segment'
+[18:56:29] INFO     Building staging model 'stg_jaffle_shop_segment__product_clicked.sql'
+[18:56:29] INFO     Building dbt documentation '_stg_jaffle_shop_segment__product_clicked.yml'
+
+[18:56:29] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Cart_Viewed/1-0.json
+[18:56:29] INFO     Building dbt table 'cart_viewed' in source 'jaffle_shop_segment'
+[18:56:29] INFO     Building staging model 'stg_jaffle_shop_segment__cart_viewed.sql'
+[18:56:29] INFO     Building dbt documentation '_stg_jaffle_shop_segment__cart_viewed.yml'
+
+[18:56:29] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Removed/1-0.json
+[18:56:30] INFO     Building dbt table 'product_removed' in source 'jaffle_shop_segment'
+[18:56:30] INFO     Building staging model 'stg_jaffle_shop_segment__product_removed.sql'
+[18:56:30] INFO     Building dbt documentation '_stg_jaffle_shop_segment__product_removed.yml'
+
+[18:56:30] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Added/1-0.json
+[18:56:30] INFO     Building dbt table 'product_added' in source 'jaffle_shop_segment'
+[18:56:30] INFO     Building staging model 'stg_jaffle_shop_segment__product_added.sql'
+[18:56:30] INFO     Building dbt documentation '_stg_jaffle_shop_segment__product_added.yml'
+
+[18:56:30] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Viewed/1-0.json
+[18:56:30] INFO     Building dbt table 'checkout_step_viewed' in source 'jaffle_shop_segment'
+[18:56:30] INFO     Building staging model 'stg_jaffle_shop_segment__checkout_step_viewed.sql'
+[18:56:30] INFO     Building dbt documentation '_stg_jaffle_shop_segment__checkout_step_viewed.yml'
+
+[18:56:30] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Completed/1-0.json
+[18:56:30] INFO     Building dbt table 'checkout_step_completed' in source 'jaffle_shop_segment'
+[18:56:30] INFO     Building staging model 'stg_jaffle_shop_segment__checkout_step_completed.sql'
+[18:56:30] INFO     Building dbt documentation '_stg_jaffle_shop_segment__checkout_step_completed.yml'
+
+[18:56:30] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Page_Viewed/1-0.json
+[18:56:30] INFO     Building dbt table 'pages' in source 'jaffle_shop_segment'
+[18:56:30] INFO     Building staging model 'stg_jaffle_shop_segment__pages.sql'
+[18:56:30] INFO     Building dbt documentation '_stg_jaffle_shop_segment__pages.yml'
+
+[18:56:30] INFO     Building dbt artifacts for schema: Segment 'tracks' table
+[18:56:31] INFO     Building dbt table 'tracks' in source 'jaffle_shop_segment'
+[18:56:31] INFO     Building staging model 'stg_jaffle_shop_segment__tracks.sql'
+[18:56:31] INFO     Building dbt documentation '_stg_jaffle_shop_segment__tracks.yml'
+
+[18:56:31] INFO     Copying dbt package from temporary path /Users/gclunies/Repos/reflekt/.reflekt_cache/artifacts/dbt/jaffle_shop to /Users/gclunies/Repos/reflekt/artifacts/dbt/jaffle_shop
+
+[18:56:31] INFO     Successfully built dbt package
+```
+
+
+---
+
+## CLI Command Reference
+### `reflekt init`
+### `reflekt debug`
+### `reflekt lint`
+### `reflekt push`
+### `reflekt pull`
+### `reflekt build`
+
+---
+
+## Integrations
+### Customer Data Platform (CDP)
+Reflekt understands how popular Customer Data Platforms (CDPs) collect event data and load it into cloud data warehouses. This understanding allows Reflekt to:
+  - Parse the schemas in a Reflekt project.
+  - Find matching tables for events in the data warehouse.
+  - Automate writing a private dbt package that creates sources, staging models, and documentation for event data.
+
+| CDP | Supported |
+|-----|-----------|
+| [Segment](https://segment.com/) | ✅ |
+| [Rudderstack](https://www.rudderstack.com/) | 🚧 Coming Soon 🚧 |
+| [Amplitude](https://amplitude.com/) | 🚧 Coming Soon 🚧  |
+
+
+### Schema Registry
+Schema registries store and serve schemas. Once a schema is registered with a registry, it can be used to validate events to ensure data quality. Reflekt works with schema registries from CDPs, SaaS vendors, and open-source projects - allowing teams to decide between managed and self-hosted solutions.
+
+| Registry | Cost | Open Source | Schema Versions | Recommended Workflow |
+|----------|------|-------------|------------------------|-----------------|
+| [Segment Protocols](https://segment.com/docs/protocols/) | Pricing | ❌ | `MAJOR` only | Manage schemas in Reflekt.<br> `reflekt push` to Protocols for event validation.<br> `reflekt build --artifact dbt` to build dbt package. |
+| [Avo](https://www.avo.app/) | Pricing | ❌ | `MAJOR` only | Manage schemas in Avo.<br> `reflekt pull` to get schemas.<br>  `reflekt build --artifact dbt` to build dbt package. |
+| [reflekt-registry](https://github.com/GClunies/reflekt-registry)<br> 🚧 Coming Soon 🚧 | Free | ✅ | `MAJOR` & `MINOR` |  Manage schemas in Reflekt.<br> `reflekt push` to reflekt-registry.<br> `reflekt build --artifact dbt` to build dbt package. |
+
+### Cloud Data Warehouse
+In order to find tables and columns that match event schemas and their properties, Reflekt needs to connect to a cloud data warehouse where raw evetn data is stored.
+
+| Data Warehouse | Supported |
+|----------------|-----------|
+| [Snowflake](https://www.snowflake.com/) | ✅ |
+| [Redshift](https://aws.amazon.com/redshift/) | ✅ |
+| [BigQuery](https://cloud.google.com/bigquery) | ✅ |
+
+> [!NOTE]
+> Reflekt **NEVER** copies, moves, or modifies your events in the data warehouse. It has no visibility into your data.<br>
+> It ONLY reads table and column names for artifact templating.
+
+### dbt
+[dbt](https://www.getdbt.com/) is a data transformation tool that enables anyone who knows SQL to transform (model) data in a cloud data warehouse. When modeling data in dbt, it is [best practice](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview) to:
 - Define sources pointing to the raw data.
 - Define staging models, 1-to-1 for each source, that [rename, recast, or usefully reconsider](https://discourse.getdbt.com/t/how-we-used-to-structure-our-dbt-projects/355#data-transformation-101-1) columns into a consistent format. Materialized as views.
-- Document staging models with descriptions for the model and its fields, including relevant tests (e.g., unique and not_null IDs) as required.
+- Document staging models.
+- Test the staging models (e.g., unique values, check for nulls, etc).
 
-While we recommend following this practice, it can be ***a lot of work to maintain*** for product analytics, where:
-- There are many events (often 100+) and properties.
-- Events and properties are added or updated regularly as the product and data requirements evolve.
-- The Product and Engineer teams are bigger than the Data team, making it hard to keep up with the changes.
+For product analytics, this can be ***a lot of work to maintain***, where:
+- There 10s to 100s of events and properties.
+- Events and properties are added/updated as requirements evolve, often without the Data team knowing.
+- Product and Engineering teams are bigger than the Data team, making it account for data changes in models and documentation.
 
-**Reflekt can help by building dbt artifacts for you with a single CLI command.** Think of this as dbt's [codegen](https://github.com/dbt-labs/dbt-codegen) package on steroids :muscle: :pill:.
-
-### Building private dbt packages
-To build a private dbt package with sources, staging models, and docs that perfectly *reflekts* the schemas in a Reflekt project and the raw data in the warehouse, you can run a command like the example below.
-
-Where:
-- `--select segment/ecommerce` selects all the schemas in the `schemas/segment/ecommerce/` directory.
-- `--source snowflake.raw.ecomm_demo` specifies to connect to a data source with ID `snowflake`, database `raw`, and schema `ecomm_demo` as defined in `reflekt_profiles.yml`.
-- `--sdk segment` specifies the event data was collected via the Segment SDK. Reflekt knows how Segment loads data into data warehouses and writes SQL models accordingly.
-
-If an event schema has multiple versions, Reflekt builds a staging model for both versions, allowing the Data team to easily consolidate schema changes as needed.
-
-```bash
-❯ reflekt build dbt --select segment/ecommerce --source snowflake.raw.ecomm_demo --sdk segment
-[09:45:23] INFO     Running with reflekt=0.3.1
-
-[09:45:24] INFO     Searching for JSON schemas in: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce
-
-[09:45:24] INFO     Found 10 schemas to build
-
-[09:45:24] INFO     Building dbt package:
-                        name: reflekt_demo
-                        dir: /Users/myuser/Repos/my-reflekt-project/artifacts/dbt/reflekt_demo
-                        --select: segment/ecommerce
-                        --sdk_arg: segment
-                        --source: snowflake.raw.ecomm_demo
-
-[09:45:24] INFO     Building dbt source 'ecomm_demo'
-[09:45:24] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Identify/1-0.json
-[09:45:26] INFO     Building dbt table 'identifies' in source 'ecomm_demo'
-[09:45:26] INFO     Building staging model 'stg_ecomm_demo__identifies.sql'
-[09:45:26] INFO     Building dbt documentation '_stg_ecomm_demo__identifies.yml'
-
-[09:45:26] INFO     Building dbt artifacts for schema: Segment 'users' table
-[09:45:26] INFO     Building dbt table 'users' in source 'ecomm_demo'
-[09:45:26] INFO     Building staging model 'stg_ecomm_demo__users.sql'
-[09:45:26] INFO     Building dbt documentation '_stg_ecomm_demo__users.yml'
-
-[09:45:26] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/2-0.json
-[09:45:26] INFO     Building dbt table 'cart_viewed' in source 'ecomm_demo'
-[09:45:26] INFO     Building staging model 'stg_ecomm_demo__cart_viewed__v2_0.sql'
-[09:45:26] INFO     Building dbt documentation '_stg_ecomm_demo__cart_viewed__v2_0.yml'
-
-[09:45:26] INFO     Building dbt artifacts for schema: /Users/myuser/Repos/my-reflekt-project/schemas/segment/ecommerce/Cart Viewed/1-0.json
-[09:45:27] INFO     Building staging model 'stg_ecomm_demo__cart_viewed.sql'
-[09:45:27] INFO     Building dbt documentation '_stg_ecomm_demo__cart_viewed.yml'
-
-...
-...  # Full output omitted for brevity
-...
-
-[09:45:29] INFO     Building dbt artifacts for schema: Segment 'tracks' table
-[09:45:29] INFO     Building dbt table 'tracks' in source 'ecomm_demo'
-[09:45:29] INFO     Building staging model 'stg_ecomm_demo__tracks.sql'
-[09:45:29] INFO     Building dbt documentation '_stg_ecomm_demo__tracks.yml'
-
-
-[09:45:29] INFO     Copying dbt package from temporary path /Users/myuser/Repos/my-reflekt-project/.reflekt_cache/artifacts/dbt/reflekt_demo to
-                    /Users/myuser/Repos/my-reflekt-project/artifacts/dbt/reflekt_demo
-
-[09:45:29] INFO     Successfully built dbt package
-```
-
-### Using private dbt packages
-To use a Reflekt dbt package in a downstream dbt project, add it to the dbt project's `packages.yml`.
-
-#### dbt-core
-```yaml
-# packages.yml
-packages:
-  - git: "https://github.com/<your_user_or_org>/<your_repo>"  # Reflekt project Github repo URL
-    subdirectory: "dbt-packages/<reflekt_dbt_package_name>"
-    revision: v0.1.0__reflekt_demo  # Branch, tag, or commit (40-character hash). For latest, use 'main' branch.
-```
-
-#### dbt-cloud
-```yaml
-# packages.yml
-packages:
-  - git: ""https://{{env_var('DBT_ENV_SECRET_GITHUB_PAT')}}@github.com/<your_user_or_org>/<your_repo>.git""  # Reflekt project Github repo URL with GitHub PAT
-    subdirectory: "dbt-packages/<reflekt_dbt_package_name>"
-    revision: v0.1.0__reflekt_demo  # Branch, tag, or commit (40-character hash). For latest, use 'main' branch.
-```
-To use with dbt-cloud, you will need to create a [Github personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) (e.g., `DBT_ENV_SECRET_GITHUB_PAT`) and [configure it as an environment variable](https://docs.getdbt.com/docs/dbt-cloud/using-dbt-cloud/cloud-environment-variables) in your dbt-cloud account.
-
-For local dbt development, set the environment variable on your local machine.
-```bash
-# Add the following line to your .zshrc, .bash_profile, etc.
-export DBT_ENV_SECRET_GITHUB_PAT=YOUR_TOKEN
-```
-
-### Supported data warehouses
-Reflekt currently supports the following data warehouses:
-- Snowflake
-- Redshift
-- :construction: BigQuery support coming soon! :construction:
+`reflekt build` handles all of this by automating the creation of private dbt package that creates sources, staging models, and documentation for each event with a schema in a Reflekt project. This private package can be used as a foundation for warehouse first product analytics.

@@ -649,6 +649,7 @@ def lint(
     """
     configure_logging(verbose=verbose, project=project)
     profile = Profile(project=project)
+    select = clean_select(select)
     schema_paths = get_schema_paths(select=select, project=project)
     errors = []  # TODO: Linter should have its own errors attribute
 

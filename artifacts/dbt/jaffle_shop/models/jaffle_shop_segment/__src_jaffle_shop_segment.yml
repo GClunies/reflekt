@@ -1,0 +1,34 @@
+version: 2
+sources:
+  - name: jaffle_shop_segment
+    schema: jaffle_shop_segment
+    database: raw
+    description: Schema in snowflake with raw Segment event data.
+    tables:
+      - name: order_completed
+        description: User completed an order (i.e., user confirmed and payment
+          was successful).
+      - name: identifies
+        description: User identified on the product along with any specified
+          traits.
+      - name: users
+        description: User traits set by identify() calls.
+      - name: product_clicked
+        description: User clicked on a product.
+      - name: cart_viewed
+        description: User viewed their cart.
+      - name: product_removed
+        description: User removed a product from their cart.
+      - name: product_added
+        description: User added a product to their cart.
+      - name: checkout_step_viewed
+        description: User viewed a checkout step (e.g., shipping, payment,
+          confrimation) in the checkout process.
+      - name: checkout_step_completed
+        description: User completed a checkout step (e.g., shipping, payment,
+          confrimation) in the checkout process.
+      - name: pages
+        description: User viewed a page.
+      - name: tracks
+        description: A summary of track() calls from all events. Properties
+          unique to each event's track() call are omitted.

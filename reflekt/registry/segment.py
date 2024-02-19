@@ -319,13 +319,11 @@ class SegmentRegistry:
                 json={"trackingPlanId": plan_id, "rules": schemas},
             )
 
-        print("")
         logger.debug("Logging request details sent to Segment API...")
         logger.debug(f"Request Method: {r.request.method}")
         logger.debug(f"Request URL: {r.url}")
         logger.debug(f"Request Headers: {r.headers}")
         logger.debug(f"Request body: {r.request.body.decode('utf-8')}")
-        print("")
         logger.debug("Logging Segment API response details...")
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")
