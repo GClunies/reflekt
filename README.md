@@ -469,7 +469,7 @@ You no longer have to choose between speed and best practice. Automate writing S
 ---
 
 ## CLI Commands
-
+You can access the `reflekt` CLI help by running `reflekt --help`. Below is a list of available commands.
 
 
 

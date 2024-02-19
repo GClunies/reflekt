@@ -68,10 +68,8 @@ def main(
         None, "--version", callback=version_callback, is_eager=True
     ),
 ):
-    """Main entrypoint for Reflekt CLI.
-
-    Sets up the global project object and logging to be used throughout the CLI.
-    """
+    # Main entrypoint for Reflekt CLI.
+    # Sets up the global project object and logging to be used throughout the CLI.
     global project
 
     try:
