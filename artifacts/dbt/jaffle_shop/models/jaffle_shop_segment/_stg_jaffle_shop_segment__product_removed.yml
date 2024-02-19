@@ -55,23 +55,23 @@ models:
           or omission.
       - name: name
         description: The name of the page or screen.
-      - name: session_id
-        description: Unique identifier for the session.
       - name: cart_id
         description: Unique identifier for the cart the product was added
           to.
-      - name: product_id
-        description: Unique identifier for the product.
-      - name: sku
-        description: Stock keeping unit (SKU) for the product.
       - name: category
         description: Category of the product.
       - name: _name
         description: Name of the product.
       - name: price
         description: Price of the product.
+      - name: product_id
+        description: Unique identifier for the product.
       - name: quantity
         description: Quantity of the product added to the cart.
+      - name: session_id
+        description: Unique identifier for the session.
+      - name: sku
+        description: Stock keeping unit (SKU) for the product.
       - name: call_type
         description: The type of Segment call (i.e., identify, group, page,
           screen , track) that collected the data.

@@ -9,8 +9,7 @@ sources:
         description: User completed an order (i.e., user confirmed and payment
           was successful).
       - name: identifies
-        description: User identified on the product along with any specified
-          traits.
+        description: Segment identify() call.
       - name: users
         description: User traits set by identify() calls.
       - name: product_clicked

@@ -59,24 +59,24 @@ models:
           Represented as a string.
       - name: name
         description: The name of the page or screen.
-      - name: session_id
-        description: Unique identifier for the session.
+      - name: cart_id
+        description: ID of the cart associated with the page.
       - name: _name
         description: Name of the page.
+      - name: order_id
+        description: ID of the order associated with the page.
       - name: path
         description: Path of the page.
+      - name: product_id
+        description: ID of the product associated with the page.
       - name: referrer
         description: Referrer of the page.
+      - name: session_id
+        description: Unique identifier for the session.
       - name: title
         description: Title of the page.
       - name: url
         description: URL of the page.
-      - name: product_id
-        description: ID of the product associated with the page.
-      - name: cart_id
-        description: ID of the cart associated with the page.
-      - name: order_id
-        description: ID of the order associated with the page.
       - name: call_type
         description: The type of Segment call (i.e., identify, group, page,
           screen , track) that collected the data.

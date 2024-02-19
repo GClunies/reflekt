@@ -11,43 +11,38 @@
     },
     "type": "object",
     "properties": {
-        "session_id": {
-            "type": "string",
-            "description": "Unique identifier for the session."
-        },
         "cart_id": {
-            "type": "string",
-            "description": "Unique identifier for the cart."
+            "description": "Unique identifier for the cart.",
+            "type": "string"
         },
         "products": {
-            "type": "array",
             "description": "List of products in the cart.",
             "items": {
-                "type": "object",
+                "additionalProperties": false,
                 "properties": {
-                    "product_id": {
-                        "type": "string",
-                        "description": "Unique identifier for the product."
-                    },
-                    "sku": {
-                        "type": "string",
-                        "description": "Stock keeping unit for the product."
-                    },
                     "category": {
-                        "type": "string",
-                        "description": "Category of the product."
+                        "description": "Category of the product.",
+                        "type": "string"
                     },
                     "name": {
-                        "type": "string",
-                        "description": "Name of the product."
+                        "description": "Name of the product.",
+                        "type": "string"
                     },
                     "price": {
-                        "type": "number",
-                        "description": "Price of the product."
+                        "description": "Price of the product.",
+                        "type": "number"
+                    },
+                    "product_id": {
+                        "description": "Unique identifier for the product.",
+                        "type": "string"
                     },
                     "quantity": {
-                        "type": "integer",
-                        "description": "Quantity of the product in the cart."
+                        "description": "Quantity of the product in the cart.",
+                        "type": "integer"
+                    },
+                    "sku": {
+                        "description": "Stock keeping unit for the product.",
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -58,8 +53,13 @@
                     "price",
                     "quantity"
                 ],
-                "additionalProperties": false
-            }
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "session_id": {
+            "description": "Unique identifier for the session.",
+            "type": "string"
         }
     },
     "required": [

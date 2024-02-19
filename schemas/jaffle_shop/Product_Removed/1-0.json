@@ -11,37 +11,37 @@
     },
     "type": "object",
     "properties": {
-        "session_id": {
-            "type": "string",
-            "description": "Unique identifier for the session."
-        },
         "cart_id": {
-            "type": "string",
-            "description": "Unique identifier for the cart the product was added to."
-        },
-        "product_id": {
-            "type": "string",
-            "description": "Unique identifier for the product."
-        },
-        "sku": {
-            "type": "string",
-            "description": "Stock keeping unit (SKU) for the product."
+            "description": "Unique identifier for the cart the product was added to.",
+            "type": "string"
         },
         "category": {
-            "type": "string",
-            "description": "Category of the product."
+            "description": "Category of the product.",
+            "type": "string"
         },
         "name": {
-            "type": "string",
-            "description": "Name of the product."
+            "description": "Name of the product.",
+            "type": "string"
         },
         "price": {
-            "type": "number",
-            "description": "Price of the product."
+            "description": "Price of the product.",
+            "type": "number"
+        },
+        "product_id": {
+            "description": "Unique identifier for the product.",
+            "type": "string"
         },
         "quantity": {
-            "type": "integer",
-            "description": "Quantity of the product added to the cart."
+            "description": "Quantity of the product added to the cart.",
+            "type": "integer"
+        },
+        "session_id": {
+            "description": "Unique identifier for the session.",
+            "type": "string"
+        },
+        "sku": {
+            "description": "Stock keeping unit (SKU) for the product.",
+            "type": "string"
         }
     },
     "required": [

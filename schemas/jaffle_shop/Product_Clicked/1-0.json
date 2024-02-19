@@ -11,29 +11,29 @@
     },
     "type": "object",
     "properties": {
-        "session_id": {
-            "type": "string",
-            "description": "Unique identifier for the session."
-        },
-        "product_id": {
-            "type": "string",
-            "description": "Unique identifier for the product."
-        },
-        "sku": {
-            "type": "string",
-            "description": "Stock keeping unit (SKU) for the product."
-        },
         "category": {
-            "type": "string",
-            "description": "Category of the product."
+            "description": "Category of the product.",
+            "type": "string"
         },
         "name": {
-            "type": "string",
-            "description": "Name of the product."
+            "description": "Name of the product.",
+            "type": "string"
         },
         "price": {
-            "type": "number",
-            "description": "Price of the product."
+            "description": "Price of the product.",
+            "type": "number"
+        },
+        "product_id": {
+            "description": "Unique identifier for the product.",
+            "type": "string"
+        },
+        "session_id": {
+            "description": "Unique identifier for the session.",
+            "type": "string"
+        },
+        "sku": {
+            "description": "Stock keeping unit (SKU) for the product.",
+            "type": "string"
         }
     },
     "required": [

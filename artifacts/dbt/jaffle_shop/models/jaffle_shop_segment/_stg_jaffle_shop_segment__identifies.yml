@@ -1,8 +1,7 @@
 version: 2
 models:
   - name: stg_jaffle_shop_segment__identifies
-    description: User identified on the product along with any specified
-      traits.
+    description: Segment identify() call.
     columns:
       - name: identify_id
         description: Unique identifier for the message collected by the

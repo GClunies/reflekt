@@ -209,7 +209,6 @@ class SegmentRegistry:
             list: Tracking plan schemas from Segment Protocols.
         """
         logger.info("Searching Segment for schemas")
-        print("")
         plan_name, schema_name, schema_version = self._parse_select(select)
         plan_id = self._get_plan_id(plan_name)
         r = requests.get(
@@ -223,7 +222,6 @@ class SegmentRegistry:
         logger.debug(f"Request Method: {r.request.method}")
         logger.debug(f"Request URL: {r.url}")
         logger.debug(f"Request Headers: {r.headers}")
-        print("")
         logger.debug("Logging Segment API response details...")
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")

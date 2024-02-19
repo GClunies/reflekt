@@ -469,6 +469,7 @@ You no longer have to choose between speed and best practice. Automate writing S
 ---
 
 ## CLI Commands
+The `reflekt` includes a `--help` option for the CLI and each command.
 You can access the `reflekt` CLI help by running `reflekt --help`. Below is a list of available commands.
 
 
@@ -482,6 +483,7 @@ You can access the `reflekt` CLI help by running `reflekt --help`. Below is a li
 ### `reflekt push`
 ### `reflekt pull`
 ### `reflekt build`
+##
 
 ---
 

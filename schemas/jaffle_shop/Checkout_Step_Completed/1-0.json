@@ -11,31 +11,38 @@
     },
     "type": "object",
     "properties": {
-        "session_id": {
-            "type": "string",
-            "description": "Unique identifier for the session."
+        "name": {
+            "description": "The name of the checkout step that was viewed.",
+            "type": "string"
         },
         "order_id": {
-            "type": "string",
-            "description": "Unique identifier for the order."
-        },
-        "step": {
-            "type": "integer",
-            "description": "The checkout step that was viewed."
-        },
-        "name" : {
-            "type": "string",
-            "description": "The name of the checkout step that was viewed."
+            "description": "Unique identifier for the order.",
+            "type": "string"
         },
         "payment_method": {
-            "type": "string",
             "description": "The payment method used for the order.",
-            "enum": ["cash", "credit"]
+            "enum": [
+                "cash",
+                "credit"
+            ],
+            "type": "string"
+        },
+        "session_id": {
+            "description": "Unique identifier for the session.",
+            "type": "string"
         },
         "shipping_method": {
-            "type": "string",
             "description": "The shipping method used for the order.",
-            "enum": ["bike", "car", "pickup"]
+            "enum": [
+                "bike",
+                "car",
+                "pickup"
+            ],
+            "type": "string"
+        },
+        "step": {
+            "description": "The checkout step that was viewed.",
+            "type": "integer"
         }
     },
     "required": [

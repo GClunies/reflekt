@@ -11,45 +11,51 @@
     },
     "type": "object",
     "properties": {
-        "session_id": {
-            "type": "string",
-            "description": "Unique identifier for the session."
+        "cart_id": {
+            "description": "ID of the cart associated with the page.",
+            "type": "string"
         },
         "name": {
-            "type": "string",
-            "description": "Name of the page."
-        },
-        "path": {
-            "type": "string",
-            "description": "Path of the page."
-        },
-        "referrer": {
-            "type": ["string", "null"],
-            "description": "Referrer of the page."
-        },
-        "search": {
-            "type": ["string", "null"],
-            "description": "Search query."
-        },
-        "title": {
-            "type": "string",
-            "description": "Title of the page."
-        },
-        "url": {
-            "type": "string",
-            "description": "URL of the page."
-        },
-        "product_id": {
-            "type": "string",
-            "description": "ID of the product associated with the page."
-        },
-        "cart_id": {
-            "type": "string",
-            "description": "ID of the cart associated with the page."
+            "description": "Name of the page.",
+            "type": "string"
         },
         "order_id": {
-            "type": "string",
-            "description": "ID of the order associated with the page."
+            "description": "ID of the order associated with the page.",
+            "type": "string"
+        },
+        "path": {
+            "description": "Path of the page.",
+            "type": "string"
+        },
+        "product_id": {
+            "description": "ID of the product associated with the page.",
+            "type": "string"
+        },
+        "referrer": {
+            "description": "Referrer of the page.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "search": {
+            "description": "Search query.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "session_id": {
+            "description": "Unique identifier for the session.",
+            "type": "string"
+        },
+        "title": {
+            "description": "Title of the page.",
+            "type": "string"
+        },
+        "url": {
+            "description": "URL of the page.",
+            "type": "string"
         }
     },
     "required": [

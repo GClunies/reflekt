@@ -53,12 +53,12 @@ models:
       - name: protocols_source_id
         description: The ID of the Segment source that generated the violation
           or omission.
-      - name: session_id
-        description: Unique identifier for the session.
       - name: cart_id
         description: Unique identifier for the cart.
       - name: products
         description: List of products in the cart.
+      - name: session_id
+        description: Unique identifier for the session.
       - name: call_type
         description: The type of Segment call (i.e., identify, group, page,
           screen , track) that collected the data.

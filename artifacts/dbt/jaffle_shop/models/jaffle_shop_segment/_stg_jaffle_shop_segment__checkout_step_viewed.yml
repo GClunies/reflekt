@@ -62,18 +62,18 @@ models:
           Represented as a string.
       - name: name
         description: The name of the page or screen.
-      - name: session_id
-        description: Unique identifier for the session.
-      - name: order_id
-        description: Unique identifier for the order.
-      - name: step
-        description: The checkout step that was viewed.
       - name: _name
         description: The name of the checkout step that was viewed.
+      - name: order_id
+        description: Unique identifier for the order.
       - name: payment_method
         description: The payment method used for the order.
+      - name: session_id
+        description: Unique identifier for the session.
       - name: shipping_method
         description: The shipping method used for the order.
+      - name: step
+        description: The checkout step that was viewed.
       - name: call_type
         description: The type of Segment call (i.e., identify, group, page,
           screen , track) that collected the data.
