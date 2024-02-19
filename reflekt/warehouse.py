@@ -54,7 +54,7 @@ class Warehouse:
                     f"Invalid argument '--source {self._source_arg}'. source id "
                     f"'{self.source_id}' does not match a 'source:' configuration in "
                     f"{self._profile.path}. source argument must follow the format: "
-                    f"<source_type>.<database>.<schema>\n"
+                    f"<source_id>.<database>.<schema>\n"
                 ),
                 source=self._source_arg,
             )
@@ -85,8 +85,10 @@ class Warehouse:
                     "sslmode": "prefer",
                 },
             )
-        # elif self.type == "bigquery":  # TODO: Add BigQuery support later
-        #     pass
+        elif self.type == "bigquery":  # TODO: Add BigQuery support later
+            self.engine = sqlalchemy.create_engine(
+                "bigquery://", credentials_info=self.credentials.get("keyfile_json")
+            )
 
     def find_columns(
         self, table_name: str, columns_to_search: list[dict]
@@ -125,5 +127,7 @@ class Warehouse:
                     error_msg = e.orig.msg
                 elif self.type == "redshift":
                     error_msg = e.orig.args[0]["M"]
+                elif self.type == "bigquery":
+                    error_msg = e.orig.msg  # TODO: test this is correct
 
             return found_columns, error_msg

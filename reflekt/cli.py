@@ -457,8 +457,8 @@ def pull(
     logger.debug(verbose)
     configure_logging(verbose=verbose, project=project)
     profile = (
-        profile_name
-        if profile_name != ""
+        Profile(project=project)
+        if profile_name == ""
         else Profile(project=project, profile_name=profile_name)
     )
     schema_registry = RegistryHandler(
@@ -528,8 +528,8 @@ def push(
     configure_logging(verbose=verbose, project=project)
     select = clean_select(select)
     profile = (
-        profile_name
-        if profile_name != ""
+        Profile(project=project)
+        if profile_name == ""
         else Profile(project=project, profile_name=profile_name)
     )
     schema_registry = RegistryHandler(
@@ -746,8 +746,8 @@ def build(
     configure_logging(verbose=verbose, project=project)
     select = clean_select(select)
     profile = (
-        profile_name
-        if profile_name != ""
+        Profile(project=project)
+        if profile_name == ""
         else Profile(project=project, profile_name=profile_name)
     )
     builder = BuilderHandler(
@@ -781,19 +781,26 @@ def build(
 
 if __name__ == "__main__":
     main()  # Main entrypoint for CLI and sets global `project` variable
+
     # debug()
+
     # init("~/repos/tmp/test_reflekt")
-    pull(
-        registry="segment",
-        select="ecommerce/Cart Viewed",
-        # profile_name="test",
-    )
+
+    # pull(
+    #     registry="segment",
+    #     select="ecommerce/Cart Viewed",
+    #     # profile_name="test",
+    # )
+
     # push(select="segment/ecommerce", delete=False)
+
     # lint(select="segment/ecommerce/Cart_Viewed/1-0.json")
+
     # report(
     #     select="segment/ecommerce/Cart_Viewed/1-0.json",
     #     to_file=False,
     # )
+
     # build(
     #     artifact="dbt",
     #     select="segment/ecommerce",
@@ -802,10 +809,10 @@ if __name__ == "__main__":
     #     profile_name=None,  # Must have value when using Vscode debugger
     # )
 
-    # build(
-    #     artifact="dbt",
-    #     select="segment/surfline-web/identify",
-    #     source="snowflake.raw.surfline",
-    #     sdk="segment",
-    #     profile_name="wavetrak_segment",  # Must have value when using Vscode debugger
-    # )
+    build(
+        artifact="dbt",
+        select="schemas/jaffle_shop",
+        source="bigquery.raw-data.jaffle_shop_segment",
+        sdk="segment",
+        profile_name="dev_segment_bigquery",  # Must have value when using Vscode debugger
+    )
