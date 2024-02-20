@@ -338,11 +338,8 @@ Schemas can be linted to test if they follow the naming conventions in your [`re
 ```bash
 ❯ reflekt lint --select schemas/jaffle_shop
 [18:31:12] INFO     Running with reflekt=0.5.0
-
 [18:31:12] INFO     Searching for JSON schemas in: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop
-
 [18:31:12] INFO     Found 9 schema(s) to lint
-
 [18:31:12] INFO     1 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Order_Completed/1-0.json
 [18:31:19] INFO     2 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Identify/1-0.json
 [18:31:20] INFO     3 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Clicked/1-0.json
@@ -352,7 +349,6 @@ Schemas can be linted to test if they follow the naming conventions in your [`re
 [18:31:37] INFO     7 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Viewed/1-0.json
 [18:31:40] INFO     8 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Completed/1-0.json
 [18:31:44] INFO     9 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Page_Viewed/1-0.json
-
 [18:31:51] INFO     Completed successfully
 ```
 
@@ -362,11 +358,8 @@ In order to validate events as they flow from **Application -> Registry -> Custo
 ```bash
 ❯ reflekt push --registry segment --select schemas/jaffle_shop
 [18:41:05] INFO     Running with reflekt=0.5.0
-
 [18:41:06] INFO     Searching for JSON schemas in: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop
-
 [18:41:06] INFO     Found 9 schemas to push
-
 [18:41:06] INFO     1 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Order_Completed/1-0.json
 [18:41:06] INFO     2 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Identify/1-0.json
 [18:41:06] INFO     3 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Clicked/1-0.json
@@ -376,7 +369,6 @@ In order to validate events as they flow from **Application -> Registry -> Custo
 [18:41:06] INFO     7 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Viewed/1-0.json
 [18:41:06] INFO     8 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Completed/1-0.json
 [18:41:06] INFO     9 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Page_Viewed/1-0.json
-
 [18:41:08] INFO     Completed successfully
 ```
 
@@ -390,97 +382,171 @@ You no longer have to choose between speed and best practice. Automate writing S
 ```bash
 ❯ reflekt build --artifact dbt --select schemas/jaffle_shop --source snowflake.raw.jaffle_shop_segment --sdk segment
 [18:56:25] INFO     Running with reflekt=0.5.0
-
 [18:56:26] INFO     Searching for JSON schemas in: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop
-
 [18:56:26] INFO     Found 9 schemas to build
-
 [18:56:27] INFO     Building dbt package:
                         name: jaffle_shop
                         dir: /Users/gclunies/Repos/reflekt/artifacts/dbt/jaffle_shop
                         --select: jaffle_shop
                         --sdk_arg: segment
                         --source: snowflake.raw.jaffle_shop_segment
-
 [18:56:27] INFO     Building dbt source 'jaffle_shop_segment'
 [18:56:27] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Order_Completed/1-0.json
 [18:56:28] INFO     Building dbt table 'order_completed' in source 'jaffle_shop_segment'
 [18:56:28] INFO     Building staging model 'stg_jaffle_shop_segment__order_completed.sql'
 [18:56:28] INFO     Building dbt documentation '_stg_jaffle_shop_segment__order_completed.yml'
-
 [18:56:28] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Identify/1-0.json
 [18:56:29] INFO     Building dbt table 'identifies' in source 'jaffle_shop_segment'
 [18:56:29] INFO     Building staging model 'stg_jaffle_shop_segment__identifies.sql'
 [18:56:29] INFO     Building dbt documentation '_stg_jaffle_shop_segment__identifies.yml'
-
 [18:56:29] INFO     Building dbt artifacts for schema: Segment 'users' table
 [18:56:29] INFO     Building dbt table 'users' in source 'jaffle_shop_segment'
 [18:56:29] INFO     Building staging model 'stg_jaffle_shop_segment__users.sql'
 [18:56:29] INFO     Building dbt documentation '_stg_jaffle_shop_segment__users.yml'
-
 [18:56:29] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Clicked/1-0.json
 [18:56:29] INFO     Building dbt table 'product_clicked' in source 'jaffle_shop_segment'
 [18:56:29] INFO     Building staging model 'stg_jaffle_shop_segment__product_clicked.sql'
 [18:56:29] INFO     Building dbt documentation '_stg_jaffle_shop_segment__product_clicked.yml'
-
 [18:56:29] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Cart_Viewed/1-0.json
 [18:56:29] INFO     Building dbt table 'cart_viewed' in source 'jaffle_shop_segment'
 [18:56:29] INFO     Building staging model 'stg_jaffle_shop_segment__cart_viewed.sql'
 [18:56:29] INFO     Building dbt documentation '_stg_jaffle_shop_segment__cart_viewed.yml'
-
 [18:56:29] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Removed/1-0.json
 [18:56:30] INFO     Building dbt table 'product_removed' in source 'jaffle_shop_segment'
 [18:56:30] INFO     Building staging model 'stg_jaffle_shop_segment__product_removed.sql'
 [18:56:30] INFO     Building dbt documentation '_stg_jaffle_shop_segment__product_removed.yml'
-
 [18:56:30] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Product_Added/1-0.json
 [18:56:30] INFO     Building dbt table 'product_added' in source 'jaffle_shop_segment'
 [18:56:30] INFO     Building staging model 'stg_jaffle_shop_segment__product_added.sql'
 [18:56:30] INFO     Building dbt documentation '_stg_jaffle_shop_segment__product_added.yml'
-
 [18:56:30] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Viewed/1-0.json
 [18:56:30] INFO     Building dbt table 'checkout_step_viewed' in source 'jaffle_shop_segment'
 [18:56:30] INFO     Building staging model 'stg_jaffle_shop_segment__checkout_step_viewed.sql'
 [18:56:30] INFO     Building dbt documentation '_stg_jaffle_shop_segment__checkout_step_viewed.yml'
-
 [18:56:30] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Checkout_Step_Completed/1-0.json
 [18:56:30] INFO     Building dbt table 'checkout_step_completed' in source 'jaffle_shop_segment'
 [18:56:30] INFO     Building staging model 'stg_jaffle_shop_segment__checkout_step_completed.sql'
 [18:56:30] INFO     Building dbt documentation '_stg_jaffle_shop_segment__checkout_step_completed.yml'
-
 [18:56:30] INFO     Building dbt artifacts for schema: /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Page_Viewed/1-0.json
 [18:56:30] INFO     Building dbt table 'pages' in source 'jaffle_shop_segment'
 [18:56:30] INFO     Building staging model 'stg_jaffle_shop_segment__pages.sql'
 [18:56:30] INFO     Building dbt documentation '_stg_jaffle_shop_segment__pages.yml'
-
 [18:56:30] INFO     Building dbt artifacts for schema: Segment 'tracks' table
 [18:56:31] INFO     Building dbt table 'tracks' in source 'jaffle_shop_segment'
 [18:56:31] INFO     Building staging model 'stg_jaffle_shop_segment__tracks.sql'
 [18:56:31] INFO     Building dbt documentation '_stg_jaffle_shop_segment__tracks.yml'
-
 [18:56:31] INFO     Copying dbt package from temporary path /Users/gclunies/Repos/reflekt/.reflekt_cache/artifacts/dbt/jaffle_shop to /Users/gclunies/Repos/reflekt/artifacts/dbt/jaffle_shop
-
 [18:56:31] INFO     Successfully built dbt package
 ```
 
 ---
 
 ## CLI Commands
-The `reflekt` includes a `--help` option for the CLI and each command.
-You can access the `reflekt` CLI help by running `reflekt --help`. Below is a list of available commands.
-
-
+A general description of commands can be seen by running `reflekt --help`. For ease, the help page for each CLI command is shown below.
 
 ### `reflekt init`
+```bash
+❯ reflekt init --help
+[11:17:16] INFO     Running with reflekt=0.6.0
 
+ Usage: reflekt init [OPTIONS]
 
+ Initialize a Reflekt project.
+
+╭─ Options ──────────────────────────────────────────────────────╮
+│ --dir                        TEXT  [default: .]                │
+│ --verbose    --no-verbose          [default: no-verbose]       │
+│ --help                             Show this message and exit. │
+╰────────────────────────────────────────────────────────────────╯
+```
 
 ### `reflekt debug`
+```bash
+❯ reflekt debug --help
+[11:18:07] INFO     Running with reflekt=0.6.0
+
+ Usage: reflekt debug [OPTIONS]
+
+ Check Reflekt project configuration.
+
+╭─ Options ───────────────────────────────────╮
+│ --help          Show this message and exit. │
+╰─────────────────────────────────────────────╯
+```
+
 ### `reflekt lint`
+```bash
+❯ reflekt lint --help
+[11:20:29] INFO     Running with reflekt=0.6.0
+
+ Usage: reflekt lint [OPTIONS]
+
+ Lint schema(s) to test for naming and metadata conventions.
+
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *  --select   -s      TEXT  Schema(s) to lint. Starting with 'schemas/' is optional. [default: None] [required] │
+│    --verbose  -v            Verbose logging.                                                                        │
+│    --help                   Show this message and exit.                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
 ### `reflekt push`
+```bash
+❯ reflekt push --help
+[11:22:37] INFO     Running with reflekt=0.6.0
+
+ Usage: reflekt push [OPTIONS]
+
+ Push schema(s) to a schema registry.
+
+╭─ Options ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *  --registry  -r      [avo|segment]  Schema registry to push to. [default: None] [required]                                          │
+│ *  --select    -s      TEXT           Schema(s) to push to schema registry. Starting with 'schemas/' is optional. [default: None] │
+│    --delete    -D                     Delete schema(s) from schema registry. Prompts for confirmation                                 │
+│    --force     -F                     Force command to run without confirmation.                                                      │
+│    --profile   -p      TEXT           Profile in reflekt_profiles.yml to use for schema registry connection.                          │
+│    --verbose   -v                     Verbose logging.                                                                                │
+│    --help                             Show this message and exit.                                                                     │
+╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
 ### `reflekt pull`
+```bash
+❯ reflekt pull --help
+[11:25:18] INFO     Running with reflekt=0.6.0
+
+ Usage: reflekt pull [OPTIONS]
+
+ Pull schema(s) from a schema registry.
+
+╭─ Options ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *  --registry  -r      [avo|segment]  Schema registry to pull from. [default: None] [required]                                                                         │
+│ *  --select    -s      TEXT           Schema(s) to pull from schema registry. If registry uses tracking plans, starting with the plan name. [default: None] [required] │
+│    --profile   -p      TEXT           Profile in reflekt_profiles.yml to use for schema registry connection.                                                           │
+│    --verbose   -v                     Verbose logging.                                                                                                                 │
+│    --help                             Show this message and exit.                                                                                                      │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
 ### `reflekt build`
-##
+```bash
+❯ reflekt build --help
+[11:31:36] INFO     Running with reflekt=0.6.0
+
+ Usage: reflekt build [OPTIONS]
+
+ Build data artifacts based on schemas.
+
+╭─ Options ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *  --artifact  -a      [dbt]      Type of data artifact to build. [default: None] [required]                                                                                                         │
+│ *  --select    -s      TEXT       Schema(s) to build data artifacts for. Starting with 'schemas/' is optional. [default: None] [required]                                                            │
+│ *  --sdk               [segment]  The SDK used to collect the event data. [default: None] [required]                                                                                                 │
+│ *  --source            TEXT       The <source_id>.<database>.<schema> storing raw event data. <source_id> must be a data warehouse source defined in reflekt_profiles.yml [default: None] [required] │
+│    --profile   -p      TEXT       Profile in reflekt_profiles.yml to look for the data source specified by the --source option. Defaults to default_profile in reflekt_project.yml                   │
+│    --verbose   -v                 Verbose logging.                                                                                                                                                   │
+│    --help                         Show this message and exit.                                                                                                                                        │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
 
 ---
 

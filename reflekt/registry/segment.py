@@ -216,8 +216,6 @@ class SegmentRegistry:
             headers=self.headers,
             params={"pagination[count]": 200},
         )
-
-        print("")
         logger.debug("Logging request details sent to Segment API...")
         logger.debug(f"Request Method: {r.request.method}")
         logger.debug(f"Request URL: {r.url}")
@@ -226,7 +224,6 @@ class SegmentRegistry:
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")
         logger.debug(f"    Response: {r.text}")
-
         plan = self._handle_response(r)
         s_schemas = [
             rule for rule in plan["rules"] if rule["type"] not in ["COMMON", "ALIAS"]
@@ -261,7 +258,6 @@ class SegmentRegistry:
             )
         else:
             logger.info(f"Found {len(s_schemas)} schemas to pull:")
-            print("")
 
         return s_schemas
 
@@ -326,9 +322,7 @@ class SegmentRegistry:
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")
         logger.debug(f"    Response: {r.text}")
-
         self._handle_response(r)
-        print("")
         logger.info("[green]Completed successfully[green/]")
 
     def pull(self, select: str) -> int:
@@ -429,7 +423,6 @@ class SegmentRegistry:
                 json.dump(r_schema, f, indent=4, ensure_ascii=False)
                 f.write("\n")  # Add newline at end of file
 
-        print("")
         logger.info("[green]Completed successfully[green/]")
 
         return len(s_schemas)  # Return the count of schemas pulled
@@ -459,7 +452,6 @@ class SegmentRegistry:
         r_schemas = []  # Reflekt schemas
         select_path = project.dir / "schemas" / select
         logger.info(f"Searching for JSON schemas in: {str(select_path)}")
-        print("")
 
         if select_path.is_dir():  # Get all schemas in directory
             for root, _, files in os.walk(select_path):
@@ -484,7 +476,6 @@ class SegmentRegistry:
             )
         else:
             logger.info(f"Found {len(r_schemas)} schemas to push")
-            print("")
 
         for i, r_schema in enumerate(r_schemas, start=1):
             schema_path = self.profile.project.dir / "schemas" / r_schema["$id"]

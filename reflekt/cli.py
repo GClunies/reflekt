@@ -87,7 +87,6 @@ def main(
 
     configure_logging(verbose=False, project=project)
     logger.info(f"Running with reflekt={__version__}")
-    print("")
 
 
 class ExistingProjectError(Exception):
@@ -128,7 +127,6 @@ def clean_select(select: str) -> str:
 def get_schema_paths(select: str, project: Project) -> list[Path]:
     select_path = project.dir / "schemas" / select
     logger.info(f"Searching for JSON schemas in: {str(select_path)}")
-    print("")
     schema_paths = []  # List of schema IDs (Paths) to pull
 
     if select_path.is_dir():  # Get all schemas in directory
@@ -169,7 +167,6 @@ def configure_logging(verbose: bool, project: Project):
 
     if verbose:
         logger.debug("Verbose logging enabled")
-        print("")
 
 
 @app.command()
@@ -336,15 +333,11 @@ def init(
     profile.to_yaml()  # Create reflekt_profiles.yml
 
     # Success msg and get started table
-    print("")
     logger.info(
         f"Created Reflekt project '{project.name}' "
         f"at {project.dir.resolve().expanduser()}!"
     )
-    print("")
     logger.info("To get started, see the command descriptions below")
-
-    # Table for getting started message
     table = Table(show_header=True, header_style="bold light_sea_green")
     table.add_column("Command", no_wrap=True)
     table.add_column("Description", no_wrap=True)
@@ -376,7 +369,6 @@ def init(
     )
     console = Console()
     console.print(table)
-    print("")
 
     if not profile.do_not_track:  # False by default
         user.initialize()
@@ -435,8 +427,7 @@ def pull(
         "--select",
         "-s",
         help=(
-            "The schema(s) to pull from schema registry. Starting with 'schemas/' is "
-            "optional."
+            "Schema(s) to pull from schema registry. If registry uses tracking plans, starting with the plan name."
         ),
     ),
     profile_name: str = typer.Option(
@@ -494,7 +485,7 @@ def push(
         "--select",
         "-s",
         help=(
-            "The schema(s) to push to schema registry. Starting with 'schemas/' is "
+            "Schema(s) to push to schema registry. Starting with 'schemas/' is "
             "optional."
         ),
     ),
@@ -578,7 +569,7 @@ def lint(
         ...,  # Required
         "--select",
         "-s",
-        help=("The schema(s) to lint. Starting with 'schemas/' is optional."),
+        help=("Schema(s) to lint. Starting with 'schemas/' is optional."),
     ),
     verbose: bool = typer.Option(
         False,
@@ -594,10 +585,7 @@ def lint(
     cleaned_select = clean_select(select)
     schema_paths = get_schema_paths(select=cleaned_select, project=project)
     errors = []  # TODO: Linter should have its own errors attribute
-
     logger.info(f"Found {len(schema_paths)} schema(s) to lint")
-    print("")
-
     linter = Linter(project=project)
 
     for i, schema_path in enumerate(schema_paths, start=1):  # Get all Reflekt schemas
@@ -611,14 +599,12 @@ def lint(
         linter.lint_schema(r_schema, errors)  # If errors
 
     if errors:
-        print("")
         logger.error(f"[red]Linting failed with {len(errors)} error(s):[/red]")
-        print("")
+
         for error in errors:
             logger.error(error)
         raise typer.Exit(code=1)
     else:
-        print("")
         logger.info("[green]Completed successfully[green/]")
 
     if user.id is not None:
@@ -643,7 +629,7 @@ def report(
         "--select",
         "-s",
         help=(
-            "The schema(s) to generate Markdown report(s) for. Starting with 'schemas/' "
+            "Schema(s) to generate Markdown report(s) for. Starting with 'schemas/' "
             "is optional."
         ),
     ),
@@ -707,7 +693,7 @@ def build(
         "--select",
         "-s",
         help=(
-            "The schema(s) to build data artifacts for. Starting with 'schemas/' is "
+            "Schema(s) to build data artifacts for. Starting with 'schemas/' is "
             "optional."
         ),
     ),
@@ -720,9 +706,8 @@ def build(
         ...,
         "--source",
         help=(
-            "The <source_id>.<database>.<schema> specifying where raw event data is "
-            "stored in a data warehouse. source_id must match a source configured "
-            "in reflekt_profiles.yml"
+            "The <source_id>.<database>.<schema> storing raw event data. <source_id> "
+            "must be a data warehouse source defined in reflekt_profiles.yml"
         ),
     ),
     profile_name: str = typer.Option(

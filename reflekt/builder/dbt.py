@@ -14,7 +14,6 @@ import pkg_resources
 import yaml
 from inflection import titleize, underscore
 from loguru import logger
-from rich import print
 
 from reflekt.dumper import ReflektYamlDumper
 from reflekt.flatson import Flatson
@@ -464,11 +463,10 @@ class DbtBuilder:
             )
 
         logger.info(f"Building dbt documentation '{doc_file}'")
-        print("")
 
     def build(self) -> None:
         """Build dbt package."""
-        print("")
+
         logger.info(
             f"Building dbt package:"
             f"\n    name: {self.pkg_name}"
@@ -477,7 +475,6 @@ class DbtBuilder:
             f"\n    --sdk_arg: {self.sdk_arg}"
             f"\n    --source: {self.source_arg}"
         )
-        print("")
 
         if self.pkg_dir.exists():  # If dbt pkg exists, use as base for build
             if self.tmp_pkg_dir.exists():  # Start temp pkg blank template
@@ -774,5 +771,4 @@ class DbtBuilder:
 
         shutil.copytree(self.tmp_pkg_dir, self.pkg_dir)
 
-        print("")
         logger.info("[green]Successfully built dbt package[green/]")
