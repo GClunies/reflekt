@@ -8,7 +8,7 @@ SPDX-License-Identifier: Apache-2.0
 
 ## [0.6.0] - 2024-02-19
 ### Breaking
-- Only support python versions `>=3.9,<3.12`. Support for python `3.13` is DEPRECATED.
+- Only support python versions `>=3.9,<3.12`.
 
 ### Added
 - Add support for event data stored in BigQuery.
