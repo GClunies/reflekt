@@ -16,7 +16,7 @@ jobs:
   lint:
     name: Lint (${{ matrix.python-version }}, ${{ matrix.os }})
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: ['ubuntu-latest']
         python-version: ['3.11']  # Lint only needs to run once
@@ -54,9 +54,10 @@ jobs:
           make lint
 
   check-license:
+    needs: lint
     name: Lint (${{ matrix.python-version }}, ${{ matrix.os }})
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: ['ubuntu-latest']
         python-version: ['3.11']  # Lint only needs to run once
@@ -94,10 +95,10 @@ jobs:
           make check-license
 
   test:
-    needs: lint
+    needs: check-license
     name: Test (${{ matrix.python-version }}, ${{ matrix.os }})
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: ['ubuntu-latest']
         python-version: ['3.9', '3.10', '3.11']
