@@ -12,13 +12,11 @@ SPDX-License-Identifier: Apache-2.0
 > /rəˈflek(t)/ <br>
 > _To embody or represent in a faithful or appropriate way_
 
-`reflekt` helps Data, Engineering, and Product teams by providing tooling and a shared process to define, manage, and model event data for product analytics.
-- Configure conventions for events and properties. Enforced by `reflekt lint`.
-- Define events using [JSON schema](https://json-schema.org/), creating a codified, version controlled spec for event instrumentation.
-- `reflekt push` event schemas to a registry to validate events as they flow from **Application -> Registry -> Customer Data Platform (CDP) -> Data Warehouse**.
-- Automate the creation of private dbt packages with sources, staging models, and documentation for event data with `reflekt build --artifact dbt`.
-
-The `reflekt` CLI integrates with [Customer Data Platforms (CDPs)](#customer-data-platform-cdp), [Schema Registries](#schema-registry), [Cloud data Warehouses](#cloud-data-warehouse), and [dbt](#dbt).
+`reflekt` helps Data, Engineering, and Product teams by providing tooling and a shared process to define, manage, and model event data for product analytics. The `reflekt` CLI integrates with [Customer Data Platforms](#customer-data-platform-cdp) (CDPs), [Schema Registries](#schema-registry), popular [Data Warehouses](#cloud-data-warehouse), and [dbt](#dbt).
+- Configure and enforce event naming conventions with `reflekt lint`.
+- Define events with [JSON schema](https://json-schema.org/) for a codified, version controlled spec for event instrumentation.
+- `reflekt push` event schemas to a registry for validation as they flow from `App -> Registry -> CDP -> Data Warehouse`.
+- Automagically build a private dbt package to model, document, and test events with `reflekt build --artifact dbt`.
 
 https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
 
@@ -56,14 +54,15 @@ my-reflekt-project
 ```
 
 ### Configure a Reflekt Project
-Reflekt uses 3 configuration files (see the table below)
+Reflekt uses 3 files to define and configure a Reflekt project.
 | Configuration File               | Purpose |
 |----------------------------------|---------|
 | `reflekt_project.yml`            | Project settings, event and property conventions, data artifact generation, <br>additional Avo registry config (optional) |
 | `reflekt_profiles.yml`           | Connection details to schema registries and cloud data warehouses. |
 | `schemas/.reflekt/meta/1-0.json` | Meta-schema used to:<br> 1. Events in `schemas/` follow the Reflekt format.<br> 2. Define global `"metadata": {}` requirement for all schemas.  |
 
-Example configurations for each file in the table above can be found below (click to expand).
+> [!TIP]
+> Click the example configuration files below to see their structure and settings.
 
 <details>
 <summary>Example: <code>reflekt_project.yml</code></summary>
@@ -224,88 +223,132 @@ dev_reflekt:                                         # Profile name (multiple pr
 <br>
 
 ### Defining Event Schemas
-Event schemas are defined using [JSON schema](https://json-schema.org/) specification, stored in the `schemas/` directory of a Reflekt project. Click to expand the `ProductClicked` event schema example below.
+Events in a Reflekt project are defined using the [JSON schema](https://json-schema.org/) specification and are stored in the `schemas/` directory of the project.
+
+> [!TIP]
+> Click to expand the `Order Completed` example below.
 
 <details>
-<summary>Example: <code>my-reflekt-project/schemas/segment/ecommerce/ProductClicked/1-0.json</code>(CLICK TO EXPAND)</summary>
+<summary>Example: <code>my-reflekt-project/schemas/jaffle_shop/Order_Completed/1-0.json</code></summary>
 <br>
 
 ```json
 {
-  "$id": "segment/ecommerce/ProductClicked/1-0.json",    // Unique ID for the schema
-  "$schema": "http://json-schema.org/draft-07/schema#",  // JSON Schema version
-  "self": {
-      "vendor": "com.company_name",  // Company, application, team, or system that authored the schema
-      "name": "ProductClicked",      // Name of the event
-      "format": "jsonschema",        // Format of the schema
-      "version": "1-0",              // Version of the schema
-      "metadata": {                  // Metadata for the event
-          "code_owner": "engineering/ecommerce-squad",
-          "product_owner": "product_manager_name@company_name.com",
-      }
-  },
-  "type": "object",
-  "properties": {                   // Properties of the event
-      "product_id": {
-          "type": "string",
-          "description": "Database id of the product being viewed"
-      },
-      "sku": {
-          "type": "string",
-          "description": "Sku of the product being viewed"
-      },
-      "category": {
-          "type": "string",
-          "description": "Category of the product being viewed"
-      },
-      "name": {
-          "type": "string",
-          "description": "Name of the product being viewed"
-      },
-      "brand": {
-          "type": "string",
-          "description": "Brand of the product being viewed"
-      },
-      "variant": {
-          "type": "string",
-          "description": "Variant of the product being viewed"
-      },
-      "price": {
-          "type": "number",
-          "description": "Price of the product ($) being viewed"
-      },
-      "quantity": {
-          "type": "integer",
-          "description": "Quantity of the product being viewed"
-      },
-      "coupon": {
-          "type": "string",
-          "description": "Coupon code associated with a product (for example, MAY_DEALS_3)"
-      },
-      "position": {
-          "type": "integer",
-          "description": "Position in the product list (ex. 3)"
-      },
-      "url": {
-          "type": "string",
-          "description": "URL of the product being viewed"
-      },
-      "image_url": {
-          "type": "string",
-          "description": "URL of the product image being viewed"
-      },
-  },
-
-  "required": [                    // Required properties
-      "product_id",
-      "sku",
-      "category",
-      "name",
-      "brand",
-      "price",
-      "quantity"
-  ],
-  "additionalProperties": false,   // No additional properties allowed
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "jaffle_shop/Order_Completed/1-0.json",  // Unique ID for schema (relative to `schemas/` dir)
+    "description": "User completed an order (i.e., user confirmed and payment was successful).",
+    "self": {
+        "vendor": "com.thejaffleshop", // Company, application, team, or system that authored the schema
+        "name": "Order Completed",     // Name of the event
+        "format": "jsonschema",        // Format of the schema
+        "version": "1-0",              // Version of the schema
+        "metadata": {                  // Metadata for the event
+            "code_owner": "@the-jaffle-shop/frontend-guild",
+            "product_owner": "pmanager@thejaffleshop.com",
+        }
+    },
+    "type": "object",
+    "properties": {
+        "coupon": {
+            "description": "Coupon code used for the order.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "currency": {
+            "description": "Currency for the order.",
+            "type": "string"
+        },
+        "discount": {
+            "description": "Total discount for the order.",
+            "type": "number"
+        },
+        "order_id": {
+            "description": "Unique identifier for the order.",
+            "type": "string"
+        },
+        "products": {
+            "description": "List of products in the cart.",
+            "items": {
+                "additionalProperties": false,
+                "properties": {
+                    "category": {
+                        "description": "Category of the product.",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Name of the product.",
+                        "type": "string"
+                    },
+                    "price": {
+                        "description": "Price of the product.",
+                        "type": "number"
+                    },
+                    "product_id": {
+                        "description": "Unique identifier for the product.",
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "description": "Quantity of the product in the cart.",
+                        "type": "integer"
+                    },
+                    "sku": {
+                        "description": "Stock keeping unit for the product.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "product_id",
+                    "sku",
+                    "category",
+                    "name",
+                    "price",
+                    "quantity"
+                ],
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "revenue": {
+            "description": "Total revenue for the order.",
+            "type": "number"
+        },
+        "session_id": {
+            "description": "Unique identifier for the session.",
+            "type": "string"
+        },
+        "shipping": {
+            "description": "Shipping cost for the order.",
+            "type": "number"
+        },
+        "subtotal": {
+            "description": "Subtotal for the order (revenue - discount).",
+            "type": "number"
+        },
+        "tax": {
+            "description": "Tax for the order.",
+            "type": "number"
+        },
+        "total": {
+            "description": "Total cost for the order (revenue - discount + shipping + tax = subtotal + shipping + tax).",
+            "type": "number"
+        }
+    },
+    "required": [
+        "session_id",
+        "order_id",
+        "revenue",
+        "coupon",
+        "discount",
+        "subtotal",
+        "shipping",
+        "tax",
+        "total",
+        "currency",
+        "products"
+    ],
+    "additionalProperties": false
 }
 ```
 </details>
