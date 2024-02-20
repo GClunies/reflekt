@@ -57,8 +57,8 @@ addopts = "-vv -p no:warnings --cov=reflekt tests/"
 testpaths = ["tests"]
 
 [tool.tox]
-# TODO: debug why py311 in envlist causes isolated build to fail
-# pytests pass in CI suite. But fail in local tox run.
+# TODO: debug why py311 in envlist causes isolated build to fail.
+# pytest passes in CI suite, but fail in local tox run.
 legacy_tox_ini = """
 [tox]
 isolated_build = true
