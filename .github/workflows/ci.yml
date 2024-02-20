@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+    tags: ["*"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+
+  lint:
+    name: Lint (${{ matrix.python-version }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest']
+        python-version: ['3.11']  # Lint only needs to run once
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Install Python ${{ matrix.python-version }}
+        id: install-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
+
+      - name: Install Dependencies
+        if: steps.install-python.outputs.cache-hit != 'true'
+        run: poetry install --no-root --no-interaction
+
+      - name: Lint
+        run: poetry run make lint
+
+  test:
+    needs: lint
+    name: Test (${{ matrix.python-version }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest']
+        python-version: ['3.8', '3.9', '3.10']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Install Python ${{ matrix.python-version }}
+        id: install-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
+
+      - name: Install Dependencies
+        if: steps.install-python.outputs.cache-hit != 'true'
+        run: poetry install --no-root --no-interaction
+
+      - name: Run Tests
+        run: poetry run pytest --cov=reflekt tests/

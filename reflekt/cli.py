@@ -663,7 +663,8 @@ def report(
     """Generate Markdown report(s) for schema(s)."""
 
     configure_logging(verbose=verbose, project=project)
-    schema_paths = get_schema_paths(select=select, project=project)
+    cleaned_select = clean_select(select)
+    schema_paths = get_schema_paths(select=cleaned_select, project=project)
     reporter = Reporter()
 
     if not to_file:
@@ -796,10 +797,10 @@ if __name__ == "__main__":
 
     # lint(select="segment/ecommerce/Cart_Viewed/1-0.json")
 
-    # report(
-    #     select="segment/ecommerce/Cart_Viewed/1-0.json",
-    #     to_file=False,
-    # )
+    report(
+        select="schemas/jaffle_shop",
+        to_file=True,
+    )
 
     # build(
     #     artifact="dbt",
@@ -809,10 +810,10 @@ if __name__ == "__main__":
     #     profile_name=None,  # Must have value when using Vscode debugger
     # )
 
-    build(
-        artifact="dbt",
-        select="schemas/jaffle_shop",
-        source="bigquery.raw-data.jaffle_shop_segment",
-        sdk="segment",
-        profile_name="dev_segment_bigquery",  # Must have value when using Vscode debugger
-    )
+    # build(
+    #     artifact="dbt",
+    #     select="schemas/jaffle_shop",
+    #     source="bigquery.raw-data.jaffle_shop_segment",
+    #     sdk="segment",
+    #     profile_name="dev_segment_bigquery",  # Must have value when using Vscode debugger
+    # )

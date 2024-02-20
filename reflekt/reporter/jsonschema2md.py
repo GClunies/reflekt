@@ -349,7 +349,15 @@ class JSONParser:
 
                 for obj_name, obj in schema_object[name].items():
                     path = [name, obj_name] if name == "definitions" else []
-                    output_lines.extend(self._parse_object(obj, obj_name, path=path))
+                    required = obj_name in schema_object.get("required", [])
+                    output_lines.extend(
+                        self._parse_object(
+                            obj,
+                            obj_name,
+                            path=path,
+                            required=required,
+                        )
+                    )
 
         # Add examples
         if "examples" in schema_object and self.show_examples in ["all", "object"]:
