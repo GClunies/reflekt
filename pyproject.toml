@@ -47,16 +47,22 @@ faker = "^19.13.0"
 amplitude-analytics = "^1.1.4"
 rudder-sdk-python = "^2.0.2"
 
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-vv -p no:warnings --cov=reflekt tests/"
 testpaths = ["tests"]
 
 [tool.tox]
+# TODO: debug why py311 in envlist causes isolated build to fail
+# pytests pass in CI suite. But fail in local tox run.
 legacy_tox_ini = """
 [tox]
 isolated_build = true
-envlist = py39,py310,py311
+envlist = py39,py310
 
 [testenv]
 whitelist_externals = poetry
@@ -64,7 +70,3 @@ commands =
     poetry install -v
     poetry run pytest tests/
 """
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
