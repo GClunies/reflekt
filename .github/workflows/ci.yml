@@ -42,7 +42,7 @@ jobs:
         run: poetry install
 
       - name: Lint
-        run: poetry run make lint
+        run: poetry run ruff check ./reflekt ./tests
 
   check-license:
     needs: lint
@@ -70,7 +70,7 @@ jobs:
         run: poetry install
 
       - name: Check License
-        run: poetry run make check-license
+        run: poetry run reuse lint
 
   test:
     needs: check-license
