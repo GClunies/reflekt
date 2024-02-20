@@ -651,7 +651,7 @@ def report(
         False,
         "--to-file",
         "-f",
-        help="Write report(s) to file instead of stdout.",
+        help="Write report(s) to file instead of terminal.",
     ),
     verbose: bool = typer.Option(
         False,
@@ -679,7 +679,7 @@ def report(
             raise SelectArgError(
                 message=(
                     f"Command: 'reflekt report --select {select}' cannot output "
-                    f"multiple Markdown reports to stdout. Use --to-file to write to "
+                    f"multiple Markdown reports to terminal. Use --to-file to write to "
                     f"files instead."
                 ),
                 select=select,
