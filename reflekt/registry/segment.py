@@ -13,7 +13,6 @@ import requests
 from inflection import titleize
 from loguru import logger
 from requests import Response
-from rich import print
 from rich.traceback import install
 
 from reflekt import SHOW_LOCALS
