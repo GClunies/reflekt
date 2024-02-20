@@ -51,6 +51,7 @@ mypy = "^1.8.0"
 tox = "^4.13.0"
 ruff = "^0.2.2"
 make = "^0.1.6.post2"
+reuse = "^3.0.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
