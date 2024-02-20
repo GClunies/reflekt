@@ -29,6 +29,7 @@ sqlalchemy-redshift = "^0.8.12"
 segment-analytics-python = "^2.2.2"
 sqlalchemy-bigquery = "^1.9.0"
 google-cloud-bigquery-storage = "^2.24.0"
+pyarrow = "^15.0.0"
 
 [tool.poetry.group.dev.dependencies]
 make = "^0.1.6.post2"
