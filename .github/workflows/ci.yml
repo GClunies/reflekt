@@ -31,10 +31,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      # NOTE: If `Install Poetry` is run before `Install Python`, poetry will be
+      # installed in the wrong python version and fails. Unfortunately, the,
+      # this means we cannot cache the poetry venv between jobs ... but it does not take
+      # long to install poetry and the dependencies, so it's not a big deal.
       - name: Install Poetry
         run: pipx install poetry
 
-      - name: Install Poetry
+      - name: Poetry Install Dependencies
         run: poetry install
 
       - name: Lint
@@ -94,7 +98,7 @@ jobs:
         run: poetry install
 
       - name: Run Tests
-        run: poetry run make test
+        run: poetry run pytest --cov=reflekt tests/
 
   # lint:
   #   name: Lint (${{ matrix.python-version }}, ${{ matrix.os }})
