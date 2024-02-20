@@ -42,6 +42,35 @@ jobs:
       - name: Lint
         run: poetry run make lint
 
+  check-license:
+    name: Lint (${{ matrix.python-version }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest']
+        python-version: ['3.11']  # Lint only needs to run once
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Install Python ${{ matrix.python-version }}
+        id: install-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'poetry'
+
+      - name: Install Dependencies
+        if: steps.install-python.outputs.cache-hit != 'true'
+        run: poetry install --no-root --no-interaction
+
+      - name: Lint
+        run: poetry run make check-license
+
   test:
     needs: lint
     name: Test (${{ matrix.python-version }}, ${{ matrix.os }})

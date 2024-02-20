@@ -16,10 +16,11 @@ SPDX-License-Identifier: Apache-2.0
 - Add `--artifact` option to `reflekt build` command, specifying the type of artifact to build (e.g. `dbt`).
 
 ### Fixed
-- Fix bug where `reflekt push/pull` would fail when `--select`ing a single schema.
 - CLI `--help` documentation.
 - Updated `README.md` docs to reflect changes in this release.
-- Remove `jaffle_shop_sessions.py`, this now lives in demo
+- Remove `jaffle_shop_sessions.py`, this now lives in [reflekt-jaffle-shop](https://github.com/GClunies/reflekt-jaffle-shop)
+- Fix `reflekt push/pull` bug that fails when `--select`ing a single schema.
+- Fix `reflekt report` bug that labeled all properties as required, even if they were not in the schema.
 
 ## [0.5.0] - 2023-12-31
 ### Breaking

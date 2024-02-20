@@ -14,3 +14,7 @@ lint:
 .PHONY: type-check
 type-check:
 	@mypy .
+
+.PHONY: check-license
+check-license:
+	@reuse lint
