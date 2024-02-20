@@ -2,8 +2,8 @@ version: 2
 sources:
   - name: jaffle_shop_segment
     schema: jaffle_shop_segment
-    database: raw-data
-    description: Schema in bigquery with raw Segment event data.
+    database: raw
+    description: Schema in snowflake with raw Segment event data.
     tables:
       - name: order_completed
         description: User completed an order (i.e., user confirmed and payment
