@@ -15,7 +15,7 @@ SPDX-License-Identifier: Apache-2.0
 `reflekt` helps Data, Engineering, and Product teams by providing tooling and a shared process to define, manage, and model event data for product analytics.
 - Configure conventions for events and properties. Enforced by `reflekt lint`.
 - Define events using [JSON schema](https://json-schema.org/), creating a codified, version controlled spec for event instrumentation.
-- `reflekt push` event schemas to a registry where they can validate events as they flow from **Application -> Registry -> Customer Data Platform (CDP) -> Data Warehouse**.
+- `reflekt push` event schemas to a registry to validate events as they flow from **Application -> Registry -> Customer Data Platform (CDP) -> Data Warehouse**.
 - Automate the creation of private dbt packages with sources, staging models, and documentation for event data with `reflekt build --artifact dbt`.
 
 The `reflekt` CLI integrates with [Customer Data Platforms (CDPs)](#customer-data-platform-cdp), [Schema Registries](#schema-registry), [Cloud data Warehouses](#cloud-data-warehouse), and [dbt](#dbt).
