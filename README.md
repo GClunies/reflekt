@@ -128,9 +128,9 @@ artifacts:                      # Configure how data artifacts are built
 ```yaml
 # Example reflekt_profiles.yml
 version: 1.0
-dev_reflekt:                                         # Profile name (multiple profiles can be defined)
-  # Connections to schema registries
-  registry:
+
+dev_reflekt:                                         # Profile name (multiple allowed)
+  registry:                                          # Schema registry connection details (multiple allowed)
     - type: segment
       api_token: segment_api_token                   # https://docs.segmentapis.com/tag/Getting-Started#section/Get-an-API-token
 
@@ -139,8 +139,7 @@ dev_reflekt:                                         # Profile name (multiple pr
       service_account_name: avo_service_account_name # https://www.avo.app/docs/public-api/authentication#creating-service-accounts
       service_account_secret: avo_service_account_secret
 
-  # Connection to data warehouses where event data is stored
-  source:
+  source:                          # Data warehouse connection details (multiple allowed)
     - id: snowflake                # ID must be unique per profile
       type: snowflake              # Specify details where raw event data is stored
       account: abc12345
