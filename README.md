@@ -5,20 +5,23 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 # Reflekt
+> /rəˈflek(t)/ - _to embody or represent in a faithful or appropriate way_
+
 ![PyPI](https://img.shields.io/pypi/v/reflekt?style=for-the-badge)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/reflekt?style=for-the-badge)
 ![GitHub](https://img.shields.io/github/license/gclunies/reflekt?style=for-the-badge)
 
-> /rəˈflek(t)/ <br>
-> _To embody or represent in a faithful or appropriate way_
+Reflekt helps teams design, govern, and model event data for warehouse-first product analytics. Events schemas are designed and codified using [JSON schema](https://json-schema.org/), version controlled in a Reflekt project, and updated via pull requests (PRs), enabling:
+  - Branches for parallel development and testing.
+  - Reviews and discussion amongst teams and stakeholders.
+  - CI/CD suites to:
+    - `reflekt lint` schemas against naming and metadata rules.
+    - `reflekt push` schemas to deploy them to a [schema registry](#schema-registry) for event data validation.
 
-`reflekt` helps Data, Engineering, and Product teams by providing tooling and a shared process to define, manage, and model event data for product analytics. The `reflekt` CLI integrates with [Customer Data Platforms](#customer-data-platform-cdp) (CDPs), [Schema Registries](#schema-registry), popular [Data Warehouses](#cloud-data-warehouse), and [dbt](#dbt).
-- Configure and enforce event naming conventions with `reflekt lint`.
-- Define events with [JSON schema](https://json-schema.org/) for a codified, version controlled spec for event instrumentation.
-- `reflekt push` event schemas to a registry for validation as they flow from `App -> Registry -> CDP -> Data Warehouse`.
-- Automagically build a private dbt package to model, document, and test events with `reflekt build --artifact dbt`.
+With codified event schemas Reflekt can model, document, and test event data in the warehouse with dbt ✨automagically✨...
+[![asciicast](https://asciinema.org/a/OEXbTtj0U0KL7bZo5Ea7ngNnh.svg)](https://asciinema.org/a/OEXbTtj0U0KL7bZo5Ea7ngNnh)
 
-https://user-images.githubusercontent.com/28986302/217134526-df83ec90-86f3-491e-9588-b7cd56956db1.mp4
+You can see a full demo of `reflekt` in action [here](https://www.loom.com/share/75b60cfc2b3549edafde4eedcb3c9631?sid=fb610521-c651-40f9-9de5-8f07a2534302).
 
 ## Getting Started
 ### Install
@@ -643,3 +646,14 @@ For product analytics, this can be ***a lot of work to maintain***, where:
 - Product and Engineering teams are bigger than the Data team, making it account for data changes in models and documentation.
 
 `reflekt build` handles all of this by automating the creation of private dbt package that creates sources, staging models, and documentation for each event with a schema in a Reflekt project. This private package can be used as a foundation for warehouse first product analytics.
+
+## Contribute
+- Source Code: [github.com/GClunies/reflekt](https://github.com/GClunies/reflekt)
+- Issue Tracker: [github.com/GClunies/reflekt/issues](https://github.com/GClunies/reflekt/issues)
+- Pull Requests: [github.com/GClunies/reflekt/pulls](https://github.com/GClunies/reflekt/pulls)
+
+## License
+This project is [licensed](LICENSE) under the Apache-2.0 License.
+
+> [!NOTE]
+> Reflekt uses `reuse` to attribute licenses for every line of code, recognizing the work of others and ensuring compliance with the licenses of any software used.
