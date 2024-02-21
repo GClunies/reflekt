@@ -11,17 +11,20 @@ SPDX-License-Identifier: Apache-2.0
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/reflekt?style=for-the-badge)
 ![GitHub](https://img.shields.io/github/license/gclunies/reflekt?style=for-the-badge)
 
-Reflekt helps teams design, govern, and model event data for warehouse-first product analytics. Events schemas are designed and codified using [JSON schema](https://json-schema.org/), version controlled in a Reflekt project, and updated via pull requests (PRs), enabling:
+Reflekt helps teams design, govern, and model event data for warehouse-first product analytics - integrating with [Customer Data Platforms](#customer-data-platform-cdp) (CDPs), [Schema Registries](#schema-registry), [Data Warehouses](#data-warehouse), and [dbt](#dbt).
+
+Events schemas are designed and codified using [JSON schema](https://json-schema.org/), version controlled in a Reflekt project, and updated via pull requests (PRs), enabling:
   - Branches for parallel development and testing.
   - Reviews and discussion amongst teams and stakeholders.
   - CI/CD suites to:
     - `reflekt lint` schemas against naming and metadata rules.
     - `reflekt push` schemas to deploy them to a [schema registry](#schema-registry) for event data validation.
 
-With codified event schemas Reflekt can model, document, and test event data in the warehouse with dbt ✨automagically✨...
-[![asciicast](https://asciinema.org/a/OEXbTtj0U0KL7bZo5Ea7ngNnh.svg)](https://asciinema.org/a/OEXbTtj0U0KL7bZo5Ea7ngNnh)
+With codified event schemas, Reflekt can ✨automate✨ dbt packages that model, document, and test event data in the warehouse.
 
-You can see a full demo of `reflekt` in action [here](https://www.loom.com/share/75b60cfc2b3549edafde4eedcb3c9631?sid=fb610521-c651-40f9-9de5-8f07a2534302).
+[![asciicast](https://asciinema.org/a/5mQFNfPgBeNTWDrqF5LILlJ1J.svg)](https://asciinema.org/a/5mQFNfPgBeNTWDrqF5LILlJ1J)
+
+See a full demo of `reflekt` in action [here](https://www.loom.com/share/75b60cfc2b3549edafde4eedcb3c9631?sid=fb610521-c651-40f9-9de5-8f07a2534302).
 
 ## Getting Started
 ### Install
@@ -61,7 +64,7 @@ Reflekt uses 3 files to define and configure a Reflekt project.
 | Configuration File               | Purpose |
 |----------------------------------|---------|
 | `reflekt_project.yml`            | Project settings, event and property conventions, data artifact generation, <br>additional Avo registry config (optional) |
-| `reflekt_profiles.yml`           | Connection details to schema registries and cloud data warehouses. |
+| `reflekt_profiles.yml`           | Connection details to schema registries and data warehouses. |
 | `schemas/.reflekt/meta/1-0.json` | Meta-schema used to:<br> 1. Events in `schemas/` follow the Reflekt format.<br> 2. Define global `"metadata": {}` requirement for all schemas.  |
 
 > [!TIP]
@@ -130,6 +133,7 @@ dev_reflekt:                                         # Profile name (multiple pr
   registry:
     - type: segment
       api_token: segment_api_token                   # https://docs.segmentapis.com/tag/Getting-Started#section/Get-an-API-token
+
     - type: avo
       workspace_id: avo_workspace_id                 # https://www.avo.app/docs/public-api/export-tracking-plan#endpoint
       service_account_name: avo_service_account_name # https://www.avo.app/docs/public-api/authentication#creating-service-accounts
@@ -137,22 +141,38 @@ dev_reflekt:                                         # Profile name (multiple pr
 
   # Connection to data warehouses where event data is stored
   source:
-    - id: snowflake             # ID must be unique per profile
-      type: snowflake
+    - id: snowflake                # ID must be unique per profile
+      type: snowflake              # Specify details where raw event data is stored
       account: abc12345
       database: raw
       warehouse: transforming
       role: transformer
-      user: reflekt_user
+      user: reflekt_user           # Create reflekt_user with access to raw data (permissions: USAGE, SELECT)
       password: reflekt_user_password
 
-    - id: redshift              # ID must be unique per profile
-      type: redshift
+    - id: redshift                 # ID must be unique per profile
+      type: redshift               # Specify details where raw event data is stored
       host: example-redshift-cluster-1.abc123.us-west-1.redshift.amazonaws.com
       database: analytics
       port: 5439
-      user: reflekt_user
+      user: reflekt_user           # Create reflekt_user with access to raw data (permissions: USAGE, SELECT)
       password: reflekt_user_password
+
+    - id: bigquery                 # ID must be unique per profile
+      type: bigquery               # Specify details where raw event data is stored
+      project: raw-data
+      dataset: jaffle_shop_segment
+      keyfile_json:                # Create a reflekt-user service account with access to BigQuery project where raw event data lands (permissions: BigQuery Data Viewer, BigQuery Job User). Include JSON keyfile fields below.
+        type: "service_account"
+        project_id: "foo-bar-123456"
+        private_key_id: "abc123def456ghi789"
+        private_key: "-----BEGIN PRIVATE KEY-----\nmy-very-long-private-keyF\n\n-----END PRIVATE KEY-----\n"
+        client_email: "reflekt-user@foo-bar-123456.iam.gserviceaccount.com"
+        client_id: "123456789101112131415161718"
+        auth_uri: "https://accounts.google.com/o/oauth2/auth"
+        token_uri: "https://oauth2.googleapis.com/token"
+        auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs"
+        client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/reflekt-user%40foo-bar-123456.iam.gserviceaccount.com"
 ```
 </details>
 
@@ -359,8 +379,8 @@ Events in a Reflekt project are defined using the [JSON schema](https://json-sch
 
 #### Schema `$id` and `version`
 Schemas in a Reflekt project are identified and `--select`ed by their `$id`, which is their path relative to the `schemas/` directory. For example:
-| File Path to Schema                                          | Schema `$id`                       |
-|---------------------------------------------------------------|------------------------------------|
+| File Path to Schema                                                   | Schema `$id`                       |
+|-----------------------------------------------------------------------|------------------------------------|
 | `~/repos/my-reflekt-project/schemas/jaffle_shop/Cart_Viewed/1-0.json` | `jaffle_shop/Cart_Viewed/1-0.json` |
 | `~/repos/my-reflekt-project/schemas/jaffle_shop/Cart_Viewed/2-1.json` | `jaffle_shop/Cart_Viewed/2-1.json` |
 
@@ -370,7 +390,7 @@ Each schema has a `version` (e.g., `1-0`, `2-1`), used to indicate changes to da
 | MAJOR | Breaking change incompatible with previous data. | `1-0`, `2-0`<br>(ends in `-0) | - Add/remove/rename a *required* property<br> - Change a property from *optional to required*<br> - Change a property's type |
 | MINOR | Non-breaking change compatible with previous data. | `1-1`, `2-3` | - Add/remove/rename an *optional* property<br> - Change a property from *required to optional* |
 
-> [!WARNING]
+> [!NOTE]
 > For `MINOR` schema versions (non-breaking changes), you can either:
 > - Update the existing schema and increment the MINOR version number.
 > - Create a new `.json` file with the updated schema and increment the MINOR version number.
@@ -398,7 +418,7 @@ Schemas can be linted to test if they follow the naming conventions in your [`re
 [18:31:51] INFO     Completed successfully
 ```
 
-### Sending Event Schemas to a Schema Registry
+### Sending Event Schemas to a Schema Registries
 In order to validate events as they flow from **Application -> Registry -> Customer Data Platform (CDP) -> Data Warehouse**, we need to send a copy of our event schemas to a schema registry (see [supported registries](#schema-registry)). This is done with the `reflekt push` command.
 
 ```bash
@@ -599,7 +619,7 @@ A general description of commands can be seen by running `reflekt --help`. For e
 ## Integrations
 
 ### Customer Data Platform (CDP)
-Reflekt understands how popular Customer Data Platforms (CDPs) collect event data and load it into cloud data warehouses. This understanding allows Reflekt to:
+Reflekt understands how popular Customer Data Platforms (CDPs) collect event data and load it into data warehouses. This understanding allows Reflekt to:
   - Parse the schemas in a Reflekt project.
   - Find matching tables for events in the data warehouse.
   - Automate writing a private dbt package that creates sources, staging models, and documentation for event data.
@@ -620,7 +640,7 @@ Schema registries store and serve schemas. Once a schema is registered with a re
 | [Avo](https://www.avo.app/) | Pricing | ❌ | `MAJOR` only | Manage schemas in Avo.<br> `reflekt pull` to get schemas.<br>  `reflekt build --artifact dbt` to build dbt package. |
 | [reflekt-registry](https://github.com/GClunies/reflekt-registry)<br> 🚧 Coming Soon 🚧 | Free | ✅ | `MAJOR` & `MINOR` |  Manage schemas in Reflekt.<br> `reflekt push` to reflekt-registry.<br> `reflekt build --artifact dbt` to build dbt package. |
 
-### Cloud Data Warehouse
+### Data Warehouse
 In order to find tables and columns that match event schemas and their properties, Reflekt needs to connect to a cloud data warehouse where raw evetn data is stored.
 
 | Data Warehouse | Supported |
