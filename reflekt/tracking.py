@@ -25,7 +25,9 @@ def on_error(error):
 # Setup Segment
 if os.getenv("REFLEKT_SEGMENT_WRITE_KEY_DEV") is not None:
     segment_analytics.write_key = os.getenv("REFLEKT_SEGMENT_WRITE_KEY_DEV")
-    segment_analytics.debug = True
+    segment_analytics.debug = (
+        True if os.getenv("REFLEKT_SHOW_LOCALS") == "true" else False
+    )
     segment_analytics.on_error = on_error
 else:
     segment_analytics.write_key = "2r0G0DfAXeRZ9ZUhfa9Xk1Hk3FnO2GnW"
@@ -81,9 +83,10 @@ class ReflektUser:
         return user
 
 
-# NOTE - no need to call identify() since user ID is set via a cookie
 def track_event(user_id: str, event_name: str, properties: dict, context: dict):
     """Track an event.
+
+    NOTE: We don't need to call identify() since the user ID is set via a cookie.
 
     Args:
         user_id (str): The user's ID.
