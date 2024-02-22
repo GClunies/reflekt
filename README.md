@@ -18,7 +18,7 @@ Reflekt helps teams design, govern, and model event data for warehouse-first pro
     - `reflekt lint` schemas against naming and metadata rules.
     - `reflekt push` schemas to deploy them to a [schema registry](#schema-registry) for event data validation.
 
-Stop writing SQL & YAML for event data. `reflekt build` a [dbt](#dbt) package to model, document, and test events in the warehouse.
+Stop writing SQL & YAML. `reflekt build` a [dbt](#dbt) package to model, document, and test events in the warehouse.
 
 ![reflekt build](docs/reflekt_build.gif)
 
