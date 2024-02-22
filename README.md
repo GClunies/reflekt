@@ -436,7 +436,7 @@ In order to validate events as they flow from **Application -> Registry -> Custo
 ```
 
 ### Building `dbt` packages to Model Event Data
-Modeling event data in `dbt` a lot of work. Do we want staging models that are clean, documented, and tested? **OF COURSE!**
+Modeling event data in `dbt` is a lot of work. Do we want staging models that are clean, documented, and tested? **OF COURSE!**
 
 Do we want to write and maintain SQL and YAML docs for hundreds of events? **ABSOLUTELY NOT!**
 
