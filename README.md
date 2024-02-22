@@ -435,11 +435,9 @@ In order to validate events as they flow from **Application -> Registry -> Custo
 ```
 
 ### Building `dbt` packages to Model Event Data
-Modeling event data in `dbt` is a lot of work. Do we want staging models that are clean, documented, and tested? **OF COURSE!**
+Modeling event data in `dbt` is a lot of work. Everyone wants staging models that are clean, documented, and tested. But who wants to write and maintain SQL and YAML for hundreds of events?
 
-Do we want to write and maintain SQL and YAML docs for hundreds of events? **ABSOLUTELY NOT!**
-
-You no longer have to choose between speed and best practice. Automate writing SQL for staging models and YAML for documentation and testing, packaged up in your very own provate dbt package. All you need is a single CLI command.
+You don't have to choose. Put `reflekt build` to work for you - staging models, documentation, even tests - all in a dbt package ready for you to use in your dbt project.
 
 ```bash
 ❯ reflekt build --artifact dbt --select schemas/jaffle_shop --source snowflake.raw.jaffle_shop_segment --sdk segment
@@ -504,7 +502,7 @@ You no longer have to choose between speed and best practice. Automate writing S
 ---
 
 ## CLI Commands
-A general description of commands can be seen by running `reflekt --help`. For ease, the help page for each CLI command is shown below.
+A description of commands can be seen by running `reflekt --help`. The help page for each CLI command is shown below.
 
 ### `reflekt init`
 ```bash
@@ -615,10 +613,10 @@ A general description of commands can be seen by running `reflekt --help`. For e
 ## Integrations
 
 ### Customer Data Platform (CDP)
-Reflekt understands how popular Customer Data Platforms (CDPs) collect event data and load it into data warehouses. This understanding allows Reflekt to:
+Reflekt understands how Customer Data Platforms (CDPs) collect event data and load them into data warehouses, allowing it to:
   - Parse the schemas in a Reflekt project.
-  - Find matching tables for events in the data warehouse.
-  - Automate writing a private dbt package that creates sources, staging models, and documentation for event data.
+  - Find matching tables for events and columns for properties in the data warehouse.
+  - Build a `dbt` package with sources, staging models, and documentation for event data.
 
 | CDP | Supported |
 |-----|-----------|
@@ -628,7 +626,7 @@ Reflekt understands how popular Customer Data Platforms (CDPs) collect event dat
 
 
 ### Schema Registry
-Schema registries store and serve schemas. Once a schema is registered with a registry, it can be used to validate events to ensure data quality. Reflekt works with schema registries from CDPs, SaaS vendors, and open-source projects - allowing teams to decide between managed and self-hosted solutions.
+Schema registries store and serve schemas. When a schema is pushed to a registry, it can be used to validate events as they flow through. Reflekt works with schema registries from CDPs, SaaS vendors, and open-source projects - letting teams to decide between managed and self-hosted solutions.
 
 | Registry | Cost | Open Source | Schema Versions | Recommended Workflow |
 |----------|------|-------------|------------------------|-----------------|
@@ -637,7 +635,7 @@ Schema registries store and serve schemas. Once a schema is registered with a re
 | [reflekt-registry](https://github.com/GClunies/reflekt-registry)<br> 🚧 Coming Soon 🚧 | Free | ✅ | `MAJOR` & `MINOR` |  Manage schemas in Reflekt.<br> `reflekt push` to reflekt-registry.<br> `reflekt build --artifact dbt` to build dbt package. |
 
 ### Data Warehouse
-In order to find tables and columns that match event schemas and their properties, Reflekt needs to connect to a cloud data warehouse where raw evetn data is stored.
+In order to build dbt packages, Reflekt needs to connect to a cloud data warehouse where raw event data is stored.
 
 | Data Warehouse | Supported |
 |----------------|-----------|
@@ -650,18 +648,14 @@ In order to find tables and columns that match event schemas and their propertie
 > It ONLY reads table and column names for artifact templating.
 
 ### dbt
-[dbt](https://www.getdbt.com/) is a data transformation tool that enables anyone who knows SQL to transform (model) data in a cloud data warehouse. When modeling data in dbt, it is [best practice](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview) to:
+[dbt](https://www.getdbt.com/) enables anyone that knows SQL to transform data in a cloud data warehouse. But following [best practice](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview) means:
 - Define sources pointing to the raw data.
-- Define staging models, 1-to-1 for each source, that [rename, recast, or usefully reconsider](https://discourse.getdbt.com/t/how-we-used-to-structure-our-dbt-projects/355#data-transformation-101-1) columns into a consistent format. Materialized as views.
-- Document staging models.
-- Test the staging models (e.g., unique values, check for nulls, etc).
+- Write staging models that [rename, recast, or usefully reconsider](https://discourse.getdbt.com/t/how-we-used-to-structure-our-dbt-projects/355#data-transformation-101-1) columns into a consistent format.
+- Document and test the staging models.
 
-For product analytics, this can be ***a lot of work to maintain***, where:
-- There 10s to 100s of events and properties.
-- Events and properties are added/updated as requirements evolve, often without the Data team knowing.
-- Product and Engineering teams are bigger than the Data team, making it account for data changes in models and documentation.
+For 100s of product analytics events, that change at the pace of product development, this can be **burdensome and boring.**
 
-`reflekt build` handles all of this by automating the creation of private dbt package that creates sources, staging models, and documentation for each event with a schema in a Reflekt project. This private package can be used as a foundation for warehouse first product analytics.
+That's where [`reflekt build`](#reflekt-build) steps in.
 
 ## Contribute
 - Source Code: [github.com/GClunies/reflekt](https://github.com/GClunies/reflekt)
