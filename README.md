@@ -26,7 +26,7 @@ To see `reflekt` in action, checkout [reflekt-jaffle-shop](https://github.com/GC
 
 ## Getting Started
 ### Install
-Reflekt is available on [PyPI](https://pypi.org/project/reflekt/). Install with `pip` or your preferred package manager, preferably in a virtual environment:
+Reflekt is available on [PyPI](https://pypi.org/project/reflekt/). Install it with `pip` or package manager, preferably in a virtual environment:
 ```bash
 ❯ source /path/to/venv/bin/activate  # Activate virtual environment
 ❯ pip install reflekt                # Install Reflekt
@@ -35,7 +35,7 @@ Reflekt CLI Version: 0.3.1
 ```
 
 ### Create a Reflekt Project
-To create a new Reflekt project: create a new directory, initialize a Git repo, and run `reflekt init`.
+To create a new Reflekt project, make a directory, initialize a Git repo, and run `reflekt init`.
 ```bash
 ❯ mkdir ~/Repos/my-reflekt-project  # Create a new directory for the project
 ❯ cd ~/Repos/my-reflekt-project     # Navigate to the project directory
@@ -45,7 +45,7 @@ To create a new Reflekt project: create a new directory, initialize a Git repo, 
 # Follow the prompts to configure the project
 ```
 
-This will create a new Reflekt project with the following structure:
+You now have a Reflekt project with the structure:
 ```bash
 my-reflekt-project
 ├── .logs/                # CLI command logs
@@ -61,9 +61,9 @@ my-reflekt-project
 Reflekt uses 3 files to define and configure a Reflekt project.
 | Configuration File               | Purpose |
 |----------------------------------|---------|
-| `reflekt_project.yml`            | Project settings, event and property conventions, data artifact generation, <br>additional Avo registry config (optional) |
-| `reflekt_profiles.yml`           | Connection details to schema registries and data warehouses. |
-| `schemas/.reflekt/meta/1-0.json` | Meta-schema used to:<br> 1. Events in `schemas/` follow the Reflekt format.<br> 2. Define global `"metadata": {}` requirement for all schemas.  |
+| `reflekt_project.yml`            | 1. Project settings<br> 2. Event and metadat conventions<br> 3. Data artifact generation<br> 4. Optional registry config (Avo only) |
+| `reflekt_profiles.yml`           | 1. Schema Registry connections<br> 2. Data warehouse connections |
+| `schemas/.reflekt/meta/1-0.json` | Meta-schema used to:<br> 1. Events in `schemas/` follow the Reflekt format<br> 2. Define global `"metadata": {}` requirements for schemas  |
 
 > [!TIP]
 > Click the example configuration files below to see their structure and settings.
@@ -240,7 +240,6 @@ dev_reflekt:                                         # Profile name (multiple al
 
 ```
 </details>
-<br>
 
 ### Defining Event Schemas
 Events in a Reflekt project are defined using the [JSON schema](https://json-schema.org/) specification and are stored in the `schemas/` directory of the project.
