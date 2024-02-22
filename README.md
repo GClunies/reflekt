@@ -11,20 +11,20 @@ SPDX-License-Identifier: Apache-2.0
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/reflekt?style=for-the-badge)
 ![GitHub](https://img.shields.io/github/license/gclunies/reflekt?style=for-the-badge)
 
-Reflekt helps teams design, govern, and model event data for warehouse-first product analytics - integrating with [Customer Data Platforms](#customer-data-platform-cdp) (CDPs), [Schema Registries](#schema-registry), [Data Warehouses](#data-warehouse), and [dbt](#dbt).
-
-Events schemas are designed and codified using [JSON schema](https://json-schema.org/), version controlled in a Reflekt project, and updated via pull requests (PRs), enabling:
+Reflekt helps teams design, govern, and model event data for warehouse-first product analytics - integrating with [Customer Data Platforms](#customer-data-platform-cdp), [Schema Registries](#schema-registry), [Data Warehouses](#data-warehouse), and [dbt](#dbt). Events schemas are designed with `code` using [JSON schema](https://json-schema.org/), version controlled, and updated via pull requests (PRs), enabling:
   - Branches for parallel development and testing.
   - Reviews and discussion amongst teams and stakeholders.
   - CI/CD suites to:
     - `reflekt lint` schemas against naming and metadata rules.
     - `reflekt push` schemas to deploy them to a [schema registry](#schema-registry) for event data validation.
 
-With codified event schemas, Reflekt can ✨automate✨ dbt packages that model, document, and test event data in the warehouse.
+Stop writing SQL & YAML for event data. `reflekt build` a [dbt](#dbt) package to model, document, and test events in the warehouse.
 
-[![asciicast](https://asciinema.org/a/5mQFNfPgBeNTWDrqF5LILlJ1J.svg)](https://asciinema.org/a/5mQFNfPgBeNTWDrqF5LILlJ1J)
+![reflekt build](docs/reflekt_build.gif)
 
-See a full demo of `reflekt` in action [here](https://www.loom.com/share/75b60cfc2b3549edafde4eedcb3c9631?sid=fb610521-c651-40f9-9de5-8f07a2534302).
+To see `reflekt` in action, checkout:
+- Demo [video](https://www.loom.com/share/75b60cfc2b3549edafde4eedcb3c9631?sid=fb610521-c651-40f9-9de5-8f07a2534302)
+- Demo [reflekt-jaffle-shop](https://github.com/GClunies/reflekt-jaffle-shop/) project
 
 ## Getting Started
 ### Install
