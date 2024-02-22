@@ -22,9 +22,7 @@ Stop writing SQL & YAML. `reflekt build` a [dbt](#dbt) package to model, documen
 
 ![reflekt build](docs/reflekt_build.gif)
 
-To see `reflekt` in action, checkout:
-- Demo [video](https://www.loom.com/share/75b60cfc2b3549edafde4eedcb3c9631?sid=fb610521-c651-40f9-9de5-8f07a2534302)
-- Demo [reflekt-jaffle-shop](https://github.com/GClunies/reflekt-jaffle-shop/) project
+To see `reflekt` in action, checkout [reflekt-jaffle-shop](https://github.com/GClunies/reflekt-jaffle-shop/) or this [demo](https://www.loom.com/share/75b60cfc2b3549edafde4eedcb3c9631?sid=fb610521-c651-40f9-9de5-8f07a2534302).
 
 ## Getting Started
 ### Install
