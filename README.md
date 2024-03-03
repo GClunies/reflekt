@@ -11,7 +11,7 @@ SPDX-License-Identifier: Apache-2.0
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/reflekt?style=for-the-badge)
 ![GitHub](https://img.shields.io/github/license/gclunies/reflekt?style=for-the-badge)
 
-Reflekt helps teams design, govern, and model event data for warehouse-first product analytics - integrating with [Customer Data Platforms](#customer-data-platform-cdp), [Schema Registries](#schema-registry), [Data Warehouses](#data-warehouse), and [dbt](#dbt). Events schemas are designed with `code` using [JSON schema](https://json-schema.org/), version controlled, and updated via pull requests (PRs), enabling:
+Reflekt helps teams define, govern, and model event data for warehouse-first product analytics. It integrates with [Customer Data Platforms](#customer-data-platform-cdp), [Schema Registries](#schema-registry), [Data Warehouses](#data-warehouse), and [dbt](#dbt). Events are defined using [JSON schema](https://json-schema.org/), version controlled, and updated by pull requests (PRs), enabling:
   - Branches for parallel development and testing.
   - Reviews and discussion amongst teams and stakeholders.
   - CI/CD suites to:
@@ -22,7 +22,11 @@ Stop writing SQL & YAML. `reflekt build` a [dbt](#dbt) package to model, documen
 
 ![reflekt build](docs/reflekt_build.gif)
 
-To see `reflekt` in action, checkout [reflekt-jaffle-shop](https://github.com/GClunies/reflekt-jaffle-shop/) or this [demo](https://www.loom.com/share/75b60cfc2b3549edafde4eedcb3c9631?sid=fb610521-c651-40f9-9de5-8f07a2534302).
+To learn more about `reflekt`, checkout:
+- [Getting Started](#getting-started)
+- [CLI Command Reference](#cli-commands)
+- [Integrations](#integrations)
+- [reflekt-jaffle-shop](https://github.com/GClunies/reflekt-jaffle-shop/) and this [demo](https://www.loom.com/share/75b60cfc2b3549edafde4eedcb3c9631?sid=fb610521-c651-40f9-9de5-8f07a2534302)
 
 ## Getting Started
 ### Install
@@ -31,7 +35,7 @@ Reflekt is available on [PyPI](https://pypi.org/project/reflekt/). Install it wi
 ❯ source /path/to/venv/bin/activate  # Activate virtual environment
 ❯ pip install reflekt                # Install Reflekt
 ❯ reflekt --version                  # Confirm installation
-Reflekt CLI Version: 0.3.1
+Reflekt CLI Version: 0.6.0
 ```
 
 ### Create a Reflekt Project
