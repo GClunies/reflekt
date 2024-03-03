@@ -4,7 +4,6 @@
 
 from enum import Enum
 
-
 SCHEMA_DIALECT = "http://json-schema.org/draft-07/schema#"
 
 REFLEKT_JSON_SCHEMA = {
@@ -28,19 +27,18 @@ REGISTRY = [
     "segment",
 ]
 
+WAREHOUSE = [
+    "snowflake",
+    "redshift",
+    # "bigquery",
+]
+
 
 class RegistryEnum(str, Enum):
     """Enum of supported schema registries."""
 
     avo = "avo"
     segment = "segment"
-
-
-WAREHOUSE = [
-    "snowflake",
-    "redshift",
-    # "bigquery",
-]
 
 
 class WarehouseEnum(str, Enum):
@@ -62,5 +60,11 @@ class ArtifactEnum(str, Enum):
 
 class SdkEnum(str, Enum):
     """Enum of supported SDKs that generate event data."""
+
+    segment = "segment"
+
+
+class CollectorEnum(str, Enum):
+    """Enum of supported event collectors that generate event data."""
 
     segment = "segment"

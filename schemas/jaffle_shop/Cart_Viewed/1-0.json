@@ -1,0 +1,71 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "jaffle_shop/Cart_Viewed/1-0.json",
+    "description": "User viewed their cart.",
+    "self": {
+        "vendor": "com.thejaffleshop",
+        "name": "Cart Viewed",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {}
+    },
+    "type": "object",
+    "properties": {
+        "cart_id": {
+            "description": "Unique identifier for the cart.",
+            "type": "string"
+        },
+        "products": {
+            "description": "List of products in the cart.",
+            "items": {
+                "additionalProperties": false,
+                "properties": {
+                    "category": {
+                        "description": "Category of the product.",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Name of the product.",
+                        "type": "string"
+                    },
+                    "price": {
+                        "description": "Price of the product.",
+                        "type": "number"
+                    },
+                    "product_id": {
+                        "description": "Unique identifier for the product.",
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "description": "Quantity of the product in the cart.",
+                        "type": "integer"
+                    },
+                    "sku": {
+                        "description": "Stock keeping unit for the product.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "product_id",
+                    "sku",
+                    "category",
+                    "name",
+                    "price",
+                    "quantity"
+                ],
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "session_id": {
+            "description": "Unique identifier for the session.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "session_id",
+        "cart_id",
+        "products"
+    ],
+    "additionalProperties": false
+}

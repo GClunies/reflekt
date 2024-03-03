@@ -13,7 +13,6 @@ import requests
 from inflection import titleize
 from loguru import logger
 from requests import Response
-from rich import print
 from rich.traceback import install
 
 from reflekt import SHOW_LOCALS
@@ -134,30 +133,26 @@ class SegmentRegistry:
         select_error_msg = (
             f"Invalid --select argument: {select}\n"  # noqa: E501
             f"When pulling from Segment schema registry, --select args must follow the format(s):\n"  # noqa: E501
-            f"   --select segment/plan_name                             # all schemas from a plan_name\n"  # noqa: E501
-            f"   --select segment/plan_name/schema_name                 # schema_name in plan_name\n"  # noqa: E501
-            f"   --select segment/plan_name/schema_name/schema_version  # schema_version for schema_name in plan_name"  # noqa: E501
+            f"   --select plan_name                             # all schemas from a plan_name\n"  # noqa: E501
+            f"   --select plan_name/schema_name                 # schema_name in plan_name\n"  # noqa: E501
+            f"   --select plan_name/schema_name/schema_version  # schema_version for schema_name in plan_name"  # noqa: E501
         )
 
-        if select.split("/")[0] != str.lower("segment"):
+        if len(select.split("/")) > 3:
             raise SelectArgError(message=select_error_msg, select=select)
 
-        if len(select.split("/")) > 4 or len(select.split("/")) < 2:
-            raise SelectArgError(message=select_error_msg, select=select)
-
-        if len(select.split("/")) == 2:
-            plan_name = select.split("/")[1]
+        if len(select.split("/")) == 1:
+            plan_name = select.split("/")[0]
             schema_name = None
             schema_major_version = None
-        elif len(select.split("/")) == 3:
-            plan_name = select.split("/")[1]
-            schema_name = select.split("/")[2]
+        elif len(select.split("/")) == 2:
+            plan_name = select.split("/")[0]
+            schema_name = select.split("/")[1]
             schema_major_version = None
-        elif len(select.split("/")) == 4:
-            plan_name = select.split("/")[1]
-            schema_name = select.split("/")[2]
-            raw_schema_version = select.split("/")[3]
-
+        elif len(select.split("/")) == 3:
+            plan_name = select.split("/")[0]
+            schema_name = select.split("/")[1]
+            raw_schema_version = select.split("/")[2]
             schema_major_version = int(raw_schema_version.split("-")[0])
             schema_minor_version = int(
                 raw_schema_version.split("-")[1].replace(".json", "")
@@ -213,7 +208,6 @@ class SegmentRegistry:
             list: Tracking plan schemas from Segment Protocols.
         """
         logger.info("Searching Segment for schemas")
-        print("")
         plan_name, schema_name, schema_version = self._parse_select(select)
         plan_id = self._get_plan_id(plan_name)
         r = requests.get(
@@ -221,24 +215,21 @@ class SegmentRegistry:
             headers=self.headers,
             params={"pagination[count]": 200},
         )
-
-        print("")
         logger.debug("Logging request details sent to Segment API...")
         logger.debug(f"Request Method: {r.request.method}")
         logger.debug(f"Request URL: {r.url}")
         logger.debug(f"Request Headers: {r.headers}")
-        print("")
         logger.debug("Logging Segment API response details...")
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")
         logger.debug(f"    Response: {r.text}")
-
         plan = self._handle_response(r)
         s_schemas = [
             rule for rule in plan["rules"] if rule["type"] not in ["COMMON", "ALIAS"]
         ]
 
         if schema_name is not None:
+            # Seeach using exact match
             s_schemas = [
                 s_schema
                 for s_schema in s_schemas
@@ -255,19 +246,24 @@ class SegmentRegistry:
 
         if len(s_schemas) == 0:
             raise SelectArgError(
-                message=(f"No Segment schemas found for: --select {select}\n"),
+                message=(
+                    f"No Segment schemas found for: --select {select}\n\n"
+                    f"NOTE:\n"
+                    f"'reflekt pull --registry segment --select plan_name/event_name' "
+                    f"requires 'event_name' match the event name in Segment Protocols "
+                    f"exactly (case-sensitive, inlcude spaces)."
+                ),
                 select=select,
             )
         else:
             logger.info(f"Found {len(s_schemas)} schemas to pull:")
-            print("")
 
         return s_schemas
 
     def _post_put_patch_del_segment(
         self, select: str, plan_name: str, schemas: list, delete: bool = False
     ) -> None:
-        """Sync Reflekt schemas to Segment Protocols based on --select from CLI.
+        """Sync `--select`-ed schemas from Reflekt to Segment Protocols.
 
         Tracking plan does not exists -> POST request to create tracking plan
         Tracking plan exists -> PUT request to update tracking plan
@@ -316,20 +312,16 @@ class SegmentRegistry:
                 json={"trackingPlanId": plan_id, "rules": schemas},
             )
 
-        print("")
         logger.debug("Logging request details sent to Segment API...")
         logger.debug(f"Request Method: {r.request.method}")
         logger.debug(f"Request URL: {r.url}")
         logger.debug(f"Request Headers: {r.headers}")
         logger.debug(f"Request body: {r.request.body.decode('utf-8')}")
-        print("")
         logger.debug("Logging Segment API response details...")
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")
         logger.debug(f"    Response: {r.text}")
-
         self._handle_response(r)
-        print("")
         logger.info("[green]Completed successfully[green/]")
 
     def pull(self, select: str) -> int:
@@ -404,7 +396,7 @@ class SegmentRegistry:
 
             version = f"{str(s_schema['version'])}-0"
             # Schema IDs never have a space in them
-            id = f"{self.type}/{plan_name}/{name.replace(' ', '_')}/{version}.json"
+            id = f"{plan_name}/{name.replace(' ', '_')}/{version}.json"
 
             # Copy empty Reflekt jsonschema and set values
             r_schema = copy.deepcopy(REFLEKT_JSON_SCHEMA)
@@ -430,7 +422,6 @@ class SegmentRegistry:
                 json.dump(r_schema, f, indent=4, ensure_ascii=False)
                 f.write("\n")  # Add newline at end of file
 
-        print("")
         logger.info("[green]Completed successfully[green/]")
 
         return len(s_schemas)  # Return the count of schemas pulled
@@ -460,7 +451,6 @@ class SegmentRegistry:
         r_schemas = []  # Reflekt schemas
         select_path = project.dir / "schemas" / select
         logger.info(f"Searching for JSON schemas in: {str(select_path)}")
-        print("")
 
         if select_path.is_dir():  # Get all schemas in directory
             for root, _, files in os.walk(select_path):
@@ -477,12 +467,14 @@ class SegmentRegistry:
 
         if len(r_schemas) == 0:
             raise SelectArgError(
-                message=(f"No JSON schemas found for: --select {select}\n"),
+                message=(
+                    f"No schemas found in Reflekt project for: '--select {select}'\n\n"
+                    f"Check that --select arg exactly matches path to JSON schema(s)."
+                ),
                 select=select,
             )
         else:
             logger.info(f"Found {len(r_schemas)} schemas to push")
-            print("")
 
         for i, r_schema in enumerate(r_schemas, start=1):
             schema_path = self.profile.project.dir / "schemas" / r_schema["$id"]
@@ -535,7 +527,7 @@ if __name__ == "__main__":  # pragma: no cover
     registry = SegmentRegistry(profile=profile)
 
     # --- PULL SEGMENT TO REFLEKT ---
-    # registry.pull(select="segment/ecommerce")
+    # registry.pull(select="ecommerce")
 
     # --- PUSH REFLEKT TO SEGMENT ---
-    registry.push(select="segment/ecommerce/CartViewed")
+    # registry.push(select="ecommerce/Cart Viewed")

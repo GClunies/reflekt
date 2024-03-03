@@ -38,6 +38,21 @@ class SourceArgError(Exception):
         super().__init__(self.message)
 
 
+class RegistryArgError(Exception):
+    """Raised when an invalid --registry argument is provided."""
+
+    def __init__(self, message: str, registry: str) -> None:
+        """Initialize RegistryArgError class.
+
+        Args:
+            message (str): Error message.
+            registry (str): The invalid --registry argument.
+        """
+        self.message = message
+        self.registry = registry
+        super().__init__(self.message)
+
+
 class RegistryError(Exception):
     """Raised when an error with the specified registry is detected."""
 

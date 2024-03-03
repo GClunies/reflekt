@@ -1,0 +1,101 @@
+# SPDX-FileCopyrightText: 2022 Gregory Clunies <greg@reflekt-ci.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+    tags: ["*"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+
+  lint:
+    name: Lint (${{ matrix.python-version }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: true
+      matrix:
+        os: ['ubuntu-latest']
+        python-version: ['3.11']  # Lint only needs to run once
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        id: setup-python
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # NOTE: If `Install Poetry` is run before `Install Python`, poetry will be
+      # installed in the wrong python version and fails. Unfortunately, the,
+      # this means we cannot cache the poetry venv between jobs ... but it does not take
+      # long to install poetry and the dependencies, so it's not a big deal.
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Poetry Install Dependencies
+        run: poetry install
+
+      - name: Lint
+        run: poetry run ruff check ./reflekt ./tests
+
+  check-license:
+    needs: lint
+    name: Lint (${{ matrix.python-version }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: true
+      matrix:
+        os: ['ubuntu-latest']
+        python-version: ['3.11']  # Lint only needs to run once
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        id: setup-python
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Install Poetry
+        run: poetry install
+
+      - name: Check License
+        run: poetry run reuse lint
+
+  test:
+    needs: check-license
+    name: Test (${{ matrix.python-version }}, ${{ matrix.os }})
+    strategy:
+      fail-fast: true
+      matrix:
+        os: ['ubuntu-latest']
+        python-version: ['3.9', '3.10', '3.11']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        id: setup-python
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Install Poetry
+        run: poetry install
+
+      - name: Run Tests
+        run: poetry run pytest --cov=reflekt tests/

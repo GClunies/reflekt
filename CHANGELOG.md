@@ -6,6 +6,22 @@ SPDX-License-Identifier: Apache-2.0
 
 # Reflekt Changelog
 
+## [0.6.0] - 2024-02-19
+### Breaking
+- Only support python versions `>=3.9,<3.12`.
+
+### Added
+- Add support for event data stored in BigQuery.
+- Add required `--registry` option to `reflekt push` and `reflekt pull` commands, specifying a schema registry defined in `reflekt_profiles.yml`.
+- Add `--artifact` option to `reflekt build` command, specifying the type of artifact to build (e.g. `dbt`).
+
+### Fixed
+- CLI `--help` documentation.
+- Updated `README.md` docs to reflect changes in this release.
+- Remove `jaffle_shop_sessions.py`, this now lives in [reflekt-jaffle-shop](https://github.com/GClunies/reflekt-jaffle-shop)
+- Fix `reflekt push/pull` bug that fails when `--select`ing a single schema.
+- Fix `reflekt report` bug that labeled all properties as required, even if they were not in the schema.
+
 ## [0.5.0] - 2023-12-31
 ### Breaking
 - Only support python versions `>=3.9,<3.13`. Support for python `3.8` is DEPRECATED.

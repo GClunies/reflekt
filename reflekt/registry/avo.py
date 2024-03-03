@@ -12,7 +12,6 @@ import requests
 from loguru import logger
 from requests import Response
 from requests.auth import HTTPBasicAuth
-from rich import print
 from rich.traceback import install
 
 from reflekt import SHOW_LOCALS
@@ -97,19 +96,7 @@ class AvoRegistry:
         Returns:
             str: The Avo branch
         """
-        if select.split("/")[0] != str.lower("avo"):
-            raise SelectArgError(
-                message=(
-                    f"Invalid --select argument: {select}\n"
-                    f"When pulling from Avo schema registry, --select args must follow the format:\n"  # noqa: E501
-                    f"   --select avo/main           # All schemas in 'main' branch\n"  # noqa: E501
-                    f"   --select avo/staging        # All schemas in 'staging' branch"  # noqa: E501
-                ),
-                type=self.type,
-                profile=self.profile,
-            )
-
-        return select.split("/")[1]
+        return select.split("/")[0]
 
     def _handle_response(self, response: Response) -> dict:
         """Handle response from the Segment API, returning requested data as a dict.
@@ -149,7 +136,7 @@ class AvoRegistry:
             list: Tracking plan schemas from Avo.
         """
         logger.info("Searching Avo for schemas")
-        print("")
+
         branch_id = self._get_avo_branch_id(branch)
         url = self.base_url + f"branches/{branch_id}/export/v1"
         r = requests.get(
@@ -161,23 +148,23 @@ class AvoRegistry:
         logger.debug(f"Request Method: {r.request.method}")
         logger.debug(f"Request URL: {r.url}")
         logger.debug(f"Request Headers: {r.headers}")
-        print("")
         logger.debug("Logging Avo API response details...")
         logger.debug(f"    Status Code: {r.status_code}")
         logger.debug(f"    Reason: {r.reason}")
         logger.debug(f"    Response: {r.text}")
-        print("")
 
         a_schemas = self._handle_response(r)
 
         if len(a_schemas) == 0:
             raise SelectArgError(
-                message=(f"No JSON schemas found for: --select {select}\n"),
+                message=(
+                    f"No schemas found in Reflekt project for: '--select {select}'\n\n"
+                    f"Check that --select arg exactly matches path to JSON schema(s)."
+                ),
                 select=select,
             )
         else:
             logger.info(f"Found {len(a_schemas)} schema(s) to pull")
-            print("")
 
         return a_schemas
 
@@ -234,7 +221,7 @@ class AvoRegistry:
 
             version = "1-0"  # Lock version for Avo, only used to build data artifacts
             # Schema IDs never have a space in them
-            id = f"{self.type}/{branch}/{name.replace(' ', '_')}/{version}.json"
+            id = f"{branch}/{name.replace(' ', '_')}/{version}.json"
 
             # Copy empty Reflekt jsonschema and set values
             r_schema = copy.deepcopy(REFLEKT_JSON_SCHEMA)
@@ -260,7 +247,6 @@ class AvoRegistry:
                 json.dump(r_schema, f, indent=4, ensure_ascii=False)
                 f.write("\n")  # Add newline at end of file
 
-        print("")
         logger.info("[green]Completed successfully[green/]")
 
 

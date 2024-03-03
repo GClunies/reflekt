@@ -24,9 +24,9 @@ def test_project_init():
     assert project.dir == Path(".").resolve()
     assert project.path == Path("./reflekt_project.yml").resolve()
     assert project.version == 1.0
-    assert project.name == "reflekt_demo"
-    assert project.vendor == "com.reflekt-ci"
-    assert project.default_profile == "dev_reflekt"
+    assert project.name == "jaffle_shop"
+    assert project.vendor == "com.thejaffleshop"
+    assert project.default_profile == "dev_segment_snowflake"
     assert project.profiles_path == Path("./reflekt_profiles.yml").resolve()
     assert project.schemas == {
         "conventions": {
@@ -66,7 +66,7 @@ def test_project_init():
             "sources": {"prefix": "__src_"},
             "models": {
                 "prefix": "stg_",
-                "filter": "where received_at < get_date()",
+                "filter": "where received_at < getdate()",
             },
             "docs": {
                 "prefix": "_stg_",

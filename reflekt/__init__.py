@@ -6,9 +6,6 @@ import os
 
 from dotenv import load_dotenv
 
-__version__ = "0.5.0"
-
-
+__version__ = "0.6.0"
 load_dotenv()  # Load environment variables from .env file (if exists)
-
 SHOW_LOCALS = os.getenv("REFLEKT_SHOW_LOCALS") == "true"

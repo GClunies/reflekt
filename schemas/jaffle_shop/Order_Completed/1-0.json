@@ -1,0 +1,114 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "jaffle_shop/Order_Completed/1-0.json",
+    "description": "User completed an order (i.e., user confirmed and payment was successful).",
+    "self": {
+        "vendor": "com.thejaffleshop",
+        "name": "Order Completed",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {}
+    },
+    "type": "object",
+    "properties": {
+        "coupon": {
+            "description": "Coupon code used for the order.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "currency": {
+            "description": "Currency for the order.",
+            "type": "string"
+        },
+        "discount": {
+            "description": "Total discount for the order.",
+            "type": "number"
+        },
+        "order_id": {
+            "description": "Unique identifier for the order.",
+            "type": "string"
+        },
+        "products": {
+            "description": "List of products in the cart.",
+            "items": {
+                "additionalProperties": false,
+                "properties": {
+                    "category": {
+                        "description": "Category of the product.",
+                        "type": "string"
+                    },
+                    "name": {
+                        "description": "Name of the product.",
+                        "type": "string"
+                    },
+                    "price": {
+                        "description": "Price of the product.",
+                        "type": "number"
+                    },
+                    "product_id": {
+                        "description": "Unique identifier for the product.",
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "description": "Quantity of the product in the cart.",
+                        "type": "integer"
+                    },
+                    "sku": {
+                        "description": "Stock keeping unit for the product.",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "product_id",
+                    "sku",
+                    "category",
+                    "name",
+                    "price",
+                    "quantity"
+                ],
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "revenue": {
+            "description": "Total revenue for the order.",
+            "type": "number"
+        },
+        "session_id": {
+            "description": "Unique identifier for the session.",
+            "type": "string"
+        },
+        "shipping": {
+            "description": "Shipping cost for the order.",
+            "type": "number"
+        },
+        "subtotal": {
+            "description": "Subtotal for the order (revenue - discount).",
+            "type": "number"
+        },
+        "tax": {
+            "description": "Tax for the order.",
+            "type": "number"
+        },
+        "total": {
+            "description": "Total cost for the order (revenue - discount + shipping + tax = subtotal + shipping + tax).",
+            "type": "number"
+        }
+    },
+    "required": [
+        "session_id",
+        "order_id",
+        "revenue",
+        "coupon",
+        "discount",
+        "subtotal",
+        "shipping",
+        "tax",
+        "total",
+        "currency",
+        "products"
+    ],
+    "additionalProperties": false
+}

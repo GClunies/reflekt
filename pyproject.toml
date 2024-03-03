@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "reflekt"
-version = "0.5.0"
+version = "0.6.0"
 description = "A CLI tool to define event schemas, lint them to enforce conventions, publish to a schema registry, and build corresponding data artifacts (e.g., dbt sources/models/docs)."
 license = "Apache-2.0"
 authors = ["Gregory Clunies <greg@reflekt-ci.com>"]
 readme = "README.md"
 repository = "https://github.com/GClunies/Reflekt"
-keywords = ["events", "jsonchema", "analytics", "business-intelligence", "data-modeling", "dbt", "snowflake", "redshift", "segment", "avo"]
+keywords = ["events", "jsonschema", "analytics", "business-intelligence", "data-modeling", "dbt", "snowflake", "redshift", "segment", "avo"]
 include = ["reflekt/_templates/**/*", "reflekt/_validation/**/*"]
 
 [tool.poetry.scripts]
@@ -14,34 +14,48 @@ reflekt = "reflekt.cli:app"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
-typer = "^0.6.1"
-rich = "^12.5.1"
-loguru = "^0.6.0"
-PyYAML = "^6.0"
-GitPython = "^3.1.27"
-jsonschema = "^4.16.0"
-python-dotenv = "^0.21.0"
+# typer = "^0.9.0"
+# rich = "^12.5.1"
+# loguru = "^0.6.0"
+# PyYAML = "^6.0"
+# GitPython = "^3.1.27"
+# jsonschema = "^4.16.0"
+# python-dotenv = "^0.21.0"
+# inflection = "^0.5.1"
+# redshift-connector = "^2.0.909"
+# snowflake-sqlalchemy = "^1.4.6"
+# sqlalchemy-redshift = "^0.8.12"
+# segment-analytics-python = "^2.2.2"
+# sqlalchemy-bigquery = "^1.9.0"
+# google-cloud-bigquery-storage = "^2.24.0"
+# snowflake-connector-python = "^3.7.0"
+typer = "^0.9.0"
+rich = "^13.7.0"
+loguru = "^0.7.2"
+pyyaml = "^6.0.1"
+gitpython = "^3.1.42"
+jsonschema = "^4.21.1"
+python-dotenv = "^1.0.1"
 inflection = "^0.5.1"
-redshift-connector = "^2.0.909"
-snowflake-sqlalchemy = "^1.4.6"
-snowflake-connector-python = "^2.9.0"
-sqlalchemy-redshift = "^0.8.12"
-segment-analytics-python = "^2.2.2"
+sqlalchemy-redshift = "^0.8.14"  # Does NOT include redshift-connector
+redshift-connector = "^2.0.918"
+snowflake-sqlalchemy = "^1.5.1"  # Includes snowflake-connector-python
+sqlalchemy-bigquery = "^1.9.0"
+google-cloud-bigquery-storage = "^2.24.0"  # Prevents UserWarning when `reflekt build` is run against BQ data warehosue
+segment-analytics-python = "^2.3.2"
 
 [tool.poetry.group.dev.dependencies]
+pytest = "^8.0.1"
+pytest-cov = "^4.1.0"  # Includes coverage
+mypy = "^1.8.0"
+tox = "^4.13.0"
+ruff = "^0.2.2"
 make = "^0.1.6.post2"
-mypy = "^0.971"
-reuse = "^1.0.0"
-pytest = "^7.1.3"
-tox = "^3.26.0"
-coverage = "^6.5.0"
-pytest-cov = "^4.0.0"
-darglint = "^1.8.1"
-toml = "^0.10.2"
-python-dotenv = "^0.21.0"
-ruff = "^0.1.3"
-pandas = "^2.1.2"
-faker = "^19.13.0"
+reuse = "^3.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -55,12 +69,8 @@ isolated_build = true
 envlist = py39,py310,py311
 
 [testenv]
-whitelist_externals = poetry
+allowlist_externals = poetry
 commands =
     poetry install -v
     poetry run pytest tests/
 """
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

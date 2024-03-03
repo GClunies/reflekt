@@ -1,0 +1,58 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "jaffle_shop/Product_Added/1-0.json",
+    "description": "User added a product to their cart.",
+    "self": {
+        "vendor": "com.thejaffleshop",
+        "name": "Product Added",
+        "format": "jsonschema",
+        "version": "1-0",
+        "metadata": {}
+    },
+    "type": "object",
+    "properties": {
+        "cart_id": {
+            "description": "Unique identifier for the cart the product was added to.",
+            "type": "string"
+        },
+        "category": {
+            "description": "Category of the product.",
+            "type": "string"
+        },
+        "name": {
+            "description": "Name of the product.",
+            "type": "string"
+        },
+        "price": {
+            "description": "Price of the product.",
+            "type": "number"
+        },
+        "product_id": {
+            "description": "Unique identifier for the product.",
+            "type": "string"
+        },
+        "quantity": {
+            "description": "Quantity of the product added to the cart.",
+            "type": "integer"
+        },
+        "session_id": {
+            "description": "Unique identifier for the session.",
+            "type": "string"
+        },
+        "sku": {
+            "description": "Stock keeping unit (SKU) for the product.",
+            "type": "string"
+        }
+    },
+    "required": [
+        "session_id",
+        "cart_id",
+        "product_id",
+        "sku",
+        "category",
+        "name",
+        "price",
+        "quantity"
+    ],
+    "additionalProperties": false
+}

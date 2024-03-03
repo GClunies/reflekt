@@ -22,6 +22,7 @@ from rich.console import Console
 from rich.logging import RichHandler
 from rich.table import Table
 from rich.traceback import install
+from typing_extensions import Annotated
 
 from reflekt import SHOW_LOCALS, __version__
 from reflekt.builder.handler import BuilderHandler
@@ -32,7 +33,7 @@ from reflekt.constants import (
     RegistryEnum,
     SdkEnum,
 )
-from reflekt.errors import SelectArgError
+from reflekt.errors import RegistryArgError, SelectArgError
 from reflekt.linter import Linter
 from reflekt.profile import Profile, ProfileError
 from reflekt.project import Project, ProjectError
@@ -40,13 +41,12 @@ from reflekt.registry.handler import RegistryHandler
 from reflekt.reporter.reporter import Reporter
 from reflekt.tracking import ReflektUser, track_event
 
-
 # Prettify traceback messages
 app = typer.Typer(pretty_exceptions_show_locals=SHOW_LOCALS)  # Typer app
-install(show_locals=SHOW_LOCALS)  # Any other uncaught exceptions
+install(show_locals=SHOW_LOCALS)  # Other uncaught exceptions
 
 
-user = ReflektUser()  # Create Reflekt user, but do not initialize (no ID set)
+user = ReflektUser()  # Create Reflekt user object, but do not initialize (no ID set)
 default_context = {  # Default context for anonymous usage stats (if not disabled)
     "app": {
         "name": "reflekt",
@@ -64,29 +64,29 @@ def version_callback(value: bool):
 @app.callback()
 def main(
     version: Optional[bool] = typer.Option(
-        None, "--version", callback=version_callback, is_eager=True
+        None,
+        "--version",
+        callback=version_callback,
+        is_eager=True,
+        help="Show version.",
     ),
 ):
-    """Main entrypoint for Reflekt CLI.
-
-    Sets up the global project object and logging to be used throughout the CLI.
-    """
+    # Main entrypoint for Reflekt CLI.
+    # Sets up the global project object and logging to be used throughout the CLI.
     global project
 
     try:
         project = Project()
         profile = Profile(project=project)
 
-        if not profile.do_not_track:  # User has not opted out of tracking
-            user.initialize()  # Init active user for anonymous usage stats
+        if not profile.do_not_track:
+            user.initialize()
 
-    except ProjectError:  # This happens when Reflekt project has not yet been created
-        project = Project(use_defaults=True)  # Set a dummy project
+    except ProjectError:  # No Reflekt project (i.e., before `reflekt init`)
+        project = Project(use_defaults=True)  # Make a placeholder project
 
     configure_logging(verbose=False, project=project)
-
     logger.info(f"Running with reflekt={__version__}")
-    print("")
 
 
 class ExistingProjectError(Exception):
@@ -116,20 +116,17 @@ def clean_select(select: str) -> str:
     Returns:
         str: --select argument without '.json' extension.
     """
-    cleaned = select.strip().replace(".json", "")
+    select_cleaned = select.strip().replace(".json", "").replace("schemas/", "")
 
-    if cleaned.endswith("/"):
-        cleaned = cleaned[:-1]
+    if select_cleaned.endswith("/"):
+        select_cleaned = select_cleaned[:-1]
 
-    return str(cleaned)
+    return str(select_cleaned)
 
 
 def get_schema_paths(select: str, project: Project) -> list[Path]:
     select_path = project.dir / "schemas" / select
-
     logger.info(f"Searching for JSON schemas in: {str(select_path)}")
-    print("")
-
     schema_paths = []  # List of schema IDs (Paths) to pull
 
     if select_path.is_dir():  # Get all schemas in directory
@@ -170,28 +167,30 @@ def configure_logging(verbose: bool, project: Project):
 
     if verbose:
         logger.debug("Verbose logging enabled")
-        print("")
 
 
 @app.command()
 def init(
-    dir: str = typer.Option(
-        ".", "--dir", help="Directory where project will be initialized."
-    ),
-    verbose: bool = typer.Option(
-        False,
-        "--verbose",
-        "-v",
-        help="Verbose logging for debugging.",
-    ),
+    dir: Annotated[
+        str,
+        typer.Option(
+            "--dir",
+            help="Directory where project will be initialized.",
+        ),
+    ] = ".",
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            "-v",
+            help="Verbose logging.",
+        ),
+    ] = False,
 ) -> None:
-    """Initialize a Reflekt project.
+    """Initialize a Reflekt project."""
 
-    Raises:
-        ProjectError: A Reflekt project already exists in the directory.
-    """
     # NOTE: `project` defined in main() callback
-    # Since the project doesn't exist yet, we don't log to file
+    # Since project path won't yet exist, do not log to file
     configure_logging(verbose=verbose, project=project)
     project.dir = Path(dir).expanduser()
     project.path = project.dir / "reflekt_project.yml"
@@ -213,7 +212,7 @@ def init(
         raise typer.BadParameter("Vendor cannot be empty string")
 
     profile_path = typer.prompt(
-        "Path for 'reflekt_profiles.yml' [for connection to schema registry and data warehouse].",
+        "Path for 'reflekt_profiles.yml' [connection to schema registry and data warehouse].",  # noqa: E501
         type=str,
         default=str(Path.home() / ".reflekt/reflekt_profiles.yml"),
         show_default=True,
@@ -334,15 +333,11 @@ def init(
     profile.to_yaml()  # Create reflekt_profiles.yml
 
     # Success msg and get started table
-    print("")
     logger.info(
         f"Created Reflekt project '{project.name}' "
         f"at {project.dir.resolve().expanduser()}!"
     )
-    print("")
     logger.info("To get started, see the command descriptions below")
-
-    # Table for getting started message
     table = Table(show_header=True, header_style="bold light_sea_green")
     table.add_column("Command", no_wrap=True)
     table.add_column("Description", no_wrap=True)
@@ -370,11 +365,10 @@ def init(
     table.add_row(
         "build",
         "Build data artifacts (e.g. dbt models) that match schemas in Reflekt project",
-        "reflekt build dbt --select segment/ecommerce --sdk segment --source snowflake.raw.segment_prod",
+        "reflekt build dbt --select segment/ecommerce --sdk segment --source snowflake.raw.segment_prod",  # noqa: E501
     )
     console = Console()
     console.print(table)
-    print("")
 
     if not profile.do_not_track:  # False by default
         user.initialize()
@@ -395,6 +389,7 @@ def init(
 @app.command()
 def debug():
     """Check Reflekt project configuration."""
+
     try:
         profile = Profile(project=project)
 
@@ -421,24 +416,46 @@ def debug():
 
 @app.command()
 def pull(
+    registry: RegistryEnum = typer.Option(
+        ...,
+        "--registry",
+        "-r",
+        help="Schema registry to pull from.",
+    ),
     select: str = typer.Option(
-        ..., "--select", "-s", help="Schema(s) to pull from schema registry."
+        ...,
+        "--select",
+        "-s",
+        help=(
+            "Schema(s) to pull from schema registry. If registry uses tracking plans, starting with the plan name."
+        ),
     ),
     profile_name: str = typer.Option(
-        None,
+        "",
         "--profile",
         "-p",
         help="Profile in reflekt_profiles.yml to use for schema registry connection.",
     ),
     verbose: bool = typer.Option(
-        False, "--verbose", "-v", help="Verbose logging for debugging."
+        False,
+        "--verbose",
+        "-v",
+        help="Verbose logging.",
     ),
 ):
     """Pull schema(s) from a schema registry."""
+
+    logger.debug(verbose)
     configure_logging(verbose=verbose, project=project)
-    profile = Profile(project=project, profile_name=profile_name)
-    registry = RegistryHandler(select=select, profile=profile).get_registry()
-    count_schemas = registry.pull(select=select)
+    profile = (
+        Profile(project=project)
+        if profile_name == ""
+        else Profile(project=project, profile_name=profile_name)
+    )
+    schema_registry = RegistryHandler(
+        registry=registry, select=select, profile=profile
+    ).get_registry()
+    count_schemas = schema_registry.pull(select=select)
 
     if user.id is not None:
         track_event(
@@ -447,7 +464,7 @@ def pull(
             properties={
                 "project_id": hashlib.md5(project.name.encode("utf-8")).hexdigest(),
                 "profile_id": hashlib.md5(profile.name.encode("utf-8")).hexdigest(),
-                "schema_registry": registry.type,
+                "schema_registry": schema_registry.type,
                 "count_schemas": count_schemas,
                 "ci": os.getenv("CI") if os.getenv("CI") is True else False,
             },
@@ -457,46 +474,68 @@ def pull(
 
 @app.command()
 def push(
+    registry: RegistryEnum = typer.Option(
+        ...,
+        "--registry",
+        "-r",
+        help="Schema registry to push to.",
+    ),
     select: str = typer.Option(
-        ..., "--select", "-s", help="Schema(s) to push to schema registry."
+        ...,
+        "--select",
+        "-s",
+        help=(
+            "Schema(s) to push to schema registry. Starting with 'schemas/' is "
+            "optional."
+        ),
     ),
     delete: bool = typer.Option(
         False,
         "--delete",
-        "-d",
+        "-D",
         help="Delete schema(s) from schema registry. Prompts for confirmation",
     ),
     force: bool = typer.Option(
-        False, "--force", "-f", help="Force command to run without confirmation."
+        False,
+        "--force",
+        "-F",
+        help="Force command to run without confirmation.",
     ),
     profile_name: str = typer.Option(
-        None,
+        "",
         "--profile",
         "-p",
-        help="Profile in reflekt_profiles.yml to use for schema registry connection.",
+        help=("Profile in reflekt_profiles.yml to use for schema registry connection."),
     ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
         "-v",
-        help="Verbose logging for debugging.",
+        help="Verbose logging.",
     ),
 ):
     """Push schema(s) to a schema registry."""
+
     configure_logging(verbose=verbose, project=project)
     select = clean_select(select)
-    profile = Profile(project=project, profile_name=profile_name)
-    registry = RegistryHandler(select=select, profile=profile).get_registry()
+    profile = (
+        Profile(project=project)
+        if profile_name == ""
+        else Profile(project=project, profile_name=profile_name)
+    )
+    schema_registry = RegistryHandler(
+        registry=registry, select=select, profile=profile
+    ).get_registry()
 
-    if registry.type == RegistryEnum.avo:
-        raise SelectArgError(
+    if schema_registry.type == RegistryEnum.avo:
+        raise RegistryArgError(
             message=(
                 "'reflekt push' is not supported for Avo. Use the Avo UI to define and "
                 "manage your event schemas. Then you can run:\n"
-                "    reflekt pull --select avo/main                                     # Pull schemas from Avo\n"  # noqa: E501
-                "    reflekt build --artifact dbt --select avo/main --source db_schema  # Build dbt pkg"  # noqa: E501
+                "    reflekt pull --registry --select main                    # Pull schemas from main trackign plan\n"  # noqa: E501
+                "    reflekt build --artifact dbt --select main --source ...  # Build dbt pkg"  # noqa: E501
             ),
-            select=select,
+            registry=registry.type,
         )
 
     if delete and not force:
@@ -505,9 +544,9 @@ def push(
             f"   --select {select}\n",
         )
         if delete_confirmed:
-            count_schemas = registry.push(select=select, delete=delete)  # delete=True
+            count_schemas = schema_registry.push(select=select, delete=delete)
     else:
-        count_schemas = registry.push(select=select, delete=delete)
+        count_schemas = schema_registry.push(select=select, delete=delete)
 
     if user.id is not None:
         track_event(
@@ -516,7 +555,7 @@ def push(
             properties={
                 "project_id": hashlib.md5(project.name.encode("utf-8")).hexdigest(),
                 "profile_id": hashlib.md5(profile.name.encode("utf-8")).hexdigest(),
-                "schema_registry": registry.type,
+                "schema_registry": schema_registry.type,
                 "count_schemas": count_schemas,
                 "ci": os.getenv("CI") if os.getenv("CI") is True else False,
             },
@@ -526,23 +565,27 @@ def push(
 
 @app.command()
 def lint(
-    select: str = typer.Option(..., "--select", "-s", help="Schema(s) to lint."),
+    select: str = typer.Option(
+        ...,  # Required
+        "--select",
+        "-s",
+        help=("Schema(s) to lint. Starting with 'schemas/' is optional."),
+    ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
         "-v",
-        help="Verbose logging for debugging.",
+        help="Verbose logging.",
     ),
 ):
     """Lint schema(s) to test for naming and metadata conventions."""
+
     configure_logging(verbose=verbose, project=project)
     profile = Profile(project=project)
-    schema_paths = get_schema_paths(select=select, project=project)
+    cleaned_select = clean_select(select)
+    schema_paths = get_schema_paths(select=cleaned_select, project=project)
     errors = []  # TODO: Linter should have its own errors attribute
-
     logger.info(f"Found {len(schema_paths)} schema(s) to lint")
-    print("")
-
     linter = Linter(project=project)
 
     for i, schema_path in enumerate(schema_paths, start=1):  # Get all Reflekt schemas
@@ -556,14 +599,12 @@ def lint(
         linter.lint_schema(r_schema, errors)  # If errors
 
     if errors:
-        print("")
         logger.error(f"[red]Linting failed with {len(errors)} error(s):[/red]")
-        print("")
+
         for error in errors:
             logger.error(error)
         raise typer.Exit(code=1)
     else:
-        print("")
         logger.info("[green]Completed successfully[green/]")
 
     if user.id is not None:
@@ -584,24 +625,32 @@ def lint(
 @app.command()
 def report(
     select: str = typer.Option(
-        ..., "--select", "-s", help="Schema(s) to generate Markdown report(s) for."
+        ...,
+        "--select",
+        "-s",
+        help=(
+            "Schema(s) to generate Markdown report(s) for. Starting with 'schemas/' "
+            "is optional."
+        ),
     ),
     to_file: bool = typer.Option(
         False,
         "--to-file",
         "-f",
-        help="Write report(s) to file instead of stdout.",
+        help="Write report(s) to file instead of terminal.",
     ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
         "-v",
-        help="Verbose logging for debugging.",
+        help="Verbose logging.",
     ),
 ):
     """Generate Markdown report(s) for schema(s)."""
+
     configure_logging(verbose=verbose, project=project)
-    schema_paths = get_schema_paths(select=select, project=project)
+    cleaned_select = clean_select(select)
+    schema_paths = get_schema_paths(select=cleaned_select, project=project)
     reporter = Reporter()
 
     if not to_file:
@@ -616,7 +665,7 @@ def report(
             raise SelectArgError(
                 message=(
                     f"Command: 'reflekt report --select {select}' cannot output "
-                    f"multiple Markdown reports to stdout. Use `--to-file` to write to "
+                    f"multiple Markdown reports to terminal. Use --to-file to write to "
                     f"files instead."
                 ),
                 select=select,
@@ -633,38 +682,60 @@ def report(
 
 @app.command()
 def build(
-    artifact: ArtifactEnum = typer.Argument(
-        ..., help="Type of data artifact to build."
+    artifact: ArtifactEnum = typer.Option(
+        ...,
+        "--artifact",
+        "-a",
+        help="Type of data artifact to build.",
     ),
     select: str = typer.Option(
-        ..., "--select", "-s", help="Schema(s) to build data artifacts for."
+        ...,
+        "--select",
+        "-s",
+        help=(
+            "Schema(s) to build data artifacts for. Starting with 'schemas/' is "
+            "optional."
+        ),
     ),
     sdk: SdkEnum = typer.Option(
-        ..., "--sdk", "-sdk", help="The SDK used to collect the event data."
+        ...,
+        "--sdk",
+        help="The SDK used to collect the event data.",
     ),
     source: str = typer.Option(
         ...,
         "--source",
-        "-t",
-        help="Data source where the raw event data is stored. In the format `--source source_id.database.schema`, matching a configured source in reflekt_profiles.yml.",
+        help=(
+            "The <source_id>.<database>.<schema> storing raw event data. <source_id> "
+            "must be a data warehouse source defined in reflekt_profiles.yml"
+        ),
     ),
     profile_name: str = typer.Option(
-        None,
+        "",
         "--profile",
         "-p",
-        help="Profile in reflekt_profiles.yml to use when connecting to the .",
+        help=(
+            "Profile in reflekt_profiles.yml to look for the data source specified by "
+            "the --source option. Defaults to default_profile in "
+            "reflekt_project.yml"
+        ),
     ),
     verbose: bool = typer.Option(
         False,
         "--verbose",
         "-v",
-        help="Verbose logging for debugging.",
+        help="Verbose logging.",
     ),
 ):
     """Build data artifacts based on schemas."""
+
     configure_logging(verbose=verbose, project=project)
     select = clean_select(select)
-    profile = Profile(project=project, profile_name=profile_name)
+    profile = (
+        Profile(project=project)
+        if profile_name == ""
+        else Profile(project=project, profile_name=profile_name)
+    )
     builder = BuilderHandler(
         artifact_arg=artifact,
         select_arg=select,
@@ -696,15 +767,26 @@ def build(
 
 if __name__ == "__main__":
     main()  # Main entrypoint for CLI and sets global `project` variable
+
     # debug()
+
     # init("~/repos/tmp/test_reflekt")
-    # pull(select="segment/surfline-web")
+
+    # pull(
+    #     registry="segment",
+    #     select="ecommerce/Cart Viewed",
+    #     # profile_name="test",
+    # )
+
     # push(select="segment/ecommerce", delete=False)
+
     # lint(select="segment/ecommerce/Cart_Viewed/1-0.json")
+
     report(
-        select="segment/ecommerce/Cart_Viewed/1-0.json",
-        to_file=False,
+        select="schemas/jaffle_shop",
+        to_file=True,
     )
+
     # build(
     #     artifact="dbt",
     #     select="segment/ecommerce",
@@ -715,8 +797,8 @@ if __name__ == "__main__":
 
     # build(
     #     artifact="dbt",
-    #     select="segment/surfline-web/identify",
-    #     source="snowflake.raw.surfline",
+    #     select="schemas/jaffle_shop",
+    #     source="bigquery.raw-data.jaffle_shop_segment",
     #     sdk="segment",
-    #     profile_name="wavetrak_segment",  # Must have value when using Vscode debugger
+    #     profile_name="dev_segment_bigquery",  # Must have value when using Vscode debugger
     # )

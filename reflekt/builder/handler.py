@@ -78,7 +78,6 @@ class BuilderHandler:
         project = Project()
         select_path = project.dir / "schemas" / select
         logger.info(f"Searching for JSON schemas in: {str(select_path)}")
-        print("")
 
         if not select_path.exists():
             raise SelectArgError(

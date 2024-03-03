@@ -4,10 +4,10 @@
 # GENERAL CONFIG ----------------------------------------------------------------------
 version: 1.0
 
-name: reflekt_demo               # Project name
-vendor: com.reflekt-ci           # Default vendor for schemas in reflekt project
+name: jaffle_shop               # Project name
+vendor: com.thejaffleshop       # Default vendor for schemas in reflekt project
 
-default_profile: dev_reflekt     # Default profile to use from reflekt_profiles.yml
+default_profile: dev_segment_snowflake # Default profile to use from reflekt_profiles.yml
 profiles_path: ./reflekt_profiles.yml  # Path to reflekt_profiles.yml
 
 # SCHEMAS CONFIG ----------------------------------------------------------------------
@@ -40,7 +40,7 @@ artifacts:                      # Configure how data artifacts are built
     models:
       prefix: stg_              # Model files start with this prefix
       filter:                   # Filter for model files (can be empty string)
-        where received_at < get_date()
+        where received_at < getdate()
     docs:
       prefix: _stg_             # Docs files start with this prefix
       in_folder: false          # Docs files in separate folder?
