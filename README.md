@@ -37,6 +37,7 @@ Reflekt is available on [PyPI](https://pypi.org/project/reflekt/). Install it wi
 ❯ reflekt --version                  # Confirm installation
 Reflekt CLI Version: 0.6.0
 ```
+<br>
 
 ### Create a Reflekt Project
 To create a new Reflekt project, make a directory, initialize a Git repo, and run `reflekt init`.
@@ -60,20 +61,16 @@ my-reflekt-project
 ├── README.md
 └── reflekt_project.yml   # Project configuration
 ```
+<br>
 
 ### Configure a Reflekt Project
 Reflekt uses 3 files to define and configure a Reflekt project.
-| Configuration File               | Purpose |
-|----------------------------------|---------|
-| `reflekt_project.yml`            | 1. Project settings<br> 2. Event and metadat conventions<br> 3. Data artifact generation<br> 4. Optional registry config (Avo only) |
-| `reflekt_profiles.yml`           | 1. Schema Registry connections<br> 2. Data warehouse connections |
-| `schemas/.reflekt/meta/1-0.json` | Meta-schema used to:<br> 1. Events in `schemas/` follow the Reflekt format<br> 2. Define global `"metadata": {}` requirements for schemas  |
 
-> [!TIP]
-> Click the example configuration files below to see their structure and settings.
+#### `reflekt_project.yml`
+Defines project settings, event and metadata conventions, data artifact generation, and optional registry config (Avo only).
 
 <details>
-<summary>Example: <code>reflekt_project.yml</code></summary>
+<summary>Example: <code>reflekt_project.yml</code> (click to expand)</summary>
 <br>
 
 ```yaml
@@ -123,8 +120,11 @@ artifacts:                      # Configure how data artifacts are built
 ```
 </details>
 
+#### `reflekt_profiles.yml`
+This file defines connections to schema registries and data warehouse connections.
+
 <details>
-<summary>Example: <code>reflekt_profiles.yml</code></summary>
+<summary>Example: <code>reflekt_profiles.yml</code> (click to expand)</summary>
 <br>
 
 ```yaml
@@ -177,8 +177,11 @@ dev_reflekt:                                         # Profile name (multiple al
 ```
 </details>
 
+#### `schemas/.reflekt/meta/1-0.json`
+A meta-schema used by `reflekt lint` to ensure all events in `schemas/` follow the Reflekt format. Can also be used to define gloablly required metadata for all event schemas.
+
 <details>
-<summary>Example: <code>schemas/.reflekt/meta/1-0.json</code></summary>
+<summary>Example: <code>schemas/.reflekt/meta/1-0.json</code> (click to expand)</summary>
 <br>
 
 ```json
@@ -244,39 +247,37 @@ dev_reflekt:                                         # Profile name (multiple al
 
 ```
 </details>
+<br>
 
 ### Defining Event Schemas
-Events in a Reflekt project are defined using the [JSON schema](https://json-schema.org/) specification and are stored in the `schemas/` directory of the project.
-
-> [!TIP]
-> Click to expand the `Order Completed` example below.
+Events in a Reflekt project are defined using the [JSON schema](https://json-schema.org/) specification and are stored in the `schemas/` directory of the project. Click to expand the `Order Completed` example below.
 
 <details>
-<summary>Example: <code>my-reflekt-project/schemas/jaffle_shop/Order_Completed/1-0.json</code></summary>
+<summary>Example: <code>my-reflekt-project/schemas/jaffle_shop/Order_Completed/1-0.json</code> (click to expand)</summary>
 <br>
 
 ```json
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "jaffle_shop/Order_Completed/1-0.json",  // Unique ID for schema (relative to `schemas/` dir)
-    "description": "User completed an order (i.e., user confirmed and payment was successful).",
+    "$id": "jaffle_shop/Order_Completed/1-0.json",                                                // Unique ID for schema (relative to `schemas/` dir)
+    "description": "User completed an order (i.e., user confirmed and payment was successful).",  // Event description (REQUIRED)
     "self": {
-        "vendor": "com.thejaffleshop", // Company, application, team, or system that authored the schema
-        "name": "Order Completed",     // Name of the event
-        "format": "jsonschema",        // Format of the schema
-        "version": "1-0",              // Version of the schema
-        "metadata": {                  // Metadata for the event
+        "vendor": "com.thejaffleshop",                         // Company, application, or system that authored the schema
+        "name": "Order Completed",                             // Name of the event
+        "format": "jsonschema",                                // Format of the schema
+        "version": "1-0",                                      // Version of the schema
+        "metadata": {                                          // Metadata for the event
             "code_owner": "@the-jaffle-shop/frontend-guild",
             "product_owner": "pmanager@thejaffleshop.com",
         }
     },
     "type": "object",
-    "properties": {
+    "properties": {                                            // Event properties (REQUIRED, but can be empty)
         "coupon": {
-            "description": "Coupon code used for the order.",
+            "description": "Coupon code used for the order.",  // Property description (REQUIRED)
             "type": [
                 "string",
-                "null"
+                "null"                                         // Allow null values
             ]
         },
         "currency": {
@@ -293,9 +294,10 @@ Events in a Reflekt project are defined using the [JSON schema](https://json-sch
         },
         "products": {
             "description": "List of products in the cart.",
-            "items": {
-                "additionalProperties": false,
-                "properties": {
+            "type": "array",                                    // Array type
+            "items": {                                          // Items in the array
+                "type": "object",
+                "properties": {                                 // Properties of the items
                     "category": {
                         "description": "Category of the product.",
                         "type": "string"
@@ -321,7 +323,7 @@ Events in a Reflekt project are defined using the [JSON schema](https://json-sch
                         "type": "string"
                     }
                 },
-                "required": [
+                "required": [                   // Required properties for the items
                     "product_id",
                     "sku",
                     "category",
@@ -329,9 +331,8 @@ Events in a Reflekt project are defined using the [JSON schema](https://json-sch
                     "price",
                     "quantity"
                 ],
-                "type": "object"
-            },
-            "type": "array"
+                "additionalProperties": false,  // Are additional properties allowed for items in the array?
+            }
         },
         "revenue": {
             "description": "Total revenue for the order.",
@@ -358,7 +359,7 @@ Events in a Reflekt project are defined using the [JSON schema](https://json-sch
             "type": "number"
         }
     },
-    "required": [
+    "required": [                  // Required properties (can be empty)
         "session_id",
         "order_id",
         "revenue",
@@ -371,7 +372,7 @@ Events in a Reflekt project are defined using the [JSON schema](https://json-sch
         "currency",
         "products"
     ],
-    "additionalProperties": false
+    "additionalProperties": false  // Are additional properties allowed?
 }
 ```
 </details>
@@ -630,7 +631,7 @@ Reflekt understands how Customer Data Platforms (CDPs) collect event data and lo
 
 
 ### Schema Registry
-Schema registries store and serve schemas. When a schema is pushed to a registry, it can be used to validate events as they flow through. Reflekt works with schema registries from CDPs, SaaS vendors, and open-source projects - letting teams to decide between managed and self-hosted solutions.
+Schema registries store and serve schemas. When a schema is registered in a regsitry, it can be used to validate events as they flow through your data collection infrastructure. Reflekt works with schema registries from CDPs, SaaS vendors, and open-source projects, letting teams to decide between managed and self-hosted solutions.
 
 | Registry | Cost | Open Source | Schema Versions | Recommended Workflow |
 |----------|------|-------------|------------------------|-----------------|
@@ -652,14 +653,12 @@ In order to build dbt packages, Reflekt needs to connect to a cloud data warehou
 > It ONLY reads table and column names for artifact templating.
 
 ### dbt
-[dbt](https://www.getdbt.com/) enables anyone that knows SQL to transform data in a cloud data warehouse. But following [best practice](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview) means:
+[dbt](https://www.getdbt.com/) enables anyone that knows SQL to transform data in a cloud data warehouse. When modeling in dbt, it is [best practice](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview) to:
 - Define sources pointing to the raw data.
 - Write staging models that [rename, recast, or usefully reconsider](https://discourse.getdbt.com/t/how-we-used-to-structure-our-dbt-projects/355#data-transformation-101-1) columns into a consistent format.
 - Document and test the staging models.
 
-For 100s of product analytics events, that change at the pace of product development, this can be **burdensome and boring.**
-
-That's where [`reflekt build`](#reflekt-build) steps in.
+But with 100s of events that *will* change as the product evolves, this can be **burdensome and boring.** That's where [`reflekt build`](#reflekt-build) steps in.
 
 ## Contribute
 - Source Code: [github.com/GClunies/reflekt](https://github.com/GClunies/reflekt)
@@ -668,6 +667,3 @@ That's where [`reflekt build`](#reflekt-build) steps in.
 
 ## License
 This project is [licensed](LICENSE) under the Apache-2.0 License.
-
-> [!NOTE]
-> Reflekt uses `reuse` to attribute licenses for every line of code, recognizing the work of others and ensuring compliance with the licenses of any software used.
