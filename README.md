@@ -53,8 +53,8 @@ You now have a Reflekt project with the structure:
 ```bash
 my-reflekt-project
 ├── .logs/                # CLI command logs
-├── .reflekt_cache/       # Local cache used by CLI
-├── artifacts/            # Data artifacts from `reflekt build`
+├── .reflekt_cache/       # Local cache used by reflekt CLI
+├── artifacts/            # Data artifacts created by `reflekt build`
 ├── schemas/              # Event schema definitions
 ├── .gitignore
 ├── README.md
