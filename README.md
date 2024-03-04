@@ -616,6 +616,27 @@ A description of commands can be seen by running `reflekt --help`. The help page
 │    --help                         Show this message and exit.                                                                                                                                        │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
+
+### `reflekt report`
+```bash
+❯ reflekt report --help
+[08:20:09] INFO     Running with reflekt=0.6.0
+
+ Usage: reflekt report [OPTIONS]
+
+ Generate Markdown report(s) for schema(s).
+
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────╮
+│ *  --select   -s      TEXT  Schema(s) to generate Markdown report(s) for. Starting with         │
+│                             'schemas/' is optional.                                             │
+│                             [default: None]                                                     │
+│                             [required]                                                          │
+│    --to-file  -f            Write report(s) to file instead of terminal.                        │
+│    --verbose  -v            Verbose logging.                                                    │
+│    --help                   Show this message and exit.                                         │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────╯
+```
+
 ---
 <br>
 
