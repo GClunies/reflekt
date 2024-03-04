@@ -259,8 +259,8 @@ Events in a Reflekt project are defined using the [JSON schema](https://json-sch
 ```json
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "jaffle_shop/Order_Completed/1-0.json",                                                // Unique ID for schema (relative to `schemas/` dir)
-    "description": "User completed an order (i.e., user confirmed and payment was successful).",  // Event description (REQUIRED)
+    "$id": "jaffle_shop/Order_Completed/1-0.json",  // Unique ID for schema (relative to `schemas/` dir)
+    "description": "User completed an order.",      // Event description (REQUIRED)
     "self": {
         "vendor": "com.thejaffleshop",                         // Company, application, or system that authored the schema
         "name": "Order Completed",                             // Name of the event
@@ -323,7 +323,7 @@ Events in a Reflekt project are defined using the [JSON schema](https://json-sch
                         "type": "string"
                     }
                 },
-                "required": [                   // Required properties for the items
+                "required": [                                  // Required properties for the items
                     "product_id",
                     "sku",
                     "category",
@@ -331,7 +331,7 @@ Events in a Reflekt project are defined using the [JSON schema](https://json-sch
                     "price",
                     "quantity"
                 ],
-                "additionalProperties": false,  // Are additional properties allowed for items in the array?
+                "additionalProperties": false,                // Are additional item properties allowed?
             }
         },
         "revenue": {
@@ -399,6 +399,8 @@ Each schema has a `version` (e.g., `1-0`, `2-1`), used to indicate changes to da
 > For `MAJOR` schema versions (breaking changes), you MUST:
 > - **Create a new `.json` file** with the updated schema. This way, an application/product/feature can begin using the new schema while others continue to use the old schema (migrating later).
 
+<br>
+
 ### Linting Event Schemas
 Schemas can be linted to test if they follow the naming conventions in your [`reflekt_project.yml`] and metadata conventions in `schemas/.reflekt/meta/1-0.json`.
 
@@ -418,6 +420,7 @@ Schemas can be linted to test if they follow the naming conventions in your [`re
 [18:31:44] INFO     9 of 9 Linting /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Page_Viewed/1-0.json
 [18:31:51] INFO     Completed successfully
 ```
+<br>
 
 ### Sending Event Schemas to a Schema Registries
 In order to validate events as they flow from **Application -> Registry -> Customer Data Platform (CDP) -> Data Warehouse**, we need to send a copy of our event schemas to a schema registry (see [supported registries](#schema-registry)). This is done with the `reflekt push` command.
@@ -438,8 +441,9 @@ In order to validate events as they flow from **Application -> Registry -> Custo
 [18:41:06] INFO     9 of 9 Pushing /Users/gclunies/Repos/reflekt/schemas/jaffle_shop/Page_Viewed/1-0.json
 [18:41:08] INFO     Completed successfully
 ```
+<br>
 
-### Building `dbt` packages to Model Event Data
+### Building `dbt` Packages to Model Event Data
 Modeling event data in `dbt` is a lot of work. Everyone wants staging models that are clean, documented, and tested. But who wants to write and maintain SQL and YAML for hundreds of events?
 
 You don't have to choose. Put `reflekt build` to work for you - staging models, documentation, even tests - all in a dbt package ready for you to use in your dbt project.
@@ -503,8 +507,8 @@ You don't have to choose. Put `reflekt build` to work for you - staging models, 
 [18:56:31] INFO     Copying dbt package from temporary path /Users/gclunies/Repos/reflekt/.reflekt_cache/artifacts/dbt/jaffle_shop to /Users/gclunies/Repos/reflekt/artifacts/dbt/jaffle_shop
 [18:56:31] INFO     Successfully built dbt package
 ```
-
 ---
+<br>
 
 ## CLI Commands
 A description of commands can be seen by running `reflekt --help`. The help page for each CLI command is shown below.
@@ -612,8 +616,8 @@ A description of commands can be seen by running `reflekt --help`. The help page
 │    --help                         Show this message and exit.                                                                                                                                        │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
-
 ---
+<br>
 
 ## Integrations
 
@@ -633,11 +637,11 @@ Reflekt understands how Customer Data Platforms (CDPs) collect event data and lo
 ### Schema Registry
 Schema registries store and serve schemas. When a schema is registered in a regsitry, it can be used to validate events as they flow through your data collection infrastructure. Reflekt works with schema registries from CDPs, SaaS vendors, and open-source projects, letting teams to decide between managed and self-hosted solutions.
 
-| Registry | Cost | Open Source | Schema Versions | Recommended Workflow |
-|----------|------|-------------|------------------------|-----------------|
-| [Segment Protocols](https://segment.com/docs/protocols/) | Pricing | ❌ | `MAJOR` only | Manage schemas in Reflekt.<br> `reflekt push` to Protocols for event validation.<br> `reflekt build --artifact dbt` to build dbt package. |
-| [Avo](https://www.avo.app/) | Pricing | ❌ | `MAJOR` only | Manage schemas in Avo.<br> `reflekt pull` to get schemas.<br>  `reflekt build --artifact dbt` to build dbt package. |
-| [reflekt-registry](https://github.com/GClunies/reflekt-registry)<br> 🚧 Coming Soon 🚧 | Free | ✅ | `MAJOR` & `MINOR` |  Manage schemas in Reflekt.<br> `reflekt push` to reflekt-registry.<br> `reflekt build --artifact dbt` to build dbt package. |
+| Registry |  Open Source  | Schema Versions | Recommended Workflow |
+|----------|:-------------:|-----------------|----------------------|
+| [Segment Protocols](https://segment.com/docs/protocols/) | ❌ | `MAJOR` only | Manage schemas in Reflekt.<br> `reflekt push` to Protocols for event validation.<br> `reflekt build --artifact dbt` to build dbt package. |
+| [Avo](https://www.avo.app/) | ❌ | `MAJOR` only | Manage schemas in Avo.<br> `reflekt pull` to get schemas.<br>  `reflekt build --artifact dbt` to build dbt package. |
+| [reflekt-registry](https://github.com/GClunies/reflekt-registry)<br> 🚧 Coming Soon 🚧 | ✅ | `MAJOR` & `MINOR` |  Manage schemas in Reflekt.<br> `reflekt push` to reflekt-registry.<br> `reflekt build --artifact dbt` to build dbt package. |
 
 ### Data Warehouse
 In order to build dbt packages, Reflekt needs to connect to a cloud data warehouse where raw event data is stored.
@@ -648,9 +652,7 @@ In order to build dbt packages, Reflekt needs to connect to a cloud data warehou
 | [Redshift](https://aws.amazon.com/redshift/) | ✅ |
 | [BigQuery](https://cloud.google.com/bigquery) | ✅ |
 
-> [!NOTE]
-> Reflekt **NEVER** copies, moves, or modifies your events in the data warehouse. It has no visibility into your data.<br>
-> It ONLY reads table and column names for artifact templating.
+Reflekt **NEVER** copies, moves, or modifies events in the data warehouse. It ONLY reads table and column names for templating.
 
 ### dbt
 [dbt](https://www.getdbt.com/) enables anyone that knows SQL to transform data in a cloud data warehouse. When modeling in dbt, it is [best practice](https://docs.getdbt.com/guides/best-practices/how-we-structure/1-guide-overview) to:
@@ -658,7 +660,7 @@ In order to build dbt packages, Reflekt needs to connect to a cloud data warehou
 - Write staging models that [rename, recast, or usefully reconsider](https://discourse.getdbt.com/t/how-we-used-to-structure-our-dbt-projects/355#data-transformation-101-1) columns into a consistent format.
 - Document and test the staging models.
 
-But with 100s of events that *will* change as the product evolves, this can be **burdensome and boring.** That's where [`reflekt build`](#reflekt-build) steps in.
+But as the number of events intsrumented in your product grow or change as the product evolves, mainting this best practice can be **burdensome and boring.** This is where [`reflekt build`](#reflekt-build) steps in.
 
 ## Contribute
 - Source Code: [github.com/GClunies/reflekt](https://github.com/GClunies/reflekt)
